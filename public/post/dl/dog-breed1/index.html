@@ -1,0 +1,806 @@
+<!DOCTYPE html>
+<html lang="en-us">
+  <head>
+    
+    <script type="application/ld+json">
+
+{  
+  "@context":"http://schema.org",
+  "@type":"Website",
+  "@id":"https:\/\/min1321.github.io\/",
+  "author": {
+    "@type": "Person",
+    "name": "Sukmin Seo",
+    
+    "image": "https://www.gravatar.com/avatar/cba64e21b2f1d09b90cbc3bf9e945cd4"
+    
+  },
+  "name":"min1321\u0027s blog",
+  "description":"",
+  "url":"https:\/\/min1321.github.io\/post\/dl\/dog-breed1\/",
+  "keywords":"[Dog Breed dataset]"
+}
+
+</script>
+    <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="generator" content="Hugo 0.89.4 with theme Tranquilpeak 0.5.3-BETA">
+<meta name="author" content="Sukmin Seo">
+<meta name="keywords" content="Dog Breed dataset">
+<meta name="description" content="">
+
+
+<meta property="og:description" content="">
+<meta property="og:type" content="article">
+<meta property="og:title" content="강아지 분류 인공지능 웹사이트 만들기 (1)">
+<meta name="twitter:title" content="강아지 분류 인공지능 웹사이트 만들기 (1)">
+<meta property="og:url" content="https://min1321.github.io/post/dl/dog-breed1/">
+<meta property="twitter:url" content="https://min1321.github.io/post/dl/dog-breed1/">
+<meta property="og:site_name" content="min1321&#39;s blog">
+<meta property="og:description" content="">
+<meta name="twitter:description" content="">
+<meta property="og:locale" content="en-us">
+
+  
+    <meta property="article:published_time" content="2021-11-28T21:17:32">
+  
+  
+    <meta property="article:modified_time" content="2021-11-28T21:17:32">
+  
+  
+  
+    
+      <meta property="article:section" content="DeepLeaning">
+    
+      <meta property="article:section" content="ImageClassification">
+    
+  
+  
+    
+      <meta property="article:tag" content="강아지 품종 분류">
+    
+      <meta property="article:tag" content="DeepLeaning">
+    
+      <meta property="article:tag" content="ImageClassification">
+    
+      <meta property="article:tag" content="CV">
+    
+      <meta property="article:tag" content="dog breed">
+    
+  
+
+
+<meta name="twitter:card" content="summary">
+
+
+
+
+
+
+
+  <meta property="og:image" content="https://www.gravatar.com/avatar/cba64e21b2f1d09b90cbc3bf9e945cd4?s=640">
+  <meta property="twitter:image" content="https://www.gravatar.com/avatar/cba64e21b2f1d09b90cbc3bf9e945cd4?s=640">
+
+
+
+
+
+  <meta property="og:image" content="//min1321.github.io/images/dogbreed/Chihuahua.jpg">
+  <meta property="twitter:image" content="//min1321.github.io/images/dogbreed/Chihuahua.jpg">
+
+
+    <title>강아지 분류 인공지능 웹사이트 만들기 (1)</title>
+
+    <link rel="icon" href="https://min1321.github.io/favicon.png">
+    
+
+    
+
+    <link rel="canonical" href="https://min1321.github.io/post/dl/dog-breed1/">
+
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" integrity="sha512-iBBXm8fW90+nuLcSKlbmrPcLa0OT92xO1BIsZ+ywDWZCvqsWgccV3gFoRBv0z+8dLJgyAHIhR35VZc2oM/gI1w==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/fancybox/3.5.7/jquery.fancybox.min.css" integrity="sha512-H9jrZiiopUdsLpg94A333EfumgUBpO9MdbxStdeITo+KEIMaNfHNvwyjjDJb+ERPaRS6DpyRlKbvPUasNItRyw==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    
+    
+    
+    <link rel="stylesheet" href="https://min1321.github.io/css/style-h6ccsoet3mzkbb0wngshlfbaweimexgqcxj0h5hu4h82olsdzz6wmqdkajm.min.css" />
+    
+    
+
+    
+      
+    
+    
+  </head>
+
+  <body>
+    <div id="blog">
+      <header id="header" data-behavior="4">
+  <i id="btn-open-sidebar" class="fa fa-lg fa-bars"></i>
+  <div class="header-title">
+    <a class="header-title-link" href="https://min1321.github.io/" aria-label="Go to homepage">min1321&#39;s blog</a>
+  </div>
+  
+    
+      <a class="header-right-picture "
+         href="https://min1321.github.io/#about" aria-label="Open the link: /#about">
+    
+    
+    
+      
+        <img class="header-picture" src="https://www.gravatar.com/avatar/cba64e21b2f1d09b90cbc3bf9e945cd4?s=90" alt="Author&#39;s picture" />
+      
+    
+    </a>
+  
+</header>
+
+      <nav id="sidebar" data-behavior="4">
+  <div class="sidebar-container">
+    
+      <div class="sidebar-profile">
+        <a href="https://min1321.github.io/#about" aria-label="Read more about the author">
+          <img class="sidebar-profile-picture" src="https://www.gravatar.com/avatar/cba64e21b2f1d09b90cbc3bf9e945cd4?s=110" alt="Author&#39;s picture" />
+        </a>
+        <h4 class="sidebar-profile-name">Sukmin Seo</h4>
+        
+          <h5 class="sidebar-profile-bio">안녕하세요 min1321&rsquo;s 개발블로그입니다.</h5>
+        
+      </div>
+    
+    <ul class="sidebar-buttons">
+      
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="https://min1321.github.io/" title="Home">
+    
+      <i class="sidebar-button-icon fas fa-lg fa-home" aria-hidden="true"></i>
+      
+      <span class="sidebar-button-desc">Home</span>
+    </a>
+  </li>
+
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="https://min1321.github.io/categories" title="Categories">
+    
+      <i class="sidebar-button-icon fas fa-lg fa-bookmark" aria-hidden="true"></i>
+      
+      <span class="sidebar-button-desc">Categories</span>
+    </a>
+  </li>
+
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="https://min1321.github.io/tags" title="Tags">
+    
+      <i class="sidebar-button-icon fas fa-lg fa-tags" aria-hidden="true"></i>
+      
+      <span class="sidebar-button-desc">Tags</span>
+    </a>
+  </li>
+
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="https://min1321.github.io/archives" title="Archives">
+    
+      <i class="sidebar-button-icon fas fa-lg fa-archive" aria-hidden="true"></i>
+      
+      <span class="sidebar-button-desc">Archives</span>
+    </a>
+  </li>
+
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="https://min1321.github.io/#about" title="About">
+    
+      <i class="sidebar-button-icon fas fa-lg fa-question" aria-hidden="true"></i>
+      
+      <span class="sidebar-button-desc">About</span>
+    </a>
+  </li>
+
+
+    </ul>
+    <ul class="sidebar-buttons">
+      
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="https://github.com/min1321" target="_blank" rel="noopener" title="GitHub">
+    
+      <i class="sidebar-button-icon fab fa-lg fa-github" aria-hidden="true"></i>
+      
+      <span class="sidebar-button-desc">GitHub</span>
+    </a>
+  </li>
+
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="https://www.notion.so/4e5450cc96e04326a8377fbffc788376" target="_blank" rel="noopener" title="Notion">
+    
+      <i class="sidebar-button-icon fab fa-lg fa-stack-overflow" aria-hidden="true"></i>
+      
+      <span class="sidebar-button-desc">Notion</span>
+    </a>
+  </li>
+
+
+    </ul>
+    <ul class="sidebar-buttons">
+      
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="https://min1321.github.io/index.xml" title="RSS">
+    
+      <i class="sidebar-button-icon fas fa-lg fa-rss" aria-hidden="true"></i>
+      
+      <span class="sidebar-button-desc">RSS</span>
+    </a>
+  </li>
+
+
+    </ul>
+  </div>
+</nav>
+
+      
+
+      <div id="main" data-behavior="4"
+        class="
+               hasCoverMetaIn
+               ">
+        <article class="post" id="top">
+          
+          
+            <div class="post-header main-content-wrap text-left">
+  
+    <h1 class="post-title">
+      강아지 분류 인공지능 웹사이트 만들기 (1)
+    </h1>
+  
+  
+  <div class="postShorten-meta post-meta">
+    
+      <time datetime="2021-11-28T21:17:32&#43;09:00">
+        
+  November 28, 2021
+
+      </time>
+    
+    
+  
+  
+    <span>in</span>
+    
+      <a class="category-link" href="https://min1321.github.io/categories/deepleaning">DeepLeaning</a>, 
+    
+      <a class="category-link" href="https://min1321.github.io/categories/imageclassification">ImageClassification</a>
+    
+  
+
+  </div>
+
+</div>
+          
+          <div class="post-content markdown">
+            <div class="main-content-wrap">
+              <p><img src="https://min1321.github.io/images/dogbreed/Chihuahua.jpg" alt="chihuahua">
+강아지 품종 인공지능 분류 웹 사이트를 만들어 보려한다.</p>
+<p>한번에 하기에 양이 많아서 아래 처럼 post를 나눠서 올리겠다.</p>
+<ol>
+<li>강아지 데이터 다운 및 loader 정의하기</li>
+<li>강아지 분류 모델 학습</li>
+<li>AWS EC2 사용해서 Web 만들기</li>
+</ol>
+<h2 id="dataset-down--data-split">Dataset Down &amp; Data Split</h2>
+<hr>
+<p>Dataset은 스텐포드 dogs dataset을 사용하였다.</p>
+<pre tabindex="0"><code># make dog breed project directory
+$ mkdir dog-breed
+
+# dataset download
+$ wget http://vision.stanford.edu/aditya86/ImageNetDogs/images.tar
+</code></pre><p>이제 주피터 노트북으로 folder내 이미지들 경로를 학습하기 좋게 바꾸어 주었다.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#75715e"># tar 파일 풀기</span>
+<span style="color:#960050;background-color:#1e0010">!</span>tar <span style="color:#f92672">-</span>xvf images<span style="color:#f92672">.</span>tar
+</code></pre></div><div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#75715e"># 필요한 파일들 import</span>
+<span style="color:#f92672">import</span> glob
+<span style="color:#f92672">import</span> shutil
+<span style="color:#f92672">from</span> collections <span style="color:#f92672">import</span> defaultdict
+<span style="color:#f92672">import</span> os
+</code></pre></div><div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#960050;background-color:#1e0010">!</span>pwd
+<span style="color:#75715e">#/root/works/workspace/dog-breed</span>
+</code></pre></div><div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python">file_list <span style="color:#f92672">=</span> glob<span style="color:#f92672">.</span>glob(<span style="color:#e6db74">&#39;./Images/*/*&#39;</span>)
+len(file_list)
+<span style="color:#75715e"># 전체 이미지 수 20580</span>
+</code></pre></div><p>파일명과 폴더명을 보고 어떻게 옮겨 담을지 확인한다.
+강아지 품종 명은 폴더의 <code>-</code> 기준으로 분리되어있다.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python">file_list[<span style="color:#ae81ff">0</span>]
+</code></pre></div><pre><code>'./Images/n02085620-Chihuahua/n02085620_10621.jpg'
+</code></pre>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python">breed_dict <span style="color:#f92672">=</span> defaultdict(list)
+<span style="color:#66d9ef">for</span> file <span style="color:#f92672">in</span> file_list:
+    breed <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;-&#34;</span><span style="color:#f92672">.</span>join(file<span style="color:#f92672">.</span>split(<span style="color:#e6db74">&#39;/&#39;</span>)[<span style="color:#ae81ff">2</span>]<span style="color:#f92672">.</span>split(<span style="color:#e6db74">&#39;-&#39;</span>)[<span style="color:#ae81ff">1</span>:])
+    file_name <span style="color:#f92672">=</span> file<span style="color:#f92672">.</span>split(<span style="color:#e6db74">&#39;/&#39;</span>)[<span style="color:#f92672">-</span><span style="color:#ae81ff">1</span>]
+    breed_dict[breed]<span style="color:#f92672">.</span>append(file_name)
+</code></pre></div><div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#75715e"># 품종 개수</span>
+len(breed_dict)
+<span style="color:#75715e"># 120</span>
+</code></pre></div><p>Train Valid Test Set을 분리하기 위해 폴더를 만들어준다.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python">os<span style="color:#f92672">.</span>mkdir(<span style="color:#e6db74">&#34;./data&#34;</span>)
+os<span style="color:#f92672">.</span>mkdir(<span style="color:#e6db74">&#34;./data/train&#34;</span>)
+os<span style="color:#f92672">.</span>mkdir(<span style="color:#e6db74">&#34;./data/valid&#34;</span>)
+os<span style="color:#f92672">.</span>mkdir(<span style="color:#e6db74">&#34;./data/test&#34;</span>)
+
+<span style="color:#66d9ef">for</span> key <span style="color:#f92672">in</span> breed_dict:
+    os<span style="color:#f92672">.</span>mkdir(<span style="color:#e6db74">&#34;./data/test/&#34;</span><span style="color:#f92672">+</span>key)
+    os<span style="color:#f92672">.</span>mkdir(<span style="color:#e6db74">&#34;./data/valid/&#34;</span><span style="color:#f92672">+</span>key)
+    os<span style="color:#f92672">.</span>mkdir(<span style="color:#e6db74">&#34;./data/train/&#34;</span><span style="color:#f92672">+</span>key)
+</code></pre></div><p>여기서 Train 70%, Valid 20%, Test 10%를 정해주었다. 여기서 validation set으로 평가하면 충분한데 왜 test set을 다시 분리해서 평가할 필요가 있을까?
+왜냐하면 validation set은 학습에 사용되지는 않지만, 학습에 관여는 된다. 왜냐하면, 개발자는 validation Acc를 높이고자 모델을 튜닝할 것이고, 결국 valid set은 학습에 직접적인 사용이 되지는 않지만 영향을 미친다. 그래서 완전히 분리된 test set을 두어 오직 &lsquo;최종 성능&rsquo;을 평가하기 위해 쓰인다.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#75715e"># 70% train, 20% valid, 10% test</span>
+
+breed_dict <span style="color:#f92672">=</span> defaultdict(list)
+<span style="color:#66d9ef">for</span> file <span style="color:#f92672">in</span> file_list:
+    breed <span style="color:#f92672">=</span> file<span style="color:#f92672">.</span>split(<span style="color:#e6db74">&#39;/&#39;</span>)[<span style="color:#ae81ff">2</span>]<span style="color:#f92672">.</span>split(<span style="color:#e6db74">&#39;-&#39;</span>)[<span style="color:#ae81ff">1</span>]
+    file_name <span style="color:#f92672">=</span> file<span style="color:#f92672">.</span>split(<span style="color:#e6db74">&#39;/&#39;</span>)[<span style="color:#f92672">-</span><span style="color:#ae81ff">1</span>]
+    breed_dict[breed]<span style="color:#f92672">.</span>append(file)
+</code></pre></div><div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python">train_count <span style="color:#f92672">=</span> defaultdict(int)
+valid_count <span style="color:#f92672">=</span> defaultdict(int)
+test_count <span style="color:#f92672">=</span> defaultdict(int)
+<span style="color:#66d9ef">for</span> breed <span style="color:#f92672">in</span> breed_dict:
+    <span style="color:#66d9ef">for</span> file <span style="color:#f92672">in</span> breed_dict[breed]:
+        <span style="color:#66d9ef">if</span> train_count[breed] <span style="color:#f92672">&lt;</span> int(len(breed_dict[breed])<span style="color:#f92672">*</span><span style="color:#ae81ff">0.7</span>):
+            train_count[breed] <span style="color:#f92672">+=</span> <span style="color:#ae81ff">1</span>
+            shutil<span style="color:#f92672">.</span>move(file, <span style="color:#e6db74">&#34;./data/train/&#34;</span> <span style="color:#f92672">+</span> breed <span style="color:#f92672">+</span> <span style="color:#e6db74">&#39;/&#39;</span> <span style="color:#f92672">+</span> file<span style="color:#f92672">.</span>split(<span style="color:#e6db74">&#39;/&#39;</span>)[<span style="color:#f92672">-</span><span style="color:#ae81ff">1</span>])
+        <span style="color:#66d9ef">elif</span> valid_count[breed] <span style="color:#f92672">&lt;</span> int(len(breed_dict[breed])<span style="color:#f92672">*</span><span style="color:#ae81ff">0.2</span>):
+            valid_count[breed] <span style="color:#f92672">+=</span> <span style="color:#ae81ff">1</span>
+            shutil<span style="color:#f92672">.</span>move(file, <span style="color:#e6db74">&#34;./data/valid/&#34;</span> <span style="color:#f92672">+</span> breed <span style="color:#f92672">+</span> <span style="color:#e6db74">&#39;/&#39;</span> <span style="color:#f92672">+</span> file<span style="color:#f92672">.</span>split(<span style="color:#e6db74">&#39;/&#39;</span>)[<span style="color:#f92672">-</span><span style="color:#ae81ff">1</span>])
+        <span style="color:#66d9ef">else</span>:
+            test_count[breed] <span style="color:#f92672">+=</span> <span style="color:#ae81ff">1</span>
+            shutil<span style="color:#f92672">.</span>move(file, <span style="color:#e6db74">&#34;./data/test/&#34;</span> <span style="color:#f92672">+</span> breed <span style="color:#f92672">+</span> <span style="color:#e6db74">&#39;/&#39;</span> <span style="color:#f92672">+</span> file<span style="color:#f92672">.</span>split(<span style="color:#e6db74">&#39;/&#39;</span>)[<span style="color:#f92672">-</span><span style="color:#ae81ff">1</span>])
+</code></pre></div><p>Class 별 숫자를 확인해서 너무 적은 data를 갖는 class를 확인해보자.
+모든 class는 0.7%~ 1.2% 수준으로 너무 부족한 class는 없는 것을 확인하였다.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#66d9ef">for</span> key <span style="color:#f92672">in</span> train_count:
+    print(<span style="color:#e6db74">f</span><span style="color:#e6db74">&#39;</span><span style="color:#e6db74">{</span>key<span style="color:#e6db74">}</span><span style="color:#e6db74"> : </span><span style="color:#e6db74">{</span>train_count[key]<span style="color:#f92672">/</span><span style="color:#ae81ff">14406</span> <span style="color:#e6db74">:</span><span style="color:#e6db74">4.2%</span><span style="color:#e6db74">}</span><span style="color:#e6db74">&#39;</span>)
+</code></pre></div><pre><code>Chihuahua : 0.74%
+Japanese_spaniel : 0.90%
+Maltese_dog : 1.22%
+Pekinese : 0.72%
+Shih : 1.03%
+........
+........
+</code></pre>
+<h2 id="datset-정의하기">Datset 정의하기</h2>
+<hr>
+<p>dataset을 정의할때 <code>__init__</code> <code>__len__</code> <code>__getitem__</code>  을 정의해 줘야한다.
+<code>__init__</code>은 dataset이 생성될 때 정의할 부분을 지정해주고, <code>__len__</code>에서는 Dataset의 길이를 정의해준다. 마지막으로 <code>__getitem__</code> 에서는 Loader에서 index로 input data를 불러올 때 어떤 데이터를 어떤 방식으로 불러올지를 정의해둔 메소드이다.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#f92672">from</span> torch.utils.data <span style="color:#f92672">import</span> Dataset
+<span style="color:#f92672">import</span> os
+<span style="color:#f92672">import</span> numpy <span style="color:#66d9ef">as</span> np
+<span style="color:#f92672">import</span> cv2
+<span style="color:#f92672">import</span> torchvision.transforms <span style="color:#66d9ef">as</span> transforms
+<span style="color:#f92672">import</span> cv2
+<span style="color:#f92672">import</span> glob
+
+<span style="color:#66d9ef">class</span> <span style="color:#a6e22e">CustomDataset</span>(Dataset):
+   <span style="color:#66d9ef">def</span> __init__(self, path, mode<span style="color:#f92672">=</span><span style="color:#e6db74">&#39;train&#39;</span>, transform<span style="color:#f92672">=</span><span style="color:#66d9ef">None</span>, dataset<span style="color:#f92672">=</span><span style="color:#e6db74">&#34;DogBreedDataset&#34;</span>):
+       super()<span style="color:#f92672">.</span>__init__()
+       self<span style="color:#f92672">.</span>dataset <span style="color:#f92672">=</span> dataset
+       self<span style="color:#f92672">.</span>path <span style="color:#f92672">=</span> path  <span style="color:#75715e"># data/test/classes/filename, data/train/classes/filename</span>
+       self<span style="color:#f92672">.</span>mode <span style="color:#f92672">=</span> mode
+       self<span style="color:#f92672">.</span>transform <span style="color:#f92672">=</span> transform
+       <span style="color:#66d9ef">if</span> mode <span style="color:#f92672">==</span> <span style="color:#e6db74">&#39;train&#39;</span>:
+           self<span style="color:#f92672">.</span>path <span style="color:#f92672">=</span> os<span style="color:#f92672">.</span>path<span style="color:#f92672">.</span>join(path, <span style="color:#e6db74">&#34;train&#34;</span>)
+       <span style="color:#66d9ef">elif</span> mode <span style="color:#f92672">==</span> <span style="color:#e6db74">&#39;valid&#39;</span>:
+           self<span style="color:#f92672">.</span>path <span style="color:#f92672">=</span> os<span style="color:#f92672">.</span>path<span style="color:#f92672">.</span>join(path, <span style="color:#e6db74">&#34;valid&#34;</span>)
+       <span style="color:#66d9ef">elif</span> mode <span style="color:#f92672">==</span> <span style="color:#e6db74">&#39;test&#39;</span>:
+           self<span style="color:#f92672">.</span>path <span style="color:#f92672">=</span> os<span style="color:#f92672">.</span>path<span style="color:#f92672">.</span>join(path, <span style="color:#e6db74">&#34;test&#34;</span>)
+
+       self<span style="color:#f92672">.</span>categorys <span style="color:#f92672">=</span> []
+       <span style="color:#66d9ef">for</span> category_path <span style="color:#f92672">in</span> glob<span style="color:#f92672">.</span>glob(self<span style="color:#f92672">.</span>path <span style="color:#f92672">+</span> <span style="color:#e6db74">&#34;/*&#34;</span>):
+           self<span style="color:#f92672">.</span>categorys<span style="color:#f92672">.</span>append(category_path<span style="color:#f92672">.</span>split(<span style="color:#e6db74">&#39;/&#39;</span>)[<span style="color:#f92672">-</span><span style="color:#ae81ff">1</span>])
+       self<span style="color:#f92672">.</span>categorys <span style="color:#f92672">=</span> sorted(self<span style="color:#f92672">.</span>categorys)
+       
+       self<span style="color:#f92672">.</span>image_files <span style="color:#f92672">=</span> glob<span style="color:#f92672">.</span>glob(self<span style="color:#f92672">.</span>path <span style="color:#f92672">+</span> <span style="color:#e6db74">&#34;/*/*&#34;</span>)   <span style="color:#75715e"># list</span>
+       self<span style="color:#f92672">.</span>num_classes <span style="color:#f92672">=</span> len(self<span style="color:#f92672">.</span>categorys)
+       
+   <span style="color:#66d9ef">def</span> __len__(self):
+       <span style="color:#66d9ef">return</span> len(self<span style="color:#f92672">.</span>image_files)
+
+   <span style="color:#66d9ef">def</span> __getitem__(self, index):
+       image_path <span style="color:#f92672">=</span> self<span style="color:#f92672">.</span>image_files[index]
+       image <span style="color:#f92672">=</span> cv2<span style="color:#f92672">.</span>imread(image_path)
+       image <span style="color:#f92672">=</span> cv2<span style="color:#f92672">.</span>cvtColor(image, cv2<span style="color:#f92672">.</span>COLOR_BGR2RGB)<span style="color:#f92672">.</span>astype(np<span style="color:#f92672">.</span>float32)
+       
+       <span style="color:#66d9ef">if</span> self<span style="color:#f92672">.</span>mode <span style="color:#f92672">==</span> <span style="color:#e6db74">&#39;train&#39;</span> <span style="color:#f92672">or</span> self<span style="color:#f92672">.</span>mode <span style="color:#f92672">==</span> <span style="color:#e6db74">&#39;valid&#39;</span>:
+           label_name <span style="color:#f92672">=</span> image_path<span style="color:#f92672">.</span>split(<span style="color:#e6db74">&#39;/&#39;</span>)[<span style="color:#f92672">-</span><span style="color:#ae81ff">2</span>]
+           label_id <span style="color:#f92672">=</span> self<span style="color:#f92672">.</span>categorys<span style="color:#f92672">.</span>index(label_name)
+           <span style="color:#66d9ef">if</span> self<span style="color:#f92672">.</span>transform <span style="color:#f92672">is</span> <span style="color:#f92672">not</span> <span style="color:#66d9ef">None</span>:
+               transformed <span style="color:#f92672">=</span> self<span style="color:#f92672">.</span>transform(image<span style="color:#f92672">=</span>image)
+               image <span style="color:#f92672">=</span> transformed[<span style="color:#e6db74">&#34;image&#34;</span>]
+           <span style="color:#66d9ef">return</span> image, label_id
+       <span style="color:#66d9ef">if</span> self<span style="color:#f92672">.</span>mode <span style="color:#f92672">==</span> <span style="color:#e6db74">&#39;test&#39;</span>:
+           <span style="color:#66d9ef">if</span> self<span style="color:#f92672">.</span>transform <span style="color:#f92672">is</span> <span style="color:#f92672">not</span> <span style="color:#66d9ef">None</span>:
+               transformed <span style="color:#f92672">=</span> self<span style="color:#f92672">.</span>transform(image<span style="color:#f92672">=</span>image)
+               image <span style="color:#f92672">=</span> transformed[<span style="color:#e6db74">&#34;image&#34;</span>]
+           <span style="color:#66d9ef">return</span> image
+</code></pre></div><p>이렇게 정의해둔 Dataset으로 loader를 생성시키는 부분을 보겠다.
+Train transform은 resize와 randomCorp부분만 추가하였고, Normalize는 <code>Imagenet</code>에서 사용된 mean과 std를 사용해서 정의해 주었다. 사실 나중에 모델에 <code>batch normalize</code>가 들어가기 때문에 의미는 많이 줄어들었다.
+Dataloader에서 sampler는 분산학습을 할 경우 distributed를 True로 학습한다.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#f92672">from</span> torch.utils.data <span style="color:#f92672">import</span> DataLoader, sampler
+<span style="color:#f92672">import</span> albumentations <span style="color:#66d9ef">as</span> A
+<span style="color:#f92672">from</span> albumentations.pytorch <span style="color:#f92672">import</span> ToTensorV2
+
+train_trans <span style="color:#f92672">=</span> A<span style="color:#f92672">.</span>Compose(
+    [
+        A<span style="color:#f92672">.</span>Resize(<span style="color:#ae81ff">320</span>,<span style="color:#ae81ff">320</span>),
+        A<span style="color:#f92672">.</span>RandomCrop(<span style="color:#ae81ff">320</span>, <span style="color:#ae81ff">320</span>),
+        A<span style="color:#f92672">.</span>Normalize(mean<span style="color:#f92672">=</span>(<span style="color:#ae81ff">0.485</span>, <span style="color:#ae81ff">0.456</span>, <span style="color:#ae81ff">0.406</span>), std<span style="color:#f92672">=</span>(<span style="color:#ae81ff">0.229</span>, <span style="color:#ae81ff">0.224</span>, <span style="color:#ae81ff">0.225</span>)),
+        ToTensorV2(),
+    ]
+)
+
+train_set <span style="color:#f92672">=</span> CustomDataset(args<span style="color:#f92672">.</span>path, mode<span style="color:#f92672">=</span><span style="color:#e6db74">&#34;train&#34;</span>, transform<span style="color:#f92672">=</span>train_trans, dataset<span style="color:#f92672">=</span>args<span style="color:#f92672">.</span>dataset)
+
+train_loader <span style="color:#f92672">=</span> DataLoader(
+    train_set,
+    batch_size<span style="color:#f92672">=</span>args<span style="color:#f92672">.</span>batch,
+    num_workers<span style="color:#f92672">=</span><span style="color:#ae81ff">1</span>,
+    sampler<span style="color:#f92672">=</span>data_sampler(train_set, shuffle<span style="color:#f92672">=</span><span style="color:#66d9ef">True</span>, distributed<span style="color:#f92672">=</span>args<span style="color:#f92672">.</span>distributed),
+)
+</code></pre></div><p><strong>이후 model을 선정하고, hyper parameter를 튜닝하는 것을 진행하겠다.
+2부에서 다시 이어서 포스팅 하도록 하겠다.</strong></p>
+              
+
+
+            </div>
+          </div>
+          <div id="post-footer" class="post-footer main-content-wrap">
+            
+              
+                
+                
+                  <div class="post-footer-tags">
+                    <span class="text-color-light text-small">TAGGED IN</span><br/>
+                    
+  <a class="tag tag--primary tag--small" href="https://min1321.github.io/tags/%EA%B0%95%EC%95%84%EC%A7%80-%ED%92%88%EC%A2%85-%EB%B6%84%EB%A5%98/">강아지 품종 분류</a>
+
+  <a class="tag tag--primary tag--small" href="https://min1321.github.io/tags/deepleaning/">DeepLeaning</a>
+
+  <a class="tag tag--primary tag--small" href="https://min1321.github.io/tags/imageclassification/">ImageClassification</a>
+
+  <a class="tag tag--primary tag--small" href="https://min1321.github.io/tags/cv/">CV</a>
+
+  <a class="tag tag--primary tag--small" href="https://min1321.github.io/tags/dog-breed/">dog breed</a>
+
+                  </div>
+                
+              
+            
+            
+<div class="post-actions-wrap">
+  <nav >
+    <ul class="post-actions post-action-nav">
+      
+        <li class="post-action">
+          
+            <a class="post-action-btn btn btn--default tooltip--top" href="https://min1321.github.io/post/dl/nikl/" data-tooltip="[장관상 후기] 2021 국립국어원 인공 지능 언어 능력 평가" aria-label="NEXT: [장관상 후기] 2021 국립국어원 인공 지능 언어 능력 평가">
+          
+              <i class="fa fa-angle-left"></i>
+              <span class="hide-xs hide-sm text-small icon-ml">NEXT</span>
+            </a>
+        </li>
+        <li class="post-action">
+          
+            <a class="post-action-btn btn btn--default tooltip--top" href="https://min1321.github.io/post/test/" data-tooltip="Github 페이지 블로그 만들기 (with Hugo)" aria-label="PREVIOUS: Github 페이지 블로그 만들기 (with Hugo)">
+          
+              <span class="hide-xs hide-sm text-small icon-mr">PREVIOUS</span>
+              <i class="fa fa-angle-right"></i>
+            </a>
+        </li>
+      
+    </ul>
+  </nav>
+<ul class="post-actions post-action-share" >
+  
+    <li class="post-action hide-lg hide-md hide-sm">
+      <a class="post-action-btn btn btn--default btn-open-shareoptions" href="#btn-open-shareoptions" aria-label="Share this post">
+        <i class="fa fa-share-alt" aria-hidden="true"></i>
+      </a>
+    </li>
+    
+      <li class="post-action hide-xs">
+        <a class="post-action-btn btn btn--default" target="new" href="https://www.facebook.com/sharer/sharer.php?u=https://min1321.github.io/post/dl/dog-breed1/" title="Share on Facebook" aria-label="Share on Facebook">
+          <i class="fab fa-facebook-square" aria-hidden="true"></i>
+        </a>
+      </li>
+    
+      <li class="post-action hide-xs">
+        <a class="post-action-btn btn btn--default" target="new" href="https://twitter.com/intent/tweet?text=https://min1321.github.io/post/dl/dog-breed1/" title="Share on Twitter" aria-label="Share on Twitter">
+          <i class="fab fa-twitter" aria-hidden="true"></i>
+        </a>
+      </li>
+    
+      <li class="post-action hide-xs">
+        <a class="post-action-btn btn btn--default" target="new" href="https://www.linkedin.com/sharing/share-offsite/?url=https://min1321.github.io/post/dl/dog-breed1/" title="Share on Linkedin" aria-label="Share on Linkedin">
+          <i class="fab fa-linkedin" aria-hidden="true"></i>
+        </a>
+      </li>
+    
+  
+  
+    <li class="post-action">
+      <a class="post-action-btn btn btn--default" href="#disqus_thread" aria-label="Leave a comment">
+        <i class="far fa-comment"></i>
+      </a>
+    </li>
+  
+  <li class="post-action">
+    
+      <a class="post-action-btn btn btn--default" href="#top" aria-label="Back to top">
+      <i class="fa fa-arrow-up" aria-hidden="true"></i>
+    
+    </a>
+  </li>
+</ul>
+</div>
+
+
+            
+  
+    
+
+    
+    <script src="https://utteranc.es/client.js"
+        repo="min1321/blog-comments"
+        issue-term="title"
+        theme="github-light"
+        crossorigin="anonymous"
+        async>
+    </script>
+    <script type="text/javascript">
+      var disqus_config = function() {
+        this.page.url = 'https:\/\/min1321.github.io\/post\/dl\/dog-breed1\/';
+        
+          this.page.identifier = '\/post\/dl\/dog-breed1\/'
+        
+      };
+      (function() {
+        
+        
+        if (["localhost", "127.0.0.1"].indexOf(window.location.hostname) != -1) {
+          document.getElementById('disqus_thread').innerHTML = 'Disqus comments not available by default when the website is previewed locally.';
+          return;
+        }
+        var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+        var disqus_shortname = 'hugo-tranquilpeak-theme';
+        dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+      })();
+    </script>
+  
+
+
+          </div>
+        </article>
+        <footer id="footer" class="main-content-wrap">
+  <span class="copyrights">
+    &copy; 2021 Sukmin Seo. All Rights Reserved
+  </span>
+</footer>
+
+      </div>
+      <div id="bottom-bar" class="post-bottom-bar" data-behavior="4">
+        
+<div class="post-actions-wrap">
+  <nav >
+    <ul class="post-actions post-action-nav">
+      
+        <li class="post-action">
+          
+            <a class="post-action-btn btn btn--default tooltip--top" href="https://min1321.github.io/post/dl/nikl/" data-tooltip="[장관상 후기] 2021 국립국어원 인공 지능 언어 능력 평가" aria-label="NEXT: [장관상 후기] 2021 국립국어원 인공 지능 언어 능력 평가">
+          
+              <i class="fa fa-angle-left"></i>
+              <span class="hide-xs hide-sm text-small icon-ml">NEXT</span>
+            </a>
+        </li>
+        <li class="post-action">
+          
+            <a class="post-action-btn btn btn--default tooltip--top" href="https://min1321.github.io/post/test/" data-tooltip="Github 페이지 블로그 만들기 (with Hugo)" aria-label="PREVIOUS: Github 페이지 블로그 만들기 (with Hugo)">
+          
+              <span class="hide-xs hide-sm text-small icon-mr">PREVIOUS</span>
+              <i class="fa fa-angle-right"></i>
+            </a>
+        </li>
+      
+    </ul>
+  </nav>
+<ul class="post-actions post-action-share" >
+  
+    <li class="post-action hide-lg hide-md hide-sm">
+      <a class="post-action-btn btn btn--default btn-open-shareoptions" href="#btn-open-shareoptions" aria-label="Share this post">
+        <i class="fa fa-share-alt" aria-hidden="true"></i>
+      </a>
+    </li>
+    
+      <li class="post-action hide-xs">
+        <a class="post-action-btn btn btn--default" target="new" href="https://www.facebook.com/sharer/sharer.php?u=https://min1321.github.io/post/dl/dog-breed1/" title="Share on Facebook" aria-label="Share on Facebook">
+          <i class="fab fa-facebook-square" aria-hidden="true"></i>
+        </a>
+      </li>
+    
+      <li class="post-action hide-xs">
+        <a class="post-action-btn btn btn--default" target="new" href="https://twitter.com/intent/tweet?text=https://min1321.github.io/post/dl/dog-breed1/" title="Share on Twitter" aria-label="Share on Twitter">
+          <i class="fab fa-twitter" aria-hidden="true"></i>
+        </a>
+      </li>
+    
+      <li class="post-action hide-xs">
+        <a class="post-action-btn btn btn--default" target="new" href="https://www.linkedin.com/sharing/share-offsite/?url=https://min1321.github.io/post/dl/dog-breed1/" title="Share on Linkedin" aria-label="Share on Linkedin">
+          <i class="fab fa-linkedin" aria-hidden="true"></i>
+        </a>
+      </li>
+    
+  
+  
+    <li class="post-action">
+      <a class="post-action-btn btn btn--default" href="#disqus_thread" aria-label="Leave a comment">
+        <i class="far fa-comment"></i>
+      </a>
+    </li>
+  
+  <li class="post-action">
+    
+      <a class="post-action-btn btn btn--default" href="#top" aria-label="Back to top">
+      <i class="fa fa-arrow-up" aria-hidden="true"></i>
+    
+    </a>
+  </li>
+</ul>
+</div>
+
+
+      </div>
+      
+<div id="share-options-bar" class="share-options-bar" data-behavior="4">
+  <i id="btn-close-shareoptions" class="fa fa-times"></i>
+  <ul class="share-options">
+    
+      <li class="share-option">
+        <a class="share-option-btn" target="new" href="https://www.facebook.com/sharer/sharer.php?u=https%3A%2F%2Fmin1321.github.io%2Fpost%2Fdl%2Fdog-breed1%2F" aria-label="Share on Facebook">
+          <i class="fab fa-facebook-square" aria-hidden="true"></i><span>Share on Facebook</span>
+        </a>
+      </li>
+    
+      <li class="share-option">
+        <a class="share-option-btn" target="new" href="https://twitter.com/intent/tweet?text=https%3A%2F%2Fmin1321.github.io%2Fpost%2Fdl%2Fdog-breed1%2F" aria-label="Share on Twitter">
+          <i class="fab fa-twitter" aria-hidden="true"></i><span>Share on Twitter</span>
+        </a>
+      </li>
+    
+      <li class="share-option">
+        <a class="share-option-btn" target="new" href="https://www.linkedin.com/sharing/share-offsite/?url=https%3A%2F%2Fmin1321.github.io%2Fpost%2Fdl%2Fdog-breed1%2F" aria-label="Share on Linkedin">
+          <i class="fab fa-linkedin" aria-hidden="true"></i><span>Share on Linkedin</span>
+        </a>
+      </li>
+    
+  </ul>
+</div>
+<div id="share-options-mask" class="share-options-mask"></div>
+
+
+    </div>
+    
+    <div id="about">
+  <div id="about-card">
+    <div id="about-btn-close">
+      <i class="fa fa-times"></i>
+    </div>
+    
+      <img id="about-card-picture" src="https://www.gravatar.com/avatar/cba64e21b2f1d09b90cbc3bf9e945cd4?s=110" alt="Author&#39;s picture" />
+    
+    <h4 id="about-card-name">Sukmin Seo</h4>
+    
+      <div id="about-card-bio">안녕하세요 min1321&rsquo;s 개발블로그입니다.</div>
+    
+    
+      <div id="about-card-job">
+        <i class="fa fa-briefcase"></i>
+        <br/>
+        Deep learning Engineer
+      </div>
+    
+    
+      <div id="about-card-location">
+        <i class="fa fa-map-marker-alt"></i>
+        <br/>
+        Korea
+      </div>
+    
+  </div>
+</div>
+
+    
+
+    
+  
+    
+      <div id="cover" style="background-image:url('https://min1321.github.io/images/cover.jpg');"></div>
+    
+  
+
+
+    
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js" integrity="sha512-894YE6QWD5I59HgZOGReFYm4dnWc1Qt5NtvYSaNcOP+u1T9qYdvdihz0PPSiiqn/+/3e7Jo4EaG7TubfWGUrMQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.1.0/highlight.min.js" integrity="sha512-z+/WWfyD5tccCukM4VvONpEtLmbAm5LDu7eKiyMQJ9m7OfPEDL7gENyDRL3Yfe8XAuGsS2fS4xSMnl6d30kqGQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/fancybox/3.5.7/jquery.fancybox.min.js" integrity="sha512-uURl+ZXMBrF4AwGaWmEetzrd+J5/8NRkWAvJx5sbPSSuOb0bZLqf+tOzniObO00BjHa/dD7gub9oCGMLPQHtQA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+
+
+<script src="https://min1321.github.io/js/script-yqzy9wdlzix4lbbwdnzvwx3egsne77earqmn73v9uno8aupuph8wfguccut.min.js"></script>
+
+
+  
+    <script async crossorigin="anonymous" defer integrity="sha512-gE8KAQyFIzV1C9+GZ8TKJHZS2s+n7EjNtC+IMRn1l5+WYJTHOODUM6JSjZhFhqXmc7bG8Av6XXpckA4tYhflnw==" src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.1.0/languages/apache.min.js"></script>
+  
+
+  
+    <script async crossorigin="anonymous" defer integrity="sha512-EWROca+bote+7Oaaar1F6y74iZj1r1F9rm/ly7o+/FwJopbBaWtsFDmaKoZDd3QiGU2pGacBirHJNivmGLYrow==" src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.1.0/languages/go.min.js"></script>
+  
+
+  
+    <script async crossorigin="anonymous" defer integrity="sha512-GDVzAn0wpx1yVtQsRWmFc6PhJiLBPdUic+h4GWgljBh904O3JU10fk9EKNpVyIoPqkFn54rgL2QBG4BmUTMpiQ==" src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.1.0/languages/http.min.js"></script>
+  
+
+  
+    <script async crossorigin="anonymous" defer integrity="sha512-UgZlma8NzkrDb/NWgmLIcTrH7i/CSnLLDRFqCSNF5NGPpjKmzyM25qcoXGOup8+cDakKyaiTDd7N4dyH4YT+IA==" src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.1.0/languages/less.min.js"></script>
+  
+
+  
+    <script async crossorigin="anonymous" defer integrity="sha512-lot9koe73sfXIrUvIPM/UEhuMciN56RPyBdOyZgfO53P2lkWyyXN7J+njcxIIBRV+nVDQeiWtiXg+bLAJZDTfg==" src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.1.0/languages/nginx.min.js"></script>
+  
+
+  
+    <script async crossorigin="anonymous" defer integrity="sha512-Zd3e7XxHP00TD0Imr0PIfeM0fl0v95kMWuhyAS3Wn1UTSXTkz0OhtRgBAr4JlmADRgiXr4x7lpeUdqaGN8xIog==" src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.1.0/languages/puppet.min.js"></script>
+  
+
+  
+    <script async crossorigin="anonymous" defer integrity="sha512-qtqDO052iXMSP+5d/aE/jMtL9vIIGvONgTJziC2K/ZIB1yEGa55WVxGE9/08rSQ62EoDifS9SWVGZ7ihSLhzMA==" src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.1.0/languages/scss.min.js"></script>
+  
+
+  
+    <script async crossorigin="anonymous" defer integrity="sha512-1NmkjnEDnwwwcu28KoQF8vs3oaPFokQHbmbtwGhFfeDsQZtVFI8zW2aE9O8yMYdpdyKV/5blE4pSWw4Z/Sv97w==" src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.1.0/languages/stylus.min.js"></script>
+  
+
+  
+    <script async crossorigin="anonymous" defer integrity="sha512-B2wSfruPjr8EJL6IIzQr1eAuDwrsfIfccNf/LCEdxELCgC/S/ZMt/Uvk80aD79m7IqOqW+Sw8nbkvha20yZpzg==" src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.1.0/languages/swift.min.js"></script>
+  
+
+  
+    <script async crossorigin="anonymous" defer integrity="sha512-28oDiQZGKUVN6wQ7PSLPNipOcmkCALXKwOi7bnkyFf8QiMZQxG9EQoy/iiNx6Zxj2cG2SbVa4dXKigQhu7GiFw==" src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.1.0/languages/yaml.min.js"></script>
+  
+
+
+<script>
+$(document).ready(function() {
+  hljs.configure({ classPrefix: '', useBR: false });
+  $('pre.code-highlight > code, pre > code').each(function(i, block) {
+    if (!$(this).hasClass('codeblock')) {
+      $(this).addClass('codeblock');
+    }
+    hljs.highlightBlock(block);
+  });
+});
+</script>
+
+
+
+
+    
+  </body>
+</html>
+

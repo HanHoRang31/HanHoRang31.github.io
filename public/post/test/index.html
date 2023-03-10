@@ -1,0 +1,825 @@
+<!DOCTYPE html>
+<html lang="en-us">
+  <head>
+    
+    <script type="application/ld+json">
+
+{  
+  "@context":"http://schema.org",
+  "@type":"Website",
+  "@id":"https:\/\/min1321.github.io\/",
+  "author": {
+    "@type": "Person",
+    "name": "Sukmin Seo",
+    
+    "image": "https://www.gravatar.com/avatar/cba64e21b2f1d09b90cbc3bf9e945cd4"
+    
+  },
+  "name":"min1321\u0027s blog",
+  "description":"",
+  "url":"https:\/\/min1321.github.io\/post\/test\/",
+  "keywords":"[tech]"
+}
+
+</script>
+    <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="generator" content="Hugo 0.89.4 with theme Tranquilpeak 0.5.3-BETA">
+<meta name="author" content="Sukmin Seo">
+<meta name="keywords" content="tech">
+<meta name="description" content="">
+
+
+<meta property="og:description" content="">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Github 페이지 블로그 만들기 (with Hugo)">
+<meta name="twitter:title" content="Github 페이지 블로그 만들기 (with Hugo)">
+<meta property="og:url" content="https://min1321.github.io/post/test/">
+<meta property="twitter:url" content="https://min1321.github.io/post/test/">
+<meta property="og:site_name" content="min1321&#39;s blog">
+<meta property="og:description" content="">
+<meta name="twitter:description" content="">
+<meta property="og:locale" content="en-us">
+
+  
+    <meta property="article:published_time" content="2021-11-26T18:02:24">
+  
+  
+    <meta property="article:modified_time" content="2021-11-26T18:02:24">
+  
+  
+  
+    
+      <meta property="article:section" content="TIL">
+    
+  
+  
+    
+      <meta property="article:tag" content="시작">
+    
+      <meta property="article:tag" content="TIL">
+    
+      <meta property="article:tag" content="Github pages">
+    
+      <meta property="article:tag" content="Hugo">
+    
+  
+
+
+<meta name="twitter:card" content="summary">
+
+
+
+
+
+
+
+  <meta property="og:image" content="https://www.gravatar.com/avatar/cba64e21b2f1d09b90cbc3bf9e945cd4?s=640">
+  <meta property="twitter:image" content="https://www.gravatar.com/avatar/cba64e21b2f1d09b90cbc3bf9e945cd4?s=640">
+
+
+
+
+
+
+    <title>Github 페이지 블로그 만들기 (with Hugo)</title>
+
+    <link rel="icon" href="https://min1321.github.io/favicon.png">
+    
+
+    
+
+    <link rel="canonical" href="https://min1321.github.io/post/test/">
+
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" integrity="sha512-iBBXm8fW90+nuLcSKlbmrPcLa0OT92xO1BIsZ+ywDWZCvqsWgccV3gFoRBv0z+8dLJgyAHIhR35VZc2oM/gI1w==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/fancybox/3.5.7/jquery.fancybox.min.css" integrity="sha512-H9jrZiiopUdsLpg94A333EfumgUBpO9MdbxStdeITo+KEIMaNfHNvwyjjDJb+ERPaRS6DpyRlKbvPUasNItRyw==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    
+    
+    
+    <link rel="stylesheet" href="https://min1321.github.io/css/style-h6ccsoet3mzkbb0wngshlfbaweimexgqcxj0h5hu4h82olsdzz6wmqdkajm.min.css" />
+    
+    
+
+    
+      
+    
+    
+  </head>
+
+  <body>
+    <div id="blog">
+      <header id="header" data-behavior="4">
+  <i id="btn-open-sidebar" class="fa fa-lg fa-bars"></i>
+  <div class="header-title">
+    <a class="header-title-link" href="https://min1321.github.io/" aria-label="Go to homepage">min1321&#39;s blog</a>
+  </div>
+  
+    
+      <a class="header-right-picture "
+         href="https://min1321.github.io/#about" aria-label="Open the link: /#about">
+    
+    
+    
+      
+        <img class="header-picture" src="https://www.gravatar.com/avatar/cba64e21b2f1d09b90cbc3bf9e945cd4?s=90" alt="Author&#39;s picture" />
+      
+    
+    </a>
+  
+</header>
+
+      <nav id="sidebar" data-behavior="4">
+  <div class="sidebar-container">
+    
+      <div class="sidebar-profile">
+        <a href="https://min1321.github.io/#about" aria-label="Read more about the author">
+          <img class="sidebar-profile-picture" src="https://www.gravatar.com/avatar/cba64e21b2f1d09b90cbc3bf9e945cd4?s=110" alt="Author&#39;s picture" />
+        </a>
+        <h4 class="sidebar-profile-name">Sukmin Seo</h4>
+        
+          <h5 class="sidebar-profile-bio">안녕하세요 min1321&rsquo;s 개발블로그입니다.</h5>
+        
+      </div>
+    
+    <ul class="sidebar-buttons">
+      
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="https://min1321.github.io/" title="Home">
+    
+      <i class="sidebar-button-icon fas fa-lg fa-home" aria-hidden="true"></i>
+      
+      <span class="sidebar-button-desc">Home</span>
+    </a>
+  </li>
+
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="https://min1321.github.io/categories" title="Categories">
+    
+      <i class="sidebar-button-icon fas fa-lg fa-bookmark" aria-hidden="true"></i>
+      
+      <span class="sidebar-button-desc">Categories</span>
+    </a>
+  </li>
+
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="https://min1321.github.io/tags" title="Tags">
+    
+      <i class="sidebar-button-icon fas fa-lg fa-tags" aria-hidden="true"></i>
+      
+      <span class="sidebar-button-desc">Tags</span>
+    </a>
+  </li>
+
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="https://min1321.github.io/archives" title="Archives">
+    
+      <i class="sidebar-button-icon fas fa-lg fa-archive" aria-hidden="true"></i>
+      
+      <span class="sidebar-button-desc">Archives</span>
+    </a>
+  </li>
+
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="https://min1321.github.io/#about" title="About">
+    
+      <i class="sidebar-button-icon fas fa-lg fa-question" aria-hidden="true"></i>
+      
+      <span class="sidebar-button-desc">About</span>
+    </a>
+  </li>
+
+
+    </ul>
+    <ul class="sidebar-buttons">
+      
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="https://github.com/min1321" target="_blank" rel="noopener" title="GitHub">
+    
+      <i class="sidebar-button-icon fab fa-lg fa-github" aria-hidden="true"></i>
+      
+      <span class="sidebar-button-desc">GitHub</span>
+    </a>
+  </li>
+
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="https://www.notion.so/4e5450cc96e04326a8377fbffc788376" target="_blank" rel="noopener" title="Notion">
+    
+      <i class="sidebar-button-icon fab fa-lg fa-stack-overflow" aria-hidden="true"></i>
+      
+      <span class="sidebar-button-desc">Notion</span>
+    </a>
+  </li>
+
+
+    </ul>
+    <ul class="sidebar-buttons">
+      
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="https://min1321.github.io/index.xml" title="RSS">
+    
+      <i class="sidebar-button-icon fas fa-lg fa-rss" aria-hidden="true"></i>
+      
+      <span class="sidebar-button-desc">RSS</span>
+    </a>
+  </li>
+
+
+    </ul>
+  </div>
+</nav>
+
+      
+
+      <div id="main" data-behavior="4"
+        class="
+               hasCoverMetaIn
+               ">
+        <article class="post" id="top">
+          
+          
+            <div class="post-header main-content-wrap text-left">
+  
+    <h1 class="post-title">
+      Github 페이지 블로그 만들기 (with Hugo)
+    </h1>
+  
+  
+  <div class="postShorten-meta post-meta">
+    
+      <time datetime="2021-11-26T18:02:24&#43;09:00">
+        
+  November 26, 2021
+
+      </time>
+    
+    
+  
+  
+    <span>in</span>
+    
+      <a class="category-link" href="https://min1321.github.io/categories/til">TIL</a>
+    
+  
+
+  </div>
+
+</div>
+          
+          <div class="post-content markdown">
+            <div class="main-content-wrap">
+              <p>개발을 시작한지 1년이 되어간다.
+배운 내용을 기록하는 블로그를 노션으로 하다보니 혼자 정리하는데는 좋지만 내가 알게된 내용을 공유하는 차원에서는 좋지 않다는 생각이 들었다. 그래서 github pages를 활용해 보기로 하였고, Hugo를 이용해서 관리하기로 하였다.
+Jekyll, Hexo, Hugo 이 세가지 중에 Hugo가 빠르고, Golang을 사용해 볼 수 있어서 좋다는 생각이 들었다.
+Hugo를 이용한 정적 Github pages 만들기를 해볼텐데 아래 블로그 링크를 거의 참조 하였기 때문에 아래 링크를 보고 해도 될 것 같다. git init이라던지 main 브렌치에서 하는 것을 제외하고는 거의 동일 하다.</p>
+<p><a href="https://gurumee92.github.io/2020/08/%EB%B8%94%EB%A1%9C%EA%B7%B8-%EA%B5%AC%EC%B6%95%EA%B8%B0-1-hugo-github%EC%9C%BC%EB%A1%9C-%EA%B0%9C%EC%9D%B8-%EB%B8%94%EB%A1%9C%EA%B7%B8-%EB%A7%8C%EB%93%A4%EA%B8%B0/">참고한 블로그 링크 : gurumee92.github.io</a></p>
+<h2 id="hugo-설치">Hugo 설치</h2>
+<p>시작하기 전에 아래 3가지는 해야한다.</p>
+<ul>
+<li>HomeBrew 설치</li>
+<li>Github 회원가입</li>
+<li>Golang 설치</li>
+</ul>
+<p>터미널에 아래 입력한다.</p>
+<pre tabindex="0"><code># hugo 설치
+$ brew install hugo
+
+# hugo 버전 확인
+$ hugo version
+# 다음이 출력되면 정상적으로 설치된 것이다.
+Hugo Static Site Generator v0.74.3/extended darwin/amd64 BuildDate: unknown
+</code></pre><h2 id="github-레포지토리-생성">Github 레포지토리 생성</h2>
+<p>github repo를 2개 만들어야 한다.
+<code>blog</code>
+<code>&lt;username&gt;.github.io</code></p>
+<h2 id="hugo로-프로젝트-만들기">Hugo로 프로젝트 만들기</h2>
+<p>local 컴퓨터의 blog 생성 폴더에서 아래 코드를 입력한다</p>
+<pre tabindex="0"><code># hugo 프로젝트 생성
+$ hugo new site blog
+# 생성 완료되면 출력 문구
+Congratulations! Your new Hugo site is created in /Users/user/Workspaces/blog.
+
+Just a few more steps and you're ready to go:
+
+1. Download a theme into the same-named folder.
+   Choose a theme from https://themes.gohugo.io/ or
+   create your own with the &quot;hugo new theme &lt;THEMENAME&gt;&quot; command.
+2. Perhaps you want to add some content. You can add single files
+   with &quot;hugo new &lt;SECTIONNAME&gt;/&lt;FILENAME&gt;.&lt;FORMAT&gt;&quot;.
+3. Start the built-in live server via &quot;hugo server&quot;.
+
+Visit https://gohugo.io/ for quickstart guide and full documentation.
+</code></pre><p>테마를 설치하면 되는데, 직접 만들 수도 있다고 한다. 나는 기존 공개된 테마를 설치하였다.
+<a href="https://themes.gohugo.io/">공개 테마 링크</a></p>
+<pre tabindex="0"><code>$ pwd
+# 프로젝트 루트 경로
+/Users/user/Workspaces/blog
+
+$ git init
+# git initialize
+$ git branch -M main
+# 브렌치를 main으로 변경
+
+# git submodule add https://github.com/&lt;theme 경로&gt;.git themes/&lt;theme 이름&gt;
+$ git submodule add https://github.com/kakawait/hugo-tranquilpeak-theme.git themes/hugo-tranquilpeak-theme
+
+# cp themes/hugo-tranquilpeak-theme/exampleSite/config.toml config.toml
+</code></pre><p>그후 config.toml을 자기 정보에 맞도록 수정해야하는데, baseURL은 반드시 수정하도록 하자</p>
+<pre tabindex="0"><code># ...
+# 여기가 바뀌어야 합니다.
+# https://&lt;username&gt;.github.io/
+baseURL = &quot;https://min1321.github.io/&quot;
+
+# ...
+languageCode = &quot;en-us&quot;
+defaultContentLanguage = &quot;en-us&quot;
+title = &quot;min1321's Devlog&quot;
+theme = &quot;hugo-tranquilpeak-theme&quot;
+disqusShortname = &quot;hugo-tranquilpeak-theme&quot;
+# googleAnalytics = &quot;UA-123-45&quot;
+paginate = 7
+canonifyurls = true
+
+[permalinks]
+  post = &quot;/:year/:month/:slug/&quot;
+</code></pre><p>이제 터미널에서 서버를 실행하자</p>
+<pre tabindex="0"><code>$ hugo server 
+Start building sites …
+hugo v0.89.4+extended darwin/amd64 BuildDate=unknown
+
+                   | EN-US
+-------------------+--------
+  Pages            |     9
+  Paginator pages  |     0
+  Non-page files   |     0
+  Static files     |     4
+  Processed images |     0
+  Aliases          |     1
+  Sitemaps         |     1
+  Cleaned          |     0
+
+Built in 9 ms
+Watching for changes in /Users/user/workspace/blog/{archetypes,content,data,layouts,static,themes}
+Watching for config changes in /Users/user/workspace/blog/config.toml
+Environment: &quot;development&quot;
+Serving pages from memory
+Running in Fast Render Mode. For full rebuilds on change: hugo server --disableFastRender
+Web Server is available at http://localhost:1313/ (bind address 127.0.0.1)
+Press Ctrl+C to stop
+</code></pre><p><code>http://localhost:1313/</code> 에 접속하면 아래와 같은 화면을 볼 수 있다.
+<!-- raw HTML omitted --></p>
+<h2 id="git-레포지토리-연결-및-쉘-스크립트-작성">Git 레포지토리 연결 및 쉘 스크립트 작성</h2>
+<p><code>blog</code>에 <code>Github blog</code>, <code>blog/public</code>에 <code>Github &lt;username&gt;.github.io</code>를 연결한다.</p>
+<pre tabindex="0"><code># blog -&gt; blog 레포지토리 연결
+# git remote add origin http://github.com/&lt;username&gt;/blog.git
+$ git remote add origin https://github.com/min1321/blog.git
+
+# blog/public -&gt; &lt;username&gt;.github.io 연결
+# git submodule add -b main http://github.com/&lt;username&gt;/&lt;username&gt;.github.io.git public
+$ git submodule add -b main http://github.com/min1321/min1321.github.io.git public
+</code></pre><p>배포를 sh 파일을 이용해서 쉽게 하려한다. <code>deploy.sh</code> 파일을 만들어 주자.
+<strong>blog/deploy.sh</strong></p>
+<pre tabindex="0"><code>#!/bin/bash
+
+echo -e &quot;\033[0;32mDeploying updates to GitHub...\033[0m&quot;
+
+# Build the project.
+# hugo -t &lt;여러분의 테마&gt;
+hugo -t hugo-tranquilpeak-theme
+
+# Go To Public folder, sub module commit
+cd public
+# Add changes to git.
+git add .
+
+# Commit changes.
+msg=&quot;rebuilding site `date`&quot;
+if [ $# -eq 1 ]
+  then msg=&quot;$1&quot;
+fi
+git commit -m &quot;$msg&quot;
+
+# Push source and build repos.
+git push origin main
+
+# Come Back up to the Project Root
+cd ..
+
+
+# blog 저장소 Commit &amp; Push
+git add .
+
+msg=&quot;rebuilding site `date`&quot;
+if [ $# -eq 1 ]
+  then msg=&quot;$1&quot;
+fi
+git commit -m &quot;$msg&quot;
+
+git push origin main
+</code></pre><p>터미널에서 sh 파일 권한을 주고 실행한다.</p>
+<pre tabindex="0"><code># deploy.sh 실행 파일 권한 부여
+$ chmod 777 deploy.sh
+
+# 배포 실행
+$ ./deploy.sh
+</code></pre><p><code>https://&lt;username&gt;.github.io</code> 에서 블로그를 볼 수 있다!!!</p>
+<h2 id="새로운-글-작성하기">새로운 글 작성하기</h2>
+<p>신규 포스트는 다음과 같이 터미널에 입력하면 된다.</p>
+<pre tabindex="0"><code># hugo new post/&lt;원하는 패쓰&gt;/파일 이름.md
+$ hugo new post/test.md
+Content &quot;/Users/user/workspace/blog/content/post/test.md&quot; created
+</code></pre><p>그러면 <code>blog/content/post/</code> 에 <code>test.md</code>가 생성된다. 그걸 수정해서 블로그를 작성하면 되겠다.
+터미널에서 로컬 서버 열어본다.</p>
+<pre tabindex="0"><code># 로컬 서버 실행
+$ hugo server -D
+# http://localhost:1313 접속하여 확인
+</code></pre><p><img src="https://images.velog.io/images/mellonggo/post/4064ab40-9103-4aad-812c-9f1839a554b0/F74E22B2-D9FB-4FB9-AF4A-3695F08CF287.png" alt="">
+컨텐츠 작성후 배포를 하면 된다.</p>
+<pre tabindex="0"><code>$ ./deploy.sh
+</code></pre><h2 id="댓글-추가하기">댓글 추가하기</h2>
+<p>레포지토리를 하나 더 만들어야 한다. gurumee92님이 하신대로 <code>blog-comments</code>라는 이름으로 repo를 만들었다. <a href="https://utteranc.es/">이 곳</a> 에서 “repo” 입력 창에, 자신의 레포 <code>min1321/blog-comments</code>를 입력하면 된다.
+아래에 스크립트가 생성된다.</p>
+<pre tabindex="0"><code>&lt;script src=&quot;https://utteranc.es/client.js&quot;
+        repo=&quot;min1321/blog-comments&quot;
+        issue-term=&quot;title&quot;
+        theme=&quot;github-light&quot;
+        crossorigin=&quot;anonymous&quot;
+        async&gt;
+&lt;/script&gt;
+</code></pre><p>이 스크립트를 복사해서 <code>blog/themes/hugo-tranquilpeak-theme/layouts/partials/post/comment.html</code>에 붙여넣었다.
+<strong>blog/themes/hugo-tranquilpeak-theme/layouts/partials/post/comment.html</strong></p>
+<pre tabindex="0"><code>    &lt;!-- &lt;div id=&quot;disqus_thread&quot;&gt;
+      &lt;noscript&gt;Please enable JavaScript to view the comments powered by Disqus.&lt;/noscript&gt;
+    &lt;/div&gt; --&gt;
+
+    &lt;!-- 추가코드 --&gt;
+    &lt;script src=&quot;https://utteranc.es/client.js&quot;
+        repo=&quot;min1321/blog-comments&quot;
+        issue-term=&quot;title&quot;
+        theme=&quot;github-light&quot;
+        crossorigin=&quot;anonymous&quot;
+        async&gt;
+    &lt;/script&gt;
+</code></pre><!-- raw HTML omitted -->
+<h3 id="결론">결론</h3>
+<p>만드는게 쉽지 않다. github를 통해 md를 작성하고, 이미지를 추가하는 것이 쉽지 않은 듯 한데, 계속할 수 있을지 걱정이다. 그냥 velog를 쓸까 생각이 드는데, 우선은 둘다 해보겠다.</p>
+<h3 id="참고">참고</h3>
+<p><a href="https://gurumee92.github.io/2020/08/%EB%B8%94%EB%A1%9C%EA%B7%B8-%EA%B5%AC%EC%B6%95%EA%B8%B0-1-hugo-github%EC%9C%BC%EB%A1%9C-%EA%B0%9C%EC%9D%B8-%EB%B8%94%EB%A1%9C%EA%B7%B8-%EB%A7%8C%EB%93%A4%EA%B8%B0/">https://gurumee92.github.io/2020/08/%EB%B8%94%EB%A1%9C%EA%B7%B8-%EA%B5%AC%EC%B6%95%EA%B8%B0-1-hugo-github%EC%9C%BC%EB%A1%9C-%EA%B0%9C%EC%9D%B8-%EB%B8%94%EB%A1%9C%EA%B7%B8-%EB%A7%8C%EB%93%A4%EA%B8%B0/</a></p>
+              
+
+
+            </div>
+          </div>
+          <div id="post-footer" class="post-footer main-content-wrap">
+            
+              
+                
+                
+                  <div class="post-footer-tags">
+                    <span class="text-color-light text-small">TAGGED IN</span><br/>
+                    
+  <a class="tag tag--primary tag--small" href="https://min1321.github.io/tags/%EC%8B%9C%EC%9E%91/">시작</a>
+
+  <a class="tag tag--primary tag--small" href="https://min1321.github.io/tags/til/">TIL</a>
+
+  <a class="tag tag--primary tag--small" href="https://min1321.github.io/tags/github-pages/">Github pages</a>
+
+  <a class="tag tag--primary tag--small" href="https://min1321.github.io/tags/hugo/">Hugo</a>
+
+                  </div>
+                
+              
+            
+            
+<div class="post-actions-wrap">
+  <nav >
+    <ul class="post-actions post-action-nav">
+      
+        <li class="post-action">
+          
+            <a class="post-action-btn btn btn--default tooltip--top" href="https://min1321.github.io/post/dl/dog-breed1/" data-tooltip="강아지 분류 인공지능 웹사이트 만들기 (1)" aria-label="NEXT: 강아지 분류 인공지능 웹사이트 만들기 (1)">
+          
+              <i class="fa fa-angle-left"></i>
+              <span class="hide-xs hide-sm text-small icon-ml">NEXT</span>
+            </a>
+        </li>
+        <li class="post-action">
+          
+            <a class="post-action-btn btn btn--disabled">
+          
+              <span class="hide-xs hide-sm text-small icon-mr">PREVIOUS</span>
+              <i class="fa fa-angle-right"></i>
+            </a>
+        </li>
+      
+    </ul>
+  </nav>
+<ul class="post-actions post-action-share" >
+  
+    <li class="post-action hide-lg hide-md hide-sm">
+      <a class="post-action-btn btn btn--default btn-open-shareoptions" href="#btn-open-shareoptions" aria-label="Share this post">
+        <i class="fa fa-share-alt" aria-hidden="true"></i>
+      </a>
+    </li>
+    
+      <li class="post-action hide-xs">
+        <a class="post-action-btn btn btn--default" target="new" href="https://www.facebook.com/sharer/sharer.php?u=https://min1321.github.io/post/test/" title="Share on Facebook" aria-label="Share on Facebook">
+          <i class="fab fa-facebook-square" aria-hidden="true"></i>
+        </a>
+      </li>
+    
+      <li class="post-action hide-xs">
+        <a class="post-action-btn btn btn--default" target="new" href="https://twitter.com/intent/tweet?text=https://min1321.github.io/post/test/" title="Share on Twitter" aria-label="Share on Twitter">
+          <i class="fab fa-twitter" aria-hidden="true"></i>
+        </a>
+      </li>
+    
+      <li class="post-action hide-xs">
+        <a class="post-action-btn btn btn--default" target="new" href="https://www.linkedin.com/sharing/share-offsite/?url=https://min1321.github.io/post/test/" title="Share on Linkedin" aria-label="Share on Linkedin">
+          <i class="fab fa-linkedin" aria-hidden="true"></i>
+        </a>
+      </li>
+    
+  
+  
+    <li class="post-action">
+      <a class="post-action-btn btn btn--default" href="#disqus_thread" aria-label="Leave a comment">
+        <i class="far fa-comment"></i>
+      </a>
+    </li>
+  
+  <li class="post-action">
+    
+      <a class="post-action-btn btn btn--default" href="#top" aria-label="Back to top">
+      <i class="fa fa-arrow-up" aria-hidden="true"></i>
+    
+    </a>
+  </li>
+</ul>
+</div>
+
+
+            
+  
+    
+
+    
+    <script src="https://utteranc.es/client.js"
+        repo="min1321/blog-comments"
+        issue-term="title"
+        theme="github-light"
+        crossorigin="anonymous"
+        async>
+    </script>
+    <script type="text/javascript">
+      var disqus_config = function() {
+        this.page.url = 'https:\/\/min1321.github.io\/post\/test\/';
+        
+          this.page.identifier = '\/post\/test\/'
+        
+      };
+      (function() {
+        
+        
+        if (["localhost", "127.0.0.1"].indexOf(window.location.hostname) != -1) {
+          document.getElementById('disqus_thread').innerHTML = 'Disqus comments not available by default when the website is previewed locally.';
+          return;
+        }
+        var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+        var disqus_shortname = 'hugo-tranquilpeak-theme';
+        dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+      })();
+    </script>
+  
+
+
+          </div>
+        </article>
+        <footer id="footer" class="main-content-wrap">
+  <span class="copyrights">
+    &copy; 2021 Sukmin Seo. All Rights Reserved
+  </span>
+</footer>
+
+      </div>
+      <div id="bottom-bar" class="post-bottom-bar" data-behavior="4">
+        
+<div class="post-actions-wrap">
+  <nav >
+    <ul class="post-actions post-action-nav">
+      
+        <li class="post-action">
+          
+            <a class="post-action-btn btn btn--default tooltip--top" href="https://min1321.github.io/post/dl/dog-breed1/" data-tooltip="강아지 분류 인공지능 웹사이트 만들기 (1)" aria-label="NEXT: 강아지 분류 인공지능 웹사이트 만들기 (1)">
+          
+              <i class="fa fa-angle-left"></i>
+              <span class="hide-xs hide-sm text-small icon-ml">NEXT</span>
+            </a>
+        </li>
+        <li class="post-action">
+          
+            <a class="post-action-btn btn btn--disabled">
+          
+              <span class="hide-xs hide-sm text-small icon-mr">PREVIOUS</span>
+              <i class="fa fa-angle-right"></i>
+            </a>
+        </li>
+      
+    </ul>
+  </nav>
+<ul class="post-actions post-action-share" >
+  
+    <li class="post-action hide-lg hide-md hide-sm">
+      <a class="post-action-btn btn btn--default btn-open-shareoptions" href="#btn-open-shareoptions" aria-label="Share this post">
+        <i class="fa fa-share-alt" aria-hidden="true"></i>
+      </a>
+    </li>
+    
+      <li class="post-action hide-xs">
+        <a class="post-action-btn btn btn--default" target="new" href="https://www.facebook.com/sharer/sharer.php?u=https://min1321.github.io/post/test/" title="Share on Facebook" aria-label="Share on Facebook">
+          <i class="fab fa-facebook-square" aria-hidden="true"></i>
+        </a>
+      </li>
+    
+      <li class="post-action hide-xs">
+        <a class="post-action-btn btn btn--default" target="new" href="https://twitter.com/intent/tweet?text=https://min1321.github.io/post/test/" title="Share on Twitter" aria-label="Share on Twitter">
+          <i class="fab fa-twitter" aria-hidden="true"></i>
+        </a>
+      </li>
+    
+      <li class="post-action hide-xs">
+        <a class="post-action-btn btn btn--default" target="new" href="https://www.linkedin.com/sharing/share-offsite/?url=https://min1321.github.io/post/test/" title="Share on Linkedin" aria-label="Share on Linkedin">
+          <i class="fab fa-linkedin" aria-hidden="true"></i>
+        </a>
+      </li>
+    
+  
+  
+    <li class="post-action">
+      <a class="post-action-btn btn btn--default" href="#disqus_thread" aria-label="Leave a comment">
+        <i class="far fa-comment"></i>
+      </a>
+    </li>
+  
+  <li class="post-action">
+    
+      <a class="post-action-btn btn btn--default" href="#top" aria-label="Back to top">
+      <i class="fa fa-arrow-up" aria-hidden="true"></i>
+    
+    </a>
+  </li>
+</ul>
+</div>
+
+
+      </div>
+      
+<div id="share-options-bar" class="share-options-bar" data-behavior="4">
+  <i id="btn-close-shareoptions" class="fa fa-times"></i>
+  <ul class="share-options">
+    
+      <li class="share-option">
+        <a class="share-option-btn" target="new" href="https://www.facebook.com/sharer/sharer.php?u=https%3A%2F%2Fmin1321.github.io%2Fpost%2Ftest%2F" aria-label="Share on Facebook">
+          <i class="fab fa-facebook-square" aria-hidden="true"></i><span>Share on Facebook</span>
+        </a>
+      </li>
+    
+      <li class="share-option">
+        <a class="share-option-btn" target="new" href="https://twitter.com/intent/tweet?text=https%3A%2F%2Fmin1321.github.io%2Fpost%2Ftest%2F" aria-label="Share on Twitter">
+          <i class="fab fa-twitter" aria-hidden="true"></i><span>Share on Twitter</span>
+        </a>
+      </li>
+    
+      <li class="share-option">
+        <a class="share-option-btn" target="new" href="https://www.linkedin.com/sharing/share-offsite/?url=https%3A%2F%2Fmin1321.github.io%2Fpost%2Ftest%2F" aria-label="Share on Linkedin">
+          <i class="fab fa-linkedin" aria-hidden="true"></i><span>Share on Linkedin</span>
+        </a>
+      </li>
+    
+  </ul>
+</div>
+<div id="share-options-mask" class="share-options-mask"></div>
+
+
+    </div>
+    
+    <div id="about">
+  <div id="about-card">
+    <div id="about-btn-close">
+      <i class="fa fa-times"></i>
+    </div>
+    
+      <img id="about-card-picture" src="https://www.gravatar.com/avatar/cba64e21b2f1d09b90cbc3bf9e945cd4?s=110" alt="Author&#39;s picture" />
+    
+    <h4 id="about-card-name">Sukmin Seo</h4>
+    
+      <div id="about-card-bio">안녕하세요 min1321&rsquo;s 개발블로그입니다.</div>
+    
+    
+      <div id="about-card-job">
+        <i class="fa fa-briefcase"></i>
+        <br/>
+        Deep learning Engineer
+      </div>
+    
+    
+      <div id="about-card-location">
+        <i class="fa fa-map-marker-alt"></i>
+        <br/>
+        Korea
+      </div>
+    
+  </div>
+</div>
+
+    
+
+    
+  
+    
+      <div id="cover" style="background-image:url('https://min1321.github.io/images/cover.jpg');"></div>
+    
+  
+
+
+    
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js" integrity="sha512-894YE6QWD5I59HgZOGReFYm4dnWc1Qt5NtvYSaNcOP+u1T9qYdvdihz0PPSiiqn/+/3e7Jo4EaG7TubfWGUrMQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.1.0/highlight.min.js" integrity="sha512-z+/WWfyD5tccCukM4VvONpEtLmbAm5LDu7eKiyMQJ9m7OfPEDL7gENyDRL3Yfe8XAuGsS2fS4xSMnl6d30kqGQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/fancybox/3.5.7/jquery.fancybox.min.js" integrity="sha512-uURl+ZXMBrF4AwGaWmEetzrd+J5/8NRkWAvJx5sbPSSuOb0bZLqf+tOzniObO00BjHa/dD7gub9oCGMLPQHtQA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+
+
+<script src="https://min1321.github.io/js/script-yqzy9wdlzix4lbbwdnzvwx3egsne77earqmn73v9uno8aupuph8wfguccut.min.js"></script>
+
+
+  
+    <script async crossorigin="anonymous" defer integrity="sha512-gE8KAQyFIzV1C9+GZ8TKJHZS2s+n7EjNtC+IMRn1l5+WYJTHOODUM6JSjZhFhqXmc7bG8Av6XXpckA4tYhflnw==" src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.1.0/languages/apache.min.js"></script>
+  
+
+  
+    <script async crossorigin="anonymous" defer integrity="sha512-EWROca+bote+7Oaaar1F6y74iZj1r1F9rm/ly7o+/FwJopbBaWtsFDmaKoZDd3QiGU2pGacBirHJNivmGLYrow==" src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.1.0/languages/go.min.js"></script>
+  
+
+  
+    <script async crossorigin="anonymous" defer integrity="sha512-GDVzAn0wpx1yVtQsRWmFc6PhJiLBPdUic+h4GWgljBh904O3JU10fk9EKNpVyIoPqkFn54rgL2QBG4BmUTMpiQ==" src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.1.0/languages/http.min.js"></script>
+  
+
+  
+    <script async crossorigin="anonymous" defer integrity="sha512-UgZlma8NzkrDb/NWgmLIcTrH7i/CSnLLDRFqCSNF5NGPpjKmzyM25qcoXGOup8+cDakKyaiTDd7N4dyH4YT+IA==" src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.1.0/languages/less.min.js"></script>
+  
+
+  
+    <script async crossorigin="anonymous" defer integrity="sha512-lot9koe73sfXIrUvIPM/UEhuMciN56RPyBdOyZgfO53P2lkWyyXN7J+njcxIIBRV+nVDQeiWtiXg+bLAJZDTfg==" src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.1.0/languages/nginx.min.js"></script>
+  
+
+  
+    <script async crossorigin="anonymous" defer integrity="sha512-Zd3e7XxHP00TD0Imr0PIfeM0fl0v95kMWuhyAS3Wn1UTSXTkz0OhtRgBAr4JlmADRgiXr4x7lpeUdqaGN8xIog==" src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.1.0/languages/puppet.min.js"></script>
+  
+
+  
+    <script async crossorigin="anonymous" defer integrity="sha512-qtqDO052iXMSP+5d/aE/jMtL9vIIGvONgTJziC2K/ZIB1yEGa55WVxGE9/08rSQ62EoDifS9SWVGZ7ihSLhzMA==" src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.1.0/languages/scss.min.js"></script>
+  
+
+  
+    <script async crossorigin="anonymous" defer integrity="sha512-1NmkjnEDnwwwcu28KoQF8vs3oaPFokQHbmbtwGhFfeDsQZtVFI8zW2aE9O8yMYdpdyKV/5blE4pSWw4Z/Sv97w==" src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.1.0/languages/stylus.min.js"></script>
+  
+
+  
+    <script async crossorigin="anonymous" defer integrity="sha512-B2wSfruPjr8EJL6IIzQr1eAuDwrsfIfccNf/LCEdxELCgC/S/ZMt/Uvk80aD79m7IqOqW+Sw8nbkvha20yZpzg==" src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.1.0/languages/swift.min.js"></script>
+  
+
+  
+    <script async crossorigin="anonymous" defer integrity="sha512-28oDiQZGKUVN6wQ7PSLPNipOcmkCALXKwOi7bnkyFf8QiMZQxG9EQoy/iiNx6Zxj2cG2SbVa4dXKigQhu7GiFw==" src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.1.0/languages/yaml.min.js"></script>
+  
+
+
+<script>
+$(document).ready(function() {
+  hljs.configure({ classPrefix: '', useBR: false });
+  $('pre.code-highlight > code, pre > code').each(function(i, block) {
+    if (!$(this).hasClass('codeblock')) {
+      $(this).addClass('codeblock');
+    }
+    hljs.highlightBlock(block);
+  });
+});
+</script>
+
+
+
+
+    
+  </body>
+</html>
+

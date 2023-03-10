@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>kubernetes on HanHoRang Tech Blog</title>
+    <link>https://HanHoRang31.github.io/tags/kubernetes/</link>
+    <description>Recent content in kubernetes on HanHoRang Tech Blog</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-us</language>
+    <lastBuildDate>Fri, 10 Mar 2023 00:00:00 +0000</lastBuildDate><atom:link href="https://HanHoRang31.github.io/tags/kubernetes/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>PKOS 2기 1주차 - kops</title>
+      <link>https://HanHoRang31.github.io/post/pkos2-1-kops/</link>
+      <pubDate>Fri, 10 Mar 2023 00:00:00 +0000</pubDate>
+      
+      <guid>https://HanHoRang31.github.io/post/pkos2-1-kops/</guid>
+      <description>1 2 Production Kubernetes Online Study (=PKOS)는 쿠버네티스 실무 실습 스터디입니다. CloudNet@ Gasida(가시다)이 진행하며, 책 &amp;#34;24단계 실습으로 정복하는 쿠버네티스&amp;#34;을 기반으로 진행하고 있습니다. PKOS 1주차 스터디 내용과 느낌점을 정리하고자 한다. 스터디하면서 매번 느끼는 거지만 정말 괴수분들 너무 많고, 배울 점이 정말 많다… 특히 모임장님이신 가시다님의 스터디 내용은 볼 때마다 감탄만 나온다. 쿠버네티스에 대한 원리와 세부 컴포넌트에 대한 명령어까지 배운 점이 많다. 본 글에서는 필자가 배운 내용을 정리함과 동시에 개념에 대해 몰랐던 부분이나, 트러블슈팅에 대한 내용을 중점적으로 정리하였다.</description>
+    </item>
+    
+  </channel>
+</rss>

@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Projects on HanHoRang Tech Blog</title>
+    <link>https://HanHoRang31.github.io/projects/</link>
+    <description>Recent content in Projects on HanHoRang Tech Blog</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-us</language>
+    <lastBuildDate>Sun, 05 Mar 2023 00:00:00 +0000</lastBuildDate><atom:link href="https://HanHoRang31.github.io/projects/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>HanHoRang Git Repo</title>
+      <link>https://HanHoRang31.github.io/projects/a_project/</link>
+      <pubDate>Sun, 05 Mar 2023 00:00:00 +0000</pubDate>
+      
+      <guid>https://HanHoRang31.github.io/projects/a_project/</guid>
+      <description></description>
+    </item>
+    
+  </channel>
+</rss>

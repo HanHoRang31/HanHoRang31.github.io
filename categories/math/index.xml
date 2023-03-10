@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>math on Hugo Tania</title>
+    <link>https://example.com/categories/math/</link>
+    <description>Recent content in math on Hugo Tania</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-us</language>
+    <lastBuildDate>Sat, 22 May 2021 00:00:00 +0000</lastBuildDate><atom:link href="https://example.com/categories/math/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Katex support</title>
+      <link>https://example.com/post/test-katex/</link>
+      <pubDate>Sat, 22 May 2021 00:00:00 +0000</pubDate>
+      
+      <guid>https://example.com/post/test-katex/</guid>
+      <description>The following
+$$ \int_{a}^{b} x^2 dx $$
+Is an integral
+$$ \varphi = 1+\frac{1} {1+\frac{1} {1+\frac{1} {1+\cdots} } } $$
+Enable Katex in the config file by setting the katex param to true. This will import the necessary Katex CSS/JS.
+See the online reference of supported TeX functions.
+1 Inline math: $ \varphi = \dfrac{1+\sqrt5}{2}= 1.6180339887… $ Inline math: $ \varphi = \dfrac{1+\sqrt5}{2}= 1.6180339887… $
+1 2 3 Block math: $$ \varphi = 1+\frac{1} {1+\frac{1} {1+\frac{1} {1+\cdots} } } $$ Block math:</description>
+    </item>
+    
+    <item>
+      <title>MathJax support</title>
+      <link>https://example.com/post/test-mathjax/</link>
+      <pubDate>Sat, 22 May 2021 00:00:00 +0000</pubDate>
+      
+      <guid>https://example.com/post/test-mathjax/</guid>
+      <description>The following
+$$ \int_{a}^{b} x^2 dx $$
+Is an integral
+$$ \varphi = 1+\frac{1} {1+\frac{1} {1+\frac{1} {1+\cdots} } } $$
+Enable MathJax in the config file by setting the mathjax param to true. This will import the necessary MathJax CSS/JS.
+1 Inline math: $ \varphi = \dfrac{1+\sqrt5}{2}= 1.6180339887… $ Inline math: $ \varphi = \dfrac{1+\sqrt5}{2}= 1.6180339887… $
+1 2 3 Block math: $$ \varphi = 1+\frac{1} {1+\frac{1} {1+\frac{1} {1+\cdots} } } $$ Block math:</description>
+    </item>
+    
+  </channel>
+</rss>

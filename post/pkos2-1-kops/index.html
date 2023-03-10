@@ -1,0 +1,813 @@
+<!DOCTYPE html>
+<html lang="en-us">
+    
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="theme-color" content="dark">
+    <title>PKOS 2기 1주차 - kops | HanHoRang Tech Blog</title>
+
+    
+    
+    
+    <meta property="og:site_name" content="HanHoRang Tech Blog by Tania in Hugo" />
+    <meta property="og:title" content="PKOS 2기 1주차 - kops | HanHoRang Tech Blog"/>
+    <meta itemprop="name" content="PKOS 2기 1주차 - kops | HanHoRang Tech Blog" />
+    <meta name="twitter:title" content="PKOS 2기 1주차 - kops | HanHoRang Tech Blog" />
+    <meta name="application-name" content="PKOS 2기 1주차 - kops | HanHoRang Tech Blog" /><meta name="twitter:card" content="summary"/>
+
+    <meta name="description" content="kops, 쿠버네티스 클러스터 구축하기" />
+    <meta name="twitter:description" content="kops, 쿠버네티스 클러스터 구축하기 "/>
+    <meta itemprop="description" content=" kops, 쿠버네티스 클러스터 구축하기 "/>
+    <meta property="og:description" content=" kops, 쿠버네티스 클러스터 구축하기 " />
+
+    
+
+<meta property="og:type" content="article" />
+<meta property="article:publisher" content="Hugo Tania" />
+<meta property="og:article:published_time" content=2023-03-10T00:00:00Z />
+<meta property="article:published_time" content=2023-03-10T00:00:00Z />
+
+
+  <meta property="og:article:author" content="Han ho rnag" />
+  <meta property="article:author" content="Han ho rnag" />
+  <meta name="author" content="Han ho rnag" />
+
+
+
+
+<script defer type="application/ld+json">
+  {
+    "@context": "http://schema.org",
+    "@type": "Article",
+    "headline": "PKOS 2기 1주차 - kops",
+    "author": {
+      "@type": "Person",
+      "name": "Hugo Tania"
+    },
+    "datePublished": "2023-03-10",
+    "description": "kops, 쿠버네티스 클러스터 구축하기",
+    "wordCount":  1613 ,
+    "mainEntityOfPage": "True",
+    "dateModified": "2023-03-10",
+    "publisher": {
+      "@type": "Organization",
+      "name": "Hugo Tania",
+      "logo": {
+        "@type": "imageObject",
+        "url": "https:\/\/HanHoRang31.github.io\/favicon.ico"
+      }
+    }
+  }
+</script>
+
+
+
+    <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico" />
+    
+    <link rel="stylesheet" href="/sass/main.min.ab99ff095f832511e24ffb2fba2b51ad473b2f7e9301d674eba2c6c3a6e8bd81.css">
+    
+</head>
+    
+    <script>
+        (function() {
+            const colorSchemeKey = 'ThemeColorScheme';
+            if(!localStorage.getItem(colorSchemeKey)){
+                localStorage.setItem(colorSchemeKey, "auto");
+            }
+        })();
+    </script><script>
+    (function() {
+        const colorSchemeKey = 'ThemeColorScheme';
+        const colorSchemeItem = localStorage.getItem(colorSchemeKey);
+        const supportDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches === true;
+
+        if (colorSchemeItem == 'dark' || colorSchemeItem === 'auto' && supportDarkMode) {
+            
+
+            document.documentElement.dataset.userColorScheme = 'dark';
+        } else {
+            document.documentElement.dataset.userColorScheme = 'light';
+        }
+    })();
+</script>
+
+
+    <body class="dark">
+        <nav class="navbar">
+    <div class="container">
+        <div class="flex">
+            <div>
+                <a class="brand" href="/">
+                    
+                    
+                        <img src="/favicon.ico" />
+                    
+                    HanHoRang Tech Blog
+                    </a>
+            </div>
+            <div class="flex">
+                
+                <a href="/articles/">Articles</a>
+                
+                
+                    <button id="dark-mode-button">
+                    <svg class="light" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" aria-hidden="true" focusable="false" width="1em" height="1em" style="-ms-transform: rotate(360deg); -webkit-transform: rotate(360deg); transform: rotate(360deg);" preserveAspectRatio="xMidYMid meet" viewBox="0 0 36 36"><path fill="#FFD983" d="M30.312.776C32 19 20 32 .776 30.312c8.199 7.717 21.091 7.588 29.107-.429C37.9 21.867 38.03 8.975 30.312.776z"/><path d="M30.705 15.915a1.163 1.163 0 1 0 1.643 1.641a1.163 1.163 0 0 0-1.643-1.641zm-16.022 14.38a1.74 1.74 0 0 0 0 2.465a1.742 1.742 0 1 0 0-2.465zm13.968-2.147a2.904 2.904 0 0 1-4.108 0a2.902 2.902 0 0 1 0-4.107a2.902 2.902 0 0 1 4.108 0a2.902 2.902 0 0 1 0 4.107z" fill="#FFCC4D"/><rect x="0" y="0" width="36" height="36" fill="rgba(0, 0, 0, 0)" /></svg>
+                    <svg class="dark" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" aria-hidden="true" focusable="false" width="1em" height="1em" style="-ms-transform: rotate(360deg); -webkit-transform: rotate(360deg); transform: rotate(360deg);" preserveAspectRatio="xMidYMid meet" viewBox="0 0 36 36"><path fill="#FFD983" d="M16 2s0-2 2-2s2 2 2 2v2s0 2-2 2s-2-2-2-2V2zm18 14s2 0 2 2s-2 2-2 2h-2s-2 0-2-2s2-2 2-2h2zM4 16s2 0 2 2s-2 2-2 2H2s-2 0-2-2s2-2 2-2h2zm5.121-8.707s1.414 1.414 0 2.828s-2.828 0-2.828 0L4.878 8.708s-1.414-1.414 0-2.829c1.415-1.414 2.829 0 2.829 0l1.414 1.414zm21 21s1.414 1.414 0 2.828s-2.828 0-2.828 0l-1.414-1.414s-1.414-1.414 0-2.828s2.828 0 2.828 0l1.414 1.414zm-.413-18.172s-1.414 1.414-2.828 0s0-2.828 0-2.828l1.414-1.414s1.414-1.414 2.828 0s0 2.828 0 2.828l-1.414 1.414zm-21 21s-1.414 1.414-2.828 0s0-2.828 0-2.828l1.414-1.414s1.414-1.414 2.828 0s0 2.828 0 2.828l-1.414 1.414zM16 32s0-2 2-2s2 2 2 2v2s0 2-2 2s-2-2-2-2v-2z"/><circle fill="#FFD983" cx="18" cy="18" r="10"/><rect x="0" y="0" width="36" height="36" fill="rgba(0, 0, 0, 0)" /></svg>
+                    </button>
+                
+            </div>
+            </div>
+    </div>
+</nav>
+
+        <main>
+            
+<div class="container">
+    <article>
+        <header class="article-header">
+            <div class="thumb">
+                <div>
+                    <h1>PKOS 2기 1주차 - kops</h1>
+                    <div class="post-meta">
+                        <div>
+                            
+                            
+                            By HanHoRnag | <time>March 10, 2023</time>
+                            | 8 minutes
+                        </div>
+                        <div class="tags">
+                            
+                            <a href="/tags/kans/">KANS</a>
+                            
+                            <a href="/tags/kops/">kops</a>
+                            
+                            <a href="/tags/cloud/">cloud</a>
+                            
+                            <a href="/tags/aws/">AWS</a>
+                            
+                            <a href="/tags/kubernetes/">kubernetes</a>
+                            
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </header>
+    </article>
+
+    <div class="article-post">
+    <div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-markdown" data-lang="markdown"><span class="line"><span class="cl">Production Kubernetes Online Study (=PKOS)는 쿠버네티스 실무 실습 스터디입니다.
+</span></span><span class="line"><span class="cl">CloudNet@ Gasida(가시다)이 진행하며, 책 &#34;24단계 실습으로 정복하는 쿠버네티스&#34;을 기반으로 진행하고 있습니다. 
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>PKOS 1주차 스터디 내용과 느낌점을 정리하고자 한다. 스터디하면서 매번 느끼는 거지만 정말 괴수분들 너무 많고, 배울 점이 정말 많다… 특히 모임장님이신 가시다님의 스터디 내용은 볼 때마다 감탄만 나온다. 쿠버네티스에 대한 원리와 세부 컴포넌트에 대한 명령어까지 배운 점이 많다. 본 글에서는 필자가 배운 내용을 정리함과 동시에 개념에 대해 몰랐던 부분이나, 트러블슈팅에 대한 내용을 중점적으로 정리하였다.</p>
+<p>추가로, 몰랐던 부분은 ChatGPT를 활용하여 작성하였다. ChatGPT가 주는 답변은 대체로 만족하지만, 공식 문서에 대한 내용과 비교하여 다른 내용이 일부 존재한다. ChatGPT 활용시, 공식 문서와 이중 검증이 필요하다고 본다. 본 글에서도 답변 내용을 일부 수정하여 작성한다.</p>
+<p><br><br></p>
+<h2 id="kops">
+    <a href="#kops" class="anchor">
+        <svg class="icon" aria-hidden="true" focusable="false" height="16" version="1.1" viewBox="0 0 16 16" width="16">
+            <path fill-rule="evenodd"
+                d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z">
+            </path>
+        </svg>
+    </a>
+    kops?
+</h2>
+<p>kops는 쿠버네티스 클러스터를 생성, 업그레이드, 관리하는 데 사용되는 오픈 소스 도구이다. 명령어 툴로 쉽게 쿠버네티스 클러스터를 구성하고 관리할 수 있는 툴이라고 이해하면 되겠다. 쿠버네티스 클러스터의 인프라를 코드로 정의하고 관리하는데 사용할 수 있어 IaC 이며, 같은 IaC 툴인 Terraform(테라폼)과의 특징을 비교하면 다음과 같다.</p>
+<p>kops과 Terraform 특징 비교 표</p>
+<table>
+<thead>
+<tr>
+<th>특징</th>
+<th>kops</th>
+<th>Terraform</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>지원하는 클라우드 플랫폼(Provider)</td>
+<td>AWS, GCP, OpenStack, DigitalOcean 등</td>
+<td>AWS, GCP, Azure, Oracle Cloud, Alibaba Cloud, VMware, OpenStack 등</td>
+</tr>
+<tr>
+<td>관리 대상</td>
+<td>Kubernetes 클러스터</td>
+<td>인프라스트럭처 (서버, 네트워크, 데이터베이스 등)</td>
+</tr>
+<tr>
+<td>코드 작성 방식</td>
+<td>YAML 파일</td>
+<td>HCL (HashiCorp Configuration Language)</td>
+</tr>
+<tr>
+<td>상태 관리</td>
+<td>상태를 지정된 저장소(state)에 저장</td>
+<td>상태를 지정된 저장소(backend)에 저장</td>
+</tr>
+<tr>
+<td>장점</td>
+<td>간단하고 직관적인 클러스터 구성</td>
+<td>AWS뿐만 아니라 다른 클라우드 프로바이더도 지원</td>
+</tr>
+<tr>
+<td>단점</td>
+<td>Kubernetes 클러스터만 지원</td>
+<td>Kops에 비해 배우기가 어려움</td>
+</tr>
+</tbody>
+</table>
+<br>
+<br> 
+<p>그렇다면 kops는 언제 써야 할까?</p>
+<p>모임장님 의견과 동일하게 <code>교육용</code>이 적합하다고 본다. 쿠버네티스 클러스터 구축이 간단하고 배우기 쉽다. 또한, 배포 속도도 빠르다. 쿠버네티스 관리형 서비스인 EKS 와 비교했을 때, 마스터 노드들을 세부적으로 알 수 있어 세부 원리 이해에 좋고, 비용도 저렴하다. kops 공식문서도 정리가 잘 되어 있다. 눈여겨 볼 점은 공식문서의  addon과 Operation 부분이다. 클러스터 관리를 및 addon 배포를 간단하게 테스트할 수 있고 배포 yaml를 확인할 수 있기 때문이다.</p>
+<br>
+<br><br>
+<h3 id="실습">
+    <a href="#%ec%8b%a4%ec%8a%b5" class="anchor">
+        <svg class="icon" aria-hidden="true" focusable="false" height="16" version="1.1" viewBox="0 0 16 16" width="16">
+            <path fill-rule="evenodd"
+                d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z">
+            </path>
+        </svg>
+    </a>
+    실습
+</h3>
+<p>스터디 내용으로 kops를 통해 AWS에 쿠버네티스 클러스터를 구축하고, 게임 마리오를 예제로 배포하였다. 과정은 크게 3가지로 진행하였다.</p>
+<p><img loading="lazy" 
+    src="/./PKOS2-1-kops/arch.png" 
+    alt="arch.png" 
+     
+    width=2000 
+    height="1172"  /></p>
+<ol>
+<li>베스천 서버(kops-ec2) 구성</li>
+<li>kops 를 통한 클러스터 구축 및 확인</li>
+<li>External DNS 와 게임, 슈퍼마리오 배포</li>
+</ol>
+<p>실습 과정 전 사전 작업으로 퍼블릭 도메인 구입, 키 페어 생성, S3 버킷 생성, AWS IAM 자격 증명을 진행하였다. 사전 작업 내용은 <a href="https://kops.sigs.k8s.io/getting_started/aws/">공식 문서</a>에서 참고가 가능하다.</p>
+<ul>
+<li>
+<p><strong>Q. 퍼블릭 도메인 구입 이유 ?</strong></p>
+<p>퍼블릭 도메인은 쿠버네티스 클러스터 이름으로 사용하기 위하여 구입하였다. 클러스터 이름을 도메인으로 설정하면 외부에서 서비스 디스커버리 및 클러스터 액세스가 쉽게 가능해지기 때문이다. 스터디에서는 해당 도메인을 통해 클러스터 구성 확인과 게임 배포 후 접근을 위해 사용하였다.</p>
+</li>
+</ul>
+<p><br><br></p>
+<h3 id="1--베스천-서버kops-ec2-구성">
+    <a href="#1--%eb%b2%a0%ec%8a%a4%ec%b2%9c-%ec%84%9c%eb%b2%84kops-ec2-%ea%b5%ac%ec%84%b1" class="anchor">
+        <svg class="icon" aria-hidden="true" focusable="false" height="16" version="1.1" viewBox="0 0 16 16" width="16">
+            <path fill-rule="evenodd"
+                d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z">
+            </path>
+        </svg>
+    </a>
+    1.  베스천 서버(kops-ec2) 구성
+</h3>
+<p>베스천 서버 구성은 모임장님이 공유해주신 <a href="https://s3.ap-northeast-2.amazonaws.com/cloudformation.cloudneta.net/K8S/kops-new-ec2.yaml">CloudFormation 템플릿</a>을 통해 구성하였다. 템플릿 구성은 VPC 와 igw 구성같은 AWS 네트워크 구성과 EC2 서버 설정으로 되어있다. 그 중 EC2 서버 설정 스크립트를 확인할 필요가 있는데 kops와 필요 패키지를 같이 설치해주기 때문이다.</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span><span class="lnt">31
+</span><span class="lnt">32
+</span><span class="lnt">33
+</span><span class="lnt">34
+</span><span class="lnt">35
+</span><span class="lnt">36
+</span><span class="lnt">37
+</span><span class="lnt">38
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl"><span class="cp">#!/bin/bash
+</span></span></span><span class="line"><span class="cl"><span class="cp"></span>
+</span></span><span class="line"><span class="cl"><span class="c1"># 호스트 이름 변경 </span>
+</span></span><span class="line"><span class="cl">hostnamectl --static set-hostname kops-ec2
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1"># EC2 서버 시간을 서울로 변경 </span>
+</span></span><span class="line"><span class="cl">ln -sf /usr/share/zoneinfo/Asia/Seoul /etc/localtime
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1"># Install Packages</span>
+</span></span><span class="line"><span class="cl"><span class="nb">cd</span> /root
+</span></span><span class="line"><span class="cl">yum -y install tree jq git htop
+</span></span><span class="line"><span class="cl"><span class="c1">## kubectl 설치 </span>
+</span></span><span class="line"><span class="cl">curl -LO <span class="s2">&#34;https://dl.k8s.io/release/</span><span class="k">$(</span>curl -L -s https://dl.k8s.io/release/stable.txt<span class="k">)</span><span class="s2">/bin/linux/amd64/kubectl&#34;</span>
+</span></span><span class="line"><span class="cl">install -o root -g root -m <span class="m">0755</span> kubectl /usr/local/bin/kubectl
+</span></span><span class="line"><span class="cl"><span class="c1">## kops 설치</span>
+</span></span><span class="line"><span class="cl">curl -Lo kops https://github.com/kubernetes/kops/releases/download/<span class="k">$(</span>curl -s https://api.github.com/repos/kubernetes/kops/releases/latest <span class="p">|</span> grep tag_name <span class="p">|</span> cut -d <span class="s1">&#39;&#34;&#39;</span> -f 4<span class="k">)</span>/kops-linux-amd64
+</span></span><span class="line"><span class="cl">chmod +x kops
+</span></span><span class="line"><span class="cl">mv kops /usr/local/bin/kops
+</span></span><span class="line"><span class="cl"><span class="c1">## awscli 설치</span>
+</span></span><span class="line"><span class="cl">curl <span class="s2">&#34;https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip&#34;</span> -o <span class="s2">&#34;awscliv2.zip&#34;</span>
+</span></span><span class="line"><span class="cl">unzip awscliv2.zip
+</span></span><span class="line"><span class="cl">sudo ./aws/install
+</span></span><span class="line"><span class="cl"><span class="c1">## 환경 변수 설정</span>
+</span></span><span class="line"><span class="cl"><span class="nb">export</span> <span class="nv">PATH</span><span class="o">=</span>/usr/local/bin:<span class="nv">$PATH</span>
+</span></span><span class="line"><span class="cl"><span class="nb">source</span> ~/.bash_profile
+</span></span><span class="line"><span class="cl"><span class="c1">## aws cli 자동 완성 설정</span>
+</span></span><span class="line"><span class="cl"><span class="nb">complete</span> -C <span class="s1">&#39;/usr/local/bin/aws_completer&#39;</span> aws
+</span></span><span class="line"><span class="cl"><span class="c1">## SSH 설정 </span>
+</span></span><span class="line"><span class="cl">ssh-keygen -t rsa -N <span class="s2">&#34;&#34;</span> -f /root/.ssh/id_rsa
+</span></span><span class="line"><span class="cl"><span class="c1">## vi -&gt; vim 으로 설정 </span>
+</span></span><span class="line"><span class="cl"><span class="nb">echo</span> <span class="s1">&#39;alias vi=vim&#39;</span> &gt;&gt; /etc/profile
+</span></span><span class="line"><span class="cl"><span class="c1">## root 계정 변환</span>
+</span></span><span class="line"><span class="cl"><span class="nb">echo</span> <span class="s1">&#39;sudo su -&#39;</span> &gt;&gt; /home/ec2-user/.bashrc
+</span></span><span class="line"><span class="cl"><span class="c1">## helm 설치</span>
+</span></span><span class="line"><span class="cl">curl -s https://raw.githubusercontent.com/helm/helm/master/scripts/get-helm-3 <span class="p">|</span> bash
+</span></span><span class="line"><span class="cl">wget https://github.com/andreazorzetto/yh/releases/download/v0.4.0/yh-linux-amd64.zip
+</span></span><span class="line"><span class="cl">unzip yh-linux-amd64.zip
+</span></span><span class="line"><span class="cl">mv yh /usr/local/bin/
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>베스천 서버 구성 과정 중 에러 발생 시, AWS Cloudformation에서 로그를 확인할 수 있다. 필자는 VPC가 최대여서 베스천 서버 구성이 안되었다. 해결을 위해 필요없는 VPC를 삭제하고, 템플릿으로 생성한 Cloudformtation 스택을 삭제하고 재실행하였다.</p>
+<p><img loading="lazy" 
+    src="/./PKOS2-1-kops/study1.png" 
+    alt="study1.png" 
+     
+    width=1843 
+    height="821"  /></p>
+<p><br><br></p>
+<h3 id="2-kops를-통한-클러스터-구축-및-확인">
+    <a href="#2-kops%eb%a5%bc-%ed%86%b5%ed%95%9c-%ed%81%b4%eb%9f%ac%ec%8a%a4%ed%84%b0-%ea%b5%ac%ec%b6%95-%eb%b0%8f-%ed%99%95%ec%9d%b8" class="anchor">
+        <svg class="icon" aria-hidden="true" focusable="false" height="16" version="1.1" viewBox="0 0 16 16" width="16">
+            <path fill-rule="evenodd"
+                d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z">
+            </path>
+        </svg>
+    </a>
+    2. kops를 통한 클러스터 구축 및 확인
+</h3>
+<p>쿠버네티스 클러스터 구축은 kops 명령어로 구축하였다. 클러스터 생성에 대한 옵션은 <a href="https://kops.sigs.k8s.io/cli/kops_create_cluster/">공식 문서</a>에서 참고할 수 있었다.</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl"><span class="c1"># 클러스터 생성 bash</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1">## export KOPS_STATE_STORE=s3://( 클러스터 관리 저장소로 활용할 버킷 이름)</span>
+</span></span><span class="line"><span class="cl"><span class="c1">## export KOPS_CLUSTER_NAME=&lt;도메인 메인 주소&gt;</span>
+</span></span><span class="line"><span class="cl"><span class="c1">## export REGION=ap-northeast-2 지역</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">kops create cluster <span class="se">\
+</span></span></span><span class="line"><span class="cl"><span class="se"></span>--cloud aws <span class="se">\
+</span></span></span><span class="line"><span class="cl"><span class="se"></span>--name <span class="nv">$KOPS_CLUSTER_NAME</span> <span class="se">\
+</span></span></span><span class="line"><span class="cl"><span class="se"></span>--state s3://<span class="nv">$KOPS_STATE_STORE</span> <span class="se">\
+</span></span></span><span class="line"><span class="cl"><span class="se"></span>--zones <span class="s2">&#34;</span><span class="nv">$REGION</span><span class="s2">&#34;</span>a,<span class="s2">&#34;</span><span class="nv">$REGION</span><span class="s2">&#34;</span>c <span class="se">\
+</span></span></span><span class="line"><span class="cl"><span class="se"></span>--networking amazonvpc <span class="se">\
+</span></span></span><span class="line"><span class="cl"><span class="se"></span>--network-cidr 172.30.0.0/16 <span class="se">\
+</span></span></span><span class="line"><span class="cl"><span class="se"></span>--kubernetes-version <span class="s2">&#34;1.24.10&#34;</span> <span class="se">\
+</span></span></span><span class="line"><span class="cl"><span class="se"></span>--node-count <span class="m">2</span> <span class="se">\
+</span></span></span><span class="line"><span class="cl"><span class="se"></span>--node-size t3.medium <span class="se">\
+</span></span></span><span class="line"><span class="cl"><span class="se"></span>--master-size t3.medium <span class="se">\
+</span></span></span><span class="line"><span class="cl"><span class="se"></span>--ssh-public-key ~/.ssh/id_rsa.pub <span class="se">\
+</span></span></span><span class="line"><span class="cl"><span class="se"></span>-y
+</span></span></code></pre></td></tr></table>
+</div>
+</div><ul>
+<li><code>--state</code> : 클러스터 관련 설정 파일들이 저장된다. 이렇게 저장된 설정 파일들은 나중에 클러스터를 업데이트하거나 삭제할 때 사용된다. 실습에서는 외부 스토리지인 S3를 이용하였다.</li>
+<li>—state 플래그를 사용하지 않으면 로컬 저장소인 <code>~/.kops</code> 에 클러스터 설정 파일이 저장된다. 하지만 로컬 시스템에 대한 의존성이 높아지고 협업시에 대한 공유성이 떨어져 외부 스토리지를 사용하는 것을 권장한다.</li>
+</ul>
+<p>필자는 클러스터 생성시 VPC 개수 이유(error creating VPC: VpcLimitExceeded) 로 클러스터 생성이 되지 않았다.</p>
+<p><img loading="lazy" 
+    src="/./PKOS2-1-kops/kops-cluster-error.png" 
+    alt="kops cluster-error.png" 
+     
+    width=1968 
+    height="240"  /></p>
+<p>재설치를 위해서는 기존 클러스터 삭제가 필요하다. 실습 내용의 구성 단계에 따라 삭제하면 된다.</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">1. EC2 Auto Scaling 그룹 삭제
+</span></span><span class="line"><span class="cl">2. EC2 시작 템플릿 Launch Templates 삭제
+</span></span><span class="line"><span class="cl">3. S3 버킷 비우기
+</span></span><span class="line"><span class="cl">4. Route53에 추가된 A 레코드 3개 삭제 
+</span></span><span class="line"><span class="cl">5. CloudFormation 삭제
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>VPC 문제는 S3 버킷만 지우면 됐었다.  Cloudformtation 스택 생성시 에러가 발생하여 AWS 리소스들은 생성되지 않았기 때문이다. 아래는 kops 를 통한 클러스터 구성 과정을 정리하였다</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span><span class="lnt">8
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">1. kops create cluster 명령어 실행
+</span></span><span class="line"><span class="cl">2. 클러스터 구성 정보를 S3에 저장
+</span></span><span class="line"><span class="cl">3. 클러스터 구성 정보를 기반으로 CloudFormation 스택 생성
+</span></span><span class="line"><span class="cl">4. VPC 및 관련 리소스 생성
+</span></span><span class="line"><span class="cl">5. 마스터 노드 EC2 인스턴스 생성
+</span></span><span class="line"><span class="cl">6. 노드 그룹 EC2 인스턴스 생성
+</span></span><span class="line"><span class="cl">7. 노드 그룹 EC2 인스턴스가 마스터 노드를 참조하여 클러스터에 가입
+</span></span><span class="line"><span class="cl">8. 클러스터가 실행되고 kubectl을 통해 액세스 가능해짐
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p><strong>클러스터 구성 확인 확인</strong></p>
+<p>스터디 실습 내용으로  클러스터 구성 확인에 대한 것도 시간을 할당하여 확인하였다. 쿠버네티스 클러스터가 복잡한 만큼 확인할 것이 많았는데, 실습 내용을 참고로 하여 명령어를 정리해보았다.</p>
+<ul>
+<li>
+<p>클러스터 도메인 확인</p>
+<p>클러스터 구성시 클러스터 이름을 퍼블릭 도메인으로 입력하였다. 필자는 퍼블릭 도메인을 AWS Route53 에서 구매하였는데, 이 같은 경우 route53에서 A레코드도메인이 추가된 것을 확인할 수 있다.</p>
+<p><img loading="lazy" 
+    src="/./PKOS2-1-kops/create-cluster-check1.png" 
+    alt="create-cluster-check1.png" 
+     
+    width=1450 
+    height="438"  /></p>
+</li>
+<li>
+<p>클러스터 구성 정보 확인</p>
+<p>클러스터 구성 정보는 kubectl 와 kops 툴로 확인이 가능하다. kops 툴을 통해 클러스터 정보 뿐만 아니라 이미지 확인(assets), 보안 정보 확인이 가능하다. <a href="https://kops.sigs.k8s.io/cli/kops_get/">공식문서</a>를 링크한다.</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl"><span class="c1"># 클러스터 확인 </span>
+</span></span><span class="line"><span class="cl">kops get cluster 
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1"># 클러스터 인스턴스 그룹 확인 </span>
+</span></span><span class="line"><span class="cl">kops get ig 
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1"># 클러스터 인스턴스 확인</span>
+</span></span><span class="line"><span class="cl">kops get instances
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1"># 클러스터 접근 정보 확인 </span>
+</span></span><span class="line"><span class="cl">kubectl get nodes -v6
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1"># 클러스터 배포 파드 확인 </span>
+</span></span><span class="line"><span class="cl">kubectl get pods -A 
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1"># 클러스터 정보 확인</span>
+</span></span><span class="line"><span class="cl">k**ubectl cluster-info dump**
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p><img loading="lazy" 
+    src="/./PKOS2-1-kops/kops-craete-cluster.png" 
+    alt="kops-craete-cluster.png" 
+     
+    width=2052 
+    height="504"  /></p>
+<p><img loading="lazy" 
+    src="/./PKOS2-1-kops/kops-create-cluster3.png" 
+    alt="kops-create-cluster3.png" 
+     
+    width=1898 
+    height="848"  /></p>
+</li>
+<li>
+<p>클러스터 세부 구성 확인</p>
+<p>클러스터 세부 구성 확인으로 스토리지, 네트워크, 파드, 마스터 노드 컴포넌트들의 구성 정보를 확인하였다. 추후 참고용을 위해 정리해둔다. 퍼블릭 도메인을 이용하여 구성 정보를 확인할 수 있다.</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl"><span class="c1"># storage class 확인 </span>
+</span></span><span class="line"><span class="cl">kubectl get sc
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1"># 노드별 스토리지 확인 </span>
+</span></span><span class="line"><span class="cl">lsblk 
+</span></span><span class="line"><span class="cl">df -hT
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1"># 네트워크 확인 </span>
+</span></span><span class="line"><span class="cl">sudo iptables -t nat -S
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1"># 마스터 노드 컴포넌트 확인 </span>
+</span></span><span class="line"><span class="cl">**tree /etc/kubernetes/manifests/
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1"># kubelet 작동 확인</span>
+</span></span><span class="line"><span class="cl">systemctl status kubelet
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1"># 컨테이너 접근 방법 확인</span>
+</span></span><span class="line"><span class="cl">ps axf <span class="p">|</span> grep /usr/bin/containerd
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1"># ec2 메타데이터 확인 - IAM role 확인** </span>
+</span></span><span class="line"><span class="cl"><span class="nv">TOKEN</span><span class="o">=</span><span class="sb">`</span>curl -s -X PUT <span class="s2">&#34;http://169.254.169.254/latest/api/token&#34;</span> -H <span class="s2">&#34;X-aws-ec2-metadata-token-ttl-seconds: 21600&#34;</span><span class="sb">`</span>
+</span></span><span class="line"><span class="cl"><span class="nb">echo</span> <span class="nv">$TOKEN</span>
+</span></span><span class="line"><span class="cl">curl -s -H <span class="s2">&#34;X-aws-ec2-metadata-token: </span><span class="nv">$TOKEN</span><span class="s2">&#34;</span> –v http://169.254.169.254/latest/meta-data/iam/security-credentials/&lt;도메인&gt; <span class="p">|</span> jq
+</span></span></code></pre></td></tr></table>
+</div>
+</div><ul>
+<li>
+<p>kubectl get sc : kops로 클러스터 구성시 스토리지 CSI 가 기본 제공된다. 스토리지 CSI 는 클러스터 스토리지 관리 기능 플러그인이다. <code>kops-csi</code> 와 <code>kops-ssd</code> 가 존재하는데 <code>kops-csi</code> 는 AWS EBS(gp3),  EFS, GCP 등의 스토리지를 사용할 수 있는 플러그인이고, <code>kops-ssd</code>  는 NVMe SSD 기반 인스턴스 스토리지를 사용할 수 있는 플러그인이다.</p>
+</li>
+<li>
+<p>sudo iptables -t nat -S : Kubernetes에서 사용하는 iptables rule 을 확인할 수 있다. 이번 장에서 구성한 네트워크 CNI는 VPC로 노드 IP와 서비스 IP의 할당별 iptables rule을 확인할 수 있다.</p>
+<ul>
+<li>
+<p>파드 IP 설정 iptables rule</p>
+<p><img loading="lazy" 
+    src="/./PKOS2-1-kops/%e1%84%91%e1%85%a1%e1%84%83%e1%85%b3%e1%84%8e%e1%85%a6%e1%84%8b%e1%85%b5%e1%86%ab%e1%84%92%e1%85%aa%e1%86%a8%e1%84%8b%e1%85%b5%e1%86%ab.png" 
+    alt="파드체인확인.png" 
+     
+    width=1994 
+    height="332"  /></p>
+<ul>
+<li>임의의 애플리케이션 파드 IP를 확인했다. 체인을 따라가보면 들어오는 패킷 중 목적지 IP 주소가 100.64.59.121/32이고, 프로토콜이 TCP이며, 목적지 포트가 80인 패킷이 172.30.41.131:8080(파드 할당 IP) 으로 가는 것을 확인 할 수 있다.</li>
+</ul>
+</li>
+<li>
+<p>노드 IP 설정 iptables rule</p>
+<p><img loading="lazy" 
+    src="/./PKOS2-1-kops/%e1%84%82%e1%85%a9%e1%84%83%e1%85%b3IP%e1%84%8e%e1%85%a6%e1%84%8b%e1%85%b5%e1%86%ab%e1%84%92%e1%85%aa%e1%86%a8%e1%84%8b%e1%85%b5%e1%86%ab.png" 
+    alt="노드IP체인확인.png" 
+     
+    width=2022 
+    height="230"  /></p>
+<ul>
+<li>임의의 노트 IP를 확인했다. 노드 IP에 대해NAT 규칙을 적용하는 것을 확인할 수 있었다.</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>
+<p>tree /etc/kubernetes/manifests/ : 마스터 노드에서 작동하는 컴포넌트 mainfest 정보들이다. kubelet에 의해 Static Pod로 배포되어 있으며 API 서버의 명령어(kubectl apply, delete) 등으로 관리가 불가능하다.  kubelet을 통해 아래 컴포넌트의 manifest 를 모니터링하고 있으며 manifest 수정시 자동으로 업데이트된다.</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">/etc/kubernetes/manifests/
+</span></span><span class="line"><span class="cl">├── etcd-events-master-ap-northeast-2a.manifest
+</span></span><span class="line"><span class="cl">├── etcd-main-master-ap-northeast-2a.manifest
+</span></span><span class="line"><span class="cl">├── kube-apiserver.manifest
+</span></span><span class="line"><span class="cl">├── kube-controller-manager.manifest
+</span></span><span class="line"><span class="cl">├── kube-proxy.manifest
+</span></span><span class="line"><span class="cl">└── kube-scheduler.manifest
+</span></span></code></pre></td></tr></table>
+</div>
+</div></li>
+</ul>
+</li>
+</ul>
+<p><br><br></p>
+<h3 id="3--external-dns--게임-마리오-배포">
+    <a href="#3--external-dns--%ea%b2%8c%ec%9e%84-%eb%a7%88%eb%a6%ac%ec%98%a4-%eb%b0%b0%ed%8f%ac" class="anchor">
+        <svg class="icon" aria-hidden="true" focusable="false" height="16" version="1.1" viewBox="0 0 16 16" width="16">
+            <path fill-rule="evenodd"
+                d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z">
+            </path>
+        </svg>
+    </a>
+    3.  External DNS,  게임 마리오 배포
+</h3>
+<p>실습 예제로는 게임 마리오를 배포하였다. External DNS은 쿠버네티스 addon으로, 내부에서 동작하는 마리오 서비스의 IP 주소를 외부의 DNS 서버에 자동으로 등록시켜주기 위해 배포하였다. 인상 깊은 점은 addon인 ExternalDNS 배포였는데, kops를 통해 클러스터 정보를 수정하니 자동으로 배포되었다.</p>
+<p><a href="https://kops.sigs.k8s.io/addons/">공식 문서1,</a> <a href="https://kops.sigs.k8s.io/cluster_spec/#externaldns">공식 문서2</a> 에는 클러스터 스펙 수정시의 옵션이 잘 정리되어 있다. 추후 기능 테스트시 접근을 위해 남겨둔다.</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl"><span class="c1"># 클러스터 수정 </span>
+</span></span><span class="line"><span class="cl">kops edit cluster
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1"># 아래 spec 에 ExternalDNS 정보 추가**</span>
+</span></span><span class="line"><span class="cl">--------------------------
+</span></span><span class="line"><span class="cl">spec:
+</span></span><span class="line"><span class="cl">  externalDns:
+</span></span><span class="line"><span class="cl">    provider: external-dns
+</span></span><span class="line"><span class="cl">--------------------------
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1"># 클러스터 업데이트 후, 롤링 업데이트 진행</span>
+</span></span><span class="line"><span class="cl">kops update cluster --yes <span class="o">&amp;&amp;</span> <span class="nb">echo</span> <span class="o">&amp;&amp;</span> sleep <span class="m">3</span> <span class="o">&amp;&amp;</span> kops rolling-update cluster
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p><img loading="lazy" 
+    src="/./PKOS2-1-kops/mario.png" 
+    alt="mario.png" 
+     
+    width=677 
+    height="578"  /></p>
+<p><br><br></p>
+<h2 id="트러블슈팅">
+    <a href="#%ed%8a%b8%eb%9f%ac%eb%b8%94%ec%8a%88%ed%8c%85" class="anchor">
+        <svg class="icon" aria-hidden="true" focusable="false" height="16" version="1.1" viewBox="0 0 16 16" width="16">
+            <path fill-rule="evenodd"
+                d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z">
+            </path>
+        </svg>
+    </a>
+    트러블슈팅
+</h2>
+<p>API 서버 접근시, 아래의 에러 메세지(couldn’t get current server API group list: ~ dial tcp connect refused )가 확인되었다.</p>
+<p><img loading="lazy" 
+    src="/./PKOS2-1-kops/configerror.png" 
+    alt="configerror.png" 
+     
+    width=1966 
+    height="340"  /></p>
+<p>원인은 클러스터 접근 토큰 만료였다. kops 명령어를 통해 자격 증명을 재발급(<strong>kops export kubeconfig)</strong> 받을 수 있다하여 시도해보았지만, 쿠버네티스 유저가 없어서 그런지 접근 토큰이 <code>null</code> 로 발급되었다. kops 클러스터 관리 저장소인 s3에도 접근 토큰 정보가 없었다. 필자는 마스터 노드에 접근(~/.kube/config)하여 토큰을 복사하니 해결하였다.</p>
+<p><br><br></p>
+<h2 id="마치며">
+    <a href="#%eb%a7%88%ec%b9%98%eb%a9%b0" class="anchor">
+        <svg class="icon" aria-hidden="true" focusable="false" height="16" version="1.1" viewBox="0 0 16 16" width="16">
+            <path fill-rule="evenodd"
+                d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z">
+            </path>
+        </svg>
+    </a>
+    마치며
+</h2>
+<p>kops 간단하다! 특히 마스터 노드를 직접 접근하여 컨트롤할 수 있어 클러스터 동작 이해에 좋은 툴이였다. 공식문서도 참고할 것이 많다. 공식 문서 kops operation 에 재밌는 주제들(카펜터)이 많던데 얼른 테스트해보고 싶은 마음이다. 시간나는대로 정리해서 올려보겠다.</p>
+
+    </div>
+</div>
+
+<div class="container">
+    
+    <nav class="flex container suggested">
+        
+        
+        
+    </nav>
+    
+</div>
+ 
+<div class="container">
+    
+    <script src="https://giscus.app/client.js" 
+        data-repo="WingLim/hugo-tania"
+        data-repo-id="MDEwOlJlcG9zaXRvcnkzMTYyNjQzMDc="
+        
+        data-category="Comments"
+        data-category-id="DIC_kwDOEtnPc84B_WKP"
+        
+        data-mapping="pathname"
+        data-reactions-enabled="1"
+        data-emit-metadata="0"
+        data-theme="light"
+        crossorigin="anonymous"
+        async
+        >
+</script>
+
+<script>
+    function setGiscusTeheme(theme) {
+        let giscus = document.querySelector('.giscus iframe');
+        if (giscus) {
+            giscus.contentWindow.postMessage(
+                {
+                    giscus: {
+                        setConfig: {
+                            theme: theme
+                        }
+                    }
+                },
+                'https://giscus.app'
+            )
+        }
+    }
+
+    addEventListener('message', event => {
+        if (event.origin !== 'https://giscus.app') return;
+        setGiscusTeheme(document.documentElement.dataset.userColorScheme)
+    });
+
+    window.addEventListener('onColorSchemeChange', (e) => {
+        setGiscusTeheme(e.detail)
+    })
+</script>
+
+</div>
+
+</main>
+
+
+        </main>
+        <footer class="footer flex">
+    <section class="container">
+        <nav class="footer-links">
+            
+            <a href="/index.xml">RSS</a>
+            
+        </nav>
+
+        
+    </section>
+    <script defer src="/ts/features.706a523ba43e6d0427c7fdf2b9d05dbd0920d3f12942b453690b495cb2522743.js" 
+    data-enable-footnotes="true"
+    ></script>
+</footer>
+
+    </body>
+</html>

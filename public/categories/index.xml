@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Categories on min1321&#39;s blog</title>
+    <link>https://min1321.github.io/categories/</link>
+    <description>Recent content in Categories on min1321&#39;s blog</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-us</language>
+    <lastBuildDate>Mon, 29 Nov 2021 20:03:37 +0900</lastBuildDate><atom:link href="https://min1321.github.io/categories/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>언어 능력 평가</title>
+      <link>https://min1321.github.io/categories/%EC%96%B8%EC%96%B4-%EB%8A%A5%EB%A0%A5-%ED%8F%89%EA%B0%80/</link>
+      <pubDate>Mon, 29 Nov 2021 20:03:37 +0900</pubDate>
+      
+      <guid>https://min1321.github.io/categories/%EC%96%B8%EC%96%B4-%EB%8A%A5%EB%A0%A5-%ED%8F%89%EA%B0%80/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>인공지능 대회</title>
+      <link>https://min1321.github.io/categories/%EC%9D%B8%EA%B3%B5%EC%A7%80%EB%8A%A5-%EB%8C%80%ED%9A%8C/</link>
+      <pubDate>Mon, 29 Nov 2021 20:03:37 +0900</pubDate>
+      
+      <guid>https://min1321.github.io/categories/%EC%9D%B8%EA%B3%B5%EC%A7%80%EB%8A%A5-%EB%8C%80%ED%9A%8C/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>DeepLeaning</title>
+      <link>https://min1321.github.io/categories/deepleaning/</link>
+      <pubDate>Sun, 28 Nov 2021 21:17:32 +0900</pubDate>
+      
+      <guid>https://min1321.github.io/categories/deepleaning/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>ImageClassification</title>
+      <link>https://min1321.github.io/categories/imageclassification/</link>
+      <pubDate>Sun, 28 Nov 2021 21:17:32 +0900</pubDate>
+      
+      <guid>https://min1321.github.io/categories/imageclassification/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>TIL</title>
+      <link>https://min1321.github.io/categories/til/</link>
+      <pubDate>Fri, 26 Nov 2021 18:02:24 +0900</pubDate>
+      
+      <guid>https://min1321.github.io/categories/til/</guid>
+      <description></description>
+    </item>
+    
+  </channel>
+</rss>
