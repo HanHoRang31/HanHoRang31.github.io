@@ -6,7 +6,16 @@
     <description>Recent content in kops on HanHoRang Tech Blog</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <lastBuildDate>Fri, 10 Mar 2023 00:00:00 +0000</lastBuildDate><atom:link href="https://HanHoRang31.github.io/tags/kops/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Sat, 18 Mar 2023 00:00:00 +0000</lastBuildDate><atom:link href="https://HanHoRang31.github.io/tags/kops/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>PKOS 2기 2주차 - 로컬스토리지 </title>
+      <link>https://HanHoRang31.github.io/post/pkos2-2-localstorage/</link>
+      <pubDate>Sat, 18 Mar 2023 00:00:00 +0000</pubDate>
+      
+      <guid>https://HanHoRang31.github.io/post/pkos2-2-localstorage/</guid>
+      <description>1 2 Production Kubernetes Online Study (=PKOS)는 쿠버네티스 실무 실습 스터디입니다. CloudNet@ Gasida(가시다)이 진행하며, 책 &amp;#34;24단계 실습으로 정복하는 쿠버네티스&amp;#34;을 기반으로 진행하고 있습니다. 2주차 스터디에서는 쿠버네티스의 네트워크와 스토리지를 중점적으로 공부하였다. 분량이 많아 네트워크와 스토리지를 나눠서 블로그를 작성할 예정이다. 이번 블로그 글에서는 로컬 스토리지에 대해 공유하겠다. 일반적으로 로컬 스토리지는 IOPS 성능이 특화되어 있지만 노드에 종속되어 있어 고가용성이나 스토리지 기능에 제한이 있다. 이러한 제한을 없애기 위한 과정으로 로컬 스토리지의 Hostpath, local 볼륨을 마운트하여 테스트를 진행할 것이고, 마지막으로는 로컬 볼륨에서 고가용성과 스토리지 기능(백업)을 가진 Mysql 데이터베이스를 구성하겠다.</description>
+    </item>
+    
     <item>
       <title>PKOS 2기 1주차 - kops</title>
       <link>https://HanHoRang31.github.io/post/pkos2-1-kops/</link>

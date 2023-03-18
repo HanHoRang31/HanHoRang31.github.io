@@ -1,0 +1,2113 @@
+<!DOCTYPE html>
+<html lang="en-us">
+    
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="theme-color" content="dark">
+    <title>PKOS 2기 2주차 - 로컬스토리지  | HanHoRang Tech Blog</title>
+
+    
+    
+    
+    <meta property="og:site_name" content="HanHoRang Tech Blog by Tania in Hugo" />
+    <meta property="og:title" content="PKOS 2기 2주차 - 로컬스토리지  | HanHoRang Tech Blog"/>
+    <meta itemprop="name" content="PKOS 2기 2주차 - 로컬스토리지  | HanHoRang Tech Blog" />
+    <meta name="twitter:title" content="PKOS 2기 2주차 - 로컬스토리지  | HanHoRang Tech Blog" />
+    <meta name="application-name" content="PKOS 2기 2주차 - 로컬스토리지  | HanHoRang Tech Blog" /><meta name="twitter:card" content="summary"/>
+
+    <meta name="description" content="로컬 볼륨을 통해 Stateful 애플리케이션 구성하기" />
+    <meta name="twitter:description" content="로컬 볼륨을 통해 Stateful 애플리케이션 구성하기 "/>
+    <meta itemprop="description" content=" 로컬 볼륨을 통해 Stateful 애플리케이션 구성하기 "/>
+    <meta property="og:description" content=" 로컬 볼륨을 통해 Stateful 애플리케이션 구성하기 " />
+
+    
+
+<meta property="og:type" content="article" />
+<meta property="article:publisher" content="Hugo Tania" />
+<meta property="og:article:published_time" content=2023-03-18T00:00:00Z />
+<meta property="article:published_time" content=2023-03-18T00:00:00Z />
+
+
+  <meta property="og:article:author" content="Han ho rnag" />
+  <meta property="article:author" content="Han ho rnag" />
+  <meta name="author" content="Han ho rnag" />
+
+
+
+
+<script defer type="application/ld+json">
+  {
+    "@context": "http://schema.org",
+    "@type": "Article",
+    "headline": "PKOS 2기 2주차 - 로컬스토리지 ",
+    "author": {
+      "@type": "Person",
+      "name": "Hugo Tania"
+    },
+    "datePublished": "2023-03-18",
+    "description": "로컬 볼륨을 통해 Stateful 애플리케이션 구성하기",
+    "wordCount":  4665 ,
+    "mainEntityOfPage": "True",
+    "dateModified": "2023-03-18",
+    "publisher": {
+      "@type": "Organization",
+      "name": "Hugo Tania",
+      "logo": {
+        "@type": "imageObject",
+        "url": "https:\/\/HanHoRang31.github.io\/favicon.ico"
+      }
+    }
+  }
+</script>
+
+
+
+    <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico" />
+    
+    <link rel="stylesheet" href="/sass/main.min.ab99ff095f832511e24ffb2fba2b51ad473b2f7e9301d674eba2c6c3a6e8bd81.css">
+    
+</head>
+    
+    <script>
+        (function() {
+            const colorSchemeKey = 'ThemeColorScheme';
+            if(!localStorage.getItem(colorSchemeKey)){
+                localStorage.setItem(colorSchemeKey, "auto");
+            }
+        })();
+    </script><script>
+    (function() {
+        const colorSchemeKey = 'ThemeColorScheme';
+        const colorSchemeItem = localStorage.getItem(colorSchemeKey);
+        const supportDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches === true;
+
+        if (colorSchemeItem == 'dark' || colorSchemeItem === 'auto' && supportDarkMode) {
+            
+
+            document.documentElement.dataset.userColorScheme = 'dark';
+        } else {
+            document.documentElement.dataset.userColorScheme = 'light';
+        }
+    })();
+</script>
+
+
+    <body class="dark">
+        <nav class="navbar">
+    <div class="container">
+        <div class="flex">
+            <div>
+                <a class="brand" href="/">
+                    
+                    
+                        <img src="/favicon.ico" />
+                    
+                    HanHoRang Tech Blog
+                    </a>
+            </div>
+            <div class="flex">
+                
+                <a href="/articles/">Articles</a>
+                
+                
+                    <button id="dark-mode-button">
+                    <svg class="light" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" aria-hidden="true" focusable="false" width="1em" height="1em" style="-ms-transform: rotate(360deg); -webkit-transform: rotate(360deg); transform: rotate(360deg);" preserveAspectRatio="xMidYMid meet" viewBox="0 0 36 36"><path fill="#FFD983" d="M30.312.776C32 19 20 32 .776 30.312c8.199 7.717 21.091 7.588 29.107-.429C37.9 21.867 38.03 8.975 30.312.776z"/><path d="M30.705 15.915a1.163 1.163 0 1 0 1.643 1.641a1.163 1.163 0 0 0-1.643-1.641zm-16.022 14.38a1.74 1.74 0 0 0 0 2.465a1.742 1.742 0 1 0 0-2.465zm13.968-2.147a2.904 2.904 0 0 1-4.108 0a2.902 2.902 0 0 1 0-4.107a2.902 2.902 0 0 1 4.108 0a2.902 2.902 0 0 1 0 4.107z" fill="#FFCC4D"/><rect x="0" y="0" width="36" height="36" fill="rgba(0, 0, 0, 0)" /></svg>
+                    <svg class="dark" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" aria-hidden="true" focusable="false" width="1em" height="1em" style="-ms-transform: rotate(360deg); -webkit-transform: rotate(360deg); transform: rotate(360deg);" preserveAspectRatio="xMidYMid meet" viewBox="0 0 36 36"><path fill="#FFD983" d="M16 2s0-2 2-2s2 2 2 2v2s0 2-2 2s-2-2-2-2V2zm18 14s2 0 2 2s-2 2-2 2h-2s-2 0-2-2s2-2 2-2h2zM4 16s2 0 2 2s-2 2-2 2H2s-2 0-2-2s2-2 2-2h2zm5.121-8.707s1.414 1.414 0 2.828s-2.828 0-2.828 0L4.878 8.708s-1.414-1.414 0-2.829c1.415-1.414 2.829 0 2.829 0l1.414 1.414zm21 21s1.414 1.414 0 2.828s-2.828 0-2.828 0l-1.414-1.414s-1.414-1.414 0-2.828s2.828 0 2.828 0l1.414 1.414zm-.413-18.172s-1.414 1.414-2.828 0s0-2.828 0-2.828l1.414-1.414s1.414-1.414 2.828 0s0 2.828 0 2.828l-1.414 1.414zm-21 21s-1.414 1.414-2.828 0s0-2.828 0-2.828l1.414-1.414s1.414-1.414 2.828 0s0 2.828 0 2.828l-1.414 1.414zM16 32s0-2 2-2s2 2 2 2v2s0 2-2 2s-2-2-2-2v-2z"/><circle fill="#FFD983" cx="18" cy="18" r="10"/><rect x="0" y="0" width="36" height="36" fill="rgba(0, 0, 0, 0)" /></svg>
+                    </button>
+                
+            </div>
+            </div>
+    </div>
+</nav>
+
+        <main>
+            
+<div class="container">
+    <article>
+        <header class="article-header">
+            <div class="thumb">
+                <div>
+                    <h1>PKOS 2기 2주차 - 로컬스토리지 </h1>
+                    <div class="post-meta">
+                        <div>
+                            
+                            
+                            By HanHoRnag | <time>March 18, 2023</time>
+                            | 22 minutes
+                        </div>
+                        <div class="tags">
+                            
+                            <a href="/tags/kans/">KANS</a>
+                            
+                            <a href="/tags/kops/">kops</a>
+                            
+                            <a href="/tags/cloud/">cloud</a>
+                            
+                            <a href="/tags/aws/">AWS</a>
+                            
+                            <a href="/tags/kubernetes/">kubernetes</a>
+                            
+                            <a href="/tags/volume/">Volume</a>
+                            
+                            <a href="/tags/velero/">velero</a>
+                            
+                            <a href="/tags/local-path-provisioner/">local-path-provisioner</a>
+                            
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </header>
+    </article>
+
+    <div class="article-post">
+    <div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-markdown" data-lang="markdown"><span class="line"><span class="cl">Production Kubernetes Online Study (=PKOS)는 쿠버네티스 실무 실습 스터디입니다.
+</span></span><span class="line"><span class="cl">CloudNet@ Gasida(가시다)이 진행하며, 책 &#34;24단계 실습으로 정복하는 쿠버네티스&#34;을 기반으로 진행하고 있습니다.
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>2주차 스터디에서는 쿠버네티스의 네트워크와 스토리지를 중점적으로 공부하였다. 분량이 많아 네트워크와 스토리지를 나눠서 블로그를 작성할 예정이다.  이번 블로그 글에서는 로컬 스토리지에 대해 공유하겠다.
+<br></p>
+<p>일반적으로 로컬 스토리지는 IOPS 성능이 특화되어 있지만 노드에 종속되어 있어 고가용성이나 스토리지 기능에 제한이 있다. 이러한 제한을 없애기 위한 과정으로 로컬 스토리지의 Hostpath, local 볼륨을 마운트하여 테스트를 진행할 것이고, 마지막으로는 로컬 볼륨에서 고가용성과 스토리지 기능(백업)을 가진 Mysql 데이터베이스를 구성하겠다. 추가로 스토리지 성능 측정과 모니터링 과정, QnA를 준비하였다.
+<br></p>
+<p>본론으로 들어가서, 쿠버네티스에서 스토리지를 사용하는 이유는 무엇일까?  스토리지가 데이터를 저장하는 용도인 것처럼 데이터 저장을 위해서이다. 예를 들어, 데이터베이스같은 애플리케이션을 파드로 운영한다고 가정해보자, 파드 라이프사이클과 별개로 데이터가 보존되어야 한다. 이를 위해 쿠버네티스에서는 PV(Persistent Volume)과 PVC(Persistent Volume Claim) 리소스를 제공한다. 또한, 데이터 관리 방법(데이터 저장 위치, 데이터 공유, 확장성)에 따라 여러 스토리지 볼륨과 기능을 제공한다. 이처럼 데이터를 보존해야 하는 애플리케이션을 상태있는(Stateful) 애플리케이션이라 칭하며 스토리지를 통해 클러스터 내의 컨테이너에 안정적이고 지속적인 데이터를 제공할 수 있다.</p>
+<br>
+<br>
+<br>
+<h1 id="로컬-스토리지">
+    <a href="#%eb%a1%9c%ec%bb%ac-%ec%8a%a4%ed%86%a0%eb%a6%ac%ec%a7%80" class="anchor">
+        <svg class="icon" aria-hidden="true" focusable="false" height="16" version="1.1" viewBox="0 0 16 16" width="16">
+            <path fill-rule="evenodd"
+                d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z">
+            </path>
+        </svg>
+    </a>
+    로컬 스토리지
+</h1>
+<p>로컬 스토리지는 말 그대로 파드의 스토리지로 서버 내부 볼륨의 스토리지를 사용하는 것이다. AWS EC2는 내부 볼륨인 인스토어 스토어를 사용한다. 로컬 스토리지 구현은 쿠버네티스에서 HostPath, Local 볼륨 마운트로 나뉘어 사용이 가능하다. HostPath 볼륨과 Local 볼륨의 차이는 쿠버네티스 볼륨 리소스(PV) 사용 유무에 따라 구분한다.</p>
+<br>
+<p>일반적으로 내부 볼륨의 스토리지를 사용하는 만큼, 다른 원격 스토리지와 비교했을때 IOPS 성능이 뛰어나다. <a href="https://www.cncf.io/blog/2021/04/05/kubernetes-storage-options-can-be-overwhelming-pick-the-right-one/">cncf 공식사이트</a>에서 IOPS 기준 약 2~3배의 차이가 난다고 하니 성능 필요의 애플리케이션에서는 도입을 고려할 만하다.  그리고 로컬스토리지는 EC2 에 종속되어 있어 고가용성 구성과 백업같은 기능 사용에 추가 구성이 필요하다. 필자는 이를 해결하기 위해 볼륨프로비저닝 플러그인인 Local-path-provisioner 와 백업 솔루션인 Velero를 사용하였다.</p>
+<br>
+<p>먼저 Local-path-provisioner 플러그인 설치 과정을 살펴볼 것이고, 로컬스토리지 이해를 위해 3가지의 케이스로 나뉘어 테스트를 진행하겠다.</p>
+<ul>
+<li>Local-path-provisioner PV를 통한 고가용성 테스트</li>
+<li>Hospath PV를 통한 고가용성 테스트</li>
+<li>파드간 데이터 동기화 구성</li>
+</ul>
+<br>
+<h2 id="local-path-provisioner">
+    <a href="#local-path-provisioner" class="anchor">
+        <svg class="icon" aria-hidden="true" focusable="false" height="16" version="1.1" viewBox="0 0 16 16" width="16">
+            <path fill-rule="evenodd"
+                d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z">
+            </path>
+        </svg>
+    </a>
+    local-path-provisioner
+</h2>
+<p>볼륨 프로비저닝 플러그인 중 하나로, 로컬 노드의 파일 시스템 경로를 사용하여 PVC(Persistent Volume Claim)를 만들어주는 역할을 한다. PVC를 통해 볼륨을 요청하면 PV가 자동으로 생성되어 연결된다고 보면 된다.</p>
+<p>설치시, 로컬 노드에 대한 볼륨 설정이 필요하다.</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span><span class="lnt">31
+</span><span class="lnt">32
+</span><span class="lnt">33
+</span><span class="lnt">34
+</span><span class="lnt">35
+</span><span class="lnt">36
+</span><span class="lnt">37
+</span><span class="lnt">38
+</span><span class="lnt">39
+</span><span class="lnt">40
+</span><span class="lnt">41
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">curl -s -O https://raw.githubusercontent.com/rancher/local-path-provisioner/v0.0.23/deploy/local-path-storage.yaml
+</span></span><span class="line"><span class="cl">vim local-path-storage.yaml
+</span></span><span class="line"><span class="cl">----------------------------
+</span></span><span class="line"><span class="cl">apiVersion: apps/v1
+</span></span><span class="line"><span class="cl">kind: Deployment
+</span></span><span class="line"><span class="cl">metadata:
+</span></span><span class="line"><span class="cl">  name: local-path-provisioner
+</span></span><span class="line"><span class="cl">  namespace: local-path-storage
+</span></span><span class="line"><span class="cl">spec:
+</span></span><span class="line"><span class="cl">  replicas: <span class="m">1</span>
+</span></span><span class="line"><span class="cl">  selector:
+</span></span><span class="line"><span class="cl">    matchLabels:
+</span></span><span class="line"><span class="cl">      app: local-path-provisioner
+</span></span><span class="line"><span class="cl">  template:
+</span></span><span class="line"><span class="cl">    metadata:
+</span></span><span class="line"><span class="cl">      labels:
+</span></span><span class="line"><span class="cl">        app: local-path-provisioner
+</span></span><span class="line"><span class="cl">    spec:  <span class="c1"># 추가 부분  </span>
+</span></span><span class="line"><span class="cl">      **nodeSelector:
+</span></span><span class="line"><span class="cl">        kubernetes.io/hostname: <span class="s2">&#34;마스터 노드 이름 입력 &#34;</span>
+</span></span><span class="line"><span class="cl">      tolerations:
+</span></span><span class="line"><span class="cl">        - effect: NoSchedule
+</span></span><span class="line"><span class="cl">          key: node-role.kubernetes.io/control-plane
+</span></span><span class="line"><span class="cl">          operator: Exists**
+</span></span><span class="line"><span class="cl">...
+</span></span><span class="line"><span class="cl">kind: ConfigMap
+</span></span><span class="line"><span class="cl">apiVersion: v1
+</span></span><span class="line"><span class="cl">metadata:
+</span></span><span class="line"><span class="cl">  name: local-path-config
+</span></span><span class="line"><span class="cl">  namespace: local-path-storage
+</span></span><span class="line"><span class="cl">data:
+</span></span><span class="line"><span class="cl">  config.json: <span class="p">|</span>-
+</span></span><span class="line"><span class="cl">    <span class="o">{</span>
+</span></span><span class="line"><span class="cl">            <span class="s2">&#34;nodePathMap&#34;</span>:<span class="o">[</span>
+</span></span><span class="line"><span class="cl">            <span class="o">{</span>
+</span></span><span class="line"><span class="cl">                    <span class="s2">&#34;node&#34;</span>:<span class="s2">&#34;DEFAULT_PATH_FOR_NON_LISTED_NODES&#34;</span>,
+</span></span><span class="line"><span class="cl">                    <span class="s2">&#34;paths&#34;</span>:<span class="o">[</span><span class="s2">&#34;**/data/local-path**&#34;</span><span class="o">]</span> <span class="c1"># 추가 부분</span>
+</span></span><span class="line"><span class="cl">            <span class="o">}</span>
+</span></span><span class="line"><span class="cl">            <span class="o">]</span>
+</span></span><span class="line"><span class="cl">    <span class="o">}</span>
+</span></span><span class="line"><span class="cl">----------------------------
+</span></span></code></pre></td></tr></table>
+</div>
+</div><ul>
+<li>Deployment / spec.spec 에서 nodeselector 와 tolerations 로 볼륨 배치 노드 설정(마스터 노드로 파드 배치)</li>
+<li>Configmap / data config.json에서 로컬 볼륨 PATH 설정</li>
+</ul>
+<br>
+<p><strong>설치 확인</strong></p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">kubectl get sc local-path
+</span></span><span class="line"><span class="cl">----------------------------
+</span></span><span class="line"><span class="cl">NAME         PROVISIONER             RECLAIMPOLICY   VOLUMEBINDINGMODE      ALLOWVOLUMEEXPANSION   AGE
+</span></span><span class="line"><span class="cl">local-path   rancher.io/local-path   Delete          WaitForFirstConsumer   <span class="nb">false</span>                  29m
+</span></span></code></pre></td></tr></table>
+</div>
+</div><br>
+<br>
+<br>
+<h2 id="case-1-local-path-provisioner-pv를-통한-고가용성-테스트">
+    <a href="#case-1-local-path-provisioner-pv%eb%a5%bc-%ed%86%b5%ed%95%9c-%ea%b3%a0%ea%b0%80%ec%9a%a9%ec%84%b1-%ed%85%8c%ec%8a%a4%ed%8a%b8" class="anchor">
+        <svg class="icon" aria-hidden="true" focusable="false" height="16" version="1.1" viewBox="0 0 16 16" width="16">
+            <path fill-rule="evenodd"
+                d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z">
+            </path>
+        </svg>
+    </a>
+    Case 1. Local-path-provisioner PV를 통한 고가용성 테스트
+</h2>
+<p>HostPath 볼륨이 IOPS 성능이 좋은 것을 앞서 확인하였다. 성능적으로 사용하기 좋은 볼륨이라 할 수 있으나 고가용성 구성이  필요하다.</p>
+<p>Hostpath 볼륨의 문제점으로 노드간 마이그레이션에 자유롭지 못하기 때문이다. 이해를 위해 직접 예제 파드를 배포해보고 고가용성을 테스트 해보겠다.</p>
+<p><strong>Local-path-provisioner PV를 통한 고가용성 테스트</strong></p>
+<p>앞서 배포한 Local-path-provisioner 를 통해 PV를 생성하여 파드를 배포하고 고가용성 구성을 테스트해보겠다.</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span><span class="lnt">31
+</span><span class="lnt">32
+</span><span class="lnt">33
+</span><span class="lnt">34
+</span><span class="lnt">35
+</span><span class="lnt">36
+</span><span class="lnt">37
+</span><span class="lnt">38
+</span><span class="lnt">39
+</span><span class="lnt">40
+</span><span class="lnt">41
+</span><span class="lnt">42
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl"><span class="c1"># 파드 예제 </span>
+</span></span><span class="line"><span class="cl">apiVersion: v1
+</span></span><span class="line"><span class="cl">kind: PersistentVolumeClaim
+</span></span><span class="line"><span class="cl">metadata: 
+</span></span><span class="line"><span class="cl">  name: localpath-claim
+</span></span><span class="line"><span class="cl">spec: 
+</span></span><span class="line"><span class="cl">  accessModes: 
+</span></span><span class="line"><span class="cl">    - ReadWriteOnce
+</span></span><span class="line"><span class="cl">  resources: 
+</span></span><span class="line"><span class="cl">    requests: 
+</span></span><span class="line"><span class="cl">      storage: 2Gi
+</span></span><span class="line"><span class="cl">  storageClassName: <span class="s2">&#34;local-path&#34;</span>
+</span></span><span class="line"><span class="cl">---
+</span></span><span class="line"><span class="cl">apiVersion: apps/v1
+</span></span><span class="line"><span class="cl">kind: Deployment
+</span></span><span class="line"><span class="cl">metadata: 
+</span></span><span class="line"><span class="cl">  name: date-pod
+</span></span><span class="line"><span class="cl">  labels: 
+</span></span><span class="line"><span class="cl">    app: date
+</span></span><span class="line"><span class="cl">spec: 
+</span></span><span class="line"><span class="cl">  replicas: <span class="m">1</span>
+</span></span><span class="line"><span class="cl">  selector: 
+</span></span><span class="line"><span class="cl">    matchLabels: 
+</span></span><span class="line"><span class="cl">      app: date
+</span></span><span class="line"><span class="cl">  template: 
+</span></span><span class="line"><span class="cl">    metadata: 
+</span></span><span class="line"><span class="cl">      labels: 
+</span></span><span class="line"><span class="cl">        app: date
+</span></span><span class="line"><span class="cl">    spec: 
+</span></span><span class="line"><span class="cl">      terminationGracePeriodSeconds: <span class="m">3</span>
+</span></span><span class="line"><span class="cl">      containers: 
+</span></span><span class="line"><span class="cl">      - name: app
+</span></span><span class="line"><span class="cl">        image: centos
+</span></span><span class="line"><span class="cl">        command: <span class="o">[</span><span class="s2">&#34;/bin/sh&#34;</span><span class="o">]</span>
+</span></span><span class="line"><span class="cl">        args: <span class="o">[</span><span class="s2">&#34;-c&#34;</span>, <span class="s2">&#34;while true; do echo </span><span class="k">$(</span>date -u<span class="k">)</span><span class="s2"> &gt;&gt; /data/out.txt; sleep 5; done&#34;</span><span class="o">]</span> 
+</span></span><span class="line"><span class="cl">        volumeMounts: 
+</span></span><span class="line"><span class="cl">        - name: pod-persistent-volume
+</span></span><span class="line"><span class="cl">          mountPath: /data
+</span></span><span class="line"><span class="cl">      volumes: 
+</span></span><span class="line"><span class="cl">      - name: pod-persistent-volume
+</span></span><span class="line"><span class="cl">        persistentVolumeClaim: 
+</span></span><span class="line"><span class="cl">          claimName: localpath-claim
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>파드 배포 후 노드 드레인을 진행해보겠다.</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1"># 배포 파드의 노드 확인</span>
+</span></span><span class="line"><span class="cl"><span class="nv">PODNODE</span><span class="o">=</span><span class="k">$(</span>kubectl get pod -l <span class="nv">app</span><span class="o">=</span>date -o <span class="nv">jsonpath</span><span class="o">={</span>.items<span class="o">[</span>0<span class="o">]</span>.spec.nodeName<span class="o">}</span><span class="k">)</span>
+</span></span><span class="line"><span class="cl"><span class="nb">echo</span> <span class="nv">$PODNODE</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1"># 노드 드레인과 파드 모니터링</span>
+</span></span><span class="line"><span class="cl">kubectl drain <span class="nv">$PODNODE</span> --force --ignore-daemonsets --delete-emptydir-data <span class="o">&amp;&amp;</span> kubectl get pod -w
+</span></span><span class="line"><span class="cl">---------------------------------
+</span></span><span class="line"><span class="cl">node/i-0c41dc0f6eeb01730 cordoned
+</span></span><span class="line"><span class="cl">Warning: ignoring DaemonSet-managed Pods: kube-system/aws-node-w8bxm, kube-system/ebs-csi-node-thndq, kube-system/node-local-dns-v2hhc
+</span></span><span class="line"><span class="cl">evicting pod default/date-pod-d95d6b8f-q9skb
+</span></span><span class="line"><span class="cl">evicting pod kube-system/metrics-server-5f65d889cd-9btc7
+</span></span><span class="line"><span class="cl">pod/metrics-server-5f65d889cd-9btc7 evicted
+</span></span><span class="line"><span class="cl">pod/date-pod-d95d6b8f-q9skb evicted
+</span></span><span class="line"><span class="cl">node/i-0c41dc0f6eeb01730 drained
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">NAME                      READY   STATUS    RESTARTS   AGE
+</span></span><span class="line"><span class="cl">date-pod-d95d6b8f-x5vrb   0/1     Pending   <span class="m">0</span>          2m
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>노드 드레인시, 상태가 Pending 인 것을 확인할 수 있다. 이는 다른 노드에 PV볼륨이 없기 때문이다.</p>
+<p>마찬가지로 파드를 5개로 추가해도 볼륨이 있는 노드에만 파드가 올라온 것을 확인할 수 있다.</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl"><span class="c1"># 예제 파드 개수 5개로 증가</span>
+</span></span><span class="line"><span class="cl">kubectl scale deployment date-pod --replicas<span class="o">=</span><span class="m">5</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p><img loading="lazy" 
+    src="/./PKOS2-2-localstorage/case1-pod5.png" 
+    alt="case1-pod5.png" 
+     
+    width=555 
+    height="193"  /></p>
+<br>
+<br>
+<br>
+<h2 id="case2-hostpath를-통한-고가용성-테스트">
+    <a href="#case2-hostpath%eb%a5%bc-%ed%86%b5%ed%95%9c-%ea%b3%a0%ea%b0%80%ec%9a%a9%ec%84%b1-%ed%85%8c%ec%8a%a4%ed%8a%b8" class="anchor">
+        <svg class="icon" aria-hidden="true" focusable="false" height="16" version="1.1" viewBox="0 0 16 16" width="16">
+            <path fill-rule="evenodd"
+                d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z">
+            </path>
+        </svg>
+    </a>
+    Case2. HostPath를 통한 고가용성 테스트
+</h2>
+<p>볼륨 Hostpath로 노드 PATH를 직접 지정하여 고가용성을 테스트해보겠다.</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">apiVersion: apps/v1
+</span></span><span class="line"><span class="cl">kind: Deployment
+</span></span><span class="line"><span class="cl">metadata:
+</span></span><span class="line"><span class="cl">  name: date-pod
+</span></span><span class="line"><span class="cl">  labels:
+</span></span><span class="line"><span class="cl">    app: date
+</span></span><span class="line"><span class="cl">spec:
+</span></span><span class="line"><span class="cl">  replicas: <span class="m">1</span>
+</span></span><span class="line"><span class="cl">  selector:
+</span></span><span class="line"><span class="cl">    matchLabels:
+</span></span><span class="line"><span class="cl">      app: date
+</span></span><span class="line"><span class="cl">  template:
+</span></span><span class="line"><span class="cl">    metadata:
+</span></span><span class="line"><span class="cl">      labels:
+</span></span><span class="line"><span class="cl">        app: date
+</span></span><span class="line"><span class="cl">    spec:
+</span></span><span class="line"><span class="cl">      terminationGracePeriodSeconds: <span class="m">3</span>
+</span></span><span class="line"><span class="cl">      containers:
+</span></span><span class="line"><span class="cl">      - name: app
+</span></span><span class="line"><span class="cl">        image: centos
+</span></span><span class="line"><span class="cl">        command: <span class="o">[</span><span class="s2">&#34;/bin/sh&#34;</span><span class="o">]</span>
+</span></span><span class="line"><span class="cl">        args: <span class="o">[</span><span class="s2">&#34;-c&#34;</span>, <span class="s2">&#34;while true; do echo </span><span class="k">$(</span>date -u<span class="k">)</span><span class="s2"> &gt;&gt; /data/out.txt; sleep 5; done&#34;</span><span class="o">]</span>
+</span></span><span class="line"><span class="cl">        volumeMounts:
+</span></span><span class="line"><span class="cl">        - name: log
+</span></span><span class="line"><span class="cl">          mountPath: /data
+</span></span><span class="line"><span class="cl">      volumes: 
+</span></span><span class="line"><span class="cl">      - name: log
+</span></span><span class="line"><span class="cl">        hostPath:
+</span></span><span class="line"><span class="cl">          path: <span class="s2">&#34;/data&#34;</span>
+</span></span><span class="line"><span class="cl">          type: DirectoryOrCreate
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>파드 드레인과 개수 조절시 노드에 상관없이 배포가 진행된다.</p>
+<p><img loading="lazy" 
+    src="/./PKOS2-2-localstorage/case2-5pod.png" 
+    alt="case2-5pod.png" 
+     
+    width=575 
+    height="194"  /></p>
+<p>하지만, 볼륨별로 데이터가 쌓이는 것이 다르다. 각 노드에 들어가서 로그를 확인해보면 찍히는 것이 다른 것을 확인할 수 있다.</p>
+<p><img loading="lazy" 
+    src="/./PKOS2-2-localstorage/case2-data-fail.png" 
+    alt="case2-data-fail.png" 
+     
+    width=2768 
+    height="796"  /></p>
+<p>고가용성이라 할 수 있지만 적재되어 있는 데이터가 달라 stateful 애플리케이션(ex. MySQL)을 운영하기엔 한계가 있다.</p>
+<p>참고 책에서는 이러한 제약사항을 해결하기 위해서는 애플리케이션 단에서 다른 노드의 파드와 데이터를 동기화해서 해결할 수 있다고 한다.</p>
+<p>동기화 방법을 찾아보니 NFS 볼륨(ex. AWS EFS)을 구성하여 HostPath 를 연결하거나, 볼륨간 rsync를 사용하라 나오지만, 성능(로컬SSD가 아님)이 떨어져 해결 방법은 아닌 것 같다.</p>
+<br>
+<br>
+<br>
+<h2 id="case3-파드간-데이터-동기화-구성">
+    <a href="#case3-%ed%8c%8c%eb%93%9c%ea%b0%84-%eb%8d%b0%ec%9d%b4%ed%84%b0-%eb%8f%99%ea%b8%b0%ed%99%94-%ea%b5%ac%ec%84%b1" class="anchor">
+        <svg class="icon" aria-hidden="true" focusable="false" height="16" version="1.1" viewBox="0 0 16 16" width="16">
+            <path fill-rule="evenodd"
+                d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z">
+            </path>
+        </svg>
+    </a>
+    Case3. 파드간 데이터 동기화 구성
+</h2>
+<p>그렇다면 성능 좋고, 고가용성도 보장되고, 데이터 동기화를 보장할 수 있는 Stateful 애플리케이션을 구성할 수 있을까?</p>
+<p><a href="https://kubernetes.io/docs/tasks/run-application/run-replicated-stateful-application/">쿠버네티스 공식문서</a> 예제에서 이를 확인할 수 있는데 해당 예제를 구성해보고 테스트해보겠다. 해당 예제에서는 데이터베이스 리소스로 StatefulSet를 사용한다.</p>
+<p>StatefulSet 리소스는 이름처럼 Stateful한 애플리케이션을 위해 만든 리소스이다. StatefulSet 리소스의 특징은 다음과 같다.</p>
+<p><strong>StatefulSet 리소스의 특징</strong></p>
+<ol>
+<li>
+<p>Pod 이름</p>
+<p>StatefulSet에 의해 생성된 파드들은 {Pod 이름}-{순번} 식으로 이름이 정해진다. 이는 클러스터 내부 환경에서 데이터베이스에 접근할 때 사용하기 위해서이다.</p>
+</li>
+<li>
+<p>파드 순차적 배포</p>
+<p>Pod 생성시 모든 Pod 가 동시에 생성되지 않고 순서대로 하나씩 생성된다. 이는 데이터베이스에서 마스터 파드 → 슬레이브 파드로 기동해야 하는 조건등에서 유용하게 사용 될 수 있다.</p>
+</li>
+<li>
+<p>파드별 볼륨 마운트</p>
+<p>일반적으로 PVC &amp; PV에 중복적으로 Pod를 사용할 수 없다. 연결된 Pod가 존재하면 그 다음 파드들은 PVC를 얻지 못해 볼륨을 사용하지 못한다. 반면, Statefulset에서 PVC를 템플릿 형태로 정의하여 Pod마다 PVC, PV를 생성하여 파드별로 볼륨을 마운트할 수 있게 된다.</p>
+</li>
+</ol>
+<br>
+<p>다시 돌아가서 <a href="https://kubernetes.io/docs/tasks/run-application/run-replicated-stateful-application/">쿠버네티스 공식문서</a>의 예제는 클러스터에 MySQL 스테이트풀셋이 배포되고 각 레플리카에 순서대로 배포되는 예제이다. 중요하게 볼 점은 <a href="https://raw.githubusercontent.com/kubernetes/website/main/content/en/examples/application/mysql/mysql-statefulset.yaml">스테이트 풀셋의 매니페스트</a>이다.</p>
+<p>해당 StatefulSet 매니페스트는 3개의 replica를 가진 MySQL을 생성한다. init 컨테이너는 두개 배포되며, init-container는 MySQL init 설정을 수행하고, xtrabackup init-container는 MySQL 클러스터 복제를 위해 데이터를 클론하여 동기화를 진행한다. init 컨테이너 이후 MySQL 컨테이너는 데이터베이스 작업을 수행하며, xtrabackup 컨테이너는 클론 작업을 진행한다.</p>
+<p>공식 문서의 예제를 그대로 배포하면 스토리지 클래스가 default로 EBS 볼륨(외부)에 연결된다. 이대로 진행하면 local-path-provisioner에서 배포한 로컬 볼륨에서 마운트되지 않는다.</p>
+<br>
+<p><strong>로컬 볼륨에 마운트하기 위해서는 추가 작업</strong>이 필요하다.</p>
+<p>local-path-provisioner 배포 파일 수정</p>
+<p>local-path-provisioner 파드를 워크 노드에만 배포하도록 설정한다. 해당 설정을 통해 워크 노드에만 로컬 볼륨을 생성하고 파드에 연결할 수 있도록 한다.</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">vim local-path-storage.yaml
+</span></span><span class="line"><span class="cl">----------------------------
+</span></span><span class="line"><span class="cl">apiVersion: apps/v1
+</span></span><span class="line"><span class="cl">kind: Deployment
+</span></span><span class="line"><span class="cl">metadata:
+</span></span><span class="line"><span class="cl">  name: local-path-provisioner
+</span></span><span class="line"><span class="cl">  namespace: local-path-storage
+</span></span><span class="line"><span class="cl">spec:
+</span></span><span class="line"><span class="cl">  replicas: <span class="m">1</span>
+</span></span><span class="line"><span class="cl">  selector:
+</span></span><span class="line"><span class="cl">    matchLabels:
+</span></span><span class="line"><span class="cl">      app: local-path-provisioner
+</span></span><span class="line"><span class="cl">  template:
+</span></span><span class="line"><span class="cl">    metadata:
+</span></span><span class="line"><span class="cl">      labels:
+</span></span><span class="line"><span class="cl">        app: local-path-provisioner
+</span></span><span class="line"><span class="cl">    spec:
+</span></span><span class="line"><span class="cl">spec: <span class="c1"># 아래 부분 추가 </span>
+</span></span><span class="line"><span class="cl">    tolerations:
+</span></span><span class="line"><span class="cl">      - effect: NoSchedule
+</span></span><span class="line"><span class="cl">        key: node-role.kubernetes.io/node
+</span></span><span class="line"><span class="cl">        operator: Exists
+</span></span></code></pre></td></tr></table>
+</div>
+</div><ol>
+<li><a href="https://raw.githubusercontent.com/kubernetes/website/main/content/en/examples/application/mysql/mysql-statefulset.yaml">스테이트 풀셋의 매니페스트</a> 내 스토리지클래스 지정</li>
+</ol>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span><span class="lnt">8
+</span><span class="lnt">9
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">volumeClaimTemplates:
+</span></span><span class="line"><span class="cl">- metadata:
+</span></span><span class="line"><span class="cl">    name: data
+</span></span><span class="line"><span class="cl">  spec:
+</span></span><span class="line"><span class="cl">    accessModes: <span class="o">[</span><span class="s2">&#34;ReadWriteOnce&#34;</span><span class="o">]</span>
+</span></span><span class="line"><span class="cl">    storageClassName: local-path <span class="c1"># 로컬 볼륨 추가 </span>
+</span></span><span class="line"><span class="cl">    resources:
+</span></span><span class="line"><span class="cl">      requests:
+</span></span><span class="line"><span class="cl">        storage: 10Gi
+</span></span></code></pre></td></tr></table>
+</div>
+</div><ol start="3">
+<li><a href="https://raw.githubusercontent.com/kubernetes/website/main/content/en/examples/application/mysql/mysql-statefulset.yaml">스테이트 풀셋의 매니페스트</a> replica count 를 워크노드(2) 개수 만큼 수정</li>
+</ol>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">serviceName: mysql
+</span></span><span class="line"><span class="cl">  replicas: <span class="m">2</span> <span class="c1"># 수정</span>
+</span></span><span class="line"><span class="cl">  template:
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>배포 확인</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">kubectl apply -f ./
+</span></span><span class="line"><span class="cl">----------------------------
+</span></span><span class="line"><span class="cl">configmap/mysql created
+</span></span><span class="line"><span class="cl">service/mysql created
+</span></span><span class="line"><span class="cl">service/mysql-read created
+</span></span><span class="line"><span class="cl">statefulset.apps/mysql created
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">kubectl get pods
+</span></span><span class="line"><span class="cl">----------------------------
+</span></span><span class="line"><span class="cl">NAME      READY   STATUS    RESTARTS   AGE
+</span></span><span class="line"><span class="cl">mysql-0   2/2     Running   <span class="m">0</span>          31m
+</span></span><span class="line"><span class="cl">mysql-1   2/2     Running   <span class="m">0</span>          31m
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>동기화 테스트</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span><span class="lnt">31
+</span><span class="lnt">32
+</span><span class="lnt">33
+</span><span class="lnt">34
+</span><span class="lnt">35
+</span><span class="lnt">36
+</span><span class="lnt">37
+</span><span class="lnt">38
+</span><span class="lnt">39
+</span><span class="lnt">40
+</span><span class="lnt">41
+</span><span class="lnt">42
+</span><span class="lnt">43
+</span><span class="lnt">44
+</span><span class="lnt">45
+</span><span class="lnt">46
+</span><span class="lnt">47
+</span><span class="lnt">48
+</span><span class="lnt">49
+</span><span class="lnt">50
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl"><span class="c1"># 파드 0에서 Mysql Data 생성</span>
+</span></span><span class="line"><span class="cl">kubectl <span class="nb">exec</span> -it pod/mysql-0 -- /bin/bash
+</span></span><span class="line"><span class="cl">---------------------------------
+</span></span><span class="line"><span class="cl">Defaulted container <span class="s2">&#34;mysql&#34;</span> out of: mysql, xtrabackup, init-mysql <span class="o">(</span>init<span class="o">)</span>, clone-mysql <span class="o">(</span>init<span class="o">)</span>
+</span></span><span class="line"><span class="cl">---------------------------------
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">bash-4.2# mysql -u root -p
+</span></span><span class="line"><span class="cl">---------------------------------
+</span></span><span class="line"><span class="cl">Enter password: 
+</span></span><span class="line"><span class="cl">Welcome to the MySQL monitor.  Commands end with <span class="p">;</span> or <span class="se">\g</span>.
+</span></span><span class="line"><span class="cl">Your MySQL connection id is <span class="m">140</span>
+</span></span><span class="line"><span class="cl">Server version: 5.7.41-log MySQL Community Server <span class="o">(</span>GPL<span class="o">)</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">Copyright <span class="o">(</span>c<span class="o">)</span> 2000, 2023, Oracle and/or its affiliates.
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">Oracle is a registered trademark of Oracle Corporation and/or its
+</span></span><span class="line"><span class="cl">affiliates. Other names may be trademarks of their respective
+</span></span><span class="line"><span class="cl">owners.
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">Type <span class="s1">&#39;help;&#39;</span> or <span class="s1">&#39;\h&#39;</span> <span class="k">for</span> help. Type <span class="s1">&#39;\c&#39;</span> to clear the current input statement.
+</span></span><span class="line"><span class="cl">---------------------------------
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">mysql&gt; create database testdb<span class="p">;</span>
+</span></span><span class="line"><span class="cl">---------------------------------
+</span></span><span class="line"><span class="cl">Query OK, <span class="m">1</span> row affected <span class="o">(</span>0.01 sec<span class="o">)</span>
+</span></span><span class="line"><span class="cl">---------------------------------
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">mysql&gt; use testdb<span class="p">;</span>
+</span></span><span class="line"><span class="cl">---------------------------------
+</span></span><span class="line"><span class="cl">Database changed
+</span></span><span class="line"><span class="cl">---------------------------------
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">mysql&gt; create table test<span class="o">(</span>name varchar<span class="o">(</span>10<span class="o">)</span>, testdata varchar<span class="o">(</span>50<span class="o">))</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">---------------------------------
+</span></span><span class="line"><span class="cl">Query OK, <span class="m">0</span> rows affected <span class="o">(</span>0.02 sec<span class="o">)</span>
+</span></span><span class="line"><span class="cl">---------------------------------
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">mysql&gt; insert into <span class="nb">test</span> values<span class="o">(</span><span class="s1">&#39;han&#39;</span>, <span class="s1">&#39;mysql example test&#39;</span><span class="o">)</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">---------------------------------
+</span></span><span class="line"><span class="cl">Query OK, <span class="m">1</span> row affected <span class="o">(</span>0.01 sec<span class="o">)</span>
+</span></span><span class="line"><span class="cl">---------------------------------
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">mysql&gt; <span class="k">select</span> * from test<span class="p">;</span>
+</span></span><span class="line"><span class="cl">---------------------------------
+</span></span><span class="line"><span class="cl">+------+--------------------+
+</span></span><span class="line"><span class="cl"><span class="p">|</span> name <span class="p">|</span> testdata           <span class="p">|</span>
+</span></span><span class="line"><span class="cl">+------+--------------------+
+</span></span><span class="line"><span class="cl"><span class="p">|</span> han  <span class="p">|</span> mysql example <span class="nb">test</span> <span class="p">|</span>
+</span></span><span class="line"><span class="cl">+------+--------------------+
+</span></span><span class="line"><span class="cl"><span class="m">1</span> row in <span class="nb">set</span> <span class="o">(</span>0.00 sec<span class="o">)</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span><span class="lnt">31
+</span><span class="lnt">32
+</span><span class="lnt">33
+</span><span class="lnt">34
+</span><span class="lnt">35
+</span><span class="lnt">36
+</span><span class="lnt">37
+</span><span class="lnt">38
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl"><span class="c1"># 파드 1에서 확인</span>
+</span></span><span class="line"><span class="cl">kubectl <span class="nb">exec</span> -it pod/mysql-1 -- /bin/bash
+</span></span><span class="line"><span class="cl">---------------------------------
+</span></span><span class="line"><span class="cl">Defaulted container <span class="s2">&#34;mysql&#34;</span> out of: mysql, xtrabackup, init-mysql <span class="o">(</span>init<span class="o">)</span>, clone-mysql <span class="o">(</span>init<span class="o">)</span>
+</span></span><span class="line"><span class="cl">---------------------------------
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">bash-4.2# mysql -u root -p
+</span></span><span class="line"><span class="cl">---------------------------------
+</span></span><span class="line"><span class="cl">Enter password: 
+</span></span><span class="line"><span class="cl">Welcome to the MySQL monitor.  Commands end with <span class="p">;</span> or <span class="se">\g</span>.
+</span></span><span class="line"><span class="cl">Your MySQL connection id is <span class="m">306</span>
+</span></span><span class="line"><span class="cl">Server version: 5.7.41 MySQL Community Server <span class="o">(</span>GPL<span class="o">)</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">Copyright <span class="o">(</span>c<span class="o">)</span> 2000, 2023, Oracle and/or its affiliates.
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">Oracle is a registered trademark of Oracle Corporation and/or its
+</span></span><span class="line"><span class="cl">affiliates. Other names may be trademarks of their respective
+</span></span><span class="line"><span class="cl">owners.
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">Type <span class="s1">&#39;help;&#39;</span> or <span class="s1">&#39;\h&#39;</span> <span class="k">for</span> help. Type <span class="s1">&#39;\c&#39;</span> to clear the current input statement.
+</span></span><span class="line"><span class="cl">---------------------------------
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">mysql&gt; use testdb
+</span></span><span class="line"><span class="cl">---------------------------------
+</span></span><span class="line"><span class="cl">Reading table information <span class="k">for</span> completion of table and column names
+</span></span><span class="line"><span class="cl">You can turn off this feature to get a quicker startup with -A
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">Database changed
+</span></span><span class="line"><span class="cl">---------------------------------
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">mysql&gt; <span class="k">select</span> * from test<span class="p">;</span>
+</span></span><span class="line"><span class="cl">---------------------------------
+</span></span><span class="line"><span class="cl">+------+--------------------+
+</span></span><span class="line"><span class="cl"><span class="p">|</span> name <span class="p">|</span> testdata           <span class="p">|</span>
+</span></span><span class="line"><span class="cl">+------+--------------------+
+</span></span><span class="line"><span class="cl"><span class="p">|</span> han  <span class="p">|</span> mysql example <span class="nb">test</span> <span class="p">|</span>
+</span></span><span class="line"><span class="cl">+------+--------------------+
+</span></span><span class="line"><span class="cl"><span class="m">1</span> row in <span class="nb">set</span> <span class="o">(</span>0.00 sec<span class="o">)</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>됐다! 로컬 볼륨 기반으로 Mysql 예제를 배포하였고 고가용성 구성을 위해 동기화까지 진행을 완료했다!</p>
+<br>
+<br>
+<br>
+<h1 id="로컬-볼륨-백업과-복원">
+    <a href="#%eb%a1%9c%ec%bb%ac-%eb%b3%bc%eb%a5%a8-%eb%b0%b1%ec%97%85%ea%b3%bc-%eb%b3%b5%ec%9b%90" class="anchor">
+        <svg class="icon" aria-hidden="true" focusable="false" height="16" version="1.1" viewBox="0 0 16 16" width="16">
+            <path fill-rule="evenodd"
+                d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z">
+            </path>
+        </svg>
+    </a>
+    로컬 볼륨 백업과 복원
+</h1>
+<p>쿠버네티스에서는 HostPath 볼륨의 대한 백업과 복원 기능은 지원하지 않는다. 노드 별로 백업 스크립트를 작성하거나 써드파티 솔루션을 사용해야 한다. 이번 절에서는 local-path-provisioner 을 사용해서 볼륨을 프로비저닝한만큼, 해당 볼륨에 맞게 백업을 할 수 있는 써드파트 솔루션을 찾아보았다.</p>
+<p><a href="https://github.com/rancher/local-path-provisioner/issues/85">local-path-provisioner  깃허브 이슈</a>를 찾아보니 <a href="https://velero.io/">Velero 솔루션</a>을 이용해서 백업을 할 수 있다고 하여 테스트를 진행해보고자 한다.</p>
+<p><code>Velero</code>? 는 쿠버네티스 클러스터의 리소스와 퍼시스턴트 볼륨을 백업하고 복원하는 데 사용되는 오픈 소스 툴이다.</p>
+<p>Velero 을 사용하기전  local-path-provisioner 볼륨 타입을 Local로 수정해야 한다. Hostpath 볼륨을 지원하지 않으나 Local 볼륨은 <strong>Restic 과 연계하여 백업을 지원하기 때문이다. (<a href="https://velero.io/docs/v1.9/restic/">공식문서</a>)</strong></p>
+<p><img loading="lazy" 
+    src="/./PKOS2-2-localstorage/verelo-docs.png" 
+    alt="verelo-docs.png" 
+     
+    width=913 
+    height="561"  /></p>
+<p>이는 Local 볼륨이 쿠버네티스의 자원으로 관리되며, 스토리지 클래스와 퍼시스턴트 볼륨 클레임(PVC)을 사용할 수 있기 때문으로 보인다.</p>
+<br>
+<p><strong>local-path-provisioner 사전 작업</strong></p>
+<p>Local 볼륨을 수정하기 위해서는 local-path-provisioner 파드의 수정 작업이 필요하다.</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">volumeClaimTemplates:
+</span></span><span class="line"><span class="cl">  - metadata:
+</span></span><span class="line"><span class="cl">      name: data
+</span></span><span class="line"><span class="cl">      annotations:
+</span></span><span class="line"><span class="cl">        volumeType: <span class="nb">local</span> <span class="c1"># 추가 </span>
+</span></span><span class="line"><span class="cl">    spec:
+</span></span><span class="line"><span class="cl">      accessModes: <span class="o">[</span><span class="s2">&#34;ReadWriteOnce&#34;</span><span class="o">]</span>
+</span></span><span class="line"><span class="cl">      storageClassName: local-path
+</span></span><span class="line"><span class="cl">      resources:
+</span></span><span class="line"><span class="cl">        requests:
+</span></span><span class="line"><span class="cl">          storage: 10Gi
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>로컬 볼륨 확인</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">kubectl get pv &lt;pv-name&gt; -o yaml
+</span></span><span class="line"><span class="cl">---------------------------------
+</span></span><span class="line"><span class="cl">spec:
+</span></span><span class="line"><span class="cl">  local: <span class="c1"># local or HostPath 볼륨</span>
+</span></span><span class="line"><span class="cl">    path: /mnt/local-storage/ssd/vol1
+</span></span><span class="line"><span class="cl">  ...
+</span></span></code></pre></td></tr></table>
+</div>
+</div><br>
+<p><strong>Velero 설치</strong></p>
+<p>필자는 Velero 백업 버킷을 AWS S3 설정하여 설치를 진행하였다.</p>
+<p>설치는 S3 버켓 생성 및 설정 / Veleo CLI 로 나뉜다.</p>
+<ul>
+<li>
+<p><a href="https://velero.io/docs/v1.0.0/aws-config/">S3 버켓 지정</a> 및 IAM 설정</p>
+<p>Velero 에서 S3 버킷을 접근하기 위한 IAM USER ID와 KEY 생성</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">**aws s3 mb s3://&lt;bucket-name&gt; --region ap-northeast-2**
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>IAM Policy 생성</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span><span class="lnt">31
+</span><span class="lnt">32
+</span><span class="lnt">33
+</span><span class="lnt">34
+</span><span class="lnt">35
+</span><span class="lnt">36
+</span><span class="lnt">37
+</span><span class="lnt">38
+</span><span class="lnt">39
+</span><span class="lnt">40
+</span><span class="lnt">41
+</span><span class="lnt">42
+</span><span class="lnt">43
+</span><span class="lnt">44
+</span><span class="lnt">45
+</span><span class="lnt">46
+</span><span class="lnt">47
+</span><span class="lnt">48
+</span><span class="lnt">49
+</span><span class="lnt">50
+</span><span class="lnt">51
+</span><span class="lnt">52
+</span><span class="lnt">53
+</span><span class="lnt">54
+</span><span class="lnt">55
+</span><span class="lnt">56
+</span><span class="lnt">57
+</span><span class="lnt">58
+</span><span class="lnt">59
+</span><span class="lnt">60
+</span><span class="lnt">61
+</span><span class="lnt">62
+</span><span class="lnt">63
+</span><span class="lnt">64
+</span><span class="lnt">65
+</span><span class="lnt">66
+</span><span class="lnt">67
+</span><span class="lnt">68
+</span><span class="lnt">69
+</span><span class="lnt">70
+</span><span class="lnt">71
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl"><span class="c1"># 버킷 변수 설정 </span>
+</span></span><span class="line"><span class="cl"><span class="nb">export</span> <span class="nv">BUCKET</span><span class="o">=</span>**&lt;bucket-name&gt;**
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1"># IAM Policy 생성 </span>
+</span></span><span class="line"><span class="cl">cat &gt; velero-policy.json <span class="s">&lt;&lt;EOF
+</span></span></span><span class="line"><span class="cl"><span class="s">{
+</span></span></span><span class="line"><span class="cl"><span class="s">    &#34;Version&#34;: &#34;2012-10-17&#34;,
+</span></span></span><span class="line"><span class="cl"><span class="s">    &#34;Statement&#34;: [
+</span></span></span><span class="line"><span class="cl"><span class="s">        {
+</span></span></span><span class="line"><span class="cl"><span class="s">            &#34;Effect&#34;: &#34;Allow&#34;,
+</span></span></span><span class="line"><span class="cl"><span class="s">            &#34;Action&#34;: [
+</span></span></span><span class="line"><span class="cl"><span class="s">                &#34;ec2:DescribeVolumes&#34;,
+</span></span></span><span class="line"><span class="cl"><span class="s">                &#34;ec2:DescribeSnapshots&#34;,
+</span></span></span><span class="line"><span class="cl"><span class="s">                &#34;ec2:CreateTags&#34;,
+</span></span></span><span class="line"><span class="cl"><span class="s">                &#34;ec2:CreateVolume&#34;,
+</span></span></span><span class="line"><span class="cl"><span class="s">                &#34;ec2:CreateSnapshot&#34;,
+</span></span></span><span class="line"><span class="cl"><span class="s">                &#34;ec2:DeleteSnapshot&#34;
+</span></span></span><span class="line"><span class="cl"><span class="s">            ],
+</span></span></span><span class="line"><span class="cl"><span class="s">            &#34;Resource&#34;: &#34;*&#34;
+</span></span></span><span class="line"><span class="cl"><span class="s">        },
+</span></span></span><span class="line"><span class="cl"><span class="s">        {
+</span></span></span><span class="line"><span class="cl"><span class="s">            &#34;Effect&#34;: &#34;Allow&#34;,
+</span></span></span><span class="line"><span class="cl"><span class="s">            &#34;Action&#34;: [
+</span></span></span><span class="line"><span class="cl"><span class="s">                &#34;s3:GetObject&#34;,
+</span></span></span><span class="line"><span class="cl"><span class="s">                &#34;s3:DeleteObject&#34;,
+</span></span></span><span class="line"><span class="cl"><span class="s">                &#34;s3:PutObject&#34;,
+</span></span></span><span class="line"><span class="cl"><span class="s">                &#34;s3:AbortMultipartUpload&#34;,
+</span></span></span><span class="line"><span class="cl"><span class="s">                &#34;s3:ListMultipartUploadParts&#34;
+</span></span></span><span class="line"><span class="cl"><span class="s">            ],
+</span></span></span><span class="line"><span class="cl"><span class="s">            &#34;Resource&#34;: [
+</span></span></span><span class="line"><span class="cl"><span class="s">                &#34;arn:aws:s3:::${BUCKET}/*&#34;  
+</span></span></span><span class="line"><span class="cl"><span class="s">            ]
+</span></span></span><span class="line"><span class="cl"><span class="s">        },
+</span></span></span><span class="line"><span class="cl"><span class="s">        {
+</span></span></span><span class="line"><span class="cl"><span class="s">            &#34;Effect&#34;: &#34;Allow&#34;,
+</span></span></span><span class="line"><span class="cl"><span class="s">            &#34;Action&#34;: [
+</span></span></span><span class="line"><span class="cl"><span class="s">                &#34;s3:ListBucket&#34;
+</span></span></span><span class="line"><span class="cl"><span class="s">            ],
+</span></span></span><span class="line"><span class="cl"><span class="s">            &#34;Resource&#34;: [
+</span></span></span><span class="line"><span class="cl"><span class="s">                &#34;arn:aws:s3:::${BUCKET}&#34; 
+</span></span></span><span class="line"><span class="cl"><span class="s">            ]
+</span></span></span><span class="line"><span class="cl"><span class="s">        }
+</span></span></span><span class="line"><span class="cl"><span class="s">    ]
+</span></span></span><span class="line"><span class="cl"><span class="s">}
+</span></span></span><span class="line"><span class="cl"><span class="s">EOF</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1"># IAM Policy Attach</span>
+</span></span><span class="line"><span class="cl">aws iam put-user-policy <span class="se">\
+</span></span></span><span class="line"><span class="cl"><span class="se"></span>  --user-name velero <span class="se">\
+</span></span></span><span class="line"><span class="cl"><span class="se"></span>  --policy-name velero <span class="se">\
+</span></span></span><span class="line"><span class="cl"><span class="se"></span>  --policy-document file://velero-policy.json
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1"># IAM user 정보 가져오기 </span>
+</span></span><span class="line"><span class="cl">aws iam create-access-key --user-name velero
+</span></span><span class="line"><span class="cl">---------------------------------
+</span></span><span class="line"><span class="cl"><span class="o">{</span>
+</span></span><span class="line"><span class="cl">    <span class="s2">&#34;AccessKey&#34;</span>: <span class="o">{</span>
+</span></span><span class="line"><span class="cl">        <span class="s2">&#34;UserName&#34;</span>: <span class="s2">&#34;velero&#34;</span>,
+</span></span><span class="line"><span class="cl">        <span class="s2">&#34;AccessKeyId&#34;</span>: <span class="s2">&#34;{ID}&#34;</span>, <span class="c1"># 밑의 credentials-velero ID에 저장</span>
+</span></span><span class="line"><span class="cl">        <span class="s2">&#34;Status&#34;</span>: <span class="s2">&#34;Active&#34;</span>,
+</span></span><span class="line"><span class="cl">        <span class="s2">&#34;SecretAccessKey&#34;</span>: <span class="s2">&#34;{KEY}&#34;</span>, <span class="c1"># 밑의 credentials-velero KEY에 저장 </span>
+</span></span><span class="line"><span class="cl">        <span class="s2">&#34;CreateDate&#34;</span>: <span class="s2">&#34;2023-03-16T04:31:23+00:00&#34;</span>
+</span></span><span class="line"><span class="cl">    <span class="o">}</span>
+</span></span><span class="line"><span class="cl"><span class="o">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1"># credentials-velero 생성 및 IAM 정보 저장 </span>
+</span></span><span class="line"><span class="cl">cat <span class="s">&lt;&lt; EOF &gt; credentials-velero
+</span></span></span><span class="line"><span class="cl"><span class="s">[default]
+</span></span></span><span class="line"><span class="cl"><span class="s">aws_access_key_id=&lt;AWS_ACCESS_KEY_ID&gt;
+</span></span></span><span class="line"><span class="cl"><span class="s">aws_secret_access_key=&lt;AWS_SECRET_ACCESS_KEY&gt;
+</span></span></span><span class="line"><span class="cl"><span class="s">EOF</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div></li>
+<li>
+<p>Velero CLI 설치 후 서버 설치</p>
+<p>restic은 버전 velero 1.10(최신버전) 이상에서 더 이상 지원되지 않는다. 버전을 1.9.6으로 맞춰서 다운받아야 한다.</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl"><span class="c1"># arch 확인 </span>
+</span></span><span class="line"><span class="cl">uname -m
+</span></span><span class="line"><span class="cl">---------------------------------
+</span></span><span class="line"><span class="cl">x86_64
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1"># velero CLI 설치 </span>
+</span></span><span class="line"><span class="cl">wget https://github.com/vmware-tanzu/velero/releases/download/v1.9.6/velero-v1.9.6-linux-amd64.tar.gz
+</span></span><span class="line"><span class="cl">tar xzvf velero-v1.9.6-linux-amd64.tar.gz
+</span></span><span class="line"><span class="cl">cp velero-v1.9.6-linux-amd64/velero ~/bin
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1"># CLI 확인 </span>
+</span></span><span class="line"><span class="cl">velero
+</span></span><span class="line"><span class="cl">---------------------------------
+</span></span><span class="line"><span class="cl">Velero is a tool <span class="k">for</span> managing disaster recovery, specifically <span class="k">for</span> Kubernetes
+</span></span><span class="line"><span class="cl">cluster resources. It provides a simple, configurable, and operationally robust
+</span></span><span class="line"><span class="cl">way to back up your application state and associated data.
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">If you<span class="s1">&#39;re familiar with kubectl, Velero supports a similar model, allowing you to
+</span></span></span><span class="line"><span class="cl"><span class="s1">execute commands such as &#39;</span>velero get backup<span class="s1">&#39; and &#39;</span>velero create schedule<span class="s1">&#39;. The same
+</span></span></span><span class="line"><span class="cl"><span class="s1">operations can also be performed as &#39;</span>velero backup get<span class="s1">&#39; and &#39;</span>velero schedule create<span class="err">&#39;</span>.
+</span></span><span class="line"><span class="cl"> ...
+</span></span></code></pre></td></tr></table>
+</div>
+</div></li>
+<li>
+<p>Velero 설치</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span><span class="lnt">31
+</span><span class="lnt">32
+</span><span class="lnt">33
+</span><span class="lnt">34
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl"><span class="nb">export</span> <span class="nv">BUCKET</span><span class="o">=</span>**&lt;bucket-name&gt;**
+</span></span><span class="line"><span class="cl"><span class="nb">export</span> <span class="nv">REGION</span><span class="o">=</span>**ap-northeast-2**
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">velero install <span class="se">\
+</span></span></span><span class="line"><span class="cl"><span class="se"></span>    --provider aws <span class="se">\
+</span></span></span><span class="line"><span class="cl"><span class="se"></span>    --bucket <span class="nv">$BUCKET</span> <span class="se">\
+</span></span></span><span class="line"><span class="cl"><span class="se"></span>    --secret-file ./credentials-velero <span class="se">\
+</span></span></span><span class="line"><span class="cl"><span class="se"></span>    --backup-location-config <span class="nv">region</span><span class="o">=</span><span class="nv">$REGION</span> <span class="se">\
+</span></span></span><span class="line"><span class="cl"><span class="se"></span>    --use-volume-snapshots<span class="o">=</span><span class="nb">false</span> <span class="se">\
+</span></span></span><span class="line"><span class="cl"><span class="se"></span>    --plugins velero/velero-plugin-for-aws:v1.3.0 <span class="se">\
+</span></span></span><span class="line"><span class="cl"><span class="se"></span>    --use-restic
+</span></span><span class="line"><span class="cl">---------------------------------
+</span></span><span class="line"><span class="cl"> ...
+</span></span><span class="line"><span class="cl">Deployment/velero: created
+</span></span><span class="line"><span class="cl">DaemonSet/restic: attempting to create resource
+</span></span><span class="line"><span class="cl">DaemonSet/restic: attempting to create resource client
+</span></span><span class="line"><span class="cl">DaemonSet/restic: created
+</span></span><span class="line"><span class="cl">Velero is installed! ⛵ Use <span class="s1">&#39;kubectl logs deployment/velero -n velero&#39;</span> to view the status.
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1"># Velero 확인</span>
+</span></span><span class="line"><span class="cl">kubectl get all -n velero 
+</span></span><span class="line"><span class="cl">NAME                          READY   STATUS    RESTARTS   AGE
+</span></span><span class="line"><span class="cl">pod/restic-f5ngz              1/1     Running   <span class="m">0</span>          38s
+</span></span><span class="line"><span class="cl">pod/restic-x9sk9              1/1     Running   <span class="m">0</span>          37s
+</span></span><span class="line"><span class="cl">pod/velero-5f6657d4c8-jttxv   1/1     Running   <span class="m">0</span>          38s
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">NAME                    DESIRED   CURRENT   READY   UP-TO-DATE   AVAILABLE   NODE SELECTOR   AGE
+</span></span><span class="line"><span class="cl">daemonset.apps/restic   <span class="m">2</span>         <span class="m">2</span>         <span class="m">2</span>       <span class="m">2</span>            <span class="m">2</span>           &lt;none&gt;          38s
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">NAME                     READY   UP-TO-DATE   AVAILABLE   AGE
+</span></span><span class="line"><span class="cl">deployment.apps/velero   1/1     <span class="m">1</span>            <span class="m">1</span>           38s
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">NAME                                DESIRED   CURRENT   READY   AGE
+</span></span><span class="line"><span class="cl">replicaset.apps/velero-5f6657d4c8   <span class="m">1</span>         <span class="m">1</span>         <span class="m">1</span>       38s
+</span></span></code></pre></td></tr></table>
+</div>
+</div></li>
+</ul>
+<br>
+<p><strong>Velero 백업</strong></p>
+<p>Velero는 Restic을 사용하여 PV 볼륨에 대해 백업하는 방법에 두 가지 접근 방식을 지원한다.  <a href="https://velero.io/docs/v1.9/restic/#to-back-up">(공식문서)</a></p>
+<ul>
+<li>옵트인 접근 방식(default): Restic을 사용하여 백업할 볼륨이 포함된 모든 포드에 annotation을 달아야 한다.</li>
+<li>옵트아웃 접근 방식: 모든 포드 볼륨이 Restic을 사용하여 백업되고 백업되지 않아야 하는 볼륨을 옵트아웃할 수 있는 기능이 있다.</li>
+</ul>
+<p>이번 절에서는 옵트인 접근 방식을 택할 것이고 Case3 의 Mysql 볼륨을 백업할 예정이다.  백업할 볼륨에 대해 <code>backup.velero.io/backup-volumes</code>annotation 달고 백업을 진행하겠다.</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl"><span class="c1"># 주석 추가 pod에 볼륨 정보를 추가</span>
+</span></span><span class="line"><span class="cl">kubectl annotate pod/mysql-0 backup.velero.io/backup-volumes<span class="o">=</span>data
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1"># 백업 </span>
+</span></span><span class="line"><span class="cl">velero backup create  mysql --include-namespaces default --wait
+</span></span><span class="line"><span class="cl">---------------------------------
+</span></span><span class="line"><span class="cl">Backup request <span class="s2">&#34;mysql&#34;</span> submitted successfully.
+</span></span><span class="line"><span class="cl">Waiting <span class="k">for</span> backup to complete. You may safely press ctrl-c to stop waiting - your backup will <span class="k">continue</span> in the background.
+</span></span><span class="line"><span class="cl">..................
+</span></span><span class="line"><span class="cl">Backup completed with status: Completed. You may check <span class="k">for</span> more information using the commands <span class="sb">`</span>velero backup describe mysql<span class="sb">`</span> and <span class="sb">`</span>velero backup logs mysql<span class="sb">`</span>.
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1"># 백업 목록 확인</span>
+</span></span><span class="line"><span class="cl">velero get backup
+</span></span><span class="line"><span class="cl">---------------------------------
+</span></span><span class="line"><span class="cl">NAME    STATUS      ERRORS   WARNINGS   CREATED                         EXPIRES   STORAGE LOCATION   SELECTOR
+</span></span><span class="line"><span class="cl">mysql   Completed   <span class="m">0</span>        <span class="m">0</span>          2023-03-16 14:22:39 +0900 KST   29d       default            &lt;none&gt;
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>S3 버킷 조회할 수 있다.</p>
+<p>S3 조회시, backups(쿠버네티스 리소스 저장 경로) 와 restic(PV 볼륨 데이터 저장 경로)에 데이터를 확인할 수 있다.</p>
+<p><img loading="lazy" 
+    src="/./PKOS2-2-localstorage/velero-backup.png" 
+    alt="velero-backup.png" 
+     
+    width=1514 
+    height="494"  /></p>
+<p><img loading="lazy" 
+    src="/./PKOS2-2-localstorage/velero-restic.png" 
+    alt="velero-restic.png" 
+     
+    width=1549 
+    height="638"  /></p>
+<br>
+<p><strong>Velero 복원</strong></p>
+<p>mysql 배포 파일과 PV를 지우고 복원을 진행하겠다.</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span><span class="lnt">31
+</span><span class="lnt">32
+</span><span class="lnt">33
+</span><span class="lnt">34
+</span><span class="lnt">35
+</span><span class="lnt">36
+</span><span class="lnt">37
+</span><span class="lnt">38
+</span><span class="lnt">39
+</span><span class="lnt">40
+</span><span class="lnt">41
+</span><span class="lnt">42
+</span><span class="lnt">43
+</span><span class="lnt">44
+</span><span class="lnt">45
+</span><span class="lnt">46
+</span><span class="lnt">47
+</span><span class="lnt">48
+</span><span class="lnt">49
+</span><span class="lnt">50
+</span><span class="lnt">51
+</span><span class="lnt">52
+</span><span class="lnt">53
+</span><span class="lnt">54
+</span><span class="lnt">55
+</span><span class="lnt">56
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl"><span class="c1">#mysql 지우기</span>
+</span></span><span class="line"><span class="cl">kubectl delete -f ./
+</span></span><span class="line"><span class="cl">kubectl delete pvc/&lt;PVC 볼륨&gt;
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1">#velero 복원 </span>
+</span></span><span class="line"><span class="cl">velero restore create --from-backup mysql --wait
+</span></span><span class="line"><span class="cl">---------------------------------
+</span></span><span class="line"><span class="cl">Restore request <span class="s2">&#34;mysql-20230316155542&#34;</span> submitted successfully.
+</span></span><span class="line"><span class="cl">Waiting <span class="k">for</span> restore to complete. You may safely press ctrl-c to stop waiting - your restore will <span class="k">continue</span> in the background.
+</span></span><span class="line"><span class="cl">...........
+</span></span><span class="line"><span class="cl">Restore completed with status: Completed. You may check <span class="k">for</span> more information using the commands <span class="sb">`</span>velero restore describe mysql-20230316155542<span class="sb">`</span> and <span class="sb">`</span>velero restore logs mysql-20230316155542<span class="sb">`</span>.
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1"># 쿠버네티스 리소스 복원 확인</span>
+</span></span><span class="line"><span class="cl">kubectl get all
+</span></span><span class="line"><span class="cl">---------------------------------
+</span></span><span class="line"><span class="cl">NAME          READY   STATUS                  RESTARTS      AGE
+</span></span><span class="line"><span class="cl">pod/mysql-0   2/2     Running                 <span class="m">0</span>             39s
+</span></span><span class="line"><span class="cl">pod/mysql-1   0/2     Init:CrashLoopBackOff   <span class="m">2</span> <span class="o">(</span>18s ago<span class="o">)</span>   39s
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">NAME                 TYPE        CLUSTER-IP      EXTERNAL-IP   PORT<span class="o">(</span>S<span class="o">)</span>    AGE
+</span></span><span class="line"><span class="cl">service/kubernetes   ClusterIP   100.64.0.1      &lt;none&gt;        443/TCP    4h39m
+</span></span><span class="line"><span class="cl">service/mysql        ClusterIP   None            &lt;none&gt;        3306/TCP   39s
+</span></span><span class="line"><span class="cl">service/mysql-read   ClusterIP   100.69.52.194   &lt;none&gt;        3306/TCP   39s
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">kubectl get pv 
+</span></span><span class="line"><span class="cl">---------------------------------
+</span></span><span class="line"><span class="cl">NAME                                       CAPACITY   ACCESS MODES   RECLAIM POLICY   STATUS   CLAIM                  STORAGECLASS   REASON   AGE
+</span></span><span class="line"><span class="cl">pvc-601b919a-cf20-4478-9f28-10d541c66844   10Gi       RWO            Delete           Bound    default/data-mysql-0   local-path              71s
+</span></span><span class="line"><span class="cl">pvc-b8a766a6-411f-47df-a548-d6b0ee091ea1   10Gi       RWO            Delete           Bound    default/data-mysql-1   local-path              70s
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1"># Mysql data 확인</span>
+</span></span><span class="line"><span class="cl">kubectl <span class="nb">exec</span> -it pod/mysql-0 -- /bin/bash
+</span></span><span class="line"><span class="cl">---------------------------------
+</span></span><span class="line"><span class="cl">Defaulted container <span class="s2">&#34;mysql&#34;</span> out of: mysql, xtrabackup, restic-wait <span class="o">(</span>init<span class="o">)</span>, init-mysql <span class="o">(</span>init<span class="o">)</span>, clone-mysql <span class="o">(</span>init<span class="o">)</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">bash-4.2# mysql -u root -p
+</span></span><span class="line"><span class="cl">---------------------------------
+</span></span><span class="line"><span class="cl">Enter password: 
+</span></span><span class="line"><span class="cl">Welcome to the MySQL monitor.  Commands end with <span class="p">;</span> or <span class="se">\g</span>.
+</span></span><span class="line"><span class="cl">Your MySQL connection id is <span class="m">73</span>
+</span></span><span class="line"><span class="cl">Server version: 5.7.41-log MySQL Community Server <span class="o">(</span>GPL<span class="o">)</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">mysql&gt; use testdb<span class="p">;</span>
+</span></span><span class="line"><span class="cl">---------------------------------
+</span></span><span class="line"><span class="cl">Reading table information <span class="k">for</span> completion of table and column names
+</span></span><span class="line"><span class="cl">You can turn off this feature to get a quicker startup with -A
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">Database changed
+</span></span><span class="line"><span class="cl">---------------------------------
+</span></span><span class="line"><span class="cl">mysql&gt;  <span class="k">select</span> * from test<span class="p">;</span>
+</span></span><span class="line"><span class="cl">+------+--------------------+
+</span></span><span class="line"><span class="cl"><span class="p">|</span> name <span class="p">|</span> testdata           <span class="p">|</span>
+</span></span><span class="line"><span class="cl">+------+--------------------+
+</span></span><span class="line"><span class="cl"><span class="p">|</span> han  <span class="p">|</span> mysql example <span class="nb">test</span> <span class="p">|</span>
+</span></span><span class="line"><span class="cl">+------+--------------------+
+</span></span><span class="line"><span class="cl"><span class="m">1</span> row in <span class="nb">set</span> <span class="o">(</span>0.01 sec<span class="o">)</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>데이터가 그대로 보존되어 있다!</p>
+<br>
+<p><strong>Velero 스케쥴 백업</strong></p>
+<p>크론탭처럼 백업도 Velero가 가능하다. 다음은 5분마다 백업을 진행하는 예제이다.</p>
+<p>백업된 오브젝트별 데이터 변화를 위해 데이터베이스의 데이터를 수정 후 복원을 해보겠다.</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span><span class="lnt">31
+</span><span class="lnt">32
+</span><span class="lnt">33
+</span><span class="lnt">34
+</span><span class="lnt">35
+</span><span class="lnt">36
+</span><span class="lnt">37
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">velero schedule create mysql-crontab --include-namespaces default --schedule<span class="o">=</span><span class="s2">&#34;*/5 * * * *&#34;</span> 
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">****velero get backup
+</span></span><span class="line"><span class="cl">---------------------------------
+</span></span><span class="line"><span class="cl">NAME                           STATUS      ERRORS   WARNINGS   CREATED                         EXPIRES   STORAGE LOCATION   SELECTOR
+</span></span><span class="line"><span class="cl">mysql                          Completed   <span class="m">0</span>        <span class="m">0</span>          2023-03-16 15:51:44 +0900 KST   29d       default            &lt;none&gt;
+</span></span><span class="line"><span class="cl">mysql-crontab-20230316072517   Completed   <span class="m">0</span>        <span class="m">0</span>          2023-03-16 16:25:17 +0900 KST   29d       default            &lt;none&gt;
+</span></span><span class="line"><span class="cl">mysql-crontab-20230316072017   Completed   <span class="m">0</span>        <span class="m">0</span>          2023-03-16 16:20:17 +0900 KST   29d       default            &lt;none&gt;
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1">#DB 접속 후 데이터 삭제</span>
+</span></span><span class="line"><span class="cl"><span class="k">select</span> * from test<span class="p">;</span>
+</span></span><span class="line"><span class="cl">+------+---------------------+
+</span></span><span class="line"><span class="cl"><span class="p">|</span> name <span class="p">|</span> testdata            <span class="p">|</span>
+</span></span><span class="line"><span class="cl">+------+---------------------+
+</span></span><span class="line"><span class="cl"><span class="p">|</span> han  <span class="p">|</span> mysql example <span class="nb">test</span>  <span class="p">|</span>
+</span></span><span class="line"><span class="cl"><span class="p">|</span> han  <span class="p">|</span> mysql example test2 <span class="p">|</span>
+</span></span><span class="line"><span class="cl"><span class="p">|</span> han  <span class="p">|</span> mysql example test3 <span class="p">|</span>
+</span></span><span class="line"><span class="cl">+------+---------------------+
+</span></span><span class="line"><span class="cl"><span class="m">3</span> rows in <span class="nb">set</span> <span class="o">(</span>0.00 sec<span class="o">)</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">mysql&gt; delete from test<span class="p">;</span>
+</span></span><span class="line"><span class="cl">Query OK, <span class="m">3</span> rows affected <span class="o">(</span>0.00 sec<span class="o">)</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">mysql&gt; <span class="k">select</span> * from test<span class="p">;</span>
+</span></span><span class="line"><span class="cl">Empty <span class="nb">set</span> <span class="o">(</span>0.00 sec<span class="o">)</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1">#velero 복원 </span>
+</span></span><span class="line"><span class="cl">velero restore create --from-backup mysql-crontab-20230316072017  --wait
+</span></span><span class="line"><span class="cl">---------------------------------
+</span></span><span class="line"><span class="cl">Restore request <span class="s2">&#34;mysql-crontab-20230316072017-20230316163030&#34;</span> submitted successfully.
+</span></span><span class="line"><span class="cl">Waiting <span class="k">for</span> restore to complete. You may safely press ctrl-c to stop waiting - your restore will <span class="k">continue</span> in the background.
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">Restore completed with status: Completed. You may check <span class="k">for</span> more information using the commands <span class="sb">`</span>velero restore describe mysql-crontab-20230316072017-20230316163030<span class="sb">`</span> and <span class="sb">`</span>velero restore logs mysql-crontab-20230316072017-20230316163030<span class="sb">`</span>.
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1"># Mysql DATA 확인 </span>
+</span></span><span class="line"><span class="cl">mysql&gt; <span class="k">select</span> * from test<span class="p">;</span>
+</span></span><span class="line"><span class="cl">Empty <span class="nb">set</span> <span class="o">(</span>0.00 sec<span class="o">)</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p><code>Mysql DATA 확인</code> 의 결과가 예상과 다르다. 백업 진행 이후 백업 데이터인 행3개가 있어야 하나, 최신 데이터가 조회된다.</p>
+<p>이는 Mysql 파드가 2개 있어 파드간 데이터 무결성이 보장되어 백업 데이터 파일을 옮긴다 한들 수정이 안되기 때문이다. 따라서 백업본의 결과를 얻기 위해서는 PV 볼륨과 Mysql 리소스를 지우고 다시 복원을 해야한다.</p>
+<br>
+<p><strong>Velero 클러스터 마이그레이션</strong></p>
+<p>클러스터간 마이그레이션 방법으로 Velero를 활용할 수 있다. <a href="https://velero.io/docs/v1.9/migration-case/">공식문서</a>를 참고하여 테스트를 진행해보겠다.</p>
+<p>진행 전 Velero 에서 클러스터 마이그레이션시 제약사항이 있으니 확인이 필요하다.</p>
+<ul>
+<li>Velero는 기본적으로 클라우드 공급자 간에 PV 스냅샷의 마이그레이션을 지원하지 않는다. 이를 위한 방안으로 restic을 이용하여 파일시스템 레벨의 마이그레이션을 진행해야 한다.</li>
+<li>Velero는 백업이 수행된 위치보다 낮은 Kubernetes 버전이 있는 클러스터로의 복원을 지원하지 않는다.</li>
+<li>동일한 버전의 Kubernetes를 실행하지 않는 클러스터 간에 워크로드를 마이그레이션하는 것이 가능할 수 있지만 마이그레이션 전에 각 사용자 정의 리소스에 대한 클러스터 간 API 그룹의 호환성을 포함하여 몇 가지 요인을 고려해야 한다.</li>
+<li>AWS 및 Azure용 Velero 플러그인은 리전 간 데이터 마이그레이션을 지원하지 않는다. 이를 위한 방안으로 restic을 사용해야 한다.</li>
+</ul>
+<p>우리는 restic을 사용하니 제약사항에 자유롭다. 클러스터 마이그레이션의 예에 대한 일환으로 클러스터를 재 구축하여 앞서 생성한 Mysql 애플리케이션을 복원해보겠다.</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl"><span class="c1"># velero 설치</span>
+</span></span><span class="line"><span class="cl"><span class="nb">export</span> <span class="nv">BUCKET</span><span class="o">=</span>**hanhorang-velero-s3**
+</span></span><span class="line"><span class="cl"><span class="nb">export</span> <span class="nv">REGION</span><span class="o">=</span>**ap-northeast-2**
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">velero install <span class="se">\
+</span></span></span><span class="line"><span class="cl"><span class="se"></span>    --provider aws <span class="se">\
+</span></span></span><span class="line"><span class="cl"><span class="se"></span>    --bucket <span class="nv">$BUCKET</span> <span class="se">\
+</span></span></span><span class="line"><span class="cl"><span class="se"></span>    --secret-file ./credentials-velero <span class="se">\
+</span></span></span><span class="line"><span class="cl"><span class="se"></span>    --backup-location-config <span class="nv">region</span><span class="o">=</span><span class="nv">$REGION</span> <span class="se">\
+</span></span></span><span class="line"><span class="cl"><span class="se"></span>    --use-volume-snapshots<span class="o">=</span><span class="nb">false</span> <span class="se">\
+</span></span></span><span class="line"><span class="cl"><span class="se"></span>    --plugins velero/velero-plugin-for-aws:v1.3.0 <span class="se">\
+</span></span></span><span class="line"><span class="cl"><span class="se"></span>    --use-restic
+</span></span><span class="line"><span class="cl">---------------------------------
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">velero get backup
+</span></span><span class="line"><span class="cl">---------------------------------
+</span></span><span class="line"><span class="cl">NAME    STATUS      ERRORS   WARNINGS   CREATED                         EXPIRES   STORAGE LOCATION   SELECTOR
+</span></span><span class="line"><span class="cl">mysql   Completed   <span class="m">0</span>        <span class="m">0</span>          2023-03-17 00:31:21 +0900 KST   29d       default            &lt;none&gt;
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>velero 백업 개체가 그대로 있다. 복원 과정은 앞 과정과 동일하기에 생략하였다. 클러스터를 재구축해도 Velero 백업 객체가 남아있는 이유가 무엇일까?</p>
+<p>Velero 리소스는 오브젝트 스토리지의 백업 파일과 동기화되기 때문이다. 설치 과정에서 삭제한 클러스터와 새로운 클러스터의 Velero 버킷이 동일하므로 백업 객체가 그대로 있음을 확인하였다. 클러스터1과 클러스터2가 병행 운영시에도 버킷 데이터에 따라 Velero 리소스가 동기화가 이루어진다는데 기본 동기화 간격이 1분으로 이 부분을 확인하여 마이그레이션을 진행하면 될 것 같다.</p>
+<br>
+<br>
+<br>
+<h1 id="로컬-볼륨-모니터링">
+    <a href="#%eb%a1%9c%ec%bb%ac-%eb%b3%bc%eb%a5%a8-%eb%aa%a8%eb%8b%88%ed%84%b0%eb%a7%81" class="anchor">
+        <svg class="icon" aria-hidden="true" focusable="false" height="16" version="1.1" viewBox="0 0 16 16" width="16">
+            <path fill-rule="evenodd"
+                d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z">
+            </path>
+        </svg>
+    </a>
+    로컬 볼륨 모니터링
+</h1>
+<p>PV 볼륨 성능 확인할 수 있는 krew df-pv 도구가 있으나, HostPath 볼륨은 인스토어스토어라서 확인되지 않는다. <strong>하지만 Local 볼륨은 확인이 가능하다</strong>.</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">kubectl krew df-pv <span class="o">&amp;&amp;</span> kubectl df-pv 
+</span></span><span class="line"><span class="cl">---------------------------------
+</span></span><span class="line"><span class="cl">PV NAME                                   PVC NAME      NAMESPACE  NODE NAME            POD NAME  VOLUME MOUNT NAME  SIZE   USED  AVAILABLE  %USED  IUSED   IFREE     %IUSED 
+</span></span><span class="line"><span class="cl"> pvc-678e7407-9f76-4fd1-a9ad-8c2581b8df36  data-mysql-0  default    i-0314088c74eee3276  mysql-0   data               123Gi  4Gi   119Gi      3.68   <span class="m">119172</span>  <span class="m">16395900</span>  0.72   
+</span></span><span class="line"><span class="cl"> pvc-d2c3cbcb-13ec-46de-81e9-1178d25dd4ad  data-mysql-1  default    i-0ab66ac834dc8710d  mysql-1   data               123Gi  4Gi   119Gi      3.74   <span class="m">121203</span>  <span class="m">16393869</span>  0.73
+</span></span></code></pre></td></tr></table>
+</div>
+</div><br>
+<br>
+<br>
+<h2 id="성능-측정">
+    <a href="#%ec%84%b1%eb%8a%a5-%ec%b8%a1%ec%a0%95" class="anchor">
+        <svg class="icon" aria-hidden="true" focusable="false" height="16" version="1.1" viewBox="0 0 16 16" width="16">
+            <path fill-rule="evenodd"
+                d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z">
+            </path>
+        </svg>
+    </a>
+    성능 측정
+</h2>
+<p>로컬 스토리지의 성능 측정 방법으로 iostat 명령어와 krew 툴인 kubestr을 사용하여 성능을 측정하겠다.</p>
+<h3 id="kubestr">
+    <a href="#kubestr" class="anchor">
+        <svg class="icon" aria-hidden="true" focusable="false" height="16" version="1.1" viewBox="0 0 16 16" width="16">
+            <path fill-rule="evenodd"
+                d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z">
+            </path>
+        </svg>
+    </a>
+    kubestr
+</h3>
+<p>스토리지 IOPS 측정 툴이다. 스토리지 사용에 따른 검증용으로 사용하기 좋은 툴인 것 같다. 예제도 많으니 <a href="https://github.com/axboe/fio/tree/master/examples">링크</a>를 통해 확인하자. 이번 예제에서는 실습 참고용 책에서 제공해주신 <a href="https://github.com/wikibook/kubepractice/tree/main/ch10">예제 스크립트</a>를 통해 성능을 측정할 것이다.</p>
+<p><strong>fio-read.fio</strong></p>
+<p>fio를 사용하여 4KB 블록 크기를 가지는 랜덤 읽기 및 쓰기</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl"><span class="o">[</span>global<span class="o">]</span>
+</span></span><span class="line"><span class="cl"><span class="nv">ioengine</span><span class="o">=</span>libaio
+</span></span><span class="line"><span class="cl"><span class="nv">direct</span><span class="o">=</span><span class="m">1</span>
+</span></span><span class="line"><span class="cl"><span class="nv">bs</span><span class="o">=</span>4k
+</span></span><span class="line"><span class="cl"><span class="nv">runtime</span><span class="o">=</span><span class="m">120</span>
+</span></span><span class="line"><span class="cl"><span class="nv">time_based</span><span class="o">=</span><span class="m">1</span>
+</span></span><span class="line"><span class="cl"><span class="nv">iodepth</span><span class="o">=</span><span class="m">16</span>
+</span></span><span class="line"><span class="cl"><span class="nv">numjobs</span><span class="o">=</span><span class="m">4</span>
+</span></span><span class="line"><span class="cl"><span class="c1"># numjobs=16</span>
+</span></span><span class="line"><span class="cl"><span class="nv">size</span><span class="o">=</span>1g
+</span></span><span class="line"><span class="cl">group_reporting
+</span></span><span class="line"><span class="cl"><span class="nv">rw</span><span class="o">=</span>randrw
+</span></span><span class="line"><span class="cl"><span class="nv">rwmixread</span><span class="o">=</span><span class="m">100</span>
+</span></span><span class="line"><span class="cl"><span class="nv">rwmixwrite</span><span class="o">=</span><span class="m">0</span>
+</span></span><span class="line"><span class="cl"><span class="o">[</span>read<span class="o">]</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><ul>
+<li><code>ioengine=libaio</code> : Asynchronous I/O를 수행하기 위해 libaio 라이브러리를 사용합니다.</li>
+<li><code>direct=1</code> : Direct I/O를 사용합니다.</li>
+<li><code>bs=4k</code> : I/O 요청에 사용되는 블록 크기는 4KB입니다.</li>
+<li><code>runtime=120</code> : 120초 동안 작업을 실행합니다.</li>
+<li><code>time_based=1</code> : 시간 기반으로 작업을 수행합니다.</li>
+<li><code>iodepth=16</code> : 각 작업에 대한 I/O 요청 수를 16개로 설정합니다.</li>
+<li><code>numjobs=4</code> : 4개의 작업을 수행합니다.</li>
+<li><code>size=1g</code> : 각 작업에 대한 데이터 크기는 1GB입니다.</li>
+<li><code>group_reporting</code> : 모든 작업 결과를 통합하여 보고합니다.</li>
+<li><code>rw=randrw</code> : 랜덤 읽기 및 쓰기 작업을 수행합니다.</li>
+<li><code>rwmixread=100</code> : 작업 중 읽기 작업의 비율은 100%입니다.</li>
+<li><code>rwmixwrite=0</code> : 작업 중 쓰기 작업의 비율은 0%입니다.</li>
+</ul>
+<br>
+<p><strong><strong>fio-write.fio</strong></strong></p>
+<p>루트 디렉토리에서 4KB 블록 크기로 16개의 job이 16개의 i/o depth로 실행되며, 실행 시간이 120초인 1GB 파일에 대해 100% 쓰기 랜덤 테스트</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl"><span class="o">[</span>global<span class="o">]</span>
+</span></span><span class="line"><span class="cl"><span class="nv">ioengine</span><span class="o">=</span>libaio
+</span></span><span class="line"><span class="cl"><span class="nv">numjobs</span><span class="o">=</span><span class="m">16</span>
+</span></span><span class="line"><span class="cl"><span class="nv">iodepth</span><span class="o">=</span><span class="m">16</span>
+</span></span><span class="line"><span class="cl"><span class="nv">direct</span><span class="o">=</span><span class="m">1</span>
+</span></span><span class="line"><span class="cl"><span class="nv">bs</span><span class="o">=</span>4k
+</span></span><span class="line"><span class="cl"><span class="nv">runtime</span><span class="o">=</span><span class="m">120</span>
+</span></span><span class="line"><span class="cl"><span class="nv">time_based</span><span class="o">=</span><span class="m">1</span>
+</span></span><span class="line"><span class="cl"><span class="nv">size</span><span class="o">=</span>1g
+</span></span><span class="line"><span class="cl">group_reporting
+</span></span><span class="line"><span class="cl"><span class="nv">rw</span><span class="o">=</span>randrw
+</span></span><span class="line"><span class="cl"><span class="nv">rwmixread</span><span class="o">=</span><span class="m">0</span>
+</span></span><span class="line"><span class="cl"><span class="nv">rwmixwrite</span><span class="o">=</span><span class="m">100</span>
+</span></span><span class="line"><span class="cl"><span class="nv">directory</span><span class="o">=</span>/
+</span></span><span class="line"><span class="cl"><span class="o">[</span>read<span class="o">]</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><ul>
+<li><code>rwmixwrite=100</code>: 100% 쓰기 테스트를 수행합니다.</li>
+<li><code>directory=/</code>: 테스트할 디렉토리를 루트 디렉토리로 설정합니다.</li>
+</ul>
+<br>
+<p><strong>성능 측정</strong></p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">kubestr fio -f fio-write.fio -s local-path --size 10G
+</span></span><span class="line"><span class="cl">---------------------------------
+</span></span><span class="line"><span class="cl">PVC created kubestr-fio-pvc-hp69m
+</span></span><span class="line"><span class="cl">Pod created kubestr-fio-pod-fcvcp
+</span></span><span class="line"><span class="cl">Running FIO <span class="nb">test</span> <span class="o">(</span>fio-write.fio<span class="o">)</span> on StorageClass <span class="o">(</span>local-path<span class="o">)</span> with a PVC of Size <span class="o">(</span>10G<span class="o">)</span>
+</span></span><span class="line"><span class="cl">Elapsed time- 4m11.664545514s
+</span></span><span class="line"><span class="cl">FIO <span class="nb">test</span> results:
+</span></span><span class="line"><span class="cl">  
+</span></span><span class="line"><span class="cl">FIO version - fio-3.30
+</span></span><span class="line"><span class="cl">Global options - <span class="nv">ioengine</span><span class="o">=</span>libaio <span class="nv">verify</span><span class="o">=</span> <span class="nv">direct</span><span class="o">=</span><span class="m">1</span> <span class="nv">gtod_reduce</span><span class="o">=</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">JobName: 
+</span></span><span class="line"><span class="cl">  <span class="nv">blocksize</span><span class="o">=</span> <span class="nv">filesize</span><span class="o">=</span> <span class="nv">iodepth</span><span class="o">=</span> <span class="nv">rw</span><span class="o">=</span>
+</span></span><span class="line"><span class="cl">write:
+</span></span><span class="line"><span class="cl">  <span class="nv">IOPS</span><span class="o">=</span>3023.577881 BW<span class="o">(</span>KiB/s<span class="o">)=</span><span class="m">12094</span>
+</span></span><span class="line"><span class="cl">  iops: <span class="nv">min</span><span class="o">=</span><span class="m">992</span> <span class="nv">max</span><span class="o">=</span><span class="m">8640</span> <span class="nv">avg</span><span class="o">=</span>3023.464355
+</span></span><span class="line"><span class="cl">  bw<span class="o">(</span>KiB/s<span class="o">)</span>: <span class="nv">min</span><span class="o">=</span><span class="m">3968</span> <span class="nv">max</span><span class="o">=</span><span class="m">34564</span> <span class="nv">avg</span><span class="o">=</span>12093.908203
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">Disk stats <span class="o">(</span>read/write<span class="o">)</span>:
+</span></span><span class="line"><span class="cl">  nvme0n1: <span class="nv">ios</span><span class="o">=</span>0/362587 <span class="nv">merge</span><span class="o">=</span>0/173 <span class="nv">ticks</span><span class="o">=</span>0/6330627 <span class="nv">in_queue</span><span class="o">=</span>6330627, <span class="nv">util</span><span class="o">=</span>99.954132%
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>fio-write 실행 결과, 쓰기 평균 iops가 3034인 것을 확인할 수 있다.</p>
+<br>
+<p>Q. 테스트가 안될 경우, PV 상태 Pending?</p>
+<p>해당 경우는 PVC 요청에 맞는 볼륨의 PV가 없을때 발생한다. PVC 요청에 맞는 볼륨이 있는지 또는 Local-path-provisioner 설정을 확인하자. 필자의 경우 Local-path-provisioner 설정으로 Pending 이 발생했다.</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">kubectl get pvc -A
+</span></span><span class="line"><span class="cl">---------------------------------
+</span></span><span class="line"><span class="cl">NAMESPACE   NAME                    STATUS    VOLUME   CAPACITY   ACCESS MODES   STORAGECLASS   AGE
+</span></span><span class="line"><span class="cl">default     kubestr-fio-pvc-dl7vx   Pending                                      local-path     4m34
+</span></span></code></pre></td></tr></table>
+</div>
+</div><br>
+<h3 id="노드-볼륨-io-성능-측정">
+    <a href="#%eb%85%b8%eb%93%9c-%eb%b3%bc%eb%a5%a8-io-%ec%84%b1%eb%8a%a5-%ec%b8%a1%ec%a0%95" class="anchor">
+        <svg class="icon" aria-hidden="true" focusable="false" height="16" version="1.1" viewBox="0 0 16 16" width="16">
+            <path fill-rule="evenodd"
+                d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z">
+            </path>
+        </svg>
+    </a>
+    노드 볼륨 IO 성능 측정
+</h3>
+<p>iostat 명령어를 통해 실시간으로 스토리지의 성능과 사용량에 관한 정보를 확인할 수 있다. 클러스터 운영시 스토리지 트러블슈팅의 일환으로 사용하자.</p>
+<p>아래 예제는 fio-write 스크립트 실행 중 iostat 를 실행하여 스토리지 정보를 확인한 예제이다.</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl"><span class="c1"># iostat 패키지 설치</span>
+</span></span><span class="line"><span class="cl">sudo apt install -y **sysstat
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">iostat -xmdz <span class="m">1</span> -p nvme2n1** 
+</span></span><span class="line"><span class="cl">---------------------------------
+</span></span><span class="line"><span class="cl">**Device            r/s     rMB/s   rrqm/s  %rrqm r_await rareq-sz     w/s     wMB/s   wrqm/s  %wrqm w_await wareq-sz     d/s     dMB/s   drqm/s  %drqm d_await dareq-sz  aqu-sz  %util
+</span></span><span class="line"><span class="cl">nvme2n1          0.00      0.00     0.00   0.00    0.00     0.00   24.00      0.10     2.00   7.69    0.75     4.33    0.00      0.00     0.00   0.00    0.00     0.00    0.02   4.00**
+</span></span></code></pre></td></tr></table>
+</div>
+</div><ul>
+<li><strong><code>w/s</code></strong>: 초당 쓰기 요청 수</li>
+<li><strong><code>wMB/s</code></strong>: 초당 쓴 데이터 양 (메가바이트/초)</li>
+<li><strong><code>wrqm/s</code></strong>: 초당 쓰기 요청 큐에 들어간 요청 수</li>
+<li><strong><code>%wrqm</code></strong>: 쓰기 요청 큐에 들어간 요청 비율</li>
+<li><strong><code>w_await</code></strong>: 쓰기 요청 대기 시간, 드라이버 요청 대기열에서 기다린 시간과 장치의 I/O 응답시간을 모두 포함한다. (밀리초)</li>
+<li><strong><code>wareq-sz</code></strong>: 평균 쓰기 요청 크기 (섹터)</li>
+<li><strong><code>aqu-sz</code></strong>: 요청 대기열의 평균 길이</li>
+<li><strong><code>%util</code></strong>: 디스크 사용률 (0 ~ 100%)</li>
+</ul>
+<br>
+<br>
+<br>
+<h1 id="로컬-스토리지-qna">
+    <a href="#%eb%a1%9c%ec%bb%ac-%ec%8a%a4%ed%86%a0%eb%a6%ac%ec%a7%80-qna" class="anchor">
+        <svg class="icon" aria-hidden="true" focusable="false" height="16" version="1.1" viewBox="0 0 16 16" width="16">
+            <path fill-rule="evenodd"
+                d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z">
+            </path>
+        </svg>
+    </a>
+    로컬 스토리지 QnA
+</h1>
+<p><strong>Q1. AWS 인스토어 스토어에 대한 볼륨 스토리지 조절이 가능한가?</strong></p>
+<p>인스턴스 스토어는 EC2 인스턴스의 로컬 디스크를 사용하는 것이기 때문에 크기 조정이 불가능하다. 인스턴스 스토어를 사용하는 EC2 인스턴스를 변경하거나 새로운 인스턴스를 시작하여 크기를 조정해야 한다. 일반적으로 DB(Mysql) 볼륨 사용량으로 10G~100G을 설정한다고 하지만, 애플리케이션 규모와 기간에 따라 사용량 예측이 힘들다. 필요시 백업을 통해 인스토어 스토어 볼륨을 변경할 수 있도록 하자. EC2 인스턴스에 따른 볼륨(SSD) 는 <a href="https://docs.aws.amazon.com/ko_kr/AWSEC2/latest/UserGuide/InstanceStorage.html">링크</a>에서 확인이 가능하다.</p>
+<br>
+<p><strong>Q2. hostpath 볼륨을 여러개의 파드가 동시에 사용할 수 있을까?</strong></p>
+<p>노드의 파일 시스템은 여러 개의 프로세스가 동시에 접근할 수 있는 공유 리소스이기 때문에 여러 개의 파드가 하나의 hostpath를 사용할 수 있다. 하지만, 데이터 손상이나 권한 오류가 발생할 수 있다. 하나의 파드가 파일을 쓴 후에 다른 파드가 동일한 파일을 읽을 경우나, 여러 개의 파드가 동시에 동일한 파일을 쓰는 경우가 있기 때문이다. 이를 위해 적절한 동기화 및 락 메커니즘을 구현이 필요하다.</p>
+<p>테스트로 스터디에서 공유해주신 localpath-fail.yaml 를 수정해서 로그를 확인해봤다.</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">apiVersion: apps/v1
+</span></span><span class="line"><span class="cl">kind: Deployment
+</span></span><span class="line"><span class="cl">metadata:
+</span></span><span class="line"><span class="cl">  name: date-pod
+</span></span><span class="line"><span class="cl">  labels:
+</span></span><span class="line"><span class="cl">    app: date
+</span></span><span class="line"><span class="cl">spec:
+</span></span><span class="line"><span class="cl">  replicas: <span class="m">1</span>
+</span></span><span class="line"><span class="cl">  selector:
+</span></span><span class="line"><span class="cl">    matchLabels:
+</span></span><span class="line"><span class="cl">      app: date
+</span></span><span class="line"><span class="cl">  template:
+</span></span><span class="line"><span class="cl">    metadata:
+</span></span><span class="line"><span class="cl">      labels:
+</span></span><span class="line"><span class="cl">        app: date
+</span></span><span class="line"><span class="cl">    spec:
+</span></span><span class="line"><span class="cl">      terminationGracePeriodSeconds: <span class="m">3</span>
+</span></span><span class="line"><span class="cl">      containers:
+</span></span><span class="line"><span class="cl">      - name: app
+</span></span><span class="line"><span class="cl">        image: centos
+</span></span><span class="line"><span class="cl">        command: <span class="o">[</span><span class="s2">&#34;/bin/sh&#34;</span><span class="o">]</span>
+</span></span><span class="line"><span class="cl">        args: <span class="o">[</span><span class="s2">&#34;-c&#34;</span>, <span class="s2">&#34;while true; do echo </span><span class="k">$(</span>date -u<span class="k">)</span><span class="s2"> &gt;&gt; /data/out.txt; sleep 0.01; done&#34;</span><span class="o">]</span> <span class="c1"># 0.01 로 수정 </span>
+</span></span><span class="line"><span class="cl">        volumeMounts:
+</span></span><span class="line"><span class="cl">        - name: pod-persistent-volume
+</span></span><span class="line"><span class="cl">          mountPath: /data
+</span></span><span class="line"><span class="cl">      volumes: 
+</span></span><span class="line"><span class="cl">      - name: pod-persistent-volume
+</span></span><span class="line"><span class="cl">        persistentVolumeClaim:
+</span></span><span class="line"><span class="cl">          claimName: localpath-claim
+</span></span></code></pre></td></tr></table>
+</div>
+</div><div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl"><span class="c1"># 파드 10개로 증가후 테스트</span>
+</span></span><span class="line"><span class="cl">kubectl scale deployment date-pod --replicas<span class="o">=</span><span class="m">10</span>
+</span></span><span class="line"><span class="cl">--------------------------------------
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1"># 로그 확인 </span>
+</span></span><span class="line"><span class="cl">ubuntu@i-0993bfc0c3f4818c8:/data/local-path/pvc-9676527c-e860-4c13-acc3-cda3bd1a5f1d_default_localpath-claim$ cat out.txt <span class="p">|</span> grep 03:05 <span class="p">|</span> wc -l
+</span></span><span class="line"><span class="cl"><span class="m">355</span>
+</span></span><span class="line"><span class="cl">ubuntu@i-0993bfc0c3f4818c8:/data/local-path/pvc-9676527c-e860-4c13-acc3-cda3bd1a5f1d_default_localpath-claim$ cat out.txt <span class="p">|</span> grep 03:05 <span class="p">|</span> wc -l
+</span></span><span class="line"><span class="cl"><span class="m">355</span>
+</span></span><span class="line"><span class="cl">ubuntu@i-0993bfc0c3f4818c8:/data/local-path/pvc-9676527c-e860-4c13-acc3-cda3bd1a5f1d_default_localpath-claim$ cat out.txt <span class="p">|</span> grep 03:06 <span class="p">|</span> wc -l
+</span></span><span class="line"><span class="cl"><span class="m">457</span>
+</span></span><span class="line"><span class="cl">ubuntu@i-0993bfc0c3f4818c8:/data/local-path/pvc-9676527c-e860-4c13-acc3-cda3bd1a5f1d_default_localpath-claim$ cat out.txt <span class="p">|</span> grep 03:07 <span class="p">|</span> wc -l
+</span></span><span class="line"><span class="cl"><span class="m">511</span>
+</span></span><span class="line"><span class="cl">ubuntu@i-0993bfc0c3f4818c8:/data/local-path/pvc-9676527c-e860-4c13-acc3-cda3bd1a5f1d_default_localpath-claim$ cat out.txt <span class="p">|</span> grep 03:08 <span class="p">|</span> wc -l
+</span></span><span class="line"><span class="cl"><span class="m">513</span>
+</span></span><span class="line"><span class="cl">ubuntu@i-0993bfc0c3f4818c8:/data/local-path/pvc-9676527c-e860-4c13-acc3-cda3bd1a5f1d_default_localpath-claim$ cat out.txt <span class="p">|</span> grep 03:09 <span class="p">|</span> wc -l
+</span></span><span class="line"><span class="cl"><span class="m">530</span>
+</span></span><span class="line"><span class="cl">ubuntu@i-0993bfc0c3f4818c8:/data/local-path/pvc-9676527c-e860-4c13-acc3-cda3bd1a5f1d_default_localpath-claim$ cat out.txt <span class="p">|</span> grep 03:10 <span class="p">|</span> wc -l
+</span></span><span class="line"><span class="cl"><span class="m">506</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>0.01초 x 10 개 파드로 1초당 약 1000개의 결과가 나와야 하지만 350~530 개의 결과가 나오는 것을 확인하였다. 앞서 kubestr 측정에서 쓰기 IOPS를 측정하여 약 3000이 나왔음에도 턱없이 부족한 것을 알 수 있다.</p>
+<br>
+<p><strong>Q3. Velero 의 백업 용량은 몇 인가?</strong></p>
+<p>사용 버킷에 따라 달라진다. S3 버킷 기준으로는 해당 버킷의 용량에 따라가는데 최대 5테라까지 지원이 가능하다.</p>
+
+    </div>
+</div>
+
+<div class="container">
+    
+    <nav class="flex container suggested">
+        
+        <a rel="prev" href="/post/pkos2-1-kops/" title="Previous post (older)">
+            <span>Previous</span>
+            PKOS 2기 1주차 - kops
+            </a>
+        
+        
+        
+    </nav>
+    
+</div>
+ 
+<div class="container">
+    
+    <script src="https://giscus.app/client.js" 
+        data-repo="WingLim/hugo-tania"
+        data-repo-id="MDEwOlJlcG9zaXRvcnkzMTYyNjQzMDc="
+        
+        data-category="Comments"
+        data-category-id="DIC_kwDOEtnPc84B_WKP"
+        
+        data-mapping="pathname"
+        data-reactions-enabled="1"
+        data-emit-metadata="0"
+        data-theme="light"
+        crossorigin="anonymous"
+        async
+        >
+</script>
+
+<script>
+    function setGiscusTeheme(theme) {
+        let giscus = document.querySelector('.giscus iframe');
+        if (giscus) {
+            giscus.contentWindow.postMessage(
+                {
+                    giscus: {
+                        setConfig: {
+                            theme: theme
+                        }
+                    }
+                },
+                'https://giscus.app'
+            )
+        }
+    }
+
+    addEventListener('message', event => {
+        if (event.origin !== 'https://giscus.app') return;
+        setGiscusTeheme(document.documentElement.dataset.userColorScheme)
+    });
+
+    window.addEventListener('onColorSchemeChange', (e) => {
+        setGiscusTeheme(e.detail)
+    })
+</script>
+
+</div>
+
+</main>
+
+
+        </main>
+        <footer class="footer flex">
+    <section class="container">
+        <nav class="footer-links">
+            
+            <a href="/index.xml">RSS</a>
+            
+        </nav>
+
+        
+    </section>
+    <script defer src="/ts/features.706a523ba43e6d0427c7fdf2b9d05dbd0920d3f12942b453690b495cb2522743.js" 
+    data-enable-footnotes="true"
+    ></script>
+</footer>
+
+    </body>
+</html>

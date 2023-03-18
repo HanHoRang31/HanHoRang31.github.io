@@ -6,11 +6,11 @@
     <description>Recent content in Tags on HanHoRang Tech Blog</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <lastBuildDate>Fri, 10 Mar 2023 00:00:00 +0000</lastBuildDate><atom:link href="https://HanHoRang31.github.io/tags/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Sat, 18 Mar 2023 00:00:00 +0000</lastBuildDate><atom:link href="https://HanHoRang31.github.io/tags/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>AWS</title>
       <link>https://HanHoRang31.github.io/tags/aws/</link>
-      <pubDate>Fri, 10 Mar 2023 00:00:00 +0000</pubDate>
+      <pubDate>Sat, 18 Mar 2023 00:00:00 +0000</pubDate>
       
       <guid>https://HanHoRang31.github.io/tags/aws/</guid>
       <description></description>
@@ -19,7 +19,7 @@
     <item>
       <title>cloud</title>
       <link>https://HanHoRang31.github.io/tags/cloud/</link>
-      <pubDate>Fri, 10 Mar 2023 00:00:00 +0000</pubDate>
+      <pubDate>Sat, 18 Mar 2023 00:00:00 +0000</pubDate>
       
       <guid>https://HanHoRang31.github.io/tags/cloud/</guid>
       <description></description>
@@ -28,7 +28,7 @@
     <item>
       <title>KANS</title>
       <link>https://HanHoRang31.github.io/tags/kans/</link>
-      <pubDate>Fri, 10 Mar 2023 00:00:00 +0000</pubDate>
+      <pubDate>Sat, 18 Mar 2023 00:00:00 +0000</pubDate>
       
       <guid>https://HanHoRang31.github.io/tags/kans/</guid>
       <description></description>
@@ -37,7 +37,7 @@
     <item>
       <title>kops</title>
       <link>https://HanHoRang31.github.io/tags/kops/</link>
-      <pubDate>Fri, 10 Mar 2023 00:00:00 +0000</pubDate>
+      <pubDate>Sat, 18 Mar 2023 00:00:00 +0000</pubDate>
       
       <guid>https://HanHoRang31.github.io/tags/kops/</guid>
       <description></description>
@@ -46,9 +46,36 @@
     <item>
       <title>kubernetes</title>
       <link>https://HanHoRang31.github.io/tags/kubernetes/</link>
-      <pubDate>Fri, 10 Mar 2023 00:00:00 +0000</pubDate>
+      <pubDate>Sat, 18 Mar 2023 00:00:00 +0000</pubDate>
       
       <guid>https://HanHoRang31.github.io/tags/kubernetes/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>local-path-provisioner</title>
+      <link>https://HanHoRang31.github.io/tags/local-path-provisioner/</link>
+      <pubDate>Sat, 18 Mar 2023 00:00:00 +0000</pubDate>
+      
+      <guid>https://HanHoRang31.github.io/tags/local-path-provisioner/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>velero</title>
+      <link>https://HanHoRang31.github.io/tags/velero/</link>
+      <pubDate>Sat, 18 Mar 2023 00:00:00 +0000</pubDate>
+      
+      <guid>https://HanHoRang31.github.io/tags/velero/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>Volume</title>
+      <link>https://HanHoRang31.github.io/tags/volume/</link>
+      <pubDate>Sat, 18 Mar 2023 00:00:00 +0000</pubDate>
+      
+      <guid>https://HanHoRang31.github.io/tags/volume/</guid>
       <description></description>
     </item>
     
