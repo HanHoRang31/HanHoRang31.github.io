@@ -277,12 +277,12 @@
 </span></span><span class="line"><span class="cl">      labels:
 </span></span><span class="line"><span class="cl">        app: local-path-provisioner
 </span></span><span class="line"><span class="cl">    spec:  <span class="c1"># 추가 부분  </span>
-</span></span><span class="line"><span class="cl">      **nodeSelector:
+</span></span><span class="line"><span class="cl">      nodeSelector:
 </span></span><span class="line"><span class="cl">        kubernetes.io/hostname: <span class="s2">&#34;마스터 노드 이름 입력 &#34;</span>
 </span></span><span class="line"><span class="cl">      tolerations:
 </span></span><span class="line"><span class="cl">        - effect: NoSchedule
 </span></span><span class="line"><span class="cl">          key: node-role.kubernetes.io/control-plane
-</span></span><span class="line"><span class="cl">          operator: Exists**
+</span></span><span class="line"><span class="cl">          operator: Exists
 </span></span><span class="line"><span class="cl">...
 </span></span><span class="line"><span class="cl">kind: ConfigMap
 </span></span><span class="line"><span class="cl">apiVersion: v1
@@ -295,7 +295,7 @@
 </span></span><span class="line"><span class="cl">            <span class="s2">&#34;nodePathMap&#34;</span>:<span class="o">[</span>
 </span></span><span class="line"><span class="cl">            <span class="o">{</span>
 </span></span><span class="line"><span class="cl">                    <span class="s2">&#34;node&#34;</span>:<span class="s2">&#34;DEFAULT_PATH_FOR_NON_LISTED_NODES&#34;</span>,
-</span></span><span class="line"><span class="cl">                    <span class="s2">&#34;paths&#34;</span>:<span class="o">[</span><span class="s2">&#34;**/data/local-path**&#34;</span><span class="o">]</span> <span class="c1"># 추가 부분</span>
+</span></span><span class="line"><span class="cl">                    <span class="s2">&#34;paths&#34;</span>:<span class="o">[</span><span class="s2">&#34;/data/local-path&#34;</span><span class="o">]</span> <span class="c1"># 추가 부분</span>
 </span></span><span class="line"><span class="cl">            <span class="o">}</span>
 </span></span><span class="line"><span class="cl">            <span class="o">]</span>
 </span></span><span class="line"><span class="cl">    <span class="o">}</span>
@@ -1028,7 +1028,7 @@
 <pre tabindex="0" class="chroma"><code><span class="lnt">1
 </span></code></pre></td>
 <td class="lntd">
-<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">**aws s3 mb s3://&lt;bucket-name&gt; --region ap-northeast-2**
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">aws s3 mb s3://&lt;bucket-name&gt; --region ap-northeast-2
 </span></span></code></pre></td></tr></table>
 </div>
 </div><p>IAM Policy 생성</p>
@@ -1108,7 +1108,7 @@
 </span></code></pre></td>
 <td class="lntd">
 <pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl"><span class="c1"># 버킷 변수 설정 </span>
-</span></span><span class="line"><span class="cl"><span class="nb">export</span> <span class="nv">BUCKET</span><span class="o">=</span>**&lt;bucket-name&gt;**
+</span></span><span class="line"><span class="cl"><span class="nb">export</span> <span class="nv">BUCKET</span><span class="o">=</span>&lt;bucket-name&gt;
 </span></span><span class="line"><span class="cl">
 </span></span><span class="line"><span class="cl"><span class="c1"># IAM Policy 생성 </span>
 </span></span><span class="line"><span class="cl">cat &gt; velero-policy.json <span class="s">&lt;&lt;EOF
@@ -1273,8 +1273,8 @@
 </span><span class="lnt">34
 </span></code></pre></td>
 <td class="lntd">
-<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl"><span class="nb">export</span> <span class="nv">BUCKET</span><span class="o">=</span>**&lt;bucket-name&gt;**
-</span></span><span class="line"><span class="cl"><span class="nb">export</span> <span class="nv">REGION</span><span class="o">=</span>**ap-northeast-2**
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl"><span class="nb">export</span> <span class="nv">BUCKET</span><span class="o">=</span>&lt;bucket-name&gt;
+</span></span><span class="line"><span class="cl"><span class="nb">export</span> <span class="nv">REGION</span><span class="o">=</span>ap-northeast-2
 </span></span><span class="line"><span class="cl">
 </span></span><span class="line"><span class="cl">velero install <span class="se">\
 </span></span></span><span class="line"><span class="cl"><span class="se"></span>    --provider aws <span class="se">\
@@ -1540,7 +1540,7 @@
 <td class="lntd">
 <pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">velero schedule create mysql-crontab --include-namespaces default --schedule<span class="o">=</span><span class="s2">&#34;*/5 * * * *&#34;</span> 
 </span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl">****velero get backup
+</span></span><span class="line"><span class="cl">velero get backup
 </span></span><span class="line"><span class="cl">---------------------------------
 </span></span><span class="line"><span class="cl">NAME                           STATUS      ERRORS   WARNINGS   CREATED                         EXPIRES   STORAGE LOCATION   SELECTOR
 </span></span><span class="line"><span class="cl">mysql                          Completed   <span class="m">0</span>        <span class="m">0</span>          2023-03-16 15:51:44 +0900 KST   29d       default            &lt;none&gt;
@@ -1613,8 +1613,8 @@
 </span></code></pre></td>
 <td class="lntd">
 <pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl"><span class="c1"># velero 설치</span>
-</span></span><span class="line"><span class="cl"><span class="nb">export</span> <span class="nv">BUCKET</span><span class="o">=</span>**hanhorang-velero-s3**
-</span></span><span class="line"><span class="cl"><span class="nb">export</span> <span class="nv">REGION</span><span class="o">=</span>**ap-northeast-2**
+</span></span><span class="line"><span class="cl"><span class="nb">export</span> <span class="nv">BUCKET</span><span class="o">=</span>hanhorang-velero-s3
+</span></span><span class="line"><span class="cl"><span class="nb">export</span> <span class="nv">REGION</span><span class="o">=</span>ap-northeast-2
 </span></span><span class="line"><span class="cl">
 </span></span><span class="line"><span class="cl">velero install <span class="se">\
 </span></span></span><span class="line"><span class="cl"><span class="se"></span>    --provider aws <span class="se">\
@@ -1875,12 +1875,12 @@
 </span></code></pre></td>
 <td class="lntd">
 <pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl"><span class="c1"># iostat 패키지 설치</span>
-</span></span><span class="line"><span class="cl">sudo apt install -y **sysstat
+</span></span><span class="line"><span class="cl">sudo apt install -y sysstat
 </span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl">iostat -xmdz <span class="m">1</span> -p nvme2n1** 
+</span></span><span class="line"><span class="cl">iostat -xmdz <span class="m">1</span> -p nvme2n1
 </span></span><span class="line"><span class="cl">---------------------------------
-</span></span><span class="line"><span class="cl">**Device            r/s     rMB/s   rrqm/s  %rrqm r_await rareq-sz     w/s     wMB/s   wrqm/s  %wrqm w_await wareq-sz     d/s     dMB/s   drqm/s  %drqm d_await dareq-sz  aqu-sz  %util
-</span></span><span class="line"><span class="cl">nvme2n1          0.00      0.00     0.00   0.00    0.00     0.00   24.00      0.10     2.00   7.69    0.75     4.33    0.00      0.00     0.00   0.00    0.00     0.00    0.02   4.00**
+</span></span><span class="line"><span class="cl">Device            r/s     rMB/s   rrqm/s  %rrqm r_await rareq-sz     w/s     wMB/s   wrqm/s  %wrqm w_await wareq-sz     d/s     dMB/s   drqm/s  %drqm d_await dareq-sz  aqu-sz  %util
+</span></span><span class="line"><span class="cl">nvme2n1          0.00      0.00     0.00   0.00    0.00     0.00   24.00      0.10     2.00   7.69    0.75     4.33    0.00      0.00     0.00   0.00    0.00     0.00    0.02   4.00
 </span></span></code></pre></td></tr></table>
 </div>
 </div><ul>
