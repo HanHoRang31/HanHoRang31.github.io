@@ -1,4 +1,0 @@
-User-agent: *
-Allow: /
-
-Sitemap: http://min1321.github.io/sitemap.xml

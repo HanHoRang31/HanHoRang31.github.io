@@ -1,0 +1,999 @@
+<!DOCTYPE html>
+<html lang="en-us">
+    
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="theme-color" content="dark">
+    <title>PKOS 2기 3주차 - GitOps | HanHoRang Tech Blog</title>
+
+    
+    
+    
+    <meta property="og:site_name" content="HanHoRang Tech Blog by Tania in Hugo" />
+    <meta property="og:title" content="PKOS 2기 3주차 - GitOps | HanHoRang Tech Blog"/>
+    <meta itemprop="name" content="PKOS 2기 3주차 - GitOps | HanHoRang Tech Blog" />
+    <meta name="twitter:title" content="PKOS 2기 3주차 - GitOps | HanHoRang Tech Blog" />
+    <meta name="application-name" content="PKOS 2기 3주차 - GitOps | HanHoRang Tech Blog" /><meta name="twitter:card" content="summary"/>
+
+    <meta name="description" content="Gitlab ArgoCD 를 통한 GitOps 시스템 구축하기" />
+    <meta name="twitter:description" content="Gitlab ArgoCD 를 통한 GitOps 시스템 구축하기 "/>
+    <meta itemprop="description" content=" Gitlab ArgoCD 를 통한 GitOps 시스템 구축하기 "/>
+    <meta property="og:description" content=" Gitlab ArgoCD 를 통한 GitOps 시스템 구축하기 " />
+
+    
+
+<meta property="og:type" content="article" />
+<meta property="article:publisher" content="Hugo Tania" />
+<meta property="og:article:published_time" content=2023-03-25T07:35:40&#43;0900 />
+<meta property="article:published_time" content=2023-03-25T07:35:40&#43;0900 />
+
+
+  <meta property="og:article:author" content="Han ho rnag" />
+  <meta property="article:author" content="Han ho rnag" />
+  <meta name="author" content="Han ho rnag" />
+
+
+
+
+<script defer type="application/ld+json">
+  {
+    "@context": "http://schema.org",
+    "@type": "Article",
+    "headline": "PKOS 2기 3주차 - GitOps",
+    "author": {
+      "@type": "Person",
+      "name": "Hugo Tania"
+    },
+    "datePublished": "2023-03-25",
+    "description": "Gitlab ArgoCD 를 통한 GitOps 시스템 구축하기",
+    "wordCount":  2030 ,
+    "mainEntityOfPage": "True",
+    "dateModified": "2023-03-25",
+    "publisher": {
+      "@type": "Organization",
+      "name": "Hugo Tania",
+      "logo": {
+        "@type": "imageObject",
+        "url": "https:\/\/HanHoRang31.github.io\/favicon.ico"
+      }
+    }
+  }
+</script>
+
+
+
+    <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico" />
+    
+    <link rel="stylesheet" href="/sass/main.min.ab99ff095f832511e24ffb2fba2b51ad473b2f7e9301d674eba2c6c3a6e8bd81.css">
+    
+</head>
+    
+    <script>
+        (function() {
+            const colorSchemeKey = 'ThemeColorScheme';
+            if(!localStorage.getItem(colorSchemeKey)){
+                localStorage.setItem(colorSchemeKey, "auto");
+            }
+        })();
+    </script><script>
+    (function() {
+        const colorSchemeKey = 'ThemeColorScheme';
+        const colorSchemeItem = localStorage.getItem(colorSchemeKey);
+        const supportDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches === true;
+
+        if (colorSchemeItem == 'dark' || colorSchemeItem === 'auto' && supportDarkMode) {
+            
+
+            document.documentElement.dataset.userColorScheme = 'dark';
+        } else {
+            document.documentElement.dataset.userColorScheme = 'light';
+        }
+    })();
+</script>
+
+
+    <body class="dark">
+        <nav class="navbar">
+    <div class="container">
+        <div class="flex">
+            <div>
+                <a class="brand" href="/">
+                    
+                    
+                        <img src="/favicon.ico" />
+                    
+                    HanHoRang Tech Blog
+                    </a>
+            </div>
+            <div class="flex">
+                
+                <a href="/articles/">Articles</a>
+                
+                
+                    <button id="dark-mode-button">
+                    <svg class="light" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" aria-hidden="true" focusable="false" width="1em" height="1em" style="-ms-transform: rotate(360deg); -webkit-transform: rotate(360deg); transform: rotate(360deg);" preserveAspectRatio="xMidYMid meet" viewBox="0 0 36 36"><path fill="#FFD983" d="M30.312.776C32 19 20 32 .776 30.312c8.199 7.717 21.091 7.588 29.107-.429C37.9 21.867 38.03 8.975 30.312.776z"/><path d="M30.705 15.915a1.163 1.163 0 1 0 1.643 1.641a1.163 1.163 0 0 0-1.643-1.641zm-16.022 14.38a1.74 1.74 0 0 0 0 2.465a1.742 1.742 0 1 0 0-2.465zm13.968-2.147a2.904 2.904 0 0 1-4.108 0a2.902 2.902 0 0 1 0-4.107a2.902 2.902 0 0 1 4.108 0a2.902 2.902 0 0 1 0 4.107z" fill="#FFCC4D"/><rect x="0" y="0" width="36" height="36" fill="rgba(0, 0, 0, 0)" /></svg>
+                    <svg class="dark" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" aria-hidden="true" focusable="false" width="1em" height="1em" style="-ms-transform: rotate(360deg); -webkit-transform: rotate(360deg); transform: rotate(360deg);" preserveAspectRatio="xMidYMid meet" viewBox="0 0 36 36"><path fill="#FFD983" d="M16 2s0-2 2-2s2 2 2 2v2s0 2-2 2s-2-2-2-2V2zm18 14s2 0 2 2s-2 2-2 2h-2s-2 0-2-2s2-2 2-2h2zM4 16s2 0 2 2s-2 2-2 2H2s-2 0-2-2s2-2 2-2h2zm5.121-8.707s1.414 1.414 0 2.828s-2.828 0-2.828 0L4.878 8.708s-1.414-1.414 0-2.829c1.415-1.414 2.829 0 2.829 0l1.414 1.414zm21 21s1.414 1.414 0 2.828s-2.828 0-2.828 0l-1.414-1.414s-1.414-1.414 0-2.828s2.828 0 2.828 0l1.414 1.414zm-.413-18.172s-1.414 1.414-2.828 0s0-2.828 0-2.828l1.414-1.414s1.414-1.414 2.828 0s0 2.828 0 2.828l-1.414 1.414zm-21 21s-1.414 1.414-2.828 0s0-2.828 0-2.828l1.414-1.414s1.414-1.414 2.828 0s0 2.828 0 2.828l-1.414 1.414zM16 32s0-2 2-2s2 2 2 2v2s0 2-2 2s-2-2-2-2v-2z"/><circle fill="#FFD983" cx="18" cy="18" r="10"/><rect x="0" y="0" width="36" height="36" fill="rgba(0, 0, 0, 0)" /></svg>
+                    </button>
+                
+            </div>
+            </div>
+    </div>
+</nav>
+
+        <main>
+            
+<div class="container">
+    <article>
+        <header class="article-header">
+            <div class="thumb">
+                <div>
+                    <h1>PKOS 2기 3주차 - GitOps</h1>
+                    <div class="post-meta">
+                        <div>
+                            
+                            
+                            By HanHoRnag | <time>March 25, 2023</time>
+                            | 10 minutes
+                        </div>
+                        <div class="tags">
+                            
+                            <a href="/tags/kans/">KANS</a>
+                            
+                            <a href="/tags/kops/">kops</a>
+                            
+                            <a href="/tags/cloud/">cloud</a>
+                            
+                            <a href="/tags/aws/">AWS</a>
+                            
+                            <a href="/tags/kubernetes/">kubernetes</a>
+                            
+                            <a href="/tags/gitops/">GitOps</a>
+                            
+                            <a href="/tags/gitlab/">Gitlab</a>
+                            
+                            <a href="/tags/argocd/">ArgoCD</a>
+                            
+                            <a href="/tags/ci/cd/">CI/CD</a>
+                            
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </header>
+    </article>
+
+    <div class="article-post">
+    <div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-markdown" data-lang="markdown"><span class="line"><span class="cl">Production Kubernetes Online Study (=PKOS)는 쿠버네티스 실무 실습 스터디입니다.
+</span></span><span class="line"><span class="cl">CloudNet@ Gasida(가시다)이 진행하며, 책 &#34;24단계 실습으로 정복하는 쿠버네티스&#34;을 기반으로 진행하고 있습니다.
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>3주차 시간에는 Gitlab 과 ArgoCD를 배포하여 Gitops 시스템을 구축하였다. 이번 블로그 글에서는 GitOPS 시스템에 대한 실습 내용들을 정리하고 공유하고자 한다.</p>
+<p>GitOps는 GIt을 진실의 원천(SSOT, Single Source of Truth) 으로 사용하는 인프라와 애플리케이션 배포 관리 방식이다. 진실의 원천이라는 말은 Git에서만 소스를 관리할 수 있게 하여 단일 진실 원천을 구현한다는 말이다. 쿠버네티스에서는 GItOps를 ArgoCD를 이용하여 깃 저장소에 있는 소스를 정의된 클러스터 환경에 자동으로 반영시켜 준다.</p>
+<p>GitOps 시스템을 구축하면 얻을 수 있는 이점은 다음과 같다.</p>
+<ol>
+<li><strong>버전 관리</strong>: Git을 사용하므로 인프라 및 애플리케이션의 모든 변경 사항이 추적되고 버전이 관리된다. 이를 통해 문제 발생 시 이전 상태로 쉽게 되돌릴 수 있다.</li>
+<li><strong>디커플링</strong>: 코드와 인프라를 분리함으로써 개발자와 운영팀 간의 협업이 쉬워진다.</li>
+<li><strong>자동화</strong>: 변경 사항이 자동으로 적용되므로 수동 인프라 관리 작업이 줄어들고, 실수를 방지할 수 있다.</li>
+<li><strong>보안</strong>: Git 저장소에 접근 권한을 제어함으로써 인프라 변경에 대한 보안을 강화할 수 있다.</li>
+<li><strong>신속한 피드백 루프</strong>: 문제가 발생하면 소스 코드에 대한 변경을 통해 빠르게 해결하고 적용할 수 있다.</li>
+</ol>
+<p>이점만 존재하는 것은 아니다, 단점도 존재한다.</p>
+<ol>
+<li><strong>학습 곡선</strong>: GitOps 및 관련 도구를 사용하려면 Git, 선언적 인프라 도구 및 오케스트레이션 플랫폼에 대한 지식이 필요하다.</li>
+<li><strong>복잡성</strong>: GitOps를 사용하면 초기 설정과 관리가 복잡할 수 있다. 적절한 도구와 프로세스를 구축하고 유지 관리하는 데 시간과 노력이 필요할 수 있다.</li>
+<li><strong>높은 의존성</strong>: GitOps는 Git 저장소에 대한 높은 의존성을 가지며, 저장소 접근이 불가능한 경우 인프라 변경이 제한될 수 있다.</li>
+</ol>
+<p>간단하게 예제 시나리오를 구성하여 GitOps 시스템을 구축하고자 한다.  먼저 쿠버네티스 환경에 Gitlab과 ArgoCD를 배포할 것이고, 관리 대상을 지난 시간에 배운 Harbor 배포 차트로 지정할 것이다.</p>
+<h2 id="gitlab-배포">
+    <a href="#gitlab-%eb%b0%b0%ed%8f%ac" class="anchor">
+        <svg class="icon" aria-hidden="true" focusable="false" height="16" version="1.1" viewBox="0 0 16 16" width="16">
+            <path fill-rule="evenodd"
+                d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z">
+            </path>
+        </svg>
+    </a>
+    Gitlab 배포
+</h2>
+<p>Gitlab은 소스 원격 저장소이다. 흔히 쓰는 깃허브로 생각하면 이해가 빠르다. Gitlab의 차별점은 사설(공식문서에는 offline이라 칭함) 깃랩을 구축할 수 있다는 점인데 직접 헬름 차트를 구성하여 배포하겠다.</p>
+<p>깃랩 차트는 다음과 같이 불러올 수 있다.</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">helm repo add gitlab https://charts.gitlab.io/
+</span></span><span class="line"><span class="cl">helm repo update
+</span></span><span class="line"><span class="cl">helm fetch gitlab/gitlab --untar --version 6.8.1
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>깃랩 차트에 부가 옵션이 많다.. <a href="https://docs.gitlab.com/charts/charts/globals#configure-minio-settings">공식 문서</a>를 참고하자.  다음은 필자가 차트를 보고 간략히 정리한 내용이다.</p>
+<ul>
+<li><strong>유료 버전 무료 제공</strong> : 쿠버네티스에서 오프라인 깃랩 설치시 enterprise edtion (유료, 이하 EE라 칭함) 을 무료로 사용할 수 있다. 이유를 찾아보니 고객 유치 전략이라 한다. EE 사용시 고급 보안, 인증, 권한 관리, 진행률 보고, 고급 CI/CD 기능, 멀티 프로젝트 파이프라인 등의 고급 기능을 제공한다.</li>
+<li><strong>스토리지 관련 가용성 제공</strong> : Gitlab 자체적으로 도커 레지스트리를 제공할 수 있다. 또한,레지스트리 이미지 및  깃랩 페이지, 등의 데이터등에 대한  저장소 스토리지로 Minio 를 사용한다. 앞선 블로그 글에서 harbor 레지스트리에 대한 고가용성 구축을 다루었는데, 깃랩에서는 자동으로 연동해주는 것 같다.</li>
+<li><strong>네트워크 최적화 기능 제공</strong>  : gitlab 서버(Gitlay)에 대한 로드밸런싱(Prafect) 기능을 제공하며, Workhorse라는 컴포넌트를 통해 중앙 프록시 및 파일 처리를 관리한다.</li>
+<li><strong>보안</strong> :  Oauth, 인증 및 권한 관리(gitlab shell) 을 제공한다.</li>
+<li><strong>Observability 제공</strong> : 그라파나 연동 기능, Tracing 기능을 제공한다.</li>
+<li><strong>CI / CD 제공 :</strong>  gitlab-runner 라는 컴포넌트를 통해 CI / CD 기능을 제공한다.</li>
+</ul>
+<p>뭐지..? 단순히 깃 저장소를 확장하여 대부분의 addon를 자동으로 연계시켜 제공하다니, 심지어 고가용성, 최적화에 대한 구성도 자동으로 제공해준다. 기능별로 세세히 보고 싶은 마음이 굴뚝같지만, 이번 블로그글에서는 gitops 시스템 대한 내용만 다룬다. 차트에서 다음과 같은 부분을 수정하였다.</p>
+<p>values-gitops.yaml</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-yaml" data-lang="yaml"><span class="line"><span class="cl"><span class="nt">global</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="nt">hosts</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="nt">domain</span><span class="p">:</span><span class="w"> </span>{<span class="l">도메인 입력}</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="nt">ingress</span><span class="p">:</span><span class="w"> 
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="nt">configureCertmanager</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="nt">provider</span><span class="p">:</span><span class="w"> </span><span class="l">aws</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="nt">class</span><span class="p">:</span><span class="w"> </span><span class="l">alb</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="nt">annotations</span><span class="p">:</span><span class="w"> 
+</span></span></span><span class="line"><span class="cl"><span class="w">      </span><span class="nt">alb.ingress.kubernetes.io/scheme</span><span class="p">:</span><span class="w"> </span><span class="l">internet-facing</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">      </span><span class="nt">alb.ingress.kubernetes.io/target-type</span><span class="p">:</span><span class="w"> </span><span class="l">ip</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">      </span><span class="nt">alb.ingress.kubernetes.io/listen-ports</span><span class="p">:</span><span class="w"> </span><span class="s1">&#39;[{&#34;HTTPS&#34;:443}, {&#34;HTTP&#34;:80}]&#39;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">      </span><span class="nt">alb.ingress.kubernetes.io/certificate-arn</span><span class="p">:</span><span class="w"> </span>{<span class="l">ACM arn 입력}</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">      </span><span class="nt">alb.ingress.kubernetes.io/success-codes</span><span class="p">:</span><span class="w"> </span><span class="m">200-399</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">      </span><span class="nt">alb.ingress.kubernetes.io/group.name</span><span class="p">:</span><span class="w"> </span><span class="s2">&#34;gitlab&#34;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="nt">tls</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">      </span><span class="nt">enabled</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span><span class="w"> 
+</span></span></span><span class="line"><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="nt">certmanager</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="nt">install</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="nt">nginx-ingress</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="nt">enabled</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="nt">prometheus</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="nt">install</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="nt">gitlab-runner</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="nt">install</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span><span class="w">
+</span></span></span></code></pre></td></tr></table>
+</div>
+</div><p>헬름 차트에서는 차트 오버라이드가 가능하다.
+위의 차트에서 ACM값만 수정해서 설치를 진행하자.</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-yaml" data-lang="yaml"><span class="line"><span class="cl"><span class="l">helm install gitlab gitlab/gitlab -f values-gitops.yaml --namespace gitlab --version 6.8.4</span><span class="w">
+</span></span></span></code></pre></td></tr></table>
+</div>
+</div><p>설치 후 도메인을 통해 로그인을 진행한다. 초기 admin 계정의 아이디는 root 이며, 비밀번호는 다음의 명령어에서 확인한다.</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-yaml" data-lang="yaml"><span class="line"><span class="cl"><span class="c"># 웹 root 계정 암호 확인</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="l">kubectl get secrets -n gitlab gitlab-gitlab-initial-root-password --template={{.data.password}} | base64 -d ;echo</span><span class="w">
+</span></span></span></code></pre></td></tr></table>
+</div>
+</div><p><img loading="lazy" 
+    src="/./PKOS2-3-gitops/gitlab-login.png" 
+    alt="gitlab-login.png" 
+     
+    width=483 
+    height="468"  /></p>
+<p>접속하면 깃랩 프로젝트 화면이 보인다. 이어서 PKOS 스터디에서 진행한 실습 내용을 테스트하겠다. 사용자 계정을 생성하여 토큰을 발급받고, 신규 프로젝트를 파일을 업로드해보자.</p>
+<p><img loading="lazy" 
+    src="/./PKOS2-3-gitops/git-test.png" 
+    alt="git-test.png" 
+     
+    width=1864 
+    height="731"  /></p>
+<h2 id="argocd-배포">
+    <a href="#argocd-%eb%b0%b0%ed%8f%ac" class="anchor">
+        <svg class="icon" aria-hidden="true" focusable="false" height="16" version="1.1" viewBox="0 0 16 16" width="16">
+            <path fill-rule="evenodd"
+                d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z">
+            </path>
+        </svg>
+    </a>
+    ArgoCD 배포
+</h2>
+<p>ArgoCD는 Git 리포지토리에 저장된 쿠버네티스 매니페스트와 실제 클러스터 상태를 동기화시켜주는 지속적인 배포(Continuous Delivery, CD) 툴이다. Argo CD를 사용하면 Git 리포지토리를 기반으로 인프라 구성을 코드로 관리할 수 있게 된다. 이는 단일 진실 원천(SSOT)로 자동화, 보안, 버전 관리 측면에서 유용하다.</p>
+<p>ArgoCD 배포는 Helm 차트로 진행한다.</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">helm repo add argo https://argoproj.github.io/argo-helm
+</span></span><span class="line"><span class="cl">helm repo update
+</span></span><span class="line"><span class="cl">helm fetch argo/argo-cd --untar --version 5.19.14
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>ArgoCD 차트 분량도 상당하다. 아키텍처를 보니 이해가 빠른 것 같아서 먼저 공유한다.</p>
+<p><img loading="lazy" 
+    src="/./PKOS2-3-gitops/argocdarchi.png" 
+    alt="&lt;a href=&#34;https://blog.searce.com/argocd-gitops-continuous-delivery-approach-on-google-kubernetes-engine-2a6b3f6813c0&#34;&gt;https://blog.searce.com/argocd-gitops-continuous-delivery-approach-on-google-kubernetes-engine-2a6b3f6813c0&lt;/a&gt;" 
+     
+    width=683 
+    height="447"  /></p>
+<p><a href="https://blog.searce.com/argocd-gitops-continuous-delivery-approach-on-google-kubernetes-engine-2a6b3f6813c0">https://blog.searce.com/argocd-gitops-continuous-delivery-approach-on-google-kubernetes-engine-2a6b3f6813c0</a></p>
+<ol>
+<li><strong><code>argo-cd-server</code></strong>: Argo CD API 서버와 웹 UI를 제공하는 컴포넌트이다. 사용자 인증 및 권한 관리를 처리하며, 클러스터와 Git 리포지토리 간의 동기화를 관리한다.</li>
+<li><strong><code>argo-cd-repo-server</code></strong>: Git 리포지토리와 통신하여 사용자가 관리하는 쿠버네티스 매니페스트 파일을 가져오는 컴포넌트이다. 또한, 리포지토리 내의 Helm 차트와 Kustomize 구성을 처리한다.</li>
+<li><strong><code>argo-cd-application-controller</code></strong>: Argo CD의 핵심 컴포넌트로, 쿠버네티스 클러스터 상태와 Git 리포지토리 상태를 비교하고 동기화를 수행한다. 클러스터의 실제 상태와 원하는 상태를 일치시키는 작업을 담당한다.</li>
+<li><strong><code>argo-cd-dex-server</code></strong>: 인증 프록시 역할을 하는 컴포넌트로, 다양한 OAuth 및 OIDC 프로바이더와 통합하여 Argo CD 인증을 처리한다.</li>
+<li><strong><code>argo-cd-redis</code></strong>: 캐싱 및 세션 관리를 위한 Redis 데이터베이스이다. Argo CD는 Redis를 사용하여 성능 향상과 빠른 응답 시간을 제공한다.
+<ul>
+<li>
+<p>Kustomize ?</p>
+<p>쿠버네티스 리소스 구성을 커스터마이징을 위한 도구이다. 동일한 구성을 가진 매니패스트에 수정할 부분만 추가해서 오버라이드가 가능하다.</p>
+<p>아래 예는 원본 베이스 앱(my-app) 에 dev, ops 환경별 필요 값을 오버라이드하는 예제이다.</p>
+<p>먼저 베이스가 되는 deployment를 선언하고 Kustomize  구성한다.</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl"><span class="c1"># base/deployment.yaml</span>
+</span></span><span class="line"><span class="cl">apiVersion: apps/v1
+</span></span><span class="line"><span class="cl">kind: Deployment
+</span></span><span class="line"><span class="cl">metadata:
+</span></span><span class="line"><span class="cl">  name: my-app
+</span></span><span class="line"><span class="cl">spec:
+</span></span><span class="line"><span class="cl">  replicas: <span class="m">1</span>
+</span></span><span class="line"><span class="cl">  selector:
+</span></span><span class="line"><span class="cl">    matchLabels:
+</span></span><span class="line"><span class="cl">      app: my-app
+</span></span><span class="line"><span class="cl">  template:
+</span></span><span class="line"><span class="cl">    metadata:
+</span></span><span class="line"><span class="cl">      labels:
+</span></span><span class="line"><span class="cl">        app: my-app
+</span></span><span class="line"><span class="cl">    spec:
+</span></span><span class="line"><span class="cl">      containers:
+</span></span><span class="line"><span class="cl">      - name: my-app
+</span></span><span class="line"><span class="cl">        image: my-app-image:latest
+</span></span><span class="line"><span class="cl">        ports:
+</span></span><span class="line"><span class="cl">        - containerPort: <span class="m">80</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl"><span class="c1"># base/kustomization.yaml</span>
+</span></span><span class="line"><span class="cl">apiVersion: kustomize.config.k8s.io/v1beta1
+</span></span><span class="line"><span class="cl">kind: Kustomization
+</span></span><span class="line"><span class="cl">resources:
+</span></span><span class="line"><span class="cl">  - deployment.yaml
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>이제 dev, Ops 환경에 대한 kustomization.yaml 파일을 생성하고 다음 내용을 추가하자.</p>
+<p><strong>Dev 환경 설정</strong></p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl"><span class="c1"># overlays/dev/kustomization.yaml</span>
+</span></span><span class="line"><span class="cl">apiVersion: kustomize.config.k8s.io/v1beta1
+</span></span><span class="line"><span class="cl">kind: Kustomization
+</span></span><span class="line"><span class="cl">bases:
+</span></span><span class="line"><span class="cl">  - ../../base
+</span></span><span class="line"><span class="cl">patchesStrategicMerge:
+</span></span><span class="line"><span class="cl">  - deployment-patch.yaml
+</span></span></code></pre></td></tr></table>
+</div>
+</div><div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl"><span class="c1"># verlays/dev/deployment-patch.yaml </span>
+</span></span><span class="line"><span class="cl">apiVersion: apps/v1
+</span></span><span class="line"><span class="cl">kind: Deployment
+</span></span><span class="line"><span class="cl">metadata:
+</span></span><span class="line"><span class="cl">  name: my-app
+</span></span><span class="line"><span class="cl">spec:
+</span></span><span class="line"><span class="cl">  replicas: <span class="m">2</span>
+</span></span><span class="line"><span class="cl">  template:
+</span></span><span class="line"><span class="cl">    spec:
+</span></span><span class="line"><span class="cl">      containers:
+</span></span><span class="line"><span class="cl">      - name: my-app
+</span></span><span class="line"><span class="cl">        image: my-app-image:dev
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p><strong>Ops 환경 설정</strong></p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl"><span class="c1"># overlays/ops/kustomization.yaml</span>
+</span></span><span class="line"><span class="cl">apiVersion: kustomize.config.k8s.io/v1beta1
+</span></span><span class="line"><span class="cl">kind: Kustomization
+</span></span><span class="line"><span class="cl">bases:
+</span></span><span class="line"><span class="cl">  - ../../base
+</span></span><span class="line"><span class="cl">patchesStrategicMerge:
+</span></span><span class="line"><span class="cl">  - deployment-patch.yaml
+</span></span></code></pre></td></tr></table>
+</div>
+</div><div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl"><span class="c1"># overlays/ops/kustomization.yaml</span>
+</span></span><span class="line"><span class="cl">apiVersion: apps/v1
+</span></span><span class="line"><span class="cl">kind: Deployment
+</span></span><span class="line"><span class="cl">metadata:
+</span></span><span class="line"><span class="cl">  name: my-app
+</span></span><span class="line"><span class="cl">spec:
+</span></span><span class="line"><span class="cl">  replicas: <span class="m">4</span>
+</span></span><span class="line"><span class="cl">  template:
+</span></span><span class="line"><span class="cl">    spec:
+</span></span><span class="line"><span class="cl">      containers:
+</span></span><span class="line"><span class="cl">      - name: my-app
+</span></span><span class="line"><span class="cl">        image: my-app-image:ops
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>눈치 챘는가? Ops와 dev의 replicas 개수와 이미지 설정만 달랐고 그 부분만 추가했다. 배포는 다음 식으로 진행한다.</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">kubectl kustomize overlays/dev <span class="p">|</span> kubectl apply -f -
+</span></span></code></pre></td></tr></table>
+</div>
+</div></li>
+</ul>
+</li>
+</ol>
+<p>위의 컴포넌트별 차트에서 설정이 가능하다. 추가 설정은 아래 config.param 에서 오버라이드하는 것을 추천한다. 사용 예는 <a href="https://github.com/argoproj/argo-cd/blob/master/docs/operator-manual/argocd-cmd-params-cm.yaml">깃허브</a>에 있다.</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl"><span class="c1"># Argo CD configuration parameters</span>
+</span></span><span class="line"><span class="cl">  <span class="c1">## Ref: https://github.com/argoproj/argo-cd/blob/master/docs/operator-manual/argocd-cmd-params-cm.yaml</span>
+</span></span><span class="line"><span class="cl">  params:
+</span></span><span class="line"><span class="cl">    <span class="c1">## Controller Properties</span>
+</span></span><span class="line"><span class="cl">    <span class="c1"># -- Number of application status processors</span>
+</span></span><span class="line"><span class="cl">    controller.status.processors: <span class="m">20</span>
+</span></span><span class="line"><span class="cl">    <span class="c1"># -- Number of application operation processors</span>
+</span></span><span class="line"><span class="cl">    controller.operation.processors: <span class="m">10</span>
+</span></span><span class="line"><span class="cl">    <span class="c1"># -- Specifies timeout between application self heal attempts</span>
+</span></span><span class="line"><span class="cl">    controller.self.heal.timeout.seconds: <span class="m">5</span>
+</span></span><span class="line"><span class="cl">    <span class="c1"># -- Repo server RPC call timeout seconds.</span>
+</span></span><span class="line"><span class="cl">    controller.repo.server.timeout.seconds: <span class="m">60</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>깃허브의 사용 예에는 중요한 reSyncPreiod 설정(저장소 동기화 시간) 이 없는 것 같다. 이럴 때는 직접 차트를 확인하여 구성 값을 확인하고 config.params에 추가하자.</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-yaml" data-lang="yaml"><span class="line"><span class="cl"><span class="c"># argo-cd/templates/argocd-application-controller</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span>- <span class="nt">command</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span>- <span class="l">argocd-application-controller</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span>- --<span class="l">metrics-port={{ .Values.controller.containerPorts.metrics }}</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span>{{- <span class="l">if .Values.controller.metrics.applicationLabels.enabled }}</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span>{{- <span class="l">range .Values.controller.metrics.applicationLabels.labels }}</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span>- --<span class="l">metrics-application-labels</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span>- {{<span class="w"> </span><span class="l">. }}</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span>{{- <span class="l">end }}</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span>{{- <span class="l">end }}</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span>{{- <span class="l">with .Values.controller.args.statusProcessors }}</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span>- --<span class="l">status-processors</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span>- {{<span class="w"> </span><span class="l">. | quote }}</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span>{{- <span class="l">end }}</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span>{{- <span class="l">with .Values.controller.args.operationProcessors }}</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span>- --<span class="l">operation-processors</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span>- {{<span class="w"> </span><span class="l">. | quote }}</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span>{{- <span class="l">end }}</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span>{{- <span class="l">with .Values.controller.args.appResyncPeriod }}</span><span class="w"> </span><span class="c"># config.params 추가</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span>- --<span class="l">app-resync</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span>- {{<span class="w"> </span><span class="l">. | quote }}</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span>{{- <span class="l">end }}</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span>{{- <span class="l">with .Values.controller.args.appHardResyncPeriod }}</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span>- --<span class="l">app-hard-resync</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span>- {{<span class="w"> </span><span class="l">. | quote }}</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span>{{- <span class="l">end }}</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span>{{- <span class="l">with .Values.controller.args.selfHealTimeout }}</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span>- --<span class="l">self-heal-timeout-seconds</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span>- {{<span class="w"> </span><span class="l">. | quote }}</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span>{{- <span class="l">end }}</span><span class="w">
+</span></span></span></code></pre></td></tr></table>
+</div>
+</div><p>실제 배포는 CLB에 externalDNS 로 진행하였다.</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-yaml" data-lang="yaml"><span class="line"><span class="cl"><span class="c"># values-argocd.yaml</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="nt">server</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="nt">service</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="l">LoadBalancer</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="nt">annotations</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">      </span><span class="nt">external-dns.alpha.kubernetes.io/hostname</span><span class="p">:</span><span class="w"> </span><span class="l">argocd.&lt;도메인 입력&gt;</span><span class="w">
+</span></span></span></code></pre></td></tr></table>
+</div>
+</div><p>배포</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">kubectl create ns argocd 
+</span></span><span class="line"><span class="cl">helm install argocd argo/argo-cd -f values-argocd.yaml --namespace argocd --version 5.19.14
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>실제로 배포할 시 고려할 점은 접네트워크 대역이다. ArgoCD는 클러스터를 직접적으로 관리할 수 있기 때문이다. 실제 Devops 팀이나 Admin 사용자가 사용할 것이라 예상한다. 이를 위해 허용된 네트워크 대역에서만 로드밸런서 접근이 가능하도록 설정하는 것이 중요할 것 같다. 로드밸런스 설정 후 적절한 보안 그룹을 생성하여 접근을 제어하도록 하자.</p>
+<p><img loading="lazy" 
+    src="/./PKOS2-3-gitops/argocd.png" 
+    alt="argocd.png" 
+     
+    width=873 
+    height="686"  /></p>
+<p>초기 admin 로그인 정보는 다음의 명령어로 확인이 가능하다.</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl"><span class="c1">#비밀번호 </span>
+</span></span><span class="line"><span class="cl"><span class="nv">ARGOPW</span><span class="o">=</span><span class="k">$(</span>kubectl -n argocd get secret argocd-initial-admin-secret -o <span class="nv">jsonpath</span><span class="o">=</span><span class="s2">&#34;{.data.password}&#34;</span> <span class="p">|</span> base64 -d<span class="k">)</span>
+</span></span><span class="line"><span class="cl"><span class="nb">echo</span> <span class="nv">$ARGOPW</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>로그인 이후 ArgoCD에 클러스터와 깃 저장소 등록이 필요하다. ArgoCD UI 나 CLI 를 통해 확인 및 등록이 가능하다. 클러스터는 구축한 클러스터 정보가 기본으로 등록되어 있다. 향후 생산성을 위해 CLI를 통해 확인해보겠다.</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl"><span class="c1"># 최신버전 설치</span>
+</span></span><span class="line"><span class="cl">curl -sSL -o argocd-linux-amd64 https://github.com/argoproj/argo-cd/releases/latest/download/argocd-linux-amd64
+</span></span><span class="line"><span class="cl">install -m <span class="m">555</span> argocd-linux-amd64 /usr/local/bin/argocd
+</span></span><span class="line"><span class="cl">chmod +x /usr/local/bin/argocd
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1"># 버전 확인 </span>
+</span></span><span class="line"><span class="cl">argocd version --short
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1"># argocd 서버 로그인 </span>
+</span></span><span class="line"><span class="cl">argocd login argocd.<span class="nv">$KOPS_CLUSTER_NAME</span> --username admin --password <span class="nv">$ARGOPW</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">WARNING: server certificate had error: x509: certificate is valid <span class="k">for</span> localhost, argocd-server, argocd-server.argocd, argocd-server.argocd.svc, argocd-server.argocd.svc.cluster.local, not argocd.hanhorang.link. Proceed insecurely <span class="o">(</span>y/n<span class="o">)</span>? y 
+</span></span><span class="line"><span class="cl"><span class="s1">&#39;admin:login&#39;</span> logged in successfully
+</span></span><span class="line"><span class="cl">Context <span class="s1">&#39;argocd.hanhorang.link&#39;</span> updated
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1"># argocd repo 등록 </span>
+</span></span><span class="line"><span class="cl">argocd repo add https://gitlab.hanhorang.link/Horang/test-stg.git  --username horang --password PASSWORDa!
+</span></span><span class="line"><span class="cl">Repository <span class="s1">&#39;https://gitlab.hanhorang.link/Horang/test-stg.git&#39;</span> added
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1"># argocd 확인</span>
+</span></span><span class="line"><span class="cl">argocd repo list 
+</span></span><span class="line"><span class="cl">TYPE  NAME  REPO                                               INSECURE  OCI    LFS    CREDS  STATUS      MESSAGE  PROJECT
+</span></span><span class="line"><span class="cl">git         https://gitlab.hanhorang.link/Horang/test-stg.git  <span class="nb">false</span>     <span class="nb">false</span>  <span class="nb">false</span>  <span class="nb">true</span>   Successful
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">argocd cluster list 
+</span></span><span class="line"><span class="cl">SERVER                          NAME        VERSION  STATUS   MESSAGE                                                  PROJECT
+</span></span><span class="line"><span class="cl">https://kubernetes.default.svc  in-cluster           Unknown  Cluster has no applications and is not being monitored.
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h2 id="gitops-구축">
+    <a href="#gitops-%ea%b5%ac%ec%b6%95" class="anchor">
+        <svg class="icon" aria-hidden="true" focusable="false" height="16" version="1.1" viewBox="0 0 16 16" width="16">
+            <path fill-rule="evenodd"
+                d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z">
+            </path>
+        </svg>
+    </a>
+    GitOps 구축
+</h2>
+<p>구축한 Gilab, ArgoCD 를 통해서 GitOps 시스템을 구축해보겠다. gitops 정의대로 깃 저장소에 있는 헬름 차트가 쿠버네티스 환경에 실시간으로 동기화되는 지 테스트해보겠다. 사용 헬름 차트는 앞서 스토리지 테스트를 위해 구축한 minIO 를 대상으로 진행하겠다. 해당 차트는 <a href="https://github.com/HanHoRang31/blog-share/blob/main/pkos-docker-registry/minio-value.yaml">필자의 깃허브</a>에서 확인이 가능하다.</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">helm repo add minio https://charts.bitnami.com/bitnami
+</span></span><span class="line"><span class="cl">helm repo update
+</span></span><span class="line"><span class="cl">helm fetch minio/minio --untar --version 12.2.1
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>먼저, gitlab 저장소에 헬름 차트를 PUSH한다.</p>
+<p><img loading="lazy" 
+    src="/./PKOS2-3-gitops/gitops-test.png" 
+    alt="gitops-test.png" 
+     
+    width=860 
+    height="587"  /></p>
+<p>다음은 ArgoCD를 통해 동기화를 진행한다. 동기화 구성은 ArgoCD CRD로 작성한다.</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">apiVersion: argoproj.io/v1alpha1
+</span></span><span class="line"><span class="cl">kind: Application
+</span></span><span class="line"><span class="cl">metadata:
+</span></span><span class="line"><span class="cl">  name: minio-helm
+</span></span><span class="line"><span class="cl">  namespace: argocd
+</span></span><span class="line"><span class="cl">  finalizers:
+</span></span><span class="line"><span class="cl">  - resources-finalizer.argocd.argoproj.io
+</span></span><span class="line"><span class="cl">spec:
+</span></span><span class="line"><span class="cl">  destination:
+</span></span><span class="line"><span class="cl">    namespace: minio
+</span></span><span class="line"><span class="cl">    server: https://kubernetes.default.svc
+</span></span><span class="line"><span class="cl">  project: default
+</span></span><span class="line"><span class="cl">  source:
+</span></span><span class="line"><span class="cl">    repoURL: https://gitlab.hanhorang.link/Horang/test-stg
+</span></span><span class="line"><span class="cl">    path: minio/
+</span></span><span class="line"><span class="cl">    targetRevision: HEAD
+</span></span><span class="line"><span class="cl">    helm:
+</span></span><span class="line"><span class="cl">      valueFiles:
+</span></span><span class="line"><span class="cl">      - values-minio.yaml
+</span></span><span class="line"><span class="cl">  syncPolicy:
+</span></span><span class="line"><span class="cl">    syncOptions:
+</span></span><span class="line"><span class="cl">    - <span class="nv">CreateNamespace</span><span class="o">=</span><span class="nb">true</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><ul>
+<li><code>spec.destination</code> : 동기화 클러스터 대상을 나타낸다</li>
+<li><code>spec.source</code> : 깃허브 저장소를 입력한다.</li>
+<li><strong><code>spec. syncpolicy</code></strong> : 동기화 정책을 구성한다. 옵션은 <a href="https://argo-cd.readthedocs.io/en/stable/user-guide/sync-options/">공식 문서</a>를 참고바란다. CreateNamespace=true 옵션은 대상 네임스페이스가 없으면 생성시킨다는 옵션이다.</li>
+</ul>
+<p>배포 후 ArgoCD UI에서 확인하자.</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">kubectl apply -f minio-helm-argo.yaml
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>배포시 OutofSync 의 상태가 되는데 상단의 Sync App눌러 동기화를 진행한다.</p>
+<p><img loading="lazy" 
+    src="/./PKOS2-3-gitops/gitops-test2.png" 
+    alt="gitops-test2.png" 
+     
+    width=1870 
+    height="837"  /></p>
+<p>동기화시 옵션에 따라 세부 동작이 가능하다.</p>
+<p><img loading="lazy" 
+    src="/./PKOS2-3-gitops/gitops-sync.png" 
+    alt="gitops-sync.png" 
+     
+    width=576 
+    height="503"  /></p>
+<ul>
+<li>
+<p><strong>PRUNE</strong>: 리포지토리에 없는 리소스를 삭제함
+<strong>DRY RUN</strong> : 테스트로 실제 변경하지 않음
+<strong>APPLY ONLY</strong>: 리소스 생성 및 수정만 수행하고 삭제하지 않음
+<strong>FORCE</strong> : 강제 적용</p>
+</li>
+<li>
+<p><strong>SKIP SCHEMA VALIDATION</strong>: 리소스 매니페스트의 JSON 스키마 검증을 건너뛰는 옵션이다. 이 옵션은 매니페스트에 포함된 스키마가 유효하지 않거나 검증되지 않아도 배포를 진행하고자 할 때 사용한다.
+<strong>AUTO-CREATE NAMESPACE</strong>: ArgoCD가 리소스를 배포할 네임스페이스가 존재하지 않는 경우 자동으로 해당 네임스페이스를 생성하는 옵션이다.
+<strong>PRUNE LAST</strong>:  클러스터에 존재하지 않아야 하는 리소스를 자동으로 제거하여 깔끔한 상태를 유지할 수 있도록 돕는다.
+<strong>APPLY OUT OF SYNC ONLY</strong>: ArgoCD가 오직 동기화되지 않은 리소스에 대해서만 <strong><code>kubectl apply</code></strong> 명령을 실행하는 옵션이다. 이렇게 하면 이미 동기화된 리소스는 건드리지 않고, 변경된 리소스에 대해서만 업데이트를 진행한다.</p>
+<p><strong>RESPECT IGNORE DIFFERENCES</strong>: ArgoCD가 리소스를 비교할 때, 무시해야 하는 차이점을 존중하도록 설정하는 옵션이다. 이렇게 하면 사용자가 지정한 특정 필드의 변경 사항을 무시하고 동기화 여부를 결정할 수 있다.</p>
+<p><strong>SERVER-SIDE APPLY</strong>: ArgoCD가 서버 측에서 리소스를 적용하도록 설정하는 옵션이다. 이 옵션을 사용하면, 리소스의 변경 사항이 서버 측에서 자동으로 병합되어 관리자가 수동으로 병합할 필요가 없다. 이 방식은 클라이언트 측에서 **<code>kubectl apply</code>**를 사용하는 것보다 더 효율적인 리소스 관리를 가능하게 한다.</p>
+</li>
+<li>
+<p>REPLACE : 리소스 변경시 기존 리소스를 삭제하고 새로운 리소스를 생성하여 대체한다.</p>
+<p>RETRY : 동기화 실패시 재시도</p>
+</li>
+</ul>
+<p>Sync 후 배포까지 모니터링 후 정상적으로 작동하는 것을 확인할 수 있다.</p>
+<p><img loading="lazy" 
+    src="/./PKOS2-3-gitops/gitops3.png" 
+    alt="gitops3.png" 
+     
+    width=1623 
+    height="941"  /></p>
+<p>ArgoCD는 기본적으로 수동적으로 Sync 작업이 필요하다. 자동으로 깃 저장소에 내용으로만 동기화시키려면 self-healing 옵션이 필요하다. App Detail의 Policy 설정에서 활성화하자.</p>
+<p><img loading="lazy" 
+    src="/./PKOS2-3-gitops/self-healing.png" 
+    alt="self-healing.png" 
+     
+    width=1467 
+    height="691"  /></p>
+<h2 id="마치며">
+    <a href="#%eb%a7%88%ec%b9%98%eb%a9%b0" class="anchor">
+        <svg class="icon" aria-hidden="true" focusable="false" height="16" version="1.1" viewBox="0 0 16 16" width="16">
+            <path fill-rule="evenodd"
+                d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z">
+            </path>
+        </svg>
+    </a>
+    마치며
+</h2>
+<p>이번 글에서는 Gitlab 와 ArgoCD 차트를 분석하여 구성하였고 GitOps 시스템을 구축해보았다. 인프라 관리자 측면에서 SSOT를 구성하면 코드 구성 관리 측면에서 편리해질 것이 느껴진다. 그리고 Gitlab와 ArgoCD 메뉴얼이 잘 정리되어 있다. 확장 기능(메트릭, 알람, 보안) 필요시 메뉴얼을 참고하자!</p>
+
+    </div>
+</div>
+
+<div class="container">
+    
+    <nav class="flex container suggested">
+        
+        <a rel="prev" href="/post/pkos2-2-localstorage/" title="Previous post (older)">
+            <span>Previous</span>
+            PKOS 2기 2주차 - 로컬스토리지 
+            </a>
+        
+        
+        
+    </nav>
+    
+</div>
+ 
+<div class="container">
+    
+    <script src="https://giscus.app/client.js" 
+        data-repo="WingLim/hugo-tania"
+        data-repo-id="MDEwOlJlcG9zaXRvcnkzMTYyNjQzMDc="
+        
+        data-category="Comments"
+        data-category-id="DIC_kwDOEtnPc84B_WKP"
+        
+        data-mapping="pathname"
+        data-reactions-enabled="1"
+        data-emit-metadata="0"
+        data-theme="light"
+        crossorigin="anonymous"
+        async
+        >
+</script>
+
+<script>
+    function setGiscusTeheme(theme) {
+        let giscus = document.querySelector('.giscus iframe');
+        if (giscus) {
+            giscus.contentWindow.postMessage(
+                {
+                    giscus: {
+                        setConfig: {
+                            theme: theme
+                        }
+                    }
+                },
+                'https://giscus.app'
+            )
+        }
+    }
+
+    addEventListener('message', event => {
+        if (event.origin !== 'https://giscus.app') return;
+        setGiscusTeheme(document.documentElement.dataset.userColorScheme)
+    });
+
+    window.addEventListener('onColorSchemeChange', (e) => {
+        setGiscusTeheme(e.detail)
+    })
+</script>
+
+</div>
+
+</main>
+
+
+        </main>
+        <footer class="footer flex">
+    <section class="container">
+        <nav class="footer-links">
+            
+            <a href="/index.xml">RSS</a>
+            
+        </nav>
+
+        
+    </section>
+    <script defer src="/ts/features.706a523ba43e6d0427c7fdf2b9d05dbd0920d3f12942b453690b495cb2522743.js" 
+    data-enable-footnotes="true"
+    ></script>
+</footer>
+
+    </body>
+</html>
