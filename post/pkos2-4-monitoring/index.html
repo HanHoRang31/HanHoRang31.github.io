@@ -1,0 +1,1039 @@
+<!DOCTYPE html>
+<html lang="en-us">
+    
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="theme-color" content="dark">
+    <title>PKOS 2기 4주차 - 쿠버네티스 모니터링(Kubernetes Monitoring) | HanHoRang Tech Blog</title>
+
+    
+    
+    
+    <meta property="og:site_name" content="HanHoRang Tech Blog by Tania in Hugo" />
+    <meta property="og:title" content="PKOS 2기 4주차 - 쿠버네티스 모니터링(Kubernetes Monitoring) | HanHoRang Tech Blog"/>
+    <meta itemprop="name" content="PKOS 2기 4주차 - 쿠버네티스 모니터링(Kubernetes Monitoring) | HanHoRang Tech Blog" />
+    <meta name="twitter:title" content="PKOS 2기 4주차 - 쿠버네티스 모니터링(Kubernetes Monitoring) | HanHoRang Tech Blog" />
+    <meta name="application-name" content="PKOS 2기 4주차 - 쿠버네티스 모니터링(Kubernetes Monitoring) | HanHoRang Tech Blog" /><meta name="twitter:card" content="summary"/>
+
+    <meta name="description" content="고가용성 모니터링 시스템 구축(프로메테우스, 타노스)" />
+    <meta name="twitter:description" content="고가용성 모니터링 시스템 구축(프로메테우스, 타노스) "/>
+    <meta itemprop="description" content=" 고가용성 모니터링 시스템 구축(프로메테우스, 타노스) "/>
+    <meta property="og:description" content=" 고가용성 모니터링 시스템 구축(프로메테우스, 타노스) " />
+
+    
+
+<meta property="og:type" content="article" />
+<meta property="article:publisher" content="Hugo Tania" />
+<meta property="og:article:published_time" content=2023-04-01T00:00:00Z />
+<meta property="article:published_time" content=2023-04-01T00:00:00Z />
+
+
+  <meta property="og:article:author" content="Han ho rnag" />
+  <meta property="article:author" content="Han ho rnag" />
+  <meta name="author" content="Han ho rnag" />
+
+
+
+
+<script defer type="application/ld+json">
+  {
+    "@context": "http://schema.org",
+    "@type": "Article",
+    "headline": "PKOS 2기 4주차 - 쿠버네티스 모니터링(Kubernetes Monitoring)",
+    "author": {
+      "@type": "Person",
+      "name": "Hugo Tania"
+    },
+    "datePublished": "2023-04-01",
+    "description": "고가용성 모니터링 시스템 구축(프로메테우스, 타노스)",
+    "wordCount":  1760 ,
+    "mainEntityOfPage": "True",
+    "dateModified": "2023-04-01",
+    "publisher": {
+      "@type": "Organization",
+      "name": "Hugo Tania",
+      "logo": {
+        "@type": "imageObject",
+        "url": "https:\/\/HanHoRang31.github.io\/favicon.ico"
+      }
+    }
+  }
+</script>
+
+
+
+    <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico" />
+    
+    <link rel="stylesheet" href="/sass/main.min.ab99ff095f832511e24ffb2fba2b51ad473b2f7e9301d674eba2c6c3a6e8bd81.css">
+    
+</head>
+    
+    <script>
+        (function() {
+            const colorSchemeKey = 'ThemeColorScheme';
+            if(!localStorage.getItem(colorSchemeKey)){
+                localStorage.setItem(colorSchemeKey, "auto");
+            }
+        })();
+    </script><script>
+    (function() {
+        const colorSchemeKey = 'ThemeColorScheme';
+        const colorSchemeItem = localStorage.getItem(colorSchemeKey);
+        const supportDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches === true;
+
+        if (colorSchemeItem == 'dark' || colorSchemeItem === 'auto' && supportDarkMode) {
+            
+
+            document.documentElement.dataset.userColorScheme = 'dark';
+        } else {
+            document.documentElement.dataset.userColorScheme = 'light';
+        }
+    })();
+</script>
+
+
+    <body class="dark">
+        <nav class="navbar">
+    <div class="container">
+        <div class="flex">
+            <div>
+                <a class="brand" href="/">
+                    
+                    
+                        <img src="/favicon.ico" />
+                    
+                    HanHoRang Tech Blog
+                    </a>
+            </div>
+            <div class="flex">
+                
+                <a href="/articles/">Articles</a>
+                
+                
+                    <button id="dark-mode-button">
+                    <svg class="light" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" aria-hidden="true" focusable="false" width="1em" height="1em" style="-ms-transform: rotate(360deg); -webkit-transform: rotate(360deg); transform: rotate(360deg);" preserveAspectRatio="xMidYMid meet" viewBox="0 0 36 36"><path fill="#FFD983" d="M30.312.776C32 19 20 32 .776 30.312c8.199 7.717 21.091 7.588 29.107-.429C37.9 21.867 38.03 8.975 30.312.776z"/><path d="M30.705 15.915a1.163 1.163 0 1 0 1.643 1.641a1.163 1.163 0 0 0-1.643-1.641zm-16.022 14.38a1.74 1.74 0 0 0 0 2.465a1.742 1.742 0 1 0 0-2.465zm13.968-2.147a2.904 2.904 0 0 1-4.108 0a2.902 2.902 0 0 1 0-4.107a2.902 2.902 0 0 1 4.108 0a2.902 2.902 0 0 1 0 4.107z" fill="#FFCC4D"/><rect x="0" y="0" width="36" height="36" fill="rgba(0, 0, 0, 0)" /></svg>
+                    <svg class="dark" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" aria-hidden="true" focusable="false" width="1em" height="1em" style="-ms-transform: rotate(360deg); -webkit-transform: rotate(360deg); transform: rotate(360deg);" preserveAspectRatio="xMidYMid meet" viewBox="0 0 36 36"><path fill="#FFD983" d="M16 2s0-2 2-2s2 2 2 2v2s0 2-2 2s-2-2-2-2V2zm18 14s2 0 2 2s-2 2-2 2h-2s-2 0-2-2s2-2 2-2h2zM4 16s2 0 2 2s-2 2-2 2H2s-2 0-2-2s2-2 2-2h2zm5.121-8.707s1.414 1.414 0 2.828s-2.828 0-2.828 0L4.878 8.708s-1.414-1.414 0-2.829c1.415-1.414 2.829 0 2.829 0l1.414 1.414zm21 21s1.414 1.414 0 2.828s-2.828 0-2.828 0l-1.414-1.414s-1.414-1.414 0-2.828s2.828 0 2.828 0l1.414 1.414zm-.413-18.172s-1.414 1.414-2.828 0s0-2.828 0-2.828l1.414-1.414s1.414-1.414 2.828 0s0 2.828 0 2.828l-1.414 1.414zm-21 21s-1.414 1.414-2.828 0s0-2.828 0-2.828l1.414-1.414s1.414-1.414 2.828 0s0 2.828 0 2.828l-1.414 1.414zM16 32s0-2 2-2s2 2 2 2v2s0 2-2 2s-2-2-2-2v-2z"/><circle fill="#FFD983" cx="18" cy="18" r="10"/><rect x="0" y="0" width="36" height="36" fill="rgba(0, 0, 0, 0)" /></svg>
+                    </button>
+                
+            </div>
+            </div>
+    </div>
+</nav>
+
+        <main>
+            
+<div class="container">
+    <article>
+        <header class="article-header">
+            <div class="thumb">
+                <div>
+                    <h1>PKOS 2기 4주차 - 쿠버네티스 모니터링(Kubernetes Monitoring)</h1>
+                    <div class="post-meta">
+                        <div>
+                            
+                            
+                            By HanHoRnag | <time>April 01, 2023</time>
+                            | 9 minutes
+                        </div>
+                        <div class="tags">
+                            
+                            <a href="/tags/kans/">KANS</a>
+                            
+                            <a href="/tags/kops/">kops</a>
+                            
+                            <a href="/tags/cloud/">cloud</a>
+                            
+                            <a href="/tags/aws/">AWS</a>
+                            
+                            <a href="/tags/kubernetes/">kubernetes</a>
+                            
+                            <a href="/tags/monitoring/">monitoring</a>
+                            
+                            <a href="/tags/prometheus/">prometheus</a>
+                            
+                            <a href="/tags/thanos/">thanos</a>
+                            
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </header>
+    </article>
+
+    <div class="article-post">
+    <div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-markdown" data-lang="markdown"><span class="line"><span class="cl">Production Kubernetes Online Study (=PKOS)는 쿠버네티스 실무 실습 스터디입니다.
+</span></span><span class="line"><span class="cl">CloudNet@ Gasida(가시다)이 진행하며, 책 &#34;24단계 실습으로 정복하는 쿠버네티스&#34;을 기반으로 진행하고 있습니다.
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>스터디 4주차 시간에는 <strong>쿠버네티스 모니터링과 로깅 시스템</strong>을 구축하여 기능들을 살펴보았다. 이번 블로그 글에서는 모니터링 시스템에 대해 심화 학습한 내용들을 공유하고자 한다.</p>
+<p><strong>모니터링</strong>은 어떤 대상을 감시, 감찰한다는 뜻으로 모니터링의 목적은 지속적인 감시, 감찰을 통해 대상의 상태나 가용성, 변화 등을 확인하고 대비하는 것이다. 모니터링의 개념처럼 쿠버네티스 모니터링도 똑같다. 쿠버네티스에서 특정 기간에 측정한 일련의 숫자(메트릭)에 대해 감시와 감찰을 통해 대상의 상태나 가용성 변화를 확인하고 대비한다고 보면 되겠다. 쿠버네티스 모니터링 시스템으로는 Prometheus, InfluxDB, DataDog, 클라우드 프로바이더 등이 있으나 이번 블로그 글에서는 오픈소스 모니터링 시스템인 <strong>Prometheus</strong>와 기능 확장 시스템인 <strong>Thanos</strong>를 다루겠다.</p>
+<hr>
+<h2 id="prometheus">
+    <a href="#prometheus" class="anchor">
+        <svg class="icon" aria-hidden="true" focusable="false" height="16" version="1.1" viewBox="0 0 16 16" width="16">
+            <path fill-rule="evenodd"
+                d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z">
+            </path>
+        </svg>
+    </a>
+    Prometheus
+</h2>
+<p>오픈 소스 모니터링 시스템이다. 시계열 데이터 수집, 저장 및 쿼리 기능을 제공하고 다양한 경고 기능을 제공한다. 오픈소스 진영에서 가장 많이 사용하는 모니터링 시스템으로 사실상 거의 표준처럼 사용하고 있다. 아키텍처는 다음과 같다. (<a href="https://prometheus.io/docs/introduction/overview/">공식문서</a>)</p>
+<p><img loading="lazy" 
+    src="/./pkos-4-monitoring/prometheus.png" 
+    alt="&lt;a href=&#34;https://prometheus.io/docs/introduction/overview/&#34;&gt;https://prometheus.io/docs/introduction/overview/&lt;/a&gt;" 
+     
+    width=1351 
+    height="811"  /></p>
+<p>./pkos-4-monitoring</p>
+<p><a href="https://prometheus.io/docs/introduction/overview/">https://prometheus.io/docs/introduction/overview/</a></p>
+<p>빨간 네모로 표시된 것이 프로메테우스 구성 컴포넌트이다.</p>
+<ul>
+<li>Prometheus Server : Prometheus 서버는 메트릭 수집, 저장, 처리 및 쿼리 기능을 수행한다. 메트릭 수집 방식으로 Pull 방식을 기본적으로 사용한다. 해당 서버가 대상 서비스로부터 메트릭을 주기적으로 수집하고, 시계열 데이터베이스(TSDB, HDD/SDD)에 저장한다. 데이터베이스에 저장한 데이터는 쿼리 언어 PromQL을 통해 데이터를 필터링, 집계 시각화하는데 사용한다.</li>
+<li>Pushgateway : Pushgateway는 Push 방식을 사용하는 일부 유형의 메트릭을 Prometheus에서 수집하기 위한 중간 서버이다. 주로 일회성 작업(예: 배치 작업)으로부터 메트릭을 수집하는 데 사용됩니다. 작업이 종료되더라도 메트릭이 보존되어 Prometheus 서버가 해당 메트릭을 수집할 수 있게 합니다.</li>
+<li>Alertmanager: Alertmanager는 Prometheus 서버에서 발생한 경고를 관리하고, 사용자에게 알림을 전달하는 컴포넌트이다.</li>
+<li>Prometheus UI :  내장된 웹 인터페이스로, 사용자가 Prometheus 서버에서 메트릭을 쿼리하고, 시각화된 그래프를 확인할 수 있다. 사용자는 PromQL을 사용하여 원하는 메트릭을 검색하고 분석할 수 있으며, 기본적인 대시보드 및 경고 설정을 관리할 수 있다.</li>
+</ul>
+<p>아키텍처를 살펴보았는데 프로메테우스는 단일 노드 시스템으로 설계되어 있어 클러스터링 구조를 직접 지원하지 않는다. 이로인해 확장성과 고가용성에 일부 보완이 필요하다.</p>
+<ul>
+<li>확장성 문제
+<ul>
+<li>단일 노드에서 모든 메트릭을 처리하려 할 때 노드의 자원이 고갈되어 성능 저하를 초래할 수 있다.</li>
+<li>대규모 인프라에서 많은 수의 메트릭을 수집하고 처리하는 데 있어 성능 저하와 저장소 부족 문제가 발생할 수 있다. 외부 스토리지 연결이 필요하다.</li>
+</ul>
+</li>
+<li>고가용성 문제
+<ul>
+<li>단일 노드에서 발생하는 장애나 다운타임이 생겨 프로메테우스 서버가 내려가면 그 시간 동안에는 메트릭을 수집할 수 없다.</li>
+<li>볼륨이 AWS EBS 를 사용해도 단일 노드에서만 연결이 가능하다. 연결 노드에 다운 타임이 발생하면 메트릭을 가져올 수 없다.</li>
+</ul>
+</li>
+</ul>
+<p>이러한 문제를 해결하기 위한 도구로 Thanos를 사용할 것이다.</p>
+<h2 id="thanos">
+    <a href="#thanos" class="anchor">
+        <svg class="icon" aria-hidden="true" focusable="false" height="16" version="1.1" viewBox="0 0 16 16" width="16">
+            <path fill-rule="evenodd"
+                d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z">
+            </path>
+        </svg>
+    </a>
+    Thanos
+</h2>
+<p>프로메테우스의 확장성과 고가용성을 개선하기 위한 시스템이다. <a href="https://thanos.io/">사이트 정문</a>에 대놓고 프로메테우스를 저격하고 있다. 타노스 아키텍처를 통해 어떻게 개선할 수 있는 확인해보겠다.</p>
+<p><img loading="lazy" 
+    src="/./pkos-4-monitoring/thanos-architecture.jpeg" 
+    alt="&lt;a href=&#34;https://thanos.io/v0.6/thanos/getting-started.md/&#34;&gt;https://thanos.io/v0.6/thanos/getting-started.md/&lt;/a&gt;" 
+     
+    width=960 
+    height="720"  /></p>
+<p><a href="https://thanos.io/v0.6/thanos/getting-started.md/">https://thanos.io/v0.6/thanos/getting-started.md/</a></p>
+<p>파란 네모가 타노스 구성 컴포넌트이다. 설계 디자인은 <a href="https://thanos.io/tip/thanos/design.md/#metric-sources">공식 문서</a>에서도 참고가 가능하다.</p>
+<ul>
+<li>Thanos Sidecar : Prometheus에 연결되어 메트릭 데이터를 쿼리하고 클라우드 스토리지에 업로드한다. 노드마다 사이드카가 연결되며 외부 스토리지 저장을 통해 확장성을 개선시키는 역할의 컴포넌트이다.</li>
+<li>Thanos Store Gateway :  외부 스토리지에 메트릭 데이터를 읽어 Thanos Query로 전달한다. 해당 컴포넌트를 통해 외부 스토리지에서 과거 데이터도 쿼리할 수 있게 된다.</li>
+<li>Thanos Query : 사용자 쿼리를 요청 처리하며 짧은 시간의 데이터는 타노스 사이드카에서 가져오며, 오래된 데이터는 스토어 게이트웨이를 통해 외부 스토리지에서 가져온다. Prometheus Query API를 구현하여 사용자가 기존의 Prometheus 쿼리를 그대로 사용할 수 있게 한다.</li>
+</ul>
+<p>프로메테우스단에서 고가용성을 제공해주는 컴포넌트이다. 통합 데이터간의 중복 제거 (de-duplication) 기능을 기본으로 제공하여 여러 프로메테우스 및 원격 스토리지의 메트릭 데이터를 통합하여 쿼리할 수 있게 해준다. 한 가지 주의할 점은 Thanos query 도 고가용성을 보장해줘야 한다. 공식 문서에 따르면 타노스 구성 파드들은 샤딩 수단을 제공하지 않아, 모두 수평적 확장이 가능하다. 타노스 배포시 쿼리 파드 개수를 2개 이상으로 조절하여 가용성을 보장시키자.</p>
+<pre><code>![[https://observability.thomasriley.co.uk/prometheus/using-thanos/high-availability/](https://observability.thomasriley.co.uk/prometheus/using-thanos/high-availability/)](./pkos-4-monitoring/query-thanos.png)
+
+[https://observability.thomasriley.co.uk/prometheus/using-thanos/high-availability/](https://observability.thomasriley.co.uk/prometheus/using-thanos/high-availability/)
+
+![[https://thanos.io/tip/thanos/design.md/#metric-sources](https://thanos.io/tip/thanos/design.md/#metric-sources)](./pkos-4-monitoring/thanos-shading.png)
+
+[https://thanos.io/tip/thanos/design.md/#metric-sources](https://thanos.io/tip/thanos/design.md/#metric-sources)
+</code></pre>
+<ul>
+<li>Thanos Compactor : 타노스 쿼리와는 별개의 프로세스로, 객체 스토리지 버킷만 가리키며 여러 개의 작은 블록을 더 큰 블록으로 지속적으로 통합시켜주는 컴포넌트이다. 블록을 통합시키면 데이터가 압축하게 되므로 버킷의 총 스토리지 크기, 스토어 노드의 로드 및 버킷에서 쿼리 데이터를 가져오는 데 필요한 요청 수가 크게 줄어든다.</li>
+<li>Thanos Ruler : 프로메테우스 인스턴스들로부터 알림 규칙 정보를 가져와 통합하고, 프로메테우스와 함께 작동하는 외부 알림 시스템에게 알림을 전송하는 역할의 컴포넌트이다.</li>
+</ul>
+<hr>
+<h2 id="연계-배포">
+    <a href="#%ec%97%b0%ea%b3%84-%eb%b0%b0%ed%8f%ac" class="anchor">
+        <svg class="icon" aria-hidden="true" focusable="false" height="16" version="1.1" viewBox="0 0 16 16" width="16">
+            <path fill-rule="evenodd"
+                d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z">
+            </path>
+        </svg>
+    </a>
+    연계 배포
+</h2>
+<blockquote>
+<p>배포 환경 : kops 클러스터 (k8s 1.24), AWS Ubuntu 인스턴스</p>
+</blockquote>
+<p>프로메테우스 &amp; 타노스를 연계하여 배포한다. 배포를 위해 헬름 차트를 사용할 예정이며 프로메테우스 배포는 kube-prometheus-stack(그라파나, 추가 메트릭 자동 구성) 차트를 사용할 것이다. 또한 타노스는 bitnami/thanos 차트를 사용할 것이며 타노스 외부스토리지는 MinIO를 배포하여 연결할 것이다. 전체 배포 순서는 다음과 같다. 구성 차트는 필자의 <a href="https://github.com/HanHoRang31/blog-share">깃허브</a>에서 참고가 가능하다.</p>
+<ol>
+<li>MInIO 배포</li>
+<li>kube-promethes-statck 설정 &amp; 배포</li>
+<li>타노스 설정 &amp; 배포</li>
+<li>그라파나 설정 및 대시보드 확인</li>
+</ol>
+<h3 id="1-minio-배포">
+    <a href="#1-minio-%eb%b0%b0%ed%8f%ac" class="anchor">
+        <svg class="icon" aria-hidden="true" focusable="false" height="16" version="1.1" viewBox="0 0 16 16" width="16">
+            <path fill-rule="evenodd"
+                d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z">
+            </path>
+        </svg>
+    </a>
+    1. MinIO 배포
+</h3>
+<p>타노스 외부 스토리지로 MinIO를 설정할 것이다. 이를 위한 사전 작업으로 MinIO를 먼저 배포하겠다.</p>
+<p><strong>차트 가져오기</strong></p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">helm repo add minio https://charts.bitnami.com/bitnami
+</span></span><span class="line"><span class="cl">helm repo update
+</span></span><span class="line"><span class="cl">helm fetch minio/minio --untar --version 12.2.1
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p><strong>차트 설정</strong></p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span><span class="lnt">31
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-yaml" data-lang="yaml"><span class="line"><span class="cl"><span class="c"># values-minio.yaml</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="nt">mode</span><span class="p">:</span><span class="w"> </span><span class="l">distributed</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="nt">auth</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="nt">rootUser</span><span class="p">:</span><span class="w"> </span><span class="l">admin</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="nt">rootPassword</span><span class="p">:</span><span class="w"> </span><span class="s2">&#34;admin1234&#34;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="nt">statefulset</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="nt">replicaCount</span><span class="p">:</span><span class="w"> </span><span class="m">4</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="nt">zones</span><span class="p">:</span><span class="w"> </span><span class="m">1</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="nt">drivesPerNode</span><span class="p">:</span><span class="w"> </span><span class="m">1</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="nt">provisioning</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="nt">config</span><span class="p">:</span><span class="w"> 
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span>- <span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l">region</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">      </span><span class="nt">options</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l">ap-northeast-2</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="nt">ingress</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="nt">enabled</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="w"> 
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="nt">hostname</span><span class="p">:</span><span class="w"> </span><span class="l">minio.hanhorang.link</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="nt">path</span><span class="p">:</span><span class="w"> </span><span class="l">/*</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="nt">annotations</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="nt">kubernetes.io/ingress.class</span><span class="p">:</span><span class="w"> </span><span class="l">alb</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="nt">alb.ingress.kubernetes.io/scheme</span><span class="p">:</span><span class="w"> </span><span class="l">internet-facing</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="nt">alb.ingress.kubernetes.io/target-type</span><span class="p">:</span><span class="w"> </span><span class="l">ip</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="nt">alb.ingress.kubernetes.io/listen-ports</span><span class="p">:</span><span class="w"> </span><span class="s1">&#39;[{&#34;HTTPS&#34;:443}, {&#34;HTTP&#34;:80}, {&#34;HTTPS&#34;:9090}]&#39;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="nt">alb.ingress.kubernetes.io/certificate-arn</span><span class="p">:</span><span class="w"> </span><span class="s2">&#34;$ACM arn &#34;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="nt">persistence</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="nt">storageClass</span><span class="p">:</span><span class="w"> </span><span class="s2">&#34;kops-csi-1-21&#34;</span><span class="w">
+</span></span></span></code></pre></td></tr></table>
+</div>
+</div><ul>
+<li>분산스토리지 모드로 설정</li>
+<li>(테스트환경 노드 4개) 노드당 파드 하나를 할당</li>
+<li>Ingress(네트워크) : AWS ALB 설정</li>
+<li>persistence(볼륨) :  AWS gp2 기본 스토리지 클래스 설정</li>
+</ul>
+<p><strong>배포</strong></p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">kubectl create ns minio
+</span></span><span class="line"><span class="cl">helm install minio minio/minio -f values-minio.yaml -n minio --version 12.2.1
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p><strong>버킷 생성 및 접근 키 발급</strong></p>
+<p>타노스에서 minio 버킷에 접근하기 위한 접근 키를 발급받자</p>
+<p>minio 도메인 접속</p>
+<p><img loading="lazy" 
+    src="/./pkos-4-monitoring/minio1.png" 
+    alt="minio1.png" 
+     
+    width=918 
+    height="727"  /></p>
+<p>어드민 계정은 차트에서 admin / admin1234 로 설정되어 있다. 로그인을 하자.</p>
+<p>로그인이 완료되면 다음과 같은 화면을 확인할 수 있다.</p>
+<p><img loading="lazy" 
+    src="/./pkos-4-monitoring/minio2.png" 
+    alt="minio2.png" 
+     
+    width=913 
+    height="914"  /></p>
+<p>버킷 생성 후 버킷 접근을 위한 액세스 키 발급이 필요하다. 왼쪽 메뉴 [Access Keys] 에서 키를 발급받자.</p>
+<p><img loading="lazy" 
+    src="/./pkos-4-monitoring/Minio3.png" 
+    alt="Minio3.png" 
+     
+    width=407 
+    height="452"  /></p>
+<p>Access Key 발급 후 MINIO 동작 권한을 등록해야 한다. 생성한 키를 클릭하면 정책 입력 칸이 나온다.  아래 정책을 입력하도록 하자.</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-json" data-lang="json"><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="nt">&#34;Version&#34;</span><span class="p">:</span> <span class="s2">&#34;2012-10-17&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">    <span class="nt">&#34;Statement&#34;</span><span class="p">:</span> <span class="p">[</span>
+</span></span><span class="line"><span class="cl">        <span class="p">{</span>
+</span></span><span class="line"><span class="cl">            <span class="nt">&#34;Effect&#34;</span><span class="p">:</span> <span class="s2">&#34;Allow&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">            <span class="nt">&#34;Action&#34;</span><span class="p">:</span> <span class="p">[</span>
+</span></span><span class="line"><span class="cl">                <span class="s2">&#34;admin:*&#34;</span>
+</span></span><span class="line"><span class="cl">            <span class="p">]</span>
+</span></span><span class="line"><span class="cl">        <span class="p">},</span>
+</span></span><span class="line"><span class="cl">        <span class="p">{</span>
+</span></span><span class="line"><span class="cl">            <span class="nt">&#34;Effect&#34;</span><span class="p">:</span> <span class="s2">&#34;Allow&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">            <span class="nt">&#34;Action&#34;</span><span class="p">:</span> <span class="p">[</span>
+</span></span><span class="line"><span class="cl">                <span class="s2">&#34;kms:*&#34;</span>
+</span></span><span class="line"><span class="cl">            <span class="p">]</span>
+</span></span><span class="line"><span class="cl">        <span class="p">},</span>
+</span></span><span class="line"><span class="cl">        <span class="p">{</span>
+</span></span><span class="line"><span class="cl">            <span class="nt">&#34;Effect&#34;</span><span class="p">:</span> <span class="s2">&#34;Allow&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">            <span class="nt">&#34;Action&#34;</span><span class="p">:</span> <span class="p">[</span>
+</span></span><span class="line"><span class="cl">                <span class="s2">&#34;s3:*&#34;</span>
+</span></span><span class="line"><span class="cl">            <span class="p">],</span>
+</span></span><span class="line"><span class="cl">            <span class="nt">&#34;Resource&#34;</span><span class="p">:</span> <span class="p">[</span>
+</span></span><span class="line"><span class="cl">                <span class="s2">&#34;arn:aws:s3:::*&#34;</span>
+</span></span><span class="line"><span class="cl">            <span class="p">]</span>
+</span></span><span class="line"><span class="cl">        <span class="p">}</span>
+</span></span><span class="line"><span class="cl">    <span class="p">]</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>필자의 경우 접근 키는 다음과 같이 생성되었다.</p>
+<p>access_key : aajl91wFPCRVmfWR</p>
+<p>secret_key: SfP4woqjY3fcyh1cuwF1CNQFEe6hs4X6</p>
+<p>발급받은 키를 기반으로 Secret을 생성하자.</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-yaml" data-lang="yaml"><span class="line"><span class="cl"><span class="c">#minio-key.yaml</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="l">s3</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="nt">config</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="nt">bucket</span><span class="p">:</span><span class="w"> </span><span class="l">thanos</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="nt">endpoint</span><span class="p">:</span><span class="w"> </span><span class="l">minio.hanhorang.link</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="nt">access_key</span><span class="p">:</span><span class="w"> </span><span class="l">aajl91wFPCRVmfWR</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="nt">secret_key</span><span class="p">:</span><span class="w"> </span><span class="l">SfP4woqjY3fcyh1cuwF1CNQFEe6hs4X6</span><span class="w">
+</span></span></span></code></pre></td></tr></table>
+</div>
+</div><div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-yaml" data-lang="yaml"><span class="line"><span class="cl"><span class="l">kubectl create ns monitoring</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="l">kubectl create secret generic thanos-minio-secret -n monitoring --from-file=minio-key.yaml</span><span class="w">
+</span></span></span></code></pre></td></tr></table>
+</div>
+</div><h3 id="2-kube-promethes-statck-설정--배포">
+    <a href="#2-kube-promethes-statck-%ec%84%a4%ec%a0%95--%eb%b0%b0%ed%8f%ac" class="anchor">
+        <svg class="icon" aria-hidden="true" focusable="false" height="16" version="1.1" viewBox="0 0 16 16" width="16">
+            <path fill-rule="evenodd"
+                d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z">
+            </path>
+        </svg>
+    </a>
+    2. kube-promethes-statck 설정 &amp; 배포
+</h3>
+<p>프로메테우스 배포 및 사이드 카에 타노스 연동을 위한 설정을 진행하겠다.</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
+</span></span><span class="line"><span class="cl">helm repo update
+</span></span><span class="line"><span class="cl">helm fetch prometheus-community/kube-prometheus-stack --untar --version 45.7.1
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1"># 사용 리전의 인증서 ARN 확인</span>
+</span></span><span class="line"><span class="cl"><span class="nv">CERT_ARN</span><span class="o">=</span><span class="sb">`</span>aws acm list-certificates --query <span class="s1">&#39;CertificateSummaryList[].CertificateArn[]&#39;</span> --output text<span class="sb">`</span>
+</span></span><span class="line"><span class="cl"><span class="nb">echo</span> <span class="s2">&#34;alb.ingress.kubernetes.io/certificate-arn: </span><span class="nv">$CERT_ARN</span><span class="s2">&#34;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="nv">KOPS_CLUSTER_NAME</span><span class="o">=</span><span class="s2">&#34;hanhorang.link&#34;</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span><span class="lnt">31
+</span><span class="lnt">32
+</span><span class="lnt">33
+</span><span class="lnt">34
+</span><span class="lnt">35
+</span><span class="lnt">36
+</span><span class="lnt">37
+</span><span class="lnt">38
+</span><span class="lnt">39
+</span><span class="lnt">40
+</span><span class="lnt">41
+</span><span class="lnt">42
+</span><span class="lnt">43
+</span><span class="lnt">44
+</span><span class="lnt">45
+</span><span class="lnt">46
+</span><span class="lnt">47
+</span><span class="lnt">48
+</span><span class="lnt">49
+</span><span class="lnt">50
+</span><span class="lnt">51
+</span><span class="lnt">52
+</span><span class="lnt">53
+</span><span class="lnt">54
+</span><span class="lnt">55
+</span><span class="lnt">56
+</span><span class="lnt">57
+</span><span class="lnt">58
+</span><span class="lnt">59
+</span><span class="lnt">60
+</span><span class="lnt">61
+</span><span class="lnt">62
+</span><span class="lnt">63
+</span><span class="lnt">64
+</span><span class="lnt">65
+</span><span class="lnt">66
+</span><span class="lnt">67
+</span><span class="lnt">68
+</span><span class="lnt">69
+</span><span class="lnt">70
+</span><span class="lnt">71
+</span><span class="lnt">72
+</span><span class="lnt">73
+</span><span class="lnt">74
+</span><span class="lnt">75
+</span><span class="lnt">76
+</span><span class="lnt">77
+</span><span class="lnt">78
+</span><span class="lnt">79
+</span><span class="lnt">80
+</span><span class="lnt">81
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-yaml" data-lang="yaml"><span class="line"><span class="cl"><span class="c"># values-kube-prometheus-stack.yaml</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="l">cat &lt;&lt;EOT &gt; ./values-kube-prometheus-stack.yaml</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="nt">alertmanager</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="nt">enabled</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span><span class="w"> 
+</span></span></span><span class="line"><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="nt">grafana</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="nt">defaultDashboardsTimezone</span><span class="p">:</span><span class="w"> </span><span class="l">Asia/Seoul</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="nt">adminPassword</span><span class="p">:</span><span class="w"> </span><span class="l">admin1234</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="nt">ingress</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="nt">enabled</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="nt">ingressClassName</span><span class="p">:</span><span class="w"> </span><span class="l">alb</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="nt">annotations</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">      </span><span class="nt">alb.ingress.kubernetes.io/scheme</span><span class="p">:</span><span class="w"> </span><span class="l">internet-facing</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">      </span><span class="nt">alb.ingress.kubernetes.io/target-type</span><span class="p">:</span><span class="w"> </span><span class="l">ip</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">      </span><span class="nt">alb.ingress.kubernetes.io/listen-ports</span><span class="p">:</span><span class="w"> </span><span class="s1">&#39;[{&#34;HTTPS&#34;:443}, {&#34;HTTP&#34;:80}]&#39;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">      </span><span class="nt">alb.ingress.kubernetes.io/certificate-arn</span><span class="p">:</span><span class="w"> </span><span class="l">$CERT_ARN</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">      </span><span class="nt">alb.ingress.kubernetes.io/success-codes</span><span class="p">:</span><span class="w"> </span><span class="m">200-399</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">      </span><span class="nt">alb.ingress.kubernetes.io/group.name</span><span class="p">:</span><span class="w"> </span><span class="s2">&#34;monitoring&#34;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="nt">hosts</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">      </span>- <span class="l">grafana.$KOPS_CLUSTER_NAME</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="nt">paths</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">      </span>- <span class="l">/*</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="nt">prometheus</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">   </span><span class="c"># 사이드카 노출 서비스 설정</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="nt">thanosService</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="nt">enabled</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="nt">ingress</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="nt">enabled</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="nt">ingressClassName</span><span class="p">:</span><span class="w"> </span><span class="l">alb</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="nt">annotations</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">      </span><span class="nt">alb.ingress.kubernetes.io/scheme</span><span class="p">:</span><span class="w"> </span><span class="l">internet-facing</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">      </span><span class="nt">alb.ingress.kubernetes.io/target-type</span><span class="p">:</span><span class="w"> </span><span class="l">ip</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">      </span><span class="nt">alb.ingress.kubernetes.io/listen-ports</span><span class="p">:</span><span class="w"> </span><span class="s1">&#39;[{&#34;HTTPS&#34;:443}, {&#34;HTTP&#34;:80}]&#39;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">      </span><span class="nt">alb.ingress.kubernetes.io/certificate-arn</span><span class="p">:</span><span class="w"> </span><span class="l">$CERT_ARN</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">      </span><span class="nt">alb.ingress.kubernetes.io/success-codes</span><span class="p">:</span><span class="w"> </span><span class="m">200-399</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">      </span><span class="nt">alb.ingress.kubernetes.io/group.name</span><span class="p">:</span><span class="w"> </span><span class="s2">&#34;monitoring&#34;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="nt">hosts</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">      </span>- <span class="l">prometheus.$KOPS_CLUSTER_NAME</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="nt">paths</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">      </span>- <span class="l">/*</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="nt">prometheusSpec</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="nt">podMonitorSelectorNilUsesHelmValues</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="nt">serviceMonitorSelectorNilUsesHelmValues</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="nt">retention</span><span class="p">:</span><span class="w"> </span><span class="l">5d</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="nt">retentionSize</span><span class="p">:</span><span class="w"> </span><span class="s2">&#34;10GiB&#34;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="nt">scrapeInterval</span><span class="p">:</span><span class="w"> </span><span class="s2">&#34;15s&#34;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="c"># alert 관련 설정으로 주석 처리 </span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="c"># evaluationInterval: 15s</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="c"># 가용성 설정</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="nt">replicas</span><span class="p">:</span><span class="w"> </span><span class="m">3</span><span class="w"> 
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="c"># 타노스 설정</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="nt">thanos</span><span class="p">:</span><span class="w"> 
+</span></span></span><span class="line"><span class="cl"><span class="w">      </span><span class="nt">image</span><span class="p">:</span><span class="w"> </span><span class="s2">&#34;quay.io/thanos/thanos:v0.27.0&#34;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">      </span><span class="nt">objectStorageConfig</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="nt">key</span><span class="p">:</span><span class="w"> </span><span class="l">minio-key.yaml</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l">thanos-minio-secret</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">      </span><span class="nt">version</span><span class="p">:</span><span class="w"> </span><span class="l">v0.27.0</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="c"># 볼륨 설정 </span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="nt">storageSpec</span><span class="p">:</span><span class="w"> </span>{}<span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="c">## Using PersistentVolumeClaim</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="c">##</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="c">#  volumeClaimTemplate:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="c">#    spec:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="c">#      storageClassName: gluster</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="c">#      accessModes: [&#34;ReadWriteOnce&#34;]</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="c">#      resources:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="c">#        requests:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="c">#          storage: 50Gi</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="c">#    selector: {}</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="l">EOT</span><span class="w">
+</span></span></span></code></pre></td></tr></table>
+</div>
+</div><ul>
+<li>알람을 사용하지 않음으로 alertmanager false로 설정하였다.</li>
+<li>헬름 차트를 보면 prometheus.thanos 에 설정하는 부분이 있는데 여기서 설정하는 것이 아니다!
+원격 스토리지 접근에 대한 오류가 발생하므로 prometheus.prometheusSpec.thanos 에 앞서 생성한 시크릿 키를 입력하자. (위에 차트 그대로 입력하면 문제없습니다.)</li>
+</ul>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">kubectl create ns monitoring
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">helm install kube-prometheus-stack prometheus-community/kube-prometheus-stack --version 45.7.1 <span class="se">\
+</span></span></span><span class="line"><span class="cl"><span class="se"></span>-f values-kube-prometheus-stack.yaml --namespace monitoring
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>배포 이후 타노스 사이드카 연동을 확인하자.</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">kubectl describe pods prometheus-kube-prometheus-stack-prometheus-0  -n monitoring
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p><img loading="lazy" 
+    src="/./pkos-4-monitoring/thanos-success.png" 
+    alt="thanos-success.png" 
+     
+    width=1083 
+    height="456"  /></p>
+<p>성공이다!</p>
+<h3 id="3-타노스-설정--배포">
+    <a href="#3-%ed%83%80%eb%85%b8%ec%8a%a4-%ec%84%a4%ec%a0%95--%eb%b0%b0%ed%8f%ac" class="anchor">
+        <svg class="icon" aria-hidden="true" focusable="false" height="16" version="1.1" viewBox="0 0 16 16" width="16">
+            <path fill-rule="evenodd"
+                d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z">
+            </path>
+        </svg>
+    </a>
+    3. 타노스 설정 &amp; 배포
+</h3>
+<p>타노스 사이드카를 제외한 컴포넌트를 설치하고 thnaos query 가 프로메테우스 사이드카로, store gateway가 원격 스토리지인 minio 로 연동할 수 있도록 설정해야 한다. 차트부터 가져오도록 하자.</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">helm repo add bitnami https://charts.bitnami.com/bitnami
+</span></span><span class="line"><span class="cl">helm repo update
+</span></span><span class="line"><span class="cl">helm fetch bitnami/thanos --untar --version 12.3.2
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>타노스 연동을 위해 설정을 진행한다. 메트릭을 가져오기 위해 버킷 정보와 프로메테우스 배포시 같이 배포된 타노스 사이드카 서비스 주소를 입력한다.</p>
+<p><img loading="lazy" 
+    src="/./pkos-4-monitoring/thanos-service.png" 
+    alt="thanos-service.png" 
+     
+    width=1036 
+    height="354"  /></p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span><span class="lnt">31
+</span><span class="lnt">32
+</span><span class="lnt">33
+</span><span class="lnt">34
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-yaml" data-lang="yaml"><span class="line"><span class="cl"><span class="nt">objstoreConfig</span><span class="p">:</span><span class="w"> </span><span class="p">|-</span><span class="sd">
+</span></span></span><span class="line"><span class="cl"><span class="sd">  type: s3
+</span></span></span><span class="line"><span class="cl"><span class="sd">  config:
+</span></span></span><span class="line"><span class="cl"><span class="sd">    bucket: monitoring
+</span></span></span><span class="line"><span class="cl"><span class="sd">    endpoint: minio.minio.svc.cluster.local:9000
+</span></span></span><span class="line"><span class="cl"><span class="sd">    access_key: aajl91wFPCRVmfWR
+</span></span></span><span class="line"><span class="cl"><span class="sd">    secret_key: SfP4woqjY3fcyh1cuwF1CNQFEe6hs4X6
+</span></span></span><span class="line"><span class="cl"><span class="sd">    insecure: true </span><span class="w">  
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="nt">querier</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="nt">stores</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span>- <span class="l">kube-prometheus-stack-thanos-discovery.monitoring.svc.cluster.local:10901</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span>- <span class="l">thanos-storegateway.monitoring.svc.cluster.local:10901</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="nt">replicaCount</span><span class="p">:</span><span class="w"> </span><span class="m">2</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="nt">ingress</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="nt">enabled</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="w"> 
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="nt">hostname</span><span class="p">:</span><span class="w"> </span><span class="l">thanos.hanhorang.link</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="nt">ingressClassName</span><span class="p">:</span><span class="w"> </span><span class="s2">&#34;alb&#34;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="nt">annotations</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">      </span><span class="nt">alb.ingress.kubernetes.io/scheme</span><span class="p">:</span><span class="w"> </span><span class="l">internet-facing</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">      </span><span class="nt">alb.ingress.kubernetes.io/target-type</span><span class="p">:</span><span class="w"> </span><span class="l">ip</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">      </span><span class="nt">alb.ingress.kubernetes.io/listen-ports</span><span class="p">:</span><span class="w"> </span><span class="s1">&#39;[{&#34;HTTPS&#34;:443}, {&#34;HTTP&#34;:80}]&#39;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">      </span><span class="nt">alb.ingress.kubernetes.io/certificate-arn</span><span class="p">:</span><span class="w"> </span><span class="l">arn:aws:acm:ap-northeast-2:955963799952:certificate/7569648c-bfd5-4860-b2c1-16ef02acbb58</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">      </span><span class="nt">alb.ingress.kubernetes.io/success-codes</span><span class="p">:</span><span class="w"> </span><span class="m">200-399</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">      </span><span class="nt">alb.ingress.kubernetes.io/group.name</span><span class="p">:</span><span class="w"> </span><span class="s2">&#34;monitoring&#34;</span><span class="w"> 
+</span></span></span><span class="line"><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="nt">path </span><span class="p">:</span><span class="w"> </span><span class="l">/*</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="nt">bucketweb</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="nt">enabled</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="nt">compactor</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="nt">enabled</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="nt">storegateway</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="nt">enabled</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="nt">ruler</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="nt">enabled</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span><span class="w">
+</span></span></span></code></pre></td></tr></table>
+</div>
+</div><ul>
+<li>objstoreConfig.config.endpoint 를 서비스 DNS로 대체했다. ALB 도메인 입력시 Timeout 으로 파드가 올라가지 않기 때문이다.</li>
+<li>querier.store 에 쿼리할 대상을 등록한다. 대상으로 타노스 사이드카의 서비스 주소와 스토어게이트웨이를 등록한다.</li>
+</ul>
+<p>배포</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">helm install thanos bitnami/thanos --version 12.3.2 <span class="se">\
+</span></span></span><span class="line"><span class="cl"><span class="se"></span>-f values-thanos.yaml --namespace monitoring
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>배포 완료 후 타노스 쿼리 호스트 도메인을 통해 접속하자. Store와 Status/Target를 확인하여 사이드카 연동을 확인한다.</p>
+<p><img loading="lazy" 
+    src="/./pkos-4-monitoring/thanos.png" 
+    alt="thanos.png" 
+     
+    width=924 
+    height="647"  /></p>
+<p><img loading="lazy" 
+    src="/./pkos-4-monitoring/thanos-target.png" 
+    alt="thanos-target.png" 
+     
+    width=922 
+    height="691"  /></p>
+<p>타노스가 정상적으로 배포된 것을 확인하였다. 배포 이후에는 프로메테우스 서버를 2개 이상 띄어서 프로메테우스 서버가 고가용성을 갖도록 구성하자. (앞서 프로메테우스 배포시 프로메테우스 서버를 3개를 배포하였다)</p>
+<p><img loading="lazy" 
+    src="/./pkos-4-monitoring/proemtheus-ha.png" 
+    alt="proemtheus-ha.png" 
+     
+    width=1678 
+    height="492"  /></p>
+<p>3개의 프로메테우스 서버가 서로 독립적으로 메트릭을 수집한다. 타노스 쿼리는 프로메테우스에 등록된 사이드카를 통해 메트릭을 통합 수집한다. 이 때 고가용성이 보장되는데 하나의 프로메테우스가 다운타임이 가진다한들 다른 프로메테우스 서버에서 메트릭 수집 및 집계를 수행할 수 있기때문이다. 물론 중복 중복된 메트릭에 대해선 타노스 내 Use Deduplication 기능을 통해 소거가 가능하다. 중복 메트릭 설정은 프로메테우스 라벨 설정을 통해 가능하나 자동으로 설정이 되어 생략하겠다.</p>
+<p><img loading="lazy" 
+    src="/./pkos-4-monitoring/query1.png" 
+    alt="query1.png" 
+     
+    width=927 
+    height="500"  /></p>
+<h3 id="4-그라파나-설정">
+    <a href="#4-%ea%b7%b8%eb%9d%bc%ed%8c%8c%eb%82%98-%ec%84%a4%ec%a0%95" class="anchor">
+        <svg class="icon" aria-hidden="true" focusable="false" height="16" version="1.1" viewBox="0 0 16 16" width="16">
+            <path fill-rule="evenodd"
+                d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z">
+            </path>
+        </svg>
+    </a>
+    4. 그라파나 설정
+</h3>
+<p>그라파나는 시각화 대시보드이다. 앞서 구축한 모니터링 시스템을 기반으로 메트릭 수집 파이프라인을 구성하고 대시보드를 확인하겠다. 그라파나 도메인에 접속하여 로그인을 진행한다. (초기 아이디: admin, 비밀번호: admin1234)</p>
+<p>먼저, 수집 메트릭 URL을 프로메테우스에서 타노스 쿼리로 수정할 것이다. 왼쪽 하단의 톱니바퀴 메뉴에서 Configuration에 들어간 다음 프로메테우스 설정 URL을 thanos-query:9090 으로 수정하자.</p>
+<p><img loading="lazy" 
+    src="/./pkos-4-monitoring/grafana.png" 
+    alt="grafana.png" 
+     
+    width=930 
+    height="954"  /></p>
+<p><img loading="lazy" 
+    src="/./pkos-4-monitoring/grafana2.png" 
+    alt="grafana2.png" 
+     
+    width=866 
+    height="887"  /></p>
+<p>바꾸고 나서 대시보드를 확인하면 정상적으로 작동하는 것을 확인할 수 있다.</p>
+<p><img loading="lazy" 
+    src="/./pkos-4-monitoring/dashboard.png" 
+    alt="dashboard.png" 
+     
+    width=870 
+    height="843"  /></p>
+<h2 id="마치며">
+    <a href="#%eb%a7%88%ec%b9%98%eb%a9%b0" class="anchor">
+        <svg class="icon" aria-hidden="true" focusable="false" height="16" version="1.1" viewBox="0 0 16 16" width="16">
+            <path fill-rule="evenodd"
+                d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z">
+            </path>
+        </svg>
+    </a>
+    마치며
+</h2>
+<p>kube-prometheus-stack 자체적으로도 프로메테우스 고가용성을 보장한다. 하지만 이렇게 구성한 프로메테우스 HA는 여전히 중복 데이터와 쿼리 집계, 확장성에 대한 보완 요소가 있다. 이를 해결하기 위해 Thanos을 소개하였고 연동 방법과 구성 요소를 확인하였다.</p>
+<h2 id="참고">
+    <a href="#%ec%b0%b8%ea%b3%a0" class="anchor">
+        <svg class="icon" aria-hidden="true" focusable="false" height="16" version="1.1" viewBox="0 0 16 16" width="16">
+            <path fill-rule="evenodd"
+                d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z">
+            </path>
+        </svg>
+    </a>
+    참고
+</h2>
+<p><a href="https://aws.amazon.com/ko/blogs/opensource/improving-ha-and-long-term-storage-for-prometheus-using-thanos-on-eks-with-s3/">https://aws.amazon.com/ko/blogs/opensource/improving-ha-and-long-term-storage-for-prometheus-using-thanos-on-eks-with-s3/</a></p>
+<p><a href="https://velog.io/@seokbin/Kube-Prometheus-Thanos-%EA%B5%AC%EC%84%B1#4-%ED%94%84%EB%A1%9C%EB%A9%94%ED%85%8C%EC%9A%B0%EC%8A%A4-ha-%EA%B5%AC%EC%84%B1">https://velog.io/@seokbin/Kube-Prometheus-Thanos-구성#4-프로메테우스-ha-구성</a></p>
+
+    </div>
+</div>
+
+<div class="container">
+    
+    <nav class="flex container suggested">
+        
+        <a rel="prev" href="/post/pkos2-3-gitops/" title="Previous post (older)">
+            <span>Previous</span>
+            PKOS 2기 3주차 - GitOps
+            </a>
+        
+        
+        
+        <a rel="next" href="/post/pkos2-4-logging/" title="Next post (newer)">
+            <span>Next</span>
+            PKOS 2기 4주차 - 쿠버네티스 로깅(kubernetes logging)
+            </a> 
+        
+    </nav>
+    
+</div>
+ 
+<div class="container">
+    
+    <script src="https://giscus.app/client.js" 
+        data-repo="WingLim/hugo-tania"
+        data-repo-id="MDEwOlJlcG9zaXRvcnkzMTYyNjQzMDc="
+        
+        data-category="Comments"
+        data-category-id="DIC_kwDOEtnPc84B_WKP"
+        
+        data-mapping="pathname"
+        data-reactions-enabled="1"
+        data-emit-metadata="0"
+        data-theme="light"
+        crossorigin="anonymous"
+        async
+        >
+</script>
+
+<script>
+    function setGiscusTeheme(theme) {
+        let giscus = document.querySelector('.giscus iframe');
+        if (giscus) {
+            giscus.contentWindow.postMessage(
+                {
+                    giscus: {
+                        setConfig: {
+                            theme: theme
+                        }
+                    }
+                },
+                'https://giscus.app'
+            )
+        }
+    }
+
+    addEventListener('message', event => {
+        if (event.origin !== 'https://giscus.app') return;
+        setGiscusTeheme(document.documentElement.dataset.userColorScheme)
+    });
+
+    window.addEventListener('onColorSchemeChange', (e) => {
+        setGiscusTeheme(e.detail)
+    })
+</script>
+
+</div>
+
+</main>
+
+
+        </main>
+        <footer class="footer flex">
+    <section class="container">
+        <nav class="footer-links">
+            
+            <a href="/index.xml">RSS</a>
+            
+        </nav>
+
+        
+    </section>
+    <script defer src="/ts/features.706a523ba43e6d0427c7fdf2b9d05dbd0920d3f12942b453690b495cb2522743.js" 
+    data-enable-footnotes="true"
+    ></script>
+</footer>
+
+    </body>
+</html>
