@@ -48,7 +48,7 @@
     },
     "datePublished": "2023-04-01",
     "description": "고가용성 모니터링 시스템 구축(프로메테우스, 타노스)",
-    "wordCount":  1760 ,
+    "wordCount":  1757 ,
     "mainEntityOfPage": "True",
     "dateModified": "2023-04-01",
     "publisher": {
@@ -193,7 +193,6 @@
      
     width=1351 
     height="811"  /></p>
-<p>./pkos-4-monitoring</p>
 <p><a href="https://prometheus.io/docs/introduction/overview/">https://prometheus.io/docs/introduction/overview/</a></p>
 <p>빨간 네모로 표시된 것이 프로메테우스 구성 컴포넌트이다.</p>
 <ul>
@@ -243,14 +242,20 @@
 <li>Thanos Query : 사용자 쿼리를 요청 처리하며 짧은 시간의 데이터는 타노스 사이드카에서 가져오며, 오래된 데이터는 스토어 게이트웨이를 통해 외부 스토리지에서 가져온다. Prometheus Query API를 구현하여 사용자가 기존의 Prometheus 쿼리를 그대로 사용할 수 있게 한다.</li>
 </ul>
 <p>프로메테우스단에서 고가용성을 제공해주는 컴포넌트이다. 통합 데이터간의 중복 제거 (de-duplication) 기능을 기본으로 제공하여 여러 프로메테우스 및 원격 스토리지의 메트릭 데이터를 통합하여 쿼리할 수 있게 해준다. 한 가지 주의할 점은 Thanos query 도 고가용성을 보장해줘야 한다. 공식 문서에 따르면 타노스 구성 파드들은 샤딩 수단을 제공하지 않아, 모두 수평적 확장이 가능하다. 타노스 배포시 쿼리 파드 개수를 2개 이상으로 조절하여 가용성을 보장시키자.</p>
-<pre><code>![[https://observability.thomasriley.co.uk/prometheus/using-thanos/high-availability/](https://observability.thomasriley.co.uk/prometheus/using-thanos/high-availability/)](./pkos-4-monitoring/query-thanos.png)
-
-[https://observability.thomasriley.co.uk/prometheus/using-thanos/high-availability/](https://observability.thomasriley.co.uk/prometheus/using-thanos/high-availability/)
-
-![[https://thanos.io/tip/thanos/design.md/#metric-sources](https://thanos.io/tip/thanos/design.md/#metric-sources)](./pkos-4-monitoring/thanos-shading.png)
-
-[https://thanos.io/tip/thanos/design.md/#metric-sources](https://thanos.io/tip/thanos/design.md/#metric-sources)
-</code></pre>
+<p><img loading="lazy" 
+    src="/./pkos-4-monitoring/query-thanos.png" 
+    alt="&lt;a href=&#34;https://observability.thomasriley.co.uk/prometheus/using-thanos/high-availability/&#34;&gt;https://observability.thomasriley.co.uk/prometheus/using-thanos/high-availability/&lt;/a&gt;" 
+     
+    width=1006 
+    height="840"  /></p>
+<p><a href="https://observability.thomasriley.co.uk/prometheus/using-thanos/high-availability/">https://observability.thomasriley.co.uk/prometheus/using-thanos/high-availability/</a></p>
+<p><img loading="lazy" 
+    src="/./pkos-4-monitoring/thanos-shading.png" 
+    alt="&lt;a href=&#34;https://thanos.io/tip/thanos/design.md/#metric-sources&#34;&gt;https://thanos.io/tip/thanos/design.md/#metric-sources&lt;/a&gt;" 
+     
+    width=845 
+    height="325"  /></p>
+<p><a href="https://thanos.io/tip/thanos/design.md/#metric-sources">https://thanos.io/tip/thanos/design.md/#metric-sources</a></p>
 <ul>
 <li>Thanos Compactor : 타노스 쿼리와는 별개의 프로세스로, 객체 스토리지 버킷만 가리키며 여러 개의 작은 블록을 더 큰 블록으로 지속적으로 통합시켜주는 컴포넌트이다. 블록을 통합시키면 데이터가 압축하게 되므로 버킷의 총 스토리지 크기, 스토어 노드의 로드 및 버킷에서 쿼리 데이터를 가져오는 데 필요한 요청 수가 크게 줄어든다.</li>
 <li>Thanos Ruler : 프로메테우스 인스턴스들로부터 알림 규칙 정보를 가져와 통합하고, 프로메테우스와 함께 작동하는 외부 알림 시스템에게 알림을 전송하는 역할의 컴포넌트이다.</li>
