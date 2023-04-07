@@ -5,25 +5,15 @@
     <description>Recent content on HanHoRang Tech Blog</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <lastBuildDate>Sat, 01 Apr 2023 00:00:00 +0000</lastBuildDate><atom:link href="https://HanHoRang31.github.io/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Fri, 07 Apr 2023 00:00:00 +0000</lastBuildDate><atom:link href="https://HanHoRang31.github.io/index.xml" rel="self" type="application/rss+xml" />
     <item>
-    <title>PKOS 2기 4주차 - 쿠버네티스 로깅(kubernetes logging)</title>
-    <link>https://HanHoRang31.github.io/post/pkos2-4-logging/</link>
-    <pubDate>Sat, 01 Apr 2023 00:00:00 +0000</pubDate>
+    <title>[PKOS]쿠버네티스 보안, Kubescape DeepDive</title>
+    <link>https://HanHoRang31.github.io/post/pkos-5-security/</link>
+    <pubDate>Fri, 07 Apr 2023 00:00:00 +0000</pubDate>
     <author>HanHoRnag</author>
-    <guid>https://HanHoRang31.github.io/post/pkos2-4-logging/</guid>
+    <guid>https://HanHoRang31.github.io/post/pkos-5-security/</guid>
     <description>
-        &lt;h1 id=&#34;로깅-loki--promtail-&#34;&gt;
-    &lt;a href=&#34;#%eb%a1%9c%ea%b9%85-loki--promtail-&#34; class=&#34;anchor&#34;&gt;
-        &lt;svg class=&#34;icon&#34; aria-hidden=&#34;true&#34; focusable=&#34;false&#34; height=&#34;16&#34; version=&#34;1.1&#34; viewBox=&#34;0 0 16 16&#34; width=&#34;16&#34;&gt;
-            &lt;path fill-rule=&#34;evenodd&#34;
-                d=&#34;M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z&#34;&gt;
-            &lt;/path&gt;
-        &lt;/svg&gt;
-    &lt;/a&gt;
-    로깅 (Loki &amp;amp; Promtail )
-&lt;/h1&gt;
-&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
+        &lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
 &lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
 &lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code&gt;&lt;span class=&#34;lnt&#34;&gt;1
 &lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;2
@@ -33,105 +23,163 @@
 &lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;CloudNet@ Gasida(가시다)이 진행하며, 책 &amp;#34;24단계 실습으로 정복하는 쿠버네티스&amp;#34;을 기반으로 진행하고 있습니다.
 &lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
 &lt;/div&gt;
-&lt;/div&gt;&lt;h2 id=&#34;logging&#34;&gt;
-    &lt;a href=&#34;#logging&#34; class=&#34;anchor&#34;&gt;
+&lt;/div&gt;&lt;p&gt;5주차 시간에는 모임장님께서 쿠버네티스 보안을 주제로 학습 내용을 공유해 주셨다. 이번 블로그 글에서는 쿠버네티스 보안에 대해 스터디한 내용을 공유하고자 한다.&lt;/p&gt;
+&lt;h1 id=&#34;kubernetes-4c-layer&#34;&gt;
+    &lt;a href=&#34;#kubernetes-4c-layer&#34; class=&#34;anchor&#34;&gt;
         &lt;svg class=&#34;icon&#34; aria-hidden=&#34;true&#34; focusable=&#34;false&#34; height=&#34;16&#34; version=&#34;1.1&#34; viewBox=&#34;0 0 16 16&#34; width=&#34;16&#34;&gt;
             &lt;path fill-rule=&#34;evenodd&#34;
                 d=&#34;M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z&#34;&gt;
             &lt;/path&gt;
         &lt;/svg&gt;
     &lt;/a&gt;
-    Logging?
-&lt;/h2&gt;
-&lt;p&gt;애플리케이션 실행 중 발생하는 이벤트, 작업, 오류 등의 정보를 기록하는 프로세스이다. 로깅의 주요 목적은 프로그램의 실행 상태를 추적하고, 문제 발생 시 원인을 찾기고, 내부 감사를 기록하기 위함이다. 로그 파일은 시간 순서대로 저장되며, 대부분의 경우 텍스트 파일 또는 데이터베이스에 저장된다.&lt;/p&gt;
-&lt;p&gt;&lt;a href=&#34;https://kubernetes.io/ko/docs/concepts/cluster-administration/logging/&#34;&gt;컨테이너화된 애플리케이션에 가장 쉽고 가장 널리 사용되는 로깅 방법&lt;/a&gt;은 표준 출력(stdout)과 표준 에러(stderr) 스트림에 작성하는 것이다. 이를 이용하면 로깅 명령어를 통해 조회가 가능하다.&lt;/p&gt;
-&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
-&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
-&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code&gt;&lt;span class=&#34;lnt&#34;&gt;1
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;2
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;3
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;4
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;5
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;6
-&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
-&lt;td class=&#34;lntd&#34;&gt;
-&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;c1&#34;&gt;# 로그 확인 예 &lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;kubectl logs  metrics-server-5f65d889cd-znqw5 -n kube-system
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;I0328 00:14:31.072509       &lt;span class=&#34;m&#34;&gt;1&lt;/span&gt; serving.go:342&lt;span class=&#34;o&#34;&gt;]&lt;/span&gt; Generated self-signed cert &lt;span class=&#34;o&#34;&gt;(&lt;/span&gt;/tmp/apiserver.crt, /tmp/apiserver.key&lt;span class=&#34;o&#34;&gt;)&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;I0328 00:14:31.477085       &lt;span class=&#34;m&#34;&gt;1&lt;/span&gt; requestheader_controller.go:169&lt;span class=&#34;o&#34;&gt;]&lt;/span&gt; Starting RequestHeaderAuthRequestController
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;..
-&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
-&lt;/div&gt;
-&lt;/div&gt;&lt;p&gt;&lt;strong&gt;쿠버네티스 환경에서도 컨테이너 엔진이나 런타임이 제공하는 기본적인 로깅 기능이 있으나 충분하지 않다.&lt;/strong&gt; 컨테이너가 크래시되거나, 파드가 축출되거나, 노드가 종료된 경우에도 애플리케이션의 로그에 접근할 수 없기 때문이다.&lt;/p&gt;
-&lt;p&gt;따라서, 쿠버네티스에서 로그는 노드, 파드 또는 컨테이너와는 독립적으로 별도의 스토리지와 라이프사이클을 가져야 한다. 이 개념을 &lt;em&gt;&lt;a href=&#34;https://kubernetes.io/ko/docs/concepts/cluster-administration/logging/&#34;&gt;클러스터-레벨-로깅&lt;/a&gt;&lt;/em&gt; 이라 하며  이를 위해 별도의 벡엔드 솔루션이 필요하다. 쿠버네티스에 사용할 수 있는 로깅 솔루션은 3가가지 오픈소스 프로젝트를 결합한 PLG 스택(Promtail, Loki, Grafana) 또는 ELK(Elasticsearch, Logstash, Kibana)있다.  이번 블로그 글에서는 PLG 스택을 알아볼 것이며 로깅 시스템인 Loki 와 로그 수집 에이전트인 Promtail 을 설치하하여 클러스터-레벨-로깅을 테스트해보겠다.&lt;/p&gt;
-&lt;h2 id=&#34;loki&#34;&gt;
-    &lt;a href=&#34;#loki&#34; class=&#34;anchor&#34;&gt;
+    Kubernetes 4C Layer
+&lt;/h1&gt;
+&lt;p&gt;&lt;a href=&#34;https://kubernetes.io/docs/concepts/security/overview/&#34;&gt;쿠버네티스 공식문서&lt;/a&gt;에 따르면 쿠버네티스 보안은 4계층(클라우드/ 클러스터 /  컨테이너 / 코드)으로 구성되며, 각 계층에 대해 보안 관점이 필요하다고 한다.&lt;/p&gt;
+&lt;p&gt;&lt;img loading=&#34;lazy&#34; 
+    src=&#34;https://HanHoRang31.github.io/./pkos-5-security/4c.png&#34; 
+    alt=&#34;&amp;lt;a href=&amp;#34;https://kubernetes.io/docs/concepts/security/overview/&amp;#34;&amp;gt;https://kubernetes.io/docs/concepts/security/overview/&amp;lt;/a&amp;gt;&#34; 
+     
+    width=1720 
+    height=&#34;992&#34;  /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;a href=&#34;https://kubernetes.io/docs/concepts/security/overview/&#34;&gt;https://kubernetes.io/docs/concepts/security/overview/&lt;/a&gt;&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;&lt;strong&gt;Cloud, Infra&lt;/strong&gt; : 클라우드 계층에서는 쿠버네티스 클러스터가 실행되는 &lt;strong&gt;기반 인프라&lt;/strong&gt;에 초점을 맞춘다. 이 계층에서는 가상 머신, 네트워크, 스토리지 및 기타 자원에 대한 보안을 강화하고, 클라우드 제공 업체의 보안 도구 및 기능을 활용하는 것으로 초점이 맞춰져 있다. 인프라 보호 대상과 클라우드 제공 업체(AWS) 의 제공 보안은 다음의 표를 참고하자.
+&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th&gt;보호 대상&lt;/th&gt;
+&lt;th&gt;AWS EKS에서의 보안 기능&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td&gt;API 서버에 대한 네트워크 액세스&lt;/td&gt;
+&lt;td&gt;클러스터 구축시 액세스 지점에 대해 Elastic Load Balancer를 구성한다. 이를 통해 API 서버에 대한 액세스를 VPC 내부로 제한하거나 인터넷 게이트웨이를 통해 인터넷에서도 접근이 가능하도록 설정할 수 있다. 또한, AWS Identity and Access Management (IAM)을 사용하여 사용자와 역할에 대한 접근 제어를 구성할 수 있다.&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;노드에 대한 네트워크 액세스&lt;/td&gt;
+&lt;td&gt;VPC 서비스를 이용하여 노드에 대한 액세스를 VPC 내부로 제한하거나 인터넷 게이트웨이를 통해 인터넷에서도 접근이 가능하도록 설정할 수 있다. 또한 보안 그룹을 통해 IP 주소 범위에 대한 인바운드 및 아운바운드 트래픽을 제어할 수 있다.&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;클라우드 제공 업체 API 에 대한 쿠버네티스 액세스&lt;/td&gt;
+&lt;td&gt;IAM 권한의 접근 키를 다룬다. 접근 키가 탈취되면 해당 리소스에 대한 제어가 탈취된다. 공식 문서에서는 최소 권한 원칙을 액세스 권한을 부여할 것을 권고한다.&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;etcd에 대한 액세스&lt;/td&gt;
+&lt;td&gt;etcd 데이터베이스가 EKS 완전 관리형 컨트롤 플레인 내부에 숨겨져 있으며, 사용자는 etcd에 직접 액세스할 수 없다.&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;etcd 암호화&lt;/td&gt;
+&lt;td&gt;기본적으로 EKS 클러스터를 생성할 때, etcd 데이터를 암호화하는 옵션을 선택할 수 있다. 이렇게 설정하면, 클러스터의 etcd 데이터는 AWS Key Management Service (KMS)에서 제공하는 고객 관리형 키 (CMK)를 사용하여 암호화되어 기밀성이 보장된다.&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Cluster&lt;/strong&gt;: 클러스터 계층에서는 쿠버네티스 클러스터 자체의 보안에 중점을 둔다. 클러스터 상의 중요한 서비스 A와 보안이 취약한 서비스 B에 대해 &lt;strong&gt;격리를 위한 계층&lt;/strong&gt;이라고 보면 된다. 쿠버네티스에서는 격리에 방법으로 다양한 방법을 제안한다. 대표적으로 RBAC 인증, 네트워크 정책, 파드 보안 표준, 인그래스용 TLS 등이 있다.
+&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th&gt;항목&lt;/th&gt;
+&lt;th&gt;설명&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td&gt;RBAC 인증&lt;/td&gt;
+&lt;td&gt;역할(Role) 및 클러스터 역할(ClusterRole)을 사용하여 쿠버네티스 사용자와 서비스 계정에 권한을 부여하는 Role-Based Access Control 방식이다. 이를 통해 세분화된 권한 제어로 클러스터의 보안을 강화할 수 있다.&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;네트워크 정책&lt;/td&gt;
+&lt;td&gt;쿠버네티스 네트워크 정책은 특정 파드, 네임스페이스, 또는 IP 범위와 같은 소스로부터 들어오거나 나가는 트래픽을 허용하거나 차단하는 규칙을 정의한다. 이를 통해 네트워크 보안을 강화하고, 민감한 데이터를 처리하는 파드에 대한 접근을 제한할 수 있다.&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;파드 보안 표준&lt;/td&gt;
+&lt;td&gt;파드 보안 표준은 컨테이너와 파드가 안전하게 실행되도록 하는데 도움이 되는 일련의 보안 지침 및 구성이다. 예를 들어, 보안 컨텍스트(Security Context), 네트워크 폴리시, 리소스 제한, 파드 안티-어피니티 등을 사용하여 파드의 보안을 강화할 수 있다.&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;인그래스용 TLS&lt;/td&gt;
+&lt;td&gt;쿠버네티스 인그래스를 사용하여 클러스터 외부에서 내부 서비스로의 요청을 중앙 집중식으로 관리할 때, TLS(Transport Layer Security)를 사용하여 클라이언트와 서버 간 통신을 암호화하여 데이터를 보호할 수 있다. 인증서와 개인 키를 제공하고 호스트 이름과 인증서의 일치 여부를 확인해야 한다.&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Container&lt;/strong&gt;: 컨테이너 계층에서는 실행되는 워크로드에 직접적으로 영향을 주는 컨테이너에 초점을 맞춘다. 이 계층에서는 컨테이너 이미지 보안, 리소스 격리, 시크릿 관리 및 네트워크 정책을 포함된다. 여기에서는 보안 컨텍스트, 네트워크 폴리시, 컨테이너 런타임의 보안 기능(이미지 스캔) 등을 사용하여 컨테이너의 보안을 강화한다.
+&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th&gt;항목&lt;/th&gt;
+&lt;th&gt;설명&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td&gt;보안 컨텍스트 (Security Context)&lt;/td&gt;
+&lt;td&gt;쿠버네티스에서 컨테이너 또는 파드에 적용되는 보안 설정을 정의하는데 사용된다. 보안 컨텍스트를 사용하여 컨테이너의 파일 시스템에 대한 액세스 권한, 프로세스 ID, 사용자 ID, 그룹 ID 등을 제어할 수 있다. 이를 통해 컨테이너와 파드가 안전하게 실행되도록 할 수 있으며, 호스트 시스템과 다른 컨테이너로부터 분리되어 보안을 강화할 수 있다.&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;컨테이너 런타임의 보안 기능&lt;/td&gt;
+&lt;td&gt;컨테이너 런타임(예: Docker, containerd, CRI-O 등)은 컨테이너를 실행하고 관리하는데 사용되는 소프트웨어이다. 컨테이너 런타임은 다양한 보안 기능을 제공하여 컨테이너의 보안을 강화할 수 있다. 예를 들어, 컨테이너 런타임은 네임스페이스를 사용하여 컨테이너 프로세스를 격리할 수 있으며, cgroups을 사용하여 리소스 사용량을 제한하고, seccomp, AppArmor, SELinux와 같은 보안 프로파일을 적용하여 컨테이너의 시스템 호출을 제한할 수 있다.&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Code&lt;/strong&gt;: 코드 계층에서는 애플리케이션의 소스 코드 및 구성에 초점을 맞춘다. 이 계층에서는 애플리케이션의 취약점 및 보안 결함을 찾고 수정하여 워크로드의 보안을 향상시켜야 한다. 방법으로는 TLS 액세스, 통신 포트 제한, 종속성 보안,  정적 및 동적 소스 코드 분석, 의존성 스캔 및 안전한 코딩 기법 등이 있다.
+&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th&gt;항목&lt;/th&gt;
+&lt;th&gt;설명&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td&gt;통신 포트 제한&lt;/td&gt;
+&lt;td&gt;통신 포트 제한은 서버, 컨테이너, 애플리케이션 등이 사용하는 네트워크 포트를 제한하여 보안을 강화하는 방법이다. 불필요한 포트를 차단하고, 필요한 포트에 대해서만 허용하면 악의적인 공격자가 시스템에 액세스하는 것을 방지할 수 있다.&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;종속성 보안&lt;/td&gt;
+&lt;td&gt;종속성 보안은 애플리케이션에서 사용하는 외부 라이브러리 및 패키지에 대한 보안을 관리하는 방법이다. 취약한 종속성을 사용하면 시스템이 공격에 노출될 수 있다. 따라서, 종속성을 최신 상태로 유지하고, 보안 취약점이 발견될 경우 적절한 조치를 취하는 것이 중요하다.&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;정적 및 동적 소스 코드 분석&lt;/td&gt;
+&lt;td&gt;정적 소스 코드 분석은 코드를 실행하지 않고 소스 코드를 검사하여 보안 취약점을 찾는 방법이다. 동적 소스 코드 분석은 애플리케이션을 실행하면서 코드를 분석하여 보안 취약점을 찾는 방법이다. 이러한 분석 방법들을 사용하여 애플리케이션 코드의 보안 취약점을 발견하고 수정할 수 있다.&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;의존성 스캔 및 안전한 코딩 기법&lt;/td&gt;
+&lt;td&gt;의존성 스캔은 애플리케이션의 종속성에 대한 보안 취약점을 찾기 위한 도구를 사용하는 것이다. 안전한 코딩 기법은 개발자가 코드를 작성할 때 고려해야 하는 보안 지침 및 원칙이다. 이러한 기법을 사용하면 애플리케이션의 보안을 강화하고, 취약점을 줄일 수 있다.&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;보안적으로 신경써야할 요소가 많다. 위의 설명한 보안 기능들을 전부 다루면 좋겠지만 내용이 방대하다. 이번 블로그 글에서는 보안 툴인 kubescape를 이용하여 앞서 4C에서 Cluster, Container, Code 계층의 보안 검증 과정을 다뤄보겠다.&lt;/p&gt;
+&lt;h1 id=&#34;kubescape&#34;&gt;
+    &lt;a href=&#34;#kubescape&#34; class=&#34;anchor&#34;&gt;
         &lt;svg class=&#34;icon&#34; aria-hidden=&#34;true&#34; focusable=&#34;false&#34; height=&#34;16&#34; version=&#34;1.1&#34; viewBox=&#34;0 0 16 16&#34; width=&#34;16&#34;&gt;
             &lt;path fill-rule=&#34;evenodd&#34;
                 d=&#34;M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z&#34;&gt;
             &lt;/path&gt;
         &lt;/svg&gt;
     &lt;/a&gt;
-    Loki
-&lt;/h2&gt;
-&lt;p&gt;Loki는 Grafana Labs에서 개발한 경량 로깅 시스템으로, 쿠버네티스 환경에서 메타데이터를 기반으로 로그를 수집하고 빠르게 처리할 수 있다. 그리고 Prometheus와 호환되는 레이블 기반 질의 및 필터링 기능을 제공하며, Grafana와 통합을 통해 로깅 데이터를 대시보드에서 확인이 가능하다. 로깅 수집 에이전트인 Promtail을 사용하여 로깅을 수집하며 이를 통해 쿠버네티스 리소스(노드, 파드 또는 컨테이너)와는 독립적으로 별도의 스토리지와 라이프사이클을 가진다.&lt;/p&gt;
+    Kubescape
+&lt;/h1&gt;
+&lt;p&gt;쿠버네티스 클러스터 보안 설정을 평가하고 검증하는 오픈 소스이다. NSA와 MITRE의 Kubernetes Hardening Guidance를 기반으로 작동하며 웹 대시보드를 통해 검증 및 취약점 점검을 할 수 있다. 또한, 도커 레지스트리, 이미지 취약점 스캔이 가능하다. 23년 4월 기준으로 업데이트가 계속 진행 중이며 &lt;a href=&#34;https://hub.armosec.io/docs&#34;&gt;공식 문서&lt;/a&gt; 또한 정리가 잘 되어 있다.&lt;/p&gt;
+&lt;p&gt;그렇지만 제한적인 요소도 존재한다. 클러스터를 ARMO 웹 대시보드로 연결해야한다는 점으로 온프레미스에서 도입시 고려해야 한다. 또한 프리티어 기준 워크 노드가 10개로 제한된다.&lt;/p&gt;
+&lt;p&gt;보안 기능을 전부 사용하려면 Operator 설치가 동반된다. 아키텍처는 다음과 같이 구성된다.&lt;/p&gt;
 &lt;p&gt;&lt;img loading=&#34;lazy&#34; 
-    src=&#34;https://HanHoRang31.github.io/./pkos-4-logging/loki2.png&#34; 
-    alt=&#34;&amp;lt;a href=&amp;#34;https://grafana.com/blog/2018/12/12/loki-prometheus-inspired-open-source-logging-for-cloud-natives/&amp;#34;&amp;gt;https://grafana.com/blog/2018/12/12/loki-prometheus-inspired-open-source-logging-for-cloud-natives/&amp;lt;/a&amp;gt;&#34; 
+    src=&#34;https://HanHoRang31.github.io/./pkos-5-security/scape.png&#34; 
+    alt=&#34;&amp;lt;a href=&amp;#34;https://github.com/kubescape/helm-charts/blob/master/charts/kubescape-cloud-operator/README.md&amp;#34;&amp;gt;https://github.com/kubescape/helm-charts/blob/master/charts/kubescape-cloud-operator/README.md&amp;lt;/a&amp;gt;&#34; 
      
-    width=1415 
-    height=&#34;601&#34;  /&gt;&lt;/p&gt;
-&lt;p&gt;&lt;a href=&#34;https://grafana.com/blog/2018/12/12/loki-prometheus-inspired-open-source-logging-for-cloud-natives/&#34;&gt;https://grafana.com/blog/2018/12/12/loki-prometheus-inspired-open-source-logging-for-cloud-natives/&lt;/a&gt;&lt;/p&gt;
-&lt;p&gt;&lt;strong&gt;메타데이터 인덱싱?&lt;/strong&gt;&lt;/p&gt;
-&lt;p&gt;&lt;img loading=&#34;lazy&#34; 
-    src=&#34;https://HanHoRang31.github.io/./pkos-4-logging/loki3.png&#34; 
-    alt=&#34;&amp;lt;a href=&amp;#34;https://grafana.com/oss/loki/&amp;#34;&amp;gt;https://grafana.com/oss/loki/&amp;lt;/a&amp;gt;&#34; 
-     
-    width=1001 
-    height=&#34;546&#34;  /&gt;&lt;/p&gt;
-&lt;p&gt;&lt;a href=&#34;https://grafana.com/oss/loki/&#34;&gt;https://grafana.com/oss/loki/&lt;/a&gt;&lt;/p&gt;
-&lt;p&gt;로키는 메타데이터를 인덱싱을 통해 경량화 및 빠른 쿼리 성능을 가진다. 메타인덱싱 원리는 위의 그림과 같은데 로그 전체 텍스트를 저장하는 것이 아니라 타임스탬프와 라벨을 묶어 인덱스(index) 로 그 외 나머지 텍스트를 청크(chunk)로 나눠 저장된다.&lt;/p&gt;
+    width=774 
+    height=&#34;707&#34;  /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;a href=&#34;https://github.com/kubescape/helm-charts/blob/master/charts/kubescape-cloud-operator/README.md&#34;&gt;https://github.com/kubescape/helm-charts/blob/master/charts/kubescape-cloud-operator/README.md&lt;/a&gt;&lt;/p&gt;
 &lt;ul&gt;
-&lt;li&gt;&lt;strong&gt;인덱스&lt;/strong&gt;: 로그 시간과 레이블을 묶어 해싱을 통해 고유한 식별자를 만든다. 이 식별자를 통해 로그 스트림을 참조하고 검색하는데 사용된다. 인덱스는 일반적으로 NoSQL DB에 저장하는데 Key 값에는 인덱스를  values 값에는 해당 청크의 데이터를 저장한다.&lt;/li&gt;
-&lt;li&gt;&lt;strong&gt;청크&lt;/strong&gt;: 청크는 실제 로그 데이터이다.  청크는 데이터를 압축 및 저장하기 위해 여러 압축 알고리즘을 사용할 수 있으며, 기본적으로 압축이 적용되어 저장 공간을 최적화합니다. 일반적으로 오브젝트 스토리지에 저장한다.&lt;/li&gt;
-&lt;/ul&gt;
-&lt;h3 id=&#34;아키텍처&#34;&gt;
-    &lt;a href=&#34;#%ec%95%84%ed%82%a4%ed%85%8d%ec%b2%98&#34; class=&#34;anchor&#34;&gt;
-        &lt;svg class=&#34;icon&#34; aria-hidden=&#34;true&#34; focusable=&#34;false&#34; height=&#34;16&#34; version=&#34;1.1&#34; viewBox=&#34;0 0 16 16&#34; width=&#34;16&#34;&gt;
-            &lt;path fill-rule=&#34;evenodd&#34;
-                d=&#34;M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z&#34;&gt;
-            &lt;/path&gt;
-        &lt;/svg&gt;
-    &lt;/a&gt;
-    아키텍처
-&lt;/h3&gt;
-&lt;p&gt;&lt;img loading=&#34;lazy&#34; 
-    src=&#34;https://HanHoRang31.github.io/./pkos-4-logging/loki.png&#34; 
-    alt=&#34;&amp;lt;a href=&amp;#34;https://grafana.com/blog/2018/12/12/loki-prometheus-inspired-open-source-logging-for-cloud-natives/&amp;#34;&amp;gt;https://grafana.com/blog/2018/12/12/loki-prometheus-inspired-open-source-logging-for-cloud-natives/&amp;lt;/a&amp;gt;&#34; 
-     
-    width=1289 
-    height=&#34;693&#34;  /&gt;&lt;/p&gt;
-&lt;p&gt;&lt;a href=&#34;https://grafana.com/blog/2018/12/12/loki-prometheus-inspired-open-source-logging-for-cloud-natives/&#34;&gt;https://grafana.com/blog/2018/12/12/loki-prometheus-inspired-open-source-logging-for-cloud-natives/&lt;/a&gt;&lt;/p&gt;
-&lt;p&gt;그림에서 화살표 빨강은 로그 Write, 파랑은 Read를 의미한다. 또한, 각 구성 컴포넌트들은 HA를 지원하여 컴포넌트 내부 구성 하나에 장애가 발생하더라도 서비스가 중단되지 않는다.&lt;/p&gt;
-&lt;ul&gt;
-&lt;li&gt;Your Jobs : 로그 수집 에이전트로 사용자 정의에 맞게 로그를 수집하여 로키 서버(Distributor)에 전달한다. 로그 수집 에이전트로 Promtail를 사용하나 fluent, fluentbit 과 호환이 가능하다.&lt;/li&gt;
-&lt;li&gt;Distributor(디스트리뷰터): Distributor는 로그 데이터를 수신하고, 해당 데이터를 인제스터(Ingester)에 분산시키는 역할을 한다. 또한, 레이블의 해시 값을 사용하여 데이터를 적절한 인제스터에 전달하며 로드밸런싱을 통해 로그 데이터를 여러 인제스터에 고르게 분산시켜준다.&lt;/li&gt;
-&lt;li&gt;Ingester(인제스터): Ingester는 Distributor로부터 로그 데이터를 받아서, 로그 스트림을 청크로 나누고 압축한 후 저장시킨다. 인제스터는 메모리 또는 영구 스토리지에 청크를 저장할 수 있으며, 쿼리어(Querier)에게 저장된 청크에 대한 질의 결과를 제공한다. 청크가 일정 시간 또는 크기에 도달하면 인제스터는 이를 영구 스토리지에 저장시킨다.&lt;/li&gt;
-&lt;li&gt;Querier(쿼리어): Querier는 사용자로부터 질의를 받아 처리한다. 질의를 처리할 때, 쿼리어는 인덱스를 사용하여 관련된 청크를 찾고, 인제스터 및 영구 스토리지에서 해당 청크를 가져와 질의 결과를 반환한다.&lt;/li&gt;
-&lt;/ul&gt;
-&lt;p&gt;loki 버전 3.0 이상부터는 loki, loki-distributed가 통합되었다.&lt;/p&gt;
-&lt;p&gt;&lt;img loading=&#34;lazy&#34; 
-    src=&#34;https://HanHoRang31.github.io/./pkos-4-logging/simple-scalable-test-environment.png&#34; 
-    alt=&#34;&amp;lt;a href=&amp;#34;https://grafana.com/docs/loki/latest/getting-started/&amp;#34;&amp;gt;https://grafana.com/docs/loki/latest/getting-started/&amp;lt;/a&amp;gt;&#34; 
-     
-    width=979 
-    height=&#34;721&#34;  /&gt;&lt;/p&gt;
-&lt;p&gt;&lt;a href=&#34;https://grafana.com/docs/loki/latest/getting-started/&#34;&gt;https://grafana.com/docs/loki/latest/getting-started/&lt;/a&gt;&lt;/p&gt;
-&lt;ul&gt;
-&lt;li&gt;Loki Write component : 로그 데이터를 수신하고 저장시켜주는 컴포넌트이다. 앞서 아키텍처의 빨간 flow를 담당하는 Distributor와 Ingester 로 구성되어 있다.&lt;/li&gt;
-&lt;li&gt;Loki Read component:  로그 데이터를 조회하고 처리하는데 사용된다. 앞서 아키텍처의 파랑 flow를 담당하는 Querier와 Query Frontend 로 구성되어 있다.&lt;/li&gt;
-&lt;li&gt;gateway :  Loki 구성요소에 대한 프록시 서버이다. 로그를 까보면 NGINX 게이트웨이가 설치되며 로드밸런싱 기능을 수행하여 각 컴포넌트에 트래픽을 분산시킨다.&lt;/li&gt;
+&lt;li&gt;Master Gateway: ARMO 백엔드에서 실행 중인 마스터 게이트웨이이며 사용자가 등록한 모든 게이트웨이에 메시지를 브로드캐스트하여 모든 클러스터 게이트웨이에 런타임 작업을 전달한다.&lt;/li&gt;
+&lt;li&gt;In-cluster Gateway: 클러스터 내에서 다른 구성 요소와 통신하기 위해 마스터 게이트웨이와 연결되며, 웹소켓(Websocket)을 사용하여 등록된다. 브로드캐스트 메세지를 전달받아 다른 컴포넌트에 전달한다.&lt;/li&gt;
+&lt;li&gt;Operator :  트리거 엔진으로 게이트웨이에서 잔달받은 작업을 실행하거나 스케줄링하는 역할을 담당한다.&lt;/li&gt;
+&lt;li&gt;Kubevuln : 컨테이너 이미지 취약점을 스캔하는 컴포넌트이다. 취약점 스캔은 &lt;a href=&#34;https://github.com/anchore/grype&#34;&gt;grype&lt;/a&gt;을 통해 진행한다.&lt;/li&gt;
+&lt;li&gt;Kubescape : 클러스터 내부 검증을 스캔하는 컴포넌트이다.&lt;/li&gt;
+&lt;li&gt;Kollector : kubernetes API Server와 통신하여 클러스터 정보와 변경 정보를 확인하며 정보를 백엔드 CloudEndpoint로 전달한다.&lt;/li&gt;
 &lt;/ul&gt;
 &lt;h2 id=&#34;설치&#34;&gt;
     &lt;a href=&#34;#%ec%84%a4%ec%b9%98&#34; class=&#34;anchor&#34;&gt;
@@ -144,343 +192,245 @@
     설치
 &lt;/h2&gt;
 &lt;blockquote&gt;
-&lt;p&gt;설치 환경 : kops 클러스터 (k8s 1.24), AWS Ubuntu 인스턴스&lt;/p&gt;
+&lt;p&gt;배포 환경 : kops 클러스터 (k8s 1.24), AWS Ubuntu 인스턴스&lt;/p&gt;
 &lt;/blockquote&gt;
-&lt;p&gt;설치는 다음과 같이 진행할 예정이다.&lt;/p&gt;
-&lt;ul&gt;
-&lt;li&gt;Loki (helm grafana/loki 4.8.0)&lt;/li&gt;
-&lt;li&gt;Promtail (helm grafana/promtail 6.9.2)&lt;/li&gt;
-&lt;/ul&gt;
-&lt;p&gt;사족이지만, 로그 저장소로 mongoDB를 활용하려 했으나 안 된다!
-로키 호환 저장소가 정해져있기 때문이다. 온프로미스에서 구성시 참고하자.&lt;/p&gt;
-&lt;p&gt;본 블로그에서는 S3에 오브젝트 데이터를 &lt;del&gt;DynamoDB에 인덱스 데이터&lt;/del&gt;를 저장시키겠다. (230402. DynamoDB 인덱스 연동문제로 S3에 인덱스, 오브젝트 데이터 저장)&lt;/p&gt;
+&lt;p&gt;먼저 &lt;a href=&#34;https://cloud.armosec.io/settings/assets/clusters&#34;&gt;https://cloud.armosec.io/&lt;/a&gt; 회원가입이 필요하다. 회원가입 이후 회원 ID 값에 맞게 helm 설치 명령어가 나온다. 복사하여 클러스터에 설치하자.&lt;/p&gt;
 &lt;p&gt;&lt;img loading=&#34;lazy&#34; 
-    src=&#34;https://HanHoRang31.github.io/./pkos-4-logging/loki4.png&#34; 
-    alt=&#34;&amp;lt;a href=&amp;#34;https://grafana.com/docs/loki/latest/operations/storage/&amp;#34;&amp;gt;https://grafana.com/docs/loki/latest/operations/storage/&amp;lt;/a&amp;gt;&#34; 
+    src=&#34;https://HanHoRang31.github.io/./pkos-5-security/kubescape.png&#34; 
+    alt=&#34;kubescape.png&#34; 
      
-    width=822 
-    height=&#34;592&#34;  /&gt;&lt;/p&gt;
-&lt;p&gt;&lt;a href=&#34;https://grafana.com/docs/loki/latest/operations/storage/&#34;&gt;https://grafana.com/docs/loki/latest/operations/storage/&lt;/a&gt;&lt;/p&gt;
-&lt;h3 id=&#34;loki-설치&#34;&gt;
-    &lt;a href=&#34;#loki-%ec%84%a4%ec%b9%98&#34; class=&#34;anchor&#34;&gt;
-        &lt;svg class=&#34;icon&#34; aria-hidden=&#34;true&#34; focusable=&#34;false&#34; height=&#34;16&#34; version=&#34;1.1&#34; viewBox=&#34;0 0 16 16&#34; width=&#34;16&#34;&gt;
-            &lt;path fill-rule=&#34;evenodd&#34;
-                d=&#34;M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z&#34;&gt;
-            &lt;/path&gt;
-        &lt;/svg&gt;
-    &lt;/a&gt;
-    Loki 설치
-&lt;/h3&gt;
-&lt;p&gt;Loki 저장소로 S3 와 DyanmoDB 스토리지 생성과  IAM role 권한 연결이 필요하다. 본 테스트에서는 S3 이름을 &lt;code&gt;han-loki&lt;/code&gt; , DyanmoDB 이름은 &lt;code&gt;loki_&lt;/code&gt; 로 생성하였다. &lt;del&gt;DynamoDB 사용시 주의해야할 점은 다음과 같다.&lt;/del&gt;&lt;/p&gt;
-&lt;ul&gt;
-&lt;li&gt;&lt;del&gt;DynamoDB 테이블 이름을 헬름 차트의 schema_config.config&lt;/del&gt;&lt;/li&gt;
-&lt;li&gt;&lt;del&gt;DynamoDB 파티션 키 &amp;amp; 정렬 키를 (문자열, 바이너리)로 지정해야 한다.&lt;/del&gt;&lt;/li&gt;
-&lt;/ul&gt;
-&lt;p&gt;IAM 권한은 S3, DyanmoDB에 대한 정책을 부여했다.&lt;/p&gt;
-&lt;ul&gt;
-&lt;li&gt;AmazonS3FullAccess&lt;/li&gt;
-&lt;li&gt;AmazonDynamoDBFullAccess&lt;/li&gt;
-&lt;/ul&gt;
-&lt;p&gt;필자는 사용자에 IAM 권한를 부여 후 access-key 와 secret-key를 가져왔다. 해당 키는 밑의 헬름 차트 버킷 연동에서 사용된다. 우선 헬름을 통해 로키 차트를 가져오겠다.&lt;/p&gt;
-&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
-&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
-&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code&gt;&lt;span class=&#34;lnt&#34;&gt;1
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;2
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;3
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;4
-&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
-&lt;td class=&#34;lntd&#34;&gt;
-&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;kubectl create ns loki
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;helm repo add grafana https://grafana.github.io/helm-charts
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;helm repo update
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;helm fetch grafana/loki --untar --version 4.8.0
-&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
-&lt;/div&gt;
-&lt;/div&gt;&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
-&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
-&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code&gt;&lt;span class=&#34;lnt&#34;&gt; 1
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 2
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 3
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 4
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 5
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 6
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 7
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 8
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 9
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;10
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;11
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;12
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;13
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;14
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;15
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;16
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;17
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;18
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;19
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;20
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;21
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;22
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;23
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;24
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;25
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;26
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;27
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;28
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;29
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;30
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;31
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;32
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;33
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;34
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;35
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;36
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;37
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;38
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;39
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;40
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;41
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;42
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;43
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;44
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;45
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;46
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;47
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;48
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;49
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;50
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;51
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;52
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;53
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;54
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;55
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;56
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;57
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;58
-&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
-&lt;td class=&#34;lntd&#34;&gt;
-&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-yaml&#34; data-lang=&#34;yaml&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;c&#34;&gt;#values-loki.yaml &lt;/span&gt;&lt;span class=&#34;w&#34;&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;w&#34;&gt;&lt;/span&gt;&lt;span class=&#34;nt&#34;&gt;schema_config&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;w&#34;&gt;  &lt;/span&gt;&lt;span class=&#34;nt&#34;&gt;configs&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;w&#34;&gt;  &lt;/span&gt;- &lt;span class=&#34;nt&#34;&gt;from&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt;&lt;span class=&#34;w&#34;&gt; &lt;/span&gt;&lt;span class=&#34;ld&#34;&gt;2020-05-15&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;w&#34;&gt;    &lt;/span&gt;&lt;span class=&#34;nt&#34;&gt;store&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt;&lt;span class=&#34;w&#34;&gt; &lt;/span&gt;&lt;span class=&#34;l&#34;&gt;aws&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;w&#34;&gt;    &lt;/span&gt;&lt;span class=&#34;nt&#34;&gt;object_store&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt;&lt;span class=&#34;w&#34;&gt; &lt;/span&gt;&lt;span class=&#34;l&#34;&gt;s3&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;w&#34;&gt;    &lt;/span&gt;&lt;span class=&#34;nt&#34;&gt;schema&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt;&lt;span class=&#34;w&#34;&gt; &lt;/span&gt;&lt;span class=&#34;l&#34;&gt;v11&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;w&#34;&gt;    &lt;/span&gt;&lt;span class=&#34;nt&#34;&gt;index&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;w&#34;&gt;      &lt;/span&gt;&lt;span class=&#34;nt&#34;&gt;prefix&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt;&lt;span class=&#34;w&#34;&gt; &lt;/span&gt;&lt;span class=&#34;l&#34;&gt;loki&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;w&#34;&gt;      &lt;/span&gt;&lt;span class=&#34;nt&#34;&gt;period&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt;&lt;span class=&#34;w&#34;&gt; &lt;/span&gt;&lt;span class=&#34;m&#34;&gt;0&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;w&#34;&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;w&#34;&gt;&lt;/span&gt;&lt;span class=&#34;nt&#34;&gt;storage_config&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;w&#34;&gt;  &lt;/span&gt;&lt;span class=&#34;nt&#34;&gt;aws&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;w&#34;&gt;    &lt;/span&gt;&lt;span class=&#34;nt&#34;&gt;s3&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt;&lt;span class=&#34;w&#34;&gt; &lt;/span&gt;&lt;span class=&#34;l&#34;&gt;s3://ap-northeast-2/han-loki&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;w&#34;&gt;    &lt;/span&gt;&lt;span class=&#34;nt&#34;&gt;dynamodb&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;w&#34;&gt;      &lt;/span&gt;&lt;span class=&#34;nt&#34;&gt;dynamodb_url&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt;&lt;span class=&#34;w&#34;&gt; &lt;/span&gt;&lt;span class=&#34;l&#34;&gt;dynamodb://ap-northeast-2&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;w&#34;&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;w&#34;&gt;&lt;/span&gt;&lt;span class=&#34;nt&#34;&gt;table_manager&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;w&#34;&gt;  &lt;/span&gt;&lt;span class=&#34;nt&#34;&gt;retention_deletes_enabled&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt;&lt;span class=&#34;w&#34;&gt; &lt;/span&gt;&lt;span class=&#34;kc&#34;&gt;true&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;w&#34;&gt;  &lt;/span&gt;&lt;span class=&#34;nt&#34;&gt;retention_period&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt;&lt;span class=&#34;w&#34;&gt; &lt;/span&gt;&lt;span class=&#34;l&#34;&gt;336h&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;w&#34;&gt;  &lt;/span&gt;&lt;span class=&#34;nt&#34;&gt;index_tables_provisioning&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;w&#34;&gt;    &lt;/span&gt;&lt;span class=&#34;nt&#34;&gt;write_scale&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;w&#34;&gt;      &lt;/span&gt;&lt;span class=&#34;nt&#34;&gt;enabled&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt;&lt;span class=&#34;w&#34;&gt; &lt;/span&gt;&lt;span class=&#34;kc&#34;&gt;false&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;w&#34;&gt;    &lt;/span&gt;&lt;span class=&#34;nt&#34;&gt;read_scale&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;w&#34;&gt;      &lt;/span&gt;&lt;span class=&#34;nt&#34;&gt;enabled&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt;&lt;span class=&#34;w&#34;&gt; &lt;/span&gt;&lt;span class=&#34;kc&#34;&gt;false&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;w&#34;&gt;  &lt;/span&gt;&lt;span class=&#34;nt&#34;&gt;chunk_tables_provisioning&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;w&#34;&gt;    &lt;/span&gt;&lt;span class=&#34;nt&#34;&gt;write_scale&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;w&#34;&gt;      &lt;/span&gt;&lt;span class=&#34;nt&#34;&gt;enabled&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt;&lt;span class=&#34;w&#34;&gt; &lt;/span&gt;&lt;span class=&#34;kc&#34;&gt;false&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;w&#34;&gt;    &lt;/span&gt;&lt;span class=&#34;nt&#34;&gt;read_scale&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;w&#34;&gt;      &lt;/span&gt;&lt;span class=&#34;nt&#34;&gt;enabled&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt;&lt;span class=&#34;w&#34;&gt; &lt;/span&gt;&lt;span class=&#34;kc&#34;&gt;false&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;w&#34;&gt;  &lt;/span&gt;&lt;span class=&#34;nt&#34;&gt;table_prefix&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt;&lt;span class=&#34;w&#34;&gt; &lt;/span&gt;&lt;span class=&#34;s2&#34;&gt;&amp;#34;loki&amp;#34;&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;w&#34;&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;w&#34;&gt;&lt;/span&gt;&lt;span class=&#34;nt&#34;&gt;tableManager&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;w&#34;&gt;  &lt;/span&gt;&lt;span class=&#34;nt&#34;&gt;enabled&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt;&lt;span class=&#34;w&#34;&gt; &lt;/span&gt;&lt;span class=&#34;kc&#34;&gt;true&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;w&#34;&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;w&#34;&gt;&lt;/span&gt;&lt;span class=&#34;nt&#34;&gt;monitoring&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;w&#34;&gt;  &lt;/span&gt;&lt;span class=&#34;nt&#34;&gt;lokiCanary&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;w&#34;&gt;    &lt;/span&gt;&lt;span class=&#34;nt&#34;&gt;enabled&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt;&lt;span class=&#34;w&#34;&gt; &lt;/span&gt;&lt;span class=&#34;kc&#34;&gt;true&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;w&#34;&gt;  &lt;/span&gt;&lt;span class=&#34;nt&#34;&gt;selfMonitoring&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;w&#34;&gt;    &lt;/span&gt;&lt;span class=&#34;nt&#34;&gt;enabled&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt;&lt;span class=&#34;w&#34;&gt; &lt;/span&gt;&lt;span class=&#34;kc&#34;&gt;false&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;w&#34;&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;w&#34;&gt;&lt;/span&gt;&lt;span class=&#34;nt&#34;&gt;loki&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt;&lt;span class=&#34;w&#34;&gt; 
-&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;w&#34;&gt;  &lt;/span&gt;&lt;span class=&#34;nt&#34;&gt;auth_enabled&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt;&lt;span class=&#34;w&#34;&gt; &lt;/span&gt;&lt;span class=&#34;kc&#34;&gt;false&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;w&#34;&gt;  &lt;/span&gt;&lt;span class=&#34;nt&#34;&gt;storage&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;w&#34;&gt;    &lt;/span&gt;&lt;span class=&#34;nt&#34;&gt;bucketNames&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;w&#34;&gt;      &lt;/span&gt;&lt;span class=&#34;nt&#34;&gt;chunks&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt;&lt;span class=&#34;w&#34;&gt; &lt;/span&gt;&lt;span class=&#34;l&#34;&gt;han-loki&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;w&#34;&gt;      &lt;/span&gt;&lt;span class=&#34;nt&#34;&gt;ruler&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt;&lt;span class=&#34;w&#34;&gt; &lt;/span&gt;&lt;span class=&#34;l&#34;&gt;han-loki&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;w&#34;&gt;      &lt;/span&gt;&lt;span class=&#34;nt&#34;&gt;admin&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt;&lt;span class=&#34;w&#34;&gt; &lt;/span&gt;&lt;span class=&#34;l&#34;&gt;han-loki&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;w&#34;&gt;    &lt;/span&gt;&lt;span class=&#34;nt&#34;&gt;type&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt;&lt;span class=&#34;w&#34;&gt; &lt;/span&gt;&lt;span class=&#34;l&#34;&gt;s3&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;w&#34;&gt;    &lt;/span&gt;&lt;span class=&#34;nt&#34;&gt;s3&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;w&#34;&gt;      &lt;/span&gt;&lt;span class=&#34;nt&#34;&gt;s3&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt;&lt;span class=&#34;w&#34;&gt; &lt;/span&gt;&lt;span class=&#34;l&#34;&gt;han-loki&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;w&#34;&gt;      &lt;/span&gt;&lt;span class=&#34;nt&#34;&gt;endpoint&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt;&lt;span class=&#34;w&#34;&gt; &lt;/span&gt;&lt;span class=&#34;l&#34;&gt;s3.ap-northeast-2.amazonaws.com&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;w&#34;&gt;      &lt;/span&gt;&lt;span class=&#34;nt&#34;&gt;region&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt;&lt;span class=&#34;w&#34;&gt; &lt;/span&gt;&lt;span class=&#34;l&#34;&gt;ap-northeast-2&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;w&#34;&gt;      &lt;/span&gt;&lt;span class=&#34;nt&#34;&gt;secretAccessKey&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt;&lt;span class=&#34;w&#34;&gt; &lt;/span&gt;{&lt;span class=&#34;l&#34;&gt;SECRET KEY} &lt;/span&gt;&lt;span class=&#34;w&#34;&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;w&#34;&gt;      &lt;/span&gt;&lt;span class=&#34;nt&#34;&gt;accessKeyId&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt;&lt;span class=&#34;w&#34;&gt; &lt;/span&gt;{&lt;span class=&#34;l&#34;&gt;ACCESS KEY} &lt;/span&gt;&lt;span class=&#34;w&#34;&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;w&#34;&gt;      &lt;/span&gt;&lt;span class=&#34;nt&#34;&gt;s3ForcePathStyle&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt;&lt;span class=&#34;w&#34;&gt; &lt;/span&gt;&lt;span class=&#34;kc&#34;&gt;false&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;w&#34;&gt;      &lt;/span&gt;&lt;span class=&#34;nt&#34;&gt;insecure&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt;&lt;span class=&#34;w&#34;&gt; &lt;/span&gt;&lt;span class=&#34;kc&#34;&gt;false&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;w&#34;&gt;      &lt;/span&gt;&lt;span class=&#34;nt&#34;&gt;http_config&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt;&lt;span class=&#34;w&#34;&gt; &lt;/span&gt;{}&lt;span class=&#34;w&#34;&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
-&lt;/div&gt;
-&lt;/div&gt;&lt;ul&gt;
-&lt;li&gt;access_key 와 Secret_access_key 노출에 주의하자!&lt;/li&gt;
-&lt;li&gt;schema_config : 인덱스와 청크 데이터에 대한 저장 스키마를 정의한다.&lt;/li&gt;
-&lt;li&gt;storage_config: 데이터 저장할 스토리지 정보를 입력한다.&lt;/li&gt;
-&lt;li&gt;table_manager, tableManager : 테이블 기반 데이터 저장소에 인덱스 및 청크를 지원하는데 버전 호환 문제로 작동이 안되어 dynamodb 에 인덱스가 저장이 안된다. (현재 S3에 저장됨)&lt;/li&gt;
-&lt;li&gt;monitoring.lokicanary: 시스템 검증에 사용된다. true 설정시 별도의 카나리 파드가 생성되어 일정시간마다 테스트 로그를 전달한다.&lt;/li&gt;
-&lt;li&gt;monitoring.selfMonitoring : 대시보드에 Loki 관련 대시보드가 업로드된다하지만,&lt;/li&gt;
-&lt;li&gt;loki: 로키 서버 설정을 정의한다. 최신 버전에는 스토리지 연동을 여기서 하는데 dynamodb에 대한 설정 예시가 없고 테스트가 안되서 s3 만 정의하였다.&lt;/li&gt;
-&lt;/ul&gt;
-&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
-&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
-&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code&gt;&lt;span class=&#34;lnt&#34;&gt;1
-&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
-&lt;td class=&#34;lntd&#34;&gt;
-&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;helm install loki grafana/loki -f values-loki.yaml -n loki --version 4.8.0
-&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
-&lt;/div&gt;
-&lt;/div&gt;&lt;p&gt;파드 배포는 완료되었으나, 로키 스토리지 연동으로 &lt;strong&gt;안정화 작업&lt;/strong&gt;이 필요하다.&lt;/p&gt;
-&lt;p&gt;&lt;strong&gt;안정화 작업&lt;/strong&gt;는 다음과 같다.&lt;/p&gt;
-&lt;p&gt;storage_config 스토리지 연동 문제&lt;/p&gt;
-&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
-&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
-&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code&gt;&lt;span class=&#34;lnt&#34;&gt;1
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;2
-&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
-&lt;td class=&#34;lntd&#34;&gt;
-&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;nv&#34;&gt;level&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;=&lt;/span&gt;error &lt;span class=&#34;nv&#34;&gt;ts&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;=&lt;/span&gt;2023-04-01T03:18:30.427197283Z &lt;span class=&#34;nv&#34;&gt;caller&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;=&lt;/span&gt;flush.go:144 &lt;span class=&#34;nv&#34;&gt;org_id&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;=&lt;/span&gt;self-monitoring &lt;span class=&#34;nv&#34;&gt;msg&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;=&lt;/span&gt;&lt;span class=&#34;s2&#34;&gt;&amp;#34;failed to flush&amp;#34;&lt;/span&gt; &lt;span class=&#34;nv&#34;&gt;err&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;=&lt;/span&gt;&lt;span class=&#34;s2&#34;&gt;&amp;#34;failed to flush chunks: store put chunk: NoCredentialProviders: no valid providers in chain. Deprecated.\n\tFor verbose messaging see aws.Config.CredentialsChainVerboseErrors, num_chunks: 1, labels: {app_kubernetes_io_component=\&amp;#34;read\&amp;#34;, app_kubernetes_io_instance=\&amp;#34;loki\&amp;#34;, app_kubernetes_io_name=\&amp;#34;loki\&amp;#34;, app_kubernetes_io_part_of=\&amp;#34;memberlist\&amp;#34;, cluster=\&amp;#34;loki\&amp;#34;, container=\&amp;#34;loki\&amp;#34;, controller_revision_hash=\&amp;#34;loki-read-7749df4969\&amp;#34;, filename=\&amp;#34;/var/log/pods/loki_loki-read-2_a8fab5a2-e78b-4cff-9f8d-ba0ee5952a3c/loki/0.log\&amp;#34;, job=\&amp;#34;loki/loki-read\&amp;#34;, namespace=\&amp;#34;loki\&amp;#34;, pod=\&amp;#34;loki-read-2\&amp;#34;, statefulset_kubernetes_io_pod_name=\&amp;#34;loki-read-2\&amp;#34;, stream=\&amp;#34;stderr\&amp;#34;}&amp;#34;&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;nv&#34;&gt;level&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;=&lt;/span&gt;info &lt;span class=&#34;nv&#34;&gt;ts&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;=&lt;/span&gt;2023-04-01T03:18:30.427244754Z &lt;span class=&#34;nv&#34;&gt;caller&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;=&lt;/span&gt;flush.go:168 &lt;span class=&#34;nv&#34;&gt;msg&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;=&lt;/span&gt;&lt;span class=&#34;s2&#34;&gt;&amp;#34;flushing stream&amp;#34;&lt;/span&gt; &lt;span class=&#34;nv&#34;&gt;user&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;=&lt;/span&gt;self-monitoring &lt;span class=&#34;nv&#34;&gt;fp&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;=&lt;/span&gt;33d14d11bfd98f55 &lt;span class=&#34;nv&#34;&gt;immediate&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;=&lt;/span&gt;&lt;span class=&#34;nb&#34;&gt;false&lt;/span&gt; &lt;span class=&#34;nv&#34;&gt;num_chunks&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;=&lt;/span&gt;&lt;span class=&#34;m&#34;&gt;1&lt;/span&gt; &lt;span class=&#34;nv&#34;&gt;labels&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;=&lt;/span&gt;&lt;span class=&#34;s2&#34;&gt;&amp;#34;{app_kubernetes_io_component=\&amp;#34;read\&amp;#34;, app_kubernetes_io_instance=\&amp;#34;loki\&amp;#34;, app_kubernetes_io_name=\&amp;#34;loki\&amp;#34;, app_kubernetes_io_part_of=\&amp;#34;memberlist\&amp;#34;, cluster=\&amp;#34;loki\&amp;#34;, container=\&amp;#34;loki\&amp;#34;, controller_revision_hash=\&amp;#34;loki-read-7749df4969\&amp;#34;, filename=\&amp;#34;/var/log/pods/loki_loki-read-2_a8fab5a2-e78b-4cff-9f8d-ba0ee5952a3c/loki/0.log\&amp;#34;, job=\&amp;#34;loki/loki-read\&amp;#34;, namespace=\&amp;#34;loki\&amp;#34;, pod=\&amp;#34;loki-read-2\&amp;#34;, statefulset_kubernetes_io_pod_name=\&amp;#34;loki-read-2\&amp;#34;, stream=\&amp;#34;stderr\&amp;#34;}&amp;#34;&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
-&lt;/div&gt;
-&lt;/div&gt;&lt;p&gt;공식문서 &lt;a href=&#34;https://grafana.com/docs/loki/latest/configuration/examples/&#34;&gt;예제 storage_config&lt;/a&gt; 가 최신 기준으로 업데이트된 것 같지 않다. 필자의 경우 배포 yaml로 구성을 설정하니 정상적으로 작동했다.&lt;/p&gt;
+    width=1246 
+    height=&#34;1056&#34;  /&gt;&lt;/p&gt;
+&lt;p&gt;설치 이후 Verfiy installation 버튼을 누르면 아래와 같이 연결이 안된다고 나오나 kops 클러스터에서 설치했을 때의 버그같다.&lt;/p&gt;
 &lt;p&gt;&lt;img loading=&#34;lazy&#34; 
-    src=&#34;https://HanHoRang31.github.io/./pkos-4-logging/s3-loki.png&#34; 
-    alt=&#34;s3-loki.png&#34; 
-     
-    width=585 
-    height=&#34;672&#34;  /&gt;&lt;/p&gt;
-&lt;p&gt;&lt;strong&gt;S3 디렉토리에 chunk 폴더가 없다?&lt;/strong&gt;
-&lt;a href=&#34;https://github.com/grafana/loki/issues/1760&#34;&gt;이슈&lt;/a&gt; 에 따르면 멀티테넌트 구성에서 loki를 실행할때 인증이 비활성화하면 기본적으로 fake 폴더에 저장된다고 한다. fake폴더 안에는 정상적으로 chunk가 들어가있는 것을 확인할 수 있으나 다중 클러스터에서 배포시 loki 별로 인증이 필요할 것 같다.&lt;/p&gt;
-&lt;p&gt;&lt;img loading=&#34;lazy&#34; 
-    src=&#34;https://HanHoRang31.github.io/./pkos-4-logging/fake.png&#34; 
+    src=&#34;https://HanHoRang31.github.io/./pkos-5-security/fake.png&#34; 
     alt=&#34;fake.png&#34; 
      
-    width=1540 
-    height=&#34;756&#34;  /&gt;&lt;/p&gt;
-&lt;p&gt;&lt;strong&gt;dynamoDB에 인덱스를 저장하고 싶어요.&lt;/strong&gt;&lt;/p&gt;
-&lt;p&gt;해결해야할 문제다. 현재 S3에 index값이 들어가는데 dynamodb에 옮겨야 한다. 헬름차트에 table-manager 설정이 두개(table-manager, tableManager)여서 설정이 안 먹힌다. 추가 원인으로는  깃허브 이슈( &lt;a href=&#34;https://github.com/grafana/loki/issues/5070&#34;&gt;https://github.com/grafana/loki/issues/5070&lt;/a&gt;)  설정값( extraArgs)인데 적용이 안된다. 추후 해결시 업데이트하겠다.&lt;/p&gt;
-&lt;p&gt;배포를 완료하면 로키 파드가 정상적으로 작동하는 것을 알 수 있다.&lt;/p&gt;
-&lt;p&gt;&lt;img loading=&#34;lazy&#34; 
-    src=&#34;https://HanHoRang31.github.io/./pkos-4-logging/loki-result.png&#34; 
-    alt=&#34;loki-result.png&#34; 
+    width=750 
+    height=&#34;606&#34;  /&gt;&lt;/p&gt;
+&lt;p&gt;아래와 같이 로그 확인 및 대시보드를 확인하면 정상적으로 등록이 되어 있다.&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
+&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code&gt;&lt;span class=&#34;lnt&#34;&gt;1
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;kubectl -n kubescape logs -f &lt;span class=&#34;k&#34;&gt;$(&lt;/span&gt;kubectl -n kubescape get pods &lt;span class=&#34;p&#34;&gt;|&lt;/span&gt; grep kollector &lt;span class=&#34;p&#34;&gt;|&lt;/span&gt;  awk &lt;span class=&#34;s1&#34;&gt;&amp;#39;{print $1}&amp;#39;&lt;/span&gt;&lt;span class=&#34;k&#34;&gt;)&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;p&gt;&lt;img loading=&#34;lazy&#34; 
+    src=&#34;https://HanHoRang31.github.io/./pkos-5-security/kubescape3.png&#34; 
+    alt=&#34;kubescape3.png&#34; 
      
-    width=1204 
-    height=&#34;336&#34;  /&gt;&lt;/p&gt;
+    width=2766 
+    height=&#34;588&#34;  /&gt;&lt;/p&gt;
 &lt;p&gt;&lt;img loading=&#34;lazy&#34; 
-    src=&#34;https://HanHoRang31.github.io/./pkos-4-logging/loki6.png&#34; 
-    alt=&#34;loki6.png&#34; 
+    src=&#34;https://HanHoRang31.github.io/./pkos-5-security/kubescape2.png&#34; 
+    alt=&#34;kubescape2.png&#34; 
      
-    width=850 
-    height=&#34;685&#34;  /&gt;&lt;/p&gt;
-&lt;p&gt;&lt;a href=&#34;http://loki-read-headless.loki.svc.cluster.local:3100/&#34;&gt;http://loki-read-headless.loki.svc.cluster.local:3100&lt;/a&gt;&lt;/p&gt;
-&lt;h3 id=&#34;promtail-설치&#34;&gt;
-    &lt;a href=&#34;#promtail-%ec%84%a4%ec%b9%98&#34; class=&#34;anchor&#34;&gt;
+    width=1863 
+    height=&#34;970&#34;  /&gt;&lt;/p&gt;
+&lt;h2 id=&#34;기능-확인&#34;&gt;
+    &lt;a href=&#34;#%ea%b8%b0%eb%8a%a5-%ed%99%95%ec%9d%b8&#34; class=&#34;anchor&#34;&gt;
         &lt;svg class=&#34;icon&#34; aria-hidden=&#34;true&#34; focusable=&#34;false&#34; height=&#34;16&#34; version=&#34;1.1&#34; viewBox=&#34;0 0 16 16&#34; width=&#34;16&#34;&gt;
             &lt;path fill-rule=&#34;evenodd&#34;
                 d=&#34;M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z&#34;&gt;
             &lt;/path&gt;
         &lt;/svg&gt;
     &lt;/a&gt;
-    Promtail 설치
-&lt;/h3&gt;
-&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
-&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
-&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code&gt;&lt;span class=&#34;lnt&#34;&gt;1
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;2
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;3
-&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
-&lt;td class=&#34;lntd&#34;&gt;
-&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;helm repo add grafana https://grafana.github.io/helm-charts
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;helm repo update
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;helm fetch grafana/promtail --untar --version 6.9.2
-&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
-&lt;/div&gt;
-&lt;/div&gt;&lt;p&gt;Promtail 차트에서 따로 설정할 것은 없지만, 로키 연결과 로그 라인 파이프라인 구성 확인을 위해 집어넣는다.&lt;/p&gt;
-&lt;p&gt;&lt;img loading=&#34;lazy&#34; 
-    src=&#34;https://HanHoRang31.github.io/./pkos-4-logging/promtail1.png&#34; 
-    alt=&#34;promtail1.png&#34; 
-     
-    width=2756 
-    height=&#34;1452&#34;  /&gt;&lt;/p&gt;
+    기능 확인
+&lt;/h2&gt;
+&lt;p&gt;대시보드를 접속하면 왼쪽의 메뉴를 통해서 보안 검증이 가능하다.&lt;/p&gt;
 &lt;ul&gt;
-&lt;li&gt;config.clients.url : 로그 수집 후 전달한 로그 서버를 입력한다. 보통 로키 서버 설치시 설정되는 url로 지정된다.&lt;/li&gt;
-&lt;li&gt;config.snippets: 로그 라인 분석과 추출, 필터링하는 스테이지들의 작업을 정의한다. 원하는 로그 데이터 형식을 정의해서 입력하면 된다. &lt;a href=&#34;https://grafana.com/docs/loki/latest/clients/promtail/scraping/&#34;&gt;scraping 구문은 프로메테우스와 동일하다.&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;Compliance : 쿠버네티스 준수 정책 검증&lt;/li&gt;
+&lt;li&gt;Vulnerabilities : 컨테이너 파드 취약점 점검&lt;/li&gt;
+&lt;li&gt;RBAC Visualizer : RBAC 시각화&lt;/li&gt;
+&lt;li&gt;Repository Scanning : 레파지토리 스캐닝&lt;/li&gt;
+&lt;li&gt;Registry Scanning :  도커 레지스트리 스캐닝&lt;/li&gt;
 &lt;/ul&gt;
-&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
-&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
-&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code&gt;&lt;span class=&#34;lnt&#34;&gt;1
-&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
-&lt;td class=&#34;lntd&#34;&gt;
-&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;helm install promtail grafana/promtail -n loki --version 6.9.2
-&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
-&lt;/div&gt;
-&lt;/div&gt;&lt;h3 id=&#34;로그-수집-테스트&#34;&gt;
-    &lt;a href=&#34;#%eb%a1%9c%ea%b7%b8-%ec%88%98%ec%a7%91-%ed%85%8c%ec%8a%a4%ed%8a%b8&#34; class=&#34;anchor&#34;&gt;
+&lt;h3 id=&#34;compliance&#34;&gt;
+    &lt;a href=&#34;#compliance&#34; class=&#34;anchor&#34;&gt;
         &lt;svg class=&#34;icon&#34; aria-hidden=&#34;true&#34; focusable=&#34;false&#34; height=&#34;16&#34; version=&#34;1.1&#34; viewBox=&#34;0 0 16 16&#34; width=&#34;16&#34;&gt;
             &lt;path fill-rule=&#34;evenodd&#34;
                 d=&#34;M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z&#34;&gt;
             &lt;/path&gt;
         &lt;/svg&gt;
     &lt;/a&gt;
-    로그 수집 테스트
+    &lt;strong&gt;Compliance&lt;/strong&gt;
 &lt;/h3&gt;
-&lt;p&gt;Promtail-Loki-Grafana 까지의 로그 수집을 테스트하겠다. 테스트를 위해 nginx 를 배포하고 파드 로그 확인과 그라파나(로키)에서 로그를 확인한다.&lt;/p&gt;
-&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
-&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
-&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code&gt;&lt;span class=&#34;lnt&#34;&gt;1
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;2
-&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
-&lt;td class=&#34;lntd&#34;&gt;
-&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;helm repo add bitnami https://charts.bitnami.com/bitnami
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;helm install nginx bitnami/nginx --version 13.2.23 -f nginx-values.yaml
-&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
-&lt;/div&gt;
-&lt;/div&gt;&lt;p&gt;파드 로그는 파드가 올라간 노드 &lt;code&gt;/var/log/pods&lt;/code&gt; 에 저장되어 있다. 파드의 로그를 확인하고 그라파나 대시보드에서 로키가 해당 로그를 긁어오는지 확인하자.&lt;/p&gt;
+&lt;p&gt;쿠버네티스 모범 사례를 체계화하여 수백 개의 항목들을 통해 클러스터 검증시켜주는 기능이다.  검증 항목은 MITRA 와 NSA 에서 제시하는 보안 가이드라인이며 웹 대시보드에서 프레임워크별 제어가 가능하다.&lt;/p&gt;
 &lt;p&gt;&lt;img loading=&#34;lazy&#34; 
-    src=&#34;https://HanHoRang31.github.io/./pkos-4-logging/nginx1.png&#34; 
-    alt=&#34;nginx1.png&#34; 
+    src=&#34;https://HanHoRang31.github.io/./pkos-5-security/com.png&#34; 
+    alt=&#34;com.png&#34; 
      
-    width=1804 
-    height=&#34;295&#34;  /&gt;&lt;/p&gt;
+    width=1551 
+    height=&#34;825&#34;  /&gt;&lt;/p&gt;
+&lt;p&gt;또한, 보안이 필요한 항목에는 fix버튼을 통해 구성적으로 확인이 가능하다.&lt;/p&gt;
 &lt;p&gt;&lt;img loading=&#34;lazy&#34; 
-    src=&#34;https://HanHoRang31.github.io/./pkos-4-logging/nginx2.png&#34; 
-    alt=&#34;nginx2.png&#34; 
+    src=&#34;https://HanHoRang31.github.io/./pkos-5-security/com3.png&#34; 
+    alt=&#34;com3.png&#34; 
      
-    width=1781 
-    height=&#34;975&#34;  /&gt;&lt;/p&gt;
+    width=1859 
+    height=&#34;779&#34;  /&gt;&lt;/p&gt;
+&lt;p&gt;아래는 필자 클러스터 환경에서 high 레벨 항목이며 몇 가지 항목 원인은 다음과 같다.&lt;/p&gt;
+&lt;p&gt;&lt;img loading=&#34;lazy&#34; 
+    src=&#34;https://HanHoRang31.github.io/./pkos-5-security/com4.png&#34; 
+    alt=&#34;com4.png&#34; 
+     
+    width=1529 
+    height=&#34;504&#34;  /&gt;&lt;/p&gt;
 &lt;ul&gt;
-&lt;li&gt;[Explorer] → Job = default/nginx 설정 후 로그 확인&lt;/li&gt;
+&lt;li&gt;C-0057(Privileged container) : 호스트 시스템의 모든 기능을 포함하는 컨테이너가 있어서 발생한 항목이다. 파드 구성 중 &lt;code&gt;spec.container.securityContext.privileged == true&lt;/code&gt; 일 때 발생한다. 필자의 경우 볼륨 관리 파드(ebs-csi-node) 에서 발생했다.&lt;/li&gt;
+&lt;li&gt;C-0045(Writable hostPath mount) &lt;strong&gt;&lt;strong&gt;:&lt;/strong&gt;&lt;/strong&gt;  쓰기 가능한 hostPath 볼륨으로 컨테이너를 생성했을 때 발생하는 알람이다. 설명에서는 이를 통해 호스트 볼륨의 정보를 얻을 수 있다 한다. 파드 구성 중 &lt;code&gt;mount.readOnly == false&lt;/code&gt;  이 됐을 때 발생한다.&lt;/li&gt;
+&lt;li&gt;C-0015 (kubernetes secret list) : 쿠버네티스 사용자가 시크릿에 대해 접근이 가능할 때 발생하는 알람이다.&lt;/li&gt;
+&lt;li&gt;C-0041(HostNetwork access) : 호스트 네트워크에 연결할 경우 발생하는 알람이다.  필자의 경우 external-dns 파드에서 발생했다.&lt;/li&gt;
 &lt;/ul&gt;
-&lt;p&gt;잘 들어온다! 이어서 파드 라이프사이클과 독립적으로 로그가 관리되는 지 확인하겠다.  nginx 파드를 삭제하고 파드 로그와 로키를 확인하겠다.&lt;/p&gt;
+&lt;p&gt;항목을 살펴보니 대부분 add-on 파드들에 대해 발생한 경고이다. 이러한 경우 ignore 로 알람 무시가 가능하다.&lt;/p&gt;
+&lt;p&gt;&lt;img loading=&#34;lazy&#34; 
+    src=&#34;https://HanHoRang31.github.io/./pkos-5-security/Ignore.png&#34; 
+    alt=&#34;Ignore.png&#34; 
+     
+    width=705 
+    height=&#34;253&#34;  /&gt;&lt;/p&gt;
+&lt;p&gt;각 모범 사례 기준이 엄격하고 서드 파티 레벨의 애플리케이션의 구성 정보 확인시 검증 과정에서 유용하게 사용할 수 있을 것 같다.&lt;/p&gt;
+&lt;h3 id=&#34;vulnerabilities&#34;&gt;
+    &lt;a href=&#34;#vulnerabilities&#34; class=&#34;anchor&#34;&gt;
+        &lt;svg class=&#34;icon&#34; aria-hidden=&#34;true&#34; focusable=&#34;false&#34; height=&#34;16&#34; version=&#34;1.1&#34; viewBox=&#34;0 0 16 16&#34; width=&#34;16&#34;&gt;
+            &lt;path fill-rule=&#34;evenodd&#34;
+                d=&#34;M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z&#34;&gt;
+            &lt;/path&gt;
+        &lt;/svg&gt;
+    &lt;/a&gt;
+    &lt;strong&gt;Vulnerabilities&lt;/strong&gt;
+&lt;/h3&gt;
+&lt;p&gt;취약점 점검으로 배포 컨테이너들에 대해 취약점 점검을 진행한다. 취약점 점검은  &lt;a href=&#34;https://github.com/anchore/grype&#34;&gt;grype&lt;/a&gt; 엔진을 통해 진행되며 CVE(Common Vulnerabilities and Exposures, 미국 NSA, CISA에서 제공하는 보안 가이드라인) 식별자로 검사가 진행된다.&lt;/p&gt;
+&lt;p&gt;&lt;img loading=&#34;lazy&#34; 
+    src=&#34;https://HanHoRang31.github.io/./pkos-5-security/container.png&#34; 
+    alt=&#34;container.png&#34; 
+     
+    width=1544 
+    height=&#34;736&#34;  /&gt;&lt;/p&gt;
+&lt;p&gt;위와 마찬가지로 필자의 클러스터에서 CRITICAL한 레벨의 취약점을 살펴보겠다.&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;GHSA-r48q-9g5r-8q2h(CVE-2022-1996) : emicklei/go-restful의 버전 3.8.0 이전에서 발견된 취약점이다. 사용자가 제어할 수 있는 키를 통해 권한을 우회할 수 있는 보안 문제가 있다고 한다. 한 가지 의문은 kubescape 내 파드인 kollector 에서 발생하는 것인데, 깃허브 이슈와 커밋에도 없는 사항이라 &lt;a href=&#34;https://github.com/kubescape/kubescape/issues/1182&#34;&gt;깃허브 이슈&lt;/a&gt;로 등록했다.&lt;/p&gt;
+&lt;p&gt;&lt;img loading=&#34;lazy&#34; 
+    src=&#34;https://HanHoRang31.github.io/./pkos-5-security/Issue.png&#34; 
+    alt=&#34;Issue.png&#34; 
+     
+    width=907 
+    height=&#34;892&#34;  /&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;그 외에도 &lt;a href=&#34;https://github.com/kubernetes-sigs/metrics-server/issues/1062&#34;&gt;metrics-server&lt;/a&gt;, coredns 파드에서도 발생했으며 관련 깃 이슈를 공유한다. 대부분 해당 패키지 버전 업데이트로 피드백하며 업데이트하는 것 같다.&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id=&#34;rbac-visualizer&#34;&gt;
+    &lt;a href=&#34;#rbac-visualizer&#34; class=&#34;anchor&#34;&gt;
+        &lt;svg class=&#34;icon&#34; aria-hidden=&#34;true&#34; focusable=&#34;false&#34; height=&#34;16&#34; version=&#34;1.1&#34; viewBox=&#34;0 0 16 16&#34; width=&#34;16&#34;&gt;
+            &lt;path fill-rule=&#34;evenodd&#34;
+                d=&#34;M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z&#34;&gt;
+            &lt;/path&gt;
+        &lt;/svg&gt;
+    &lt;/a&gt;
+    &lt;strong&gt;RBAC Visualizer&lt;/strong&gt;
+&lt;/h3&gt;
+&lt;p&gt;쿠버네티스 role 에 부여된 오브젝트 접근 제어 권한에 대해 시각화 기능을 제공해준다. 운영적으로 매력적인 기능이다. 아래 그림처럼 쿠버네티스 ServiceAccount 별로 접근 제어 목록을 한 눈에 확인할 수 있어 불필요한 권한 및 접근 제어에 대해 검증이 가능할 것 같다.&lt;/p&gt;
+&lt;p&gt;&lt;img loading=&#34;lazy&#34; 
+    src=&#34;https://HanHoRang31.github.io/./pkos-5-security/Rbac2.png&#34; 
+    alt=&#34;Rbac2.png&#34; 
+     
+    width=1564 
+    height=&#34;825&#34;  /&gt;&lt;/p&gt;
+&lt;h3 id=&#34;repository-scanning&#34;&gt;
+    &lt;a href=&#34;#repository-scanning&#34; class=&#34;anchor&#34;&gt;
+        &lt;svg class=&#34;icon&#34; aria-hidden=&#34;true&#34; focusable=&#34;false&#34; height=&#34;16&#34; version=&#34;1.1&#34; viewBox=&#34;0 0 16 16&#34; width=&#34;16&#34;&gt;
+            &lt;path fill-rule=&#34;evenodd&#34;
+                d=&#34;M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z&#34;&gt;
+            &lt;/path&gt;
+        &lt;/svg&gt;
+    &lt;/a&gt;
+    &lt;strong&gt;Repository scanning&lt;/strong&gt;
+&lt;/h3&gt;
+&lt;p&gt;코드 관리 저장소인 깃허브, 깃랩 등의 레파지토리에 스캐닝 검사를 시켜준다.&lt;/p&gt;
+&lt;p&gt;레파지토리 등록은 &lt;a href=&#34;https://hub.armosec.io/docs/repository-scanning&#34;&gt;공식문서&lt;/a&gt;를 참고하자. 필자는 mac 환경에서 진행했다.&lt;/p&gt;
+&lt;p&gt;깃허브 토큰을 환경 변수로 등록하고, kubescape CLI 를 통해 취약점 검사 및 웹 대시보드로 정보를 전달한다.&lt;/p&gt;
 &lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
 &lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
 &lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code&gt;&lt;span class=&#34;lnt&#34;&gt;1
 &lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
 &lt;td class=&#34;lntd&#34;&gt;
-&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;helm uninstall nginx
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;nb&#34;&gt;export&lt;/span&gt; &lt;span class=&#34;nv&#34;&gt;GITHUB_TOKEN&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;=&lt;/span&gt;my-access-token
 &lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
 &lt;/div&gt;
-&lt;/div&gt;&lt;p&gt;아래 디렉토리를 확인하면 nginx 파드가 삭제되어 로그 디렉토리가 삭제된 것을 확인할 수 있다.&lt;/p&gt;
-&lt;p&gt;&lt;img loading=&#34;lazy&#34; 
-    src=&#34;https://HanHoRang31.github.io/./pkos-4-logging/nginx3.png&#34; 
-    alt=&#34;nginx3.png&#34; 
+&lt;/div&gt;&lt;p&gt;&lt;img loading=&#34;lazy&#34; 
+    src=&#34;https://HanHoRang31.github.io/./pkos-5-security/7d27ffc-image.png&#34; 
+    alt=&#34;7d27ffc-image.png&#34; 
      
-    width=2212 
-    height=&#34;534&#34;  /&gt;&lt;/p&gt;
+    width=1702 
+    height=&#34;1120&#34;  /&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Location 은 저장소 URL 이다.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;kubescape CLI 를 통해 검사하면 웹 대시보드에서 확인이 가능하다. 아래 화면은 필자의 &lt;a href=&#34;https://github.com/HanHoRang31/blog-share&#34;&gt;깃허브 레파지토리&lt;/a&gt;를 등록해서 검사하였다.&lt;/p&gt;
 &lt;p&gt;&lt;img loading=&#34;lazy&#34; 
-    src=&#34;https://HanHoRang31.github.io/./pkos-4-logging/nginx4.png&#34; 
-    alt=&#34;nginx4.png&#34; 
+    src=&#34;https://HanHoRang31.github.io/./pkos-5-security/repo2.png&#34; 
+    alt=&#34;repo2.png&#34; 
      
-    width=1794 
-    height=&#34;955&#34;  /&gt;&lt;/p&gt;
-&lt;p&gt;파드가 삭제되었지만 그라파나(로키) 에서 nginx 로그를 확인할 수 있다.&lt;/p&gt;
-&lt;h2 id=&#34;마치며&#34;&gt;
+    width=1556 
+    height=&#34;485&#34;  /&gt;&lt;/p&gt;
+&lt;p&gt;레파지토리의 코드와 헬름 차트의 value 값들에도 취약점 검사가 진행된다.&lt;/p&gt;
+&lt;p&gt;필자의 레파지토리의 경우 C-0009(&lt;strong&gt;&lt;strong&gt;Resource limits)&lt;/strong&gt;&lt;/strong&gt; 항목이 많아 확인해보니 resource limit 설정 문제였다. 테스트 환경에서 진행함으로 리소스 제한을 풀었지만 운영 환경에서 도입시 파드 구성 환경에 따라 설정해야겠다.&lt;/p&gt;
+&lt;h3 id=&#34;registry-scanning&#34;&gt;
+    &lt;a href=&#34;#registry-scanning&#34; class=&#34;anchor&#34;&gt;
+        &lt;svg class=&#34;icon&#34; aria-hidden=&#34;true&#34; focusable=&#34;false&#34; height=&#34;16&#34; version=&#34;1.1&#34; viewBox=&#34;0 0 16 16&#34; width=&#34;16&#34;&gt;
+            &lt;path fill-rule=&#34;evenodd&#34;
+                d=&#34;M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z&#34;&gt;
+            &lt;/path&gt;
+        &lt;/svg&gt;
+    &lt;/a&gt;
+    &lt;strong&gt;Registry Scanning&lt;/strong&gt;
+&lt;/h3&gt;
+&lt;p&gt;이미지 레파지토리에도 검사가 가능하다. 하버에서도 이미지 취약점 점검이 가능하는 것으로 알고 있는데 차이점을 확인해보겠다. 기능 확인을 위해 하버를 클러스터에 설치하여 스캐닝 기능을 테스트하였다. 등록시 스캐닝 주기와 태그 개수를 설정할 수 있다.&lt;/p&gt;
+&lt;p&gt;&lt;img loading=&#34;lazy&#34; 
+    src=&#34;https://HanHoRang31.github.io/./pkos-5-security/repo.png&#34; 
+    alt=&#34;repo.png&#34; 
+     
+    width=517 
+    height=&#34;664&#34;  /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img loading=&#34;lazy&#34; 
+    src=&#34;https://HanHoRang31.github.io/./pkos-5-security/repo_regi.png&#34; 
+    alt=&#34;repo_regi.png&#34; 
+     
+    width=520 
+    height=&#34;731&#34;  /&gt;&lt;/p&gt;
+&lt;p&gt;시간별로 이미지 레파지토리에 취약 점검이 가능하다. 마찬가지로  &lt;a href=&#34;https://github.com/anchore/grype&#34;&gt;grype&lt;/a&gt; 엔진을 통해 이미지 취약점 점검을 진행한다.&lt;/p&gt;
+&lt;h3 id=&#34;integrations&#34;&gt;
+    &lt;a href=&#34;#integrations&#34; class=&#34;anchor&#34;&gt;
+        &lt;svg class=&#34;icon&#34; aria-hidden=&#34;true&#34; focusable=&#34;false&#34; height=&#34;16&#34; version=&#34;1.1&#34; viewBox=&#34;0 0 16 16&#34; width=&#34;16&#34;&gt;
+            &lt;path fill-rule=&#34;evenodd&#34;
+                d=&#34;M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z&#34;&gt;
+            &lt;/path&gt;
+        &lt;/svg&gt;
+    &lt;/a&gt;
+    &lt;strong&gt;INTEGRATIONS&lt;/strong&gt;
+&lt;/h3&gt;
+&lt;p&gt;kubescape 툴은 Code, CI / CD 에도 활용이 가능하다.&lt;/p&gt;
+&lt;p&gt;&lt;img loading=&#34;lazy&#34; 
+    src=&#34;https://HanHoRang31.github.io/./pkos-5-security/ksfromcodetodeploy.png&#34; 
+    alt=&#34;&amp;lt;a href=&amp;#34;https://github.com/kubescape/kubescape&amp;#34;&amp;gt;https://github.com/kubescape/kubescape&amp;lt;/a&amp;gt;&#34; 
+     
+    width=5000 
+    height=&#34;2625&#34;  /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;a href=&#34;https://github.com/kubescape/kubescape&#34;&gt;https://github.com/kubescape/kubescape&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;공식문서를 확인하니 jenkins, gitlab CI / CD 에서도 job 스케쥴링으로 취약점 점검이 가능하다. CI / CD 파이프라인 구축 이후 고려해보도록 하자.&lt;/p&gt;
+&lt;p&gt;3rd party 애플리케이션 연동을 통해 알람 구성도 쉽게 가능하다. 슬랙에서도 알람 설정이 쉽게 가능한데, 스캐닝과 점검 레벨에 따라 알람 설정이 가능하다.&lt;/p&gt;
+&lt;p&gt;&lt;img loading=&#34;lazy&#34; 
+    src=&#34;https://HanHoRang31.github.io/./pkos-5-security/noti.png&#34; 
+    alt=&#34;noti.png&#34; 
+     
+    width=1069 
+    height=&#34;847&#34;  /&gt;&lt;/p&gt;
+&lt;h1 id=&#34;마치며&#34;&gt;
     &lt;a href=&#34;#%eb%a7%88%ec%b9%98%eb%a9%b0&#34; class=&#34;anchor&#34;&gt;
         &lt;svg class=&#34;icon&#34; aria-hidden=&#34;true&#34; focusable=&#34;false&#34; height=&#34;16&#34; version=&#34;1.1&#34; viewBox=&#34;0 0 16 16&#34; width=&#34;16&#34;&gt;
             &lt;path fill-rule=&#34;evenodd&#34;
@@ -489,14 +439,14 @@
         &lt;/svg&gt;
     &lt;/a&gt;
     마치며
-&lt;/h2&gt;
-&lt;p&gt;그라파나 공식 문서를 참고하니 엔터프라이즈에 대한 지원만 활발한 느낌이다. 오픈소스로 설치시 연동 부분과 최신 버전 호환 문제로 테스트하는 데도 오랜 시간이 걸렸다. 특히 인덱스 데이터를 dynamodb 에 연동해야 했지만 설정 문제로 실패했고 S3에 인덱스, 청크 데이터를 저장시켰다. 이 부분은 공식 문서를 최신 버전으로 업데이트를 하거나 예가 나오면 업데이트하겠다.&lt;/p&gt;
+&lt;/h1&gt;
+&lt;p&gt;이번 블로그 글에서는 쿠버네티스 보안 계층과 보안 툴인 kubescape를 살펴보았다. 개인적으로 쿠버네티스의 보안 생태계를 경험하여 역량 향상에 도움이 되었다. 필자가 생각하기에 kubescape 툴은 미국 가이드라인의 사례나 취약점 점검과  &lt;a href=&#34;https://github.com/anchore/grype&#34;&gt;grype&lt;/a&gt; 엔진을 통합해서 평가해주는 operator 툴 느낌이 강했다. 비즈니스 모델에 따라 달라지겠지만 비슷한 operator 툴을 대안으로 찾으면 좋을 것 같다.&lt;/p&gt;
 
     </description>
     </item>
     
     <item>
-    <title>PKOS 2기 4주차 - 쿠버네티스 모니터링(Kubernetes Monitoring)</title>
+    <title>[PKOS] 고가용성 모니터링 시스템 구축하기</title>
     <link>https://HanHoRang31.github.io/post/pkos2-4-monitoring/</link>
     <pubDate>Sat, 01 Apr 2023 00:00:00 +0000</pubDate>
     <author>HanHoRnag</author>
@@ -1294,7 +1244,496 @@
     </item>
     
     <item>
-    <title>PKOS 2기 3주차 - GitOps</title>
+    <title>[PKOS] 로깅 PLG 스택 - 최신 버전(Loki v2.8.0) 배포하기</title>
+    <link>https://HanHoRang31.github.io/post/pkos2-4-logging/</link>
+    <pubDate>Sat, 01 Apr 2023 00:00:00 +0000</pubDate>
+    <author>HanHoRnag</author>
+    <guid>https://HanHoRang31.github.io/post/pkos2-4-logging/</guid>
+    <description>
+        &lt;h1 id=&#34;로깅-loki--promtail-&#34;&gt;
+    &lt;a href=&#34;#%eb%a1%9c%ea%b9%85-loki--promtail-&#34; class=&#34;anchor&#34;&gt;
+        &lt;svg class=&#34;icon&#34; aria-hidden=&#34;true&#34; focusable=&#34;false&#34; height=&#34;16&#34; version=&#34;1.1&#34; viewBox=&#34;0 0 16 16&#34; width=&#34;16&#34;&gt;
+            &lt;path fill-rule=&#34;evenodd&#34;
+                d=&#34;M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z&#34;&gt;
+            &lt;/path&gt;
+        &lt;/svg&gt;
+    &lt;/a&gt;
+    로깅 (Loki &amp;amp; Promtail )
+&lt;/h1&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
+&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code&gt;&lt;span class=&#34;lnt&#34;&gt;1
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;2
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-markdown&#34; data-lang=&#34;markdown&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;Production Kubernetes Online Study (=PKOS)는 쿠버네티스 실무 실습 스터디입니다.
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;CloudNet@ Gasida(가시다)이 진행하며, 책 &amp;#34;24단계 실습으로 정복하는 쿠버네티스&amp;#34;을 기반으로 진행하고 있습니다.
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;h2 id=&#34;logging&#34;&gt;
+    &lt;a href=&#34;#logging&#34; class=&#34;anchor&#34;&gt;
+        &lt;svg class=&#34;icon&#34; aria-hidden=&#34;true&#34; focusable=&#34;false&#34; height=&#34;16&#34; version=&#34;1.1&#34; viewBox=&#34;0 0 16 16&#34; width=&#34;16&#34;&gt;
+            &lt;path fill-rule=&#34;evenodd&#34;
+                d=&#34;M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z&#34;&gt;
+            &lt;/path&gt;
+        &lt;/svg&gt;
+    &lt;/a&gt;
+    Logging?
+&lt;/h2&gt;
+&lt;p&gt;애플리케이션 실행 중 발생하는 이벤트, 작업, 오류 등의 정보를 기록하는 프로세스이다. 로깅의 주요 목적은 프로그램의 실행 상태를 추적하고, 문제 발생 시 원인을 찾기고, 내부 감사를 기록하기 위함이다. 로그 파일은 시간 순서대로 저장되며, 대부분의 경우 텍스트 파일 또는 데이터베이스에 저장된다.&lt;/p&gt;
+&lt;p&gt;&lt;a href=&#34;https://kubernetes.io/ko/docs/concepts/cluster-administration/logging/&#34;&gt;컨테이너화된 애플리케이션에 가장 쉽고 가장 널리 사용되는 로깅 방법&lt;/a&gt;은 표준 출력(stdout)과 표준 에러(stderr) 스트림에 작성하는 것이다. 이를 이용하면 로깅 명령어를 통해 조회가 가능하다.&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
+&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code&gt;&lt;span class=&#34;lnt&#34;&gt;1
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;2
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;3
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;4
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;5
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;6
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;c1&#34;&gt;# 로그 확인 예 &lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;kubectl logs  metrics-server-5f65d889cd-znqw5 -n kube-system
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;I0328 00:14:31.072509       &lt;span class=&#34;m&#34;&gt;1&lt;/span&gt; serving.go:342&lt;span class=&#34;o&#34;&gt;]&lt;/span&gt; Generated self-signed cert &lt;span class=&#34;o&#34;&gt;(&lt;/span&gt;/tmp/apiserver.crt, /tmp/apiserver.key&lt;span class=&#34;o&#34;&gt;)&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;I0328 00:14:31.477085       &lt;span class=&#34;m&#34;&gt;1&lt;/span&gt; requestheader_controller.go:169&lt;span class=&#34;o&#34;&gt;]&lt;/span&gt; Starting RequestHeaderAuthRequestController
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;..
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;p&gt;&lt;strong&gt;쿠버네티스 환경에서도 컨테이너 엔진이나 런타임이 제공하는 기본적인 로깅 기능이 있으나 충분하지 않다.&lt;/strong&gt; 컨테이너가 크래시되거나, 파드가 축출되거나, 노드가 종료된 경우에도 애플리케이션의 로그에 접근할 수 없기 때문이다.&lt;/p&gt;
+&lt;p&gt;따라서, 쿠버네티스에서 로그는 노드, 파드 또는 컨테이너와는 독립적으로 별도의 스토리지와 라이프사이클을 가져야 한다. 이 개념을 &lt;em&gt;&lt;a href=&#34;https://kubernetes.io/ko/docs/concepts/cluster-administration/logging/&#34;&gt;클러스터-레벨-로깅&lt;/a&gt;&lt;/em&gt; 이라 하며  이를 위해 별도의 벡엔드 솔루션이 필요하다. 쿠버네티스에 사용할 수 있는 로깅 솔루션은 3가가지 오픈소스 프로젝트를 결합한 PLG 스택(Promtail, Loki, Grafana) 또는 ELK(Elasticsearch, Logstash, Kibana)있다.  이번 블로그 글에서는 PLG 스택을 알아볼 것이며 로깅 시스템인 Loki 와 로그 수집 에이전트인 Promtail 을 설치하하여 클러스터-레벨-로깅을 테스트해보겠다.&lt;/p&gt;
+&lt;h2 id=&#34;loki&#34;&gt;
+    &lt;a href=&#34;#loki&#34; class=&#34;anchor&#34;&gt;
+        &lt;svg class=&#34;icon&#34; aria-hidden=&#34;true&#34; focusable=&#34;false&#34; height=&#34;16&#34; version=&#34;1.1&#34; viewBox=&#34;0 0 16 16&#34; width=&#34;16&#34;&gt;
+            &lt;path fill-rule=&#34;evenodd&#34;
+                d=&#34;M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z&#34;&gt;
+            &lt;/path&gt;
+        &lt;/svg&gt;
+    &lt;/a&gt;
+    Loki
+&lt;/h2&gt;
+&lt;p&gt;Loki는 Grafana Labs에서 개발한 경량 로깅 시스템으로, 쿠버네티스 환경에서 메타데이터를 기반으로 로그를 수집하고 빠르게 처리할 수 있다. 그리고 Prometheus와 호환되는 레이블 기반 질의 및 필터링 기능을 제공하며, Grafana와 통합을 통해 로깅 데이터를 대시보드에서 확인이 가능하다. 로깅 수집 에이전트인 Promtail을 사용하여 로깅을 수집하며 이를 통해 쿠버네티스 리소스(노드, 파드 또는 컨테이너)와는 독립적으로 별도의 스토리지와 라이프사이클을 가진다.&lt;/p&gt;
+&lt;p&gt;&lt;img loading=&#34;lazy&#34; 
+    src=&#34;https://HanHoRang31.github.io/./pkos-4-logging/loki2.png&#34; 
+    alt=&#34;&amp;lt;a href=&amp;#34;https://grafana.com/blog/2018/12/12/loki-prometheus-inspired-open-source-logging-for-cloud-natives/&amp;#34;&amp;gt;https://grafana.com/blog/2018/12/12/loki-prometheus-inspired-open-source-logging-for-cloud-natives/&amp;lt;/a&amp;gt;&#34; 
+     
+    width=1415 
+    height=&#34;601&#34;  /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;a href=&#34;https://grafana.com/blog/2018/12/12/loki-prometheus-inspired-open-source-logging-for-cloud-natives/&#34;&gt;https://grafana.com/blog/2018/12/12/loki-prometheus-inspired-open-source-logging-for-cloud-natives/&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;메타데이터 인덱싱?&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img loading=&#34;lazy&#34; 
+    src=&#34;https://HanHoRang31.github.io/./pkos-4-logging/loki3.png&#34; 
+    alt=&#34;&amp;lt;a href=&amp;#34;https://grafana.com/oss/loki/&amp;#34;&amp;gt;https://grafana.com/oss/loki/&amp;lt;/a&amp;gt;&#34; 
+     
+    width=1001 
+    height=&#34;546&#34;  /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;a href=&#34;https://grafana.com/oss/loki/&#34;&gt;https://grafana.com/oss/loki/&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;로키는 메타데이터를 인덱싱을 통해 경량화 및 빠른 쿼리 성능을 가진다. 메타인덱싱 원리는 위의 그림과 같은데 로그 전체 텍스트를 저장하는 것이 아니라 타임스탬프와 라벨을 묶어 인덱스(index) 로 그 외 나머지 텍스트를 청크(chunk)로 나눠 저장된다.&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;인덱스&lt;/strong&gt;: 로그 시간과 레이블을 묶어 해싱을 통해 고유한 식별자를 만든다. 이 식별자를 통해 로그 스트림을 참조하고 검색하는데 사용된다. 인덱스는 일반적으로 NoSQL DB에 저장하는데 Key 값에는 인덱스를  values 값에는 해당 청크의 데이터를 저장한다.&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;청크&lt;/strong&gt;: 청크는 실제 로그 데이터이다.  청크는 데이터를 압축 및 저장하기 위해 여러 압축 알고리즘을 사용할 수 있으며, 기본적으로 압축이 적용되어 저장 공간을 최적화합니다. 일반적으로 오브젝트 스토리지에 저장한다.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id=&#34;아키텍처&#34;&gt;
+    &lt;a href=&#34;#%ec%95%84%ed%82%a4%ed%85%8d%ec%b2%98&#34; class=&#34;anchor&#34;&gt;
+        &lt;svg class=&#34;icon&#34; aria-hidden=&#34;true&#34; focusable=&#34;false&#34; height=&#34;16&#34; version=&#34;1.1&#34; viewBox=&#34;0 0 16 16&#34; width=&#34;16&#34;&gt;
+            &lt;path fill-rule=&#34;evenodd&#34;
+                d=&#34;M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z&#34;&gt;
+            &lt;/path&gt;
+        &lt;/svg&gt;
+    &lt;/a&gt;
+    아키텍처
+&lt;/h3&gt;
+&lt;p&gt;&lt;img loading=&#34;lazy&#34; 
+    src=&#34;https://HanHoRang31.github.io/./pkos-4-logging/loki.png&#34; 
+    alt=&#34;&amp;lt;a href=&amp;#34;https://grafana.com/blog/2018/12/12/loki-prometheus-inspired-open-source-logging-for-cloud-natives/&amp;#34;&amp;gt;https://grafana.com/blog/2018/12/12/loki-prometheus-inspired-open-source-logging-for-cloud-natives/&amp;lt;/a&amp;gt;&#34; 
+     
+    width=1289 
+    height=&#34;693&#34;  /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;a href=&#34;https://grafana.com/blog/2018/12/12/loki-prometheus-inspired-open-source-logging-for-cloud-natives/&#34;&gt;https://grafana.com/blog/2018/12/12/loki-prometheus-inspired-open-source-logging-for-cloud-natives/&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;그림에서 화살표 빨강은 로그 Write, 파랑은 Read를 의미한다. 또한, 각 구성 컴포넌트들은 HA를 지원하여 컴포넌트 내부 구성 하나에 장애가 발생하더라도 서비스가 중단되지 않는다.&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Your Jobs : 로그 수집 에이전트로 사용자 정의에 맞게 로그를 수집하여 로키 서버(Distributor)에 전달한다. 로그 수집 에이전트로 Promtail를 사용하나 fluent, fluentbit 과 호환이 가능하다.&lt;/li&gt;
+&lt;li&gt;Distributor(디스트리뷰터): Distributor는 로그 데이터를 수신하고, 해당 데이터를 인제스터(Ingester)에 분산시키는 역할을 한다. 또한, 레이블의 해시 값을 사용하여 데이터를 적절한 인제스터에 전달하며 로드밸런싱을 통해 로그 데이터를 여러 인제스터에 고르게 분산시켜준다.&lt;/li&gt;
+&lt;li&gt;Ingester(인제스터): Ingester는 Distributor로부터 로그 데이터를 받아서, 로그 스트림을 청크로 나누고 압축한 후 저장시킨다. 인제스터는 메모리 또는 영구 스토리지에 청크를 저장할 수 있으며, 쿼리어(Querier)에게 저장된 청크에 대한 질의 결과를 제공한다. 청크가 일정 시간 또는 크기에 도달하면 인제스터는 이를 영구 스토리지에 저장시킨다.&lt;/li&gt;
+&lt;li&gt;Querier(쿼리어): Querier는 사용자로부터 질의를 받아 처리한다. 질의를 처리할 때, 쿼리어는 인덱스를 사용하여 관련된 청크를 찾고, 인제스터 및 영구 스토리지에서 해당 청크를 가져와 질의 결과를 반환한다.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;loki 버전 3.0 이상부터는 loki, loki-distributed가 통합되었다.&lt;/p&gt;
+&lt;p&gt;&lt;img loading=&#34;lazy&#34; 
+    src=&#34;https://HanHoRang31.github.io/./pkos-4-logging/simple-scalable-test-environment.png&#34; 
+    alt=&#34;&amp;lt;a href=&amp;#34;https://grafana.com/docs/loki/latest/getting-started/&amp;#34;&amp;gt;https://grafana.com/docs/loki/latest/getting-started/&amp;lt;/a&amp;gt;&#34; 
+     
+    width=979 
+    height=&#34;721&#34;  /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;a href=&#34;https://grafana.com/docs/loki/latest/getting-started/&#34;&gt;https://grafana.com/docs/loki/latest/getting-started/&lt;/a&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Loki Write component : 로그 데이터를 수신하고 저장시켜주는 컴포넌트이다. 앞서 아키텍처의 빨간 flow를 담당하는 Distributor와 Ingester 로 구성되어 있다.&lt;/li&gt;
+&lt;li&gt;Loki Read component:  로그 데이터를 조회하고 처리하는데 사용된다. 앞서 아키텍처의 파랑 flow를 담당하는 Querier와 Query Frontend 로 구성되어 있다.&lt;/li&gt;
+&lt;li&gt;gateway :  Loki 구성요소에 대한 프록시 서버이다. 로그를 까보면 NGINX 게이트웨이가 설치되며 로드밸런싱 기능을 수행하여 각 컴포넌트에 트래픽을 분산시킨다.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id=&#34;설치&#34;&gt;
+    &lt;a href=&#34;#%ec%84%a4%ec%b9%98&#34; class=&#34;anchor&#34;&gt;
+        &lt;svg class=&#34;icon&#34; aria-hidden=&#34;true&#34; focusable=&#34;false&#34; height=&#34;16&#34; version=&#34;1.1&#34; viewBox=&#34;0 0 16 16&#34; width=&#34;16&#34;&gt;
+            &lt;path fill-rule=&#34;evenodd&#34;
+                d=&#34;M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z&#34;&gt;
+            &lt;/path&gt;
+        &lt;/svg&gt;
+    &lt;/a&gt;
+    설치
+&lt;/h2&gt;
+&lt;blockquote&gt;
+&lt;p&gt;설치 환경 : kops 클러스터 (k8s 1.24), AWS Ubuntu 인스턴스&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;설치는 다음과 같이 진행할 예정이다.&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Loki (helm grafana/loki 4.8.0)&lt;/li&gt;
+&lt;li&gt;Promtail (helm grafana/promtail 6.9.2)&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;사족이지만, 로그 저장소로 mongoDB를 활용하려 했으나 안 된다!
+로키 호환 저장소가 정해져있기 때문이다. 온프로미스에서 구성시 참고하자.&lt;/p&gt;
+&lt;p&gt;본 블로그에서는 S3에 오브젝트 데이터를 &lt;del&gt;DynamoDB에 인덱스 데이터&lt;/del&gt;를 저장시키겠다. (230402. DynamoDB 인덱스 연동문제로 S3에 인덱스, 오브젝트 데이터 저장)&lt;/p&gt;
+&lt;p&gt;&lt;img loading=&#34;lazy&#34; 
+    src=&#34;https://HanHoRang31.github.io/./pkos-4-logging/loki4.png&#34; 
+    alt=&#34;&amp;lt;a href=&amp;#34;https://grafana.com/docs/loki/latest/operations/storage/&amp;#34;&amp;gt;https://grafana.com/docs/loki/latest/operations/storage/&amp;lt;/a&amp;gt;&#34; 
+     
+    width=822 
+    height=&#34;592&#34;  /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;a href=&#34;https://grafana.com/docs/loki/latest/operations/storage/&#34;&gt;https://grafana.com/docs/loki/latest/operations/storage/&lt;/a&gt;&lt;/p&gt;
+&lt;h3 id=&#34;loki-설치&#34;&gt;
+    &lt;a href=&#34;#loki-%ec%84%a4%ec%b9%98&#34; class=&#34;anchor&#34;&gt;
+        &lt;svg class=&#34;icon&#34; aria-hidden=&#34;true&#34; focusable=&#34;false&#34; height=&#34;16&#34; version=&#34;1.1&#34; viewBox=&#34;0 0 16 16&#34; width=&#34;16&#34;&gt;
+            &lt;path fill-rule=&#34;evenodd&#34;
+                d=&#34;M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z&#34;&gt;
+            &lt;/path&gt;
+        &lt;/svg&gt;
+    &lt;/a&gt;
+    Loki 설치
+&lt;/h3&gt;
+&lt;p&gt;Loki 저장소로 S3 와 DyanmoDB 스토리지 생성과  IAM role 권한 연결이 필요하다. 본 테스트에서는 S3 이름을 &lt;code&gt;han-loki&lt;/code&gt; , DyanmoDB 이름은 &lt;code&gt;loki_&lt;/code&gt; 로 생성하였다. &lt;del&gt;DynamoDB 사용시 주의해야할 점은 다음과 같다.&lt;/del&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;del&gt;DynamoDB 테이블 이름을 헬름 차트의 schema_config.config&lt;/del&gt;&lt;/li&gt;
+&lt;li&gt;&lt;del&gt;DynamoDB 파티션 키 &amp;amp; 정렬 키를 (문자열, 바이너리)로 지정해야 한다.&lt;/del&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;IAM 권한은 S3, DyanmoDB에 대한 정책을 부여했다.&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;AmazonS3FullAccess&lt;/li&gt;
+&lt;li&gt;AmazonDynamoDBFullAccess&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;필자는 사용자에 IAM 권한를 부여 후 access-key 와 secret-key를 가져왔다. 해당 키는 밑의 헬름 차트 버킷 연동에서 사용된다. 우선 헬름을 통해 로키 차트를 가져오겠다.&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
+&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code&gt;&lt;span class=&#34;lnt&#34;&gt;1
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;2
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;3
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;4
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;kubectl create ns loki
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;helm repo add grafana https://grafana.github.io/helm-charts
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;helm repo update
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;helm fetch grafana/loki --untar --version 4.8.0
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
+&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code&gt;&lt;span class=&#34;lnt&#34;&gt; 1
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 2
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 3
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 4
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 5
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 6
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 7
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 8
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 9
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;10
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;11
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;12
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;13
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;14
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;15
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;16
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;17
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;18
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;19
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;20
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;21
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;22
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;23
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;24
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;25
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;26
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;27
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;28
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;29
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;30
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;31
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;32
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;33
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;34
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;35
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;36
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;37
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;38
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;39
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;40
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;41
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;42
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;43
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;44
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;45
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;46
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;47
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;48
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;49
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;50
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;51
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;52
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;53
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;54
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;55
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;56
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;57
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;58
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-yaml&#34; data-lang=&#34;yaml&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;c&#34;&gt;#values-loki.yaml &lt;/span&gt;&lt;span class=&#34;w&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;w&#34;&gt;&lt;/span&gt;&lt;span class=&#34;nt&#34;&gt;schema_config&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;w&#34;&gt;  &lt;/span&gt;&lt;span class=&#34;nt&#34;&gt;configs&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;w&#34;&gt;  &lt;/span&gt;- &lt;span class=&#34;nt&#34;&gt;from&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt;&lt;span class=&#34;w&#34;&gt; &lt;/span&gt;&lt;span class=&#34;ld&#34;&gt;2020-05-15&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;w&#34;&gt;    &lt;/span&gt;&lt;span class=&#34;nt&#34;&gt;store&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt;&lt;span class=&#34;w&#34;&gt; &lt;/span&gt;&lt;span class=&#34;l&#34;&gt;aws&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;w&#34;&gt;    &lt;/span&gt;&lt;span class=&#34;nt&#34;&gt;object_store&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt;&lt;span class=&#34;w&#34;&gt; &lt;/span&gt;&lt;span class=&#34;l&#34;&gt;s3&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;w&#34;&gt;    &lt;/span&gt;&lt;span class=&#34;nt&#34;&gt;schema&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt;&lt;span class=&#34;w&#34;&gt; &lt;/span&gt;&lt;span class=&#34;l&#34;&gt;v11&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;w&#34;&gt;    &lt;/span&gt;&lt;span class=&#34;nt&#34;&gt;index&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;w&#34;&gt;      &lt;/span&gt;&lt;span class=&#34;nt&#34;&gt;prefix&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt;&lt;span class=&#34;w&#34;&gt; &lt;/span&gt;&lt;span class=&#34;l&#34;&gt;loki&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;w&#34;&gt;      &lt;/span&gt;&lt;span class=&#34;nt&#34;&gt;period&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt;&lt;span class=&#34;w&#34;&gt; &lt;/span&gt;&lt;span class=&#34;m&#34;&gt;0&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;w&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;w&#34;&gt;&lt;/span&gt;&lt;span class=&#34;nt&#34;&gt;storage_config&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;w&#34;&gt;  &lt;/span&gt;&lt;span class=&#34;nt&#34;&gt;aws&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;w&#34;&gt;    &lt;/span&gt;&lt;span class=&#34;nt&#34;&gt;s3&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt;&lt;span class=&#34;w&#34;&gt; &lt;/span&gt;&lt;span class=&#34;l&#34;&gt;s3://ap-northeast-2/han-loki&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;w&#34;&gt;    &lt;/span&gt;&lt;span class=&#34;nt&#34;&gt;dynamodb&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;w&#34;&gt;      &lt;/span&gt;&lt;span class=&#34;nt&#34;&gt;dynamodb_url&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt;&lt;span class=&#34;w&#34;&gt; &lt;/span&gt;&lt;span class=&#34;l&#34;&gt;dynamodb://ap-northeast-2&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;w&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;w&#34;&gt;&lt;/span&gt;&lt;span class=&#34;nt&#34;&gt;table_manager&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;w&#34;&gt;  &lt;/span&gt;&lt;span class=&#34;nt&#34;&gt;retention_deletes_enabled&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt;&lt;span class=&#34;w&#34;&gt; &lt;/span&gt;&lt;span class=&#34;kc&#34;&gt;true&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;w&#34;&gt;  &lt;/span&gt;&lt;span class=&#34;nt&#34;&gt;retention_period&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt;&lt;span class=&#34;w&#34;&gt; &lt;/span&gt;&lt;span class=&#34;l&#34;&gt;336h&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;w&#34;&gt;  &lt;/span&gt;&lt;span class=&#34;nt&#34;&gt;index_tables_provisioning&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;w&#34;&gt;    &lt;/span&gt;&lt;span class=&#34;nt&#34;&gt;write_scale&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;w&#34;&gt;      &lt;/span&gt;&lt;span class=&#34;nt&#34;&gt;enabled&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt;&lt;span class=&#34;w&#34;&gt; &lt;/span&gt;&lt;span class=&#34;kc&#34;&gt;false&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;w&#34;&gt;    &lt;/span&gt;&lt;span class=&#34;nt&#34;&gt;read_scale&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;w&#34;&gt;      &lt;/span&gt;&lt;span class=&#34;nt&#34;&gt;enabled&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt;&lt;span class=&#34;w&#34;&gt; &lt;/span&gt;&lt;span class=&#34;kc&#34;&gt;false&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;w&#34;&gt;  &lt;/span&gt;&lt;span class=&#34;nt&#34;&gt;chunk_tables_provisioning&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;w&#34;&gt;    &lt;/span&gt;&lt;span class=&#34;nt&#34;&gt;write_scale&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;w&#34;&gt;      &lt;/span&gt;&lt;span class=&#34;nt&#34;&gt;enabled&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt;&lt;span class=&#34;w&#34;&gt; &lt;/span&gt;&lt;span class=&#34;kc&#34;&gt;false&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;w&#34;&gt;    &lt;/span&gt;&lt;span class=&#34;nt&#34;&gt;read_scale&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;w&#34;&gt;      &lt;/span&gt;&lt;span class=&#34;nt&#34;&gt;enabled&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt;&lt;span class=&#34;w&#34;&gt; &lt;/span&gt;&lt;span class=&#34;kc&#34;&gt;false&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;w&#34;&gt;  &lt;/span&gt;&lt;span class=&#34;nt&#34;&gt;table_prefix&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt;&lt;span class=&#34;w&#34;&gt; &lt;/span&gt;&lt;span class=&#34;s2&#34;&gt;&amp;#34;loki&amp;#34;&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;w&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;w&#34;&gt;&lt;/span&gt;&lt;span class=&#34;nt&#34;&gt;tableManager&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;w&#34;&gt;  &lt;/span&gt;&lt;span class=&#34;nt&#34;&gt;enabled&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt;&lt;span class=&#34;w&#34;&gt; &lt;/span&gt;&lt;span class=&#34;kc&#34;&gt;true&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;w&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;w&#34;&gt;&lt;/span&gt;&lt;span class=&#34;nt&#34;&gt;monitoring&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;w&#34;&gt;  &lt;/span&gt;&lt;span class=&#34;nt&#34;&gt;lokiCanary&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;w&#34;&gt;    &lt;/span&gt;&lt;span class=&#34;nt&#34;&gt;enabled&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt;&lt;span class=&#34;w&#34;&gt; &lt;/span&gt;&lt;span class=&#34;kc&#34;&gt;true&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;w&#34;&gt;  &lt;/span&gt;&lt;span class=&#34;nt&#34;&gt;selfMonitoring&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;w&#34;&gt;    &lt;/span&gt;&lt;span class=&#34;nt&#34;&gt;enabled&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt;&lt;span class=&#34;w&#34;&gt; &lt;/span&gt;&lt;span class=&#34;kc&#34;&gt;false&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;w&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;w&#34;&gt;&lt;/span&gt;&lt;span class=&#34;nt&#34;&gt;loki&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt;&lt;span class=&#34;w&#34;&gt; 
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;w&#34;&gt;  &lt;/span&gt;&lt;span class=&#34;nt&#34;&gt;auth_enabled&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt;&lt;span class=&#34;w&#34;&gt; &lt;/span&gt;&lt;span class=&#34;kc&#34;&gt;false&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;w&#34;&gt;  &lt;/span&gt;&lt;span class=&#34;nt&#34;&gt;storage&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;w&#34;&gt;    &lt;/span&gt;&lt;span class=&#34;nt&#34;&gt;bucketNames&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;w&#34;&gt;      &lt;/span&gt;&lt;span class=&#34;nt&#34;&gt;chunks&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt;&lt;span class=&#34;w&#34;&gt; &lt;/span&gt;&lt;span class=&#34;l&#34;&gt;han-loki&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;w&#34;&gt;      &lt;/span&gt;&lt;span class=&#34;nt&#34;&gt;ruler&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt;&lt;span class=&#34;w&#34;&gt; &lt;/span&gt;&lt;span class=&#34;l&#34;&gt;han-loki&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;w&#34;&gt;      &lt;/span&gt;&lt;span class=&#34;nt&#34;&gt;admin&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt;&lt;span class=&#34;w&#34;&gt; &lt;/span&gt;&lt;span class=&#34;l&#34;&gt;han-loki&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;w&#34;&gt;    &lt;/span&gt;&lt;span class=&#34;nt&#34;&gt;type&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt;&lt;span class=&#34;w&#34;&gt; &lt;/span&gt;&lt;span class=&#34;l&#34;&gt;s3&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;w&#34;&gt;    &lt;/span&gt;&lt;span class=&#34;nt&#34;&gt;s3&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;w&#34;&gt;      &lt;/span&gt;&lt;span class=&#34;nt&#34;&gt;s3&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt;&lt;span class=&#34;w&#34;&gt; &lt;/span&gt;&lt;span class=&#34;l&#34;&gt;han-loki&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;w&#34;&gt;      &lt;/span&gt;&lt;span class=&#34;nt&#34;&gt;endpoint&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt;&lt;span class=&#34;w&#34;&gt; &lt;/span&gt;&lt;span class=&#34;l&#34;&gt;s3.ap-northeast-2.amazonaws.com&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;w&#34;&gt;      &lt;/span&gt;&lt;span class=&#34;nt&#34;&gt;region&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt;&lt;span class=&#34;w&#34;&gt; &lt;/span&gt;&lt;span class=&#34;l&#34;&gt;ap-northeast-2&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;w&#34;&gt;      &lt;/span&gt;&lt;span class=&#34;nt&#34;&gt;secretAccessKey&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt;&lt;span class=&#34;w&#34;&gt; &lt;/span&gt;{&lt;span class=&#34;l&#34;&gt;SECRET KEY} &lt;/span&gt;&lt;span class=&#34;w&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;w&#34;&gt;      &lt;/span&gt;&lt;span class=&#34;nt&#34;&gt;accessKeyId&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt;&lt;span class=&#34;w&#34;&gt; &lt;/span&gt;{&lt;span class=&#34;l&#34;&gt;ACCESS KEY} &lt;/span&gt;&lt;span class=&#34;w&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;w&#34;&gt;      &lt;/span&gt;&lt;span class=&#34;nt&#34;&gt;s3ForcePathStyle&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt;&lt;span class=&#34;w&#34;&gt; &lt;/span&gt;&lt;span class=&#34;kc&#34;&gt;false&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;w&#34;&gt;      &lt;/span&gt;&lt;span class=&#34;nt&#34;&gt;insecure&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt;&lt;span class=&#34;w&#34;&gt; &lt;/span&gt;&lt;span class=&#34;kc&#34;&gt;false&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;w&#34;&gt;      &lt;/span&gt;&lt;span class=&#34;nt&#34;&gt;http_config&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt;&lt;span class=&#34;w&#34;&gt; &lt;/span&gt;{}&lt;span class=&#34;w&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;ul&gt;
+&lt;li&gt;access_key 와 Secret_access_key 노출에 주의하자!&lt;/li&gt;
+&lt;li&gt;schema_config : 인덱스와 청크 데이터에 대한 저장 스키마를 정의한다.&lt;/li&gt;
+&lt;li&gt;storage_config: 데이터 저장할 스토리지 정보를 입력한다.&lt;/li&gt;
+&lt;li&gt;table_manager, tableManager : 테이블 기반 데이터 저장소에 인덱스 및 청크를 지원하는데 버전 호환 문제로 작동이 안되어 dynamodb 에 인덱스가 저장이 안된다. (현재 S3에 저장됨)&lt;/li&gt;
+&lt;li&gt;monitoring.lokicanary: 시스템 검증에 사용된다. true 설정시 별도의 카나리 파드가 생성되어 일정시간마다 테스트 로그를 전달한다.&lt;/li&gt;
+&lt;li&gt;monitoring.selfMonitoring : 대시보드에 Loki 관련 대시보드가 업로드된다하지만,&lt;/li&gt;
+&lt;li&gt;loki: 로키 서버 설정을 정의한다. 최신 버전에는 스토리지 연동을 여기서 하는데 dynamodb에 대한 설정 예시가 없고 테스트가 안되서 s3 만 정의하였다.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
+&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code&gt;&lt;span class=&#34;lnt&#34;&gt;1
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;helm install loki grafana/loki -f values-loki.yaml -n loki --version 4.8.0
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;p&gt;파드 배포는 완료되었으나, 로키 스토리지 연동으로 &lt;strong&gt;안정화 작업&lt;/strong&gt;이 필요하다.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;안정화 작업&lt;/strong&gt;는 다음과 같다.&lt;/p&gt;
+&lt;p&gt;storage_config 스토리지 연동 문제&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
+&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code&gt;&lt;span class=&#34;lnt&#34;&gt;1
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;2
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;nv&#34;&gt;level&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;=&lt;/span&gt;error &lt;span class=&#34;nv&#34;&gt;ts&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;=&lt;/span&gt;2023-04-01T03:18:30.427197283Z &lt;span class=&#34;nv&#34;&gt;caller&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;=&lt;/span&gt;flush.go:144 &lt;span class=&#34;nv&#34;&gt;org_id&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;=&lt;/span&gt;self-monitoring &lt;span class=&#34;nv&#34;&gt;msg&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;=&lt;/span&gt;&lt;span class=&#34;s2&#34;&gt;&amp;#34;failed to flush&amp;#34;&lt;/span&gt; &lt;span class=&#34;nv&#34;&gt;err&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;=&lt;/span&gt;&lt;span class=&#34;s2&#34;&gt;&amp;#34;failed to flush chunks: store put chunk: NoCredentialProviders: no valid providers in chain. Deprecated.\n\tFor verbose messaging see aws.Config.CredentialsChainVerboseErrors, num_chunks: 1, labels: {app_kubernetes_io_component=\&amp;#34;read\&amp;#34;, app_kubernetes_io_instance=\&amp;#34;loki\&amp;#34;, app_kubernetes_io_name=\&amp;#34;loki\&amp;#34;, app_kubernetes_io_part_of=\&amp;#34;memberlist\&amp;#34;, cluster=\&amp;#34;loki\&amp;#34;, container=\&amp;#34;loki\&amp;#34;, controller_revision_hash=\&amp;#34;loki-read-7749df4969\&amp;#34;, filename=\&amp;#34;/var/log/pods/loki_loki-read-2_a8fab5a2-e78b-4cff-9f8d-ba0ee5952a3c/loki/0.log\&amp;#34;, job=\&amp;#34;loki/loki-read\&amp;#34;, namespace=\&amp;#34;loki\&amp;#34;, pod=\&amp;#34;loki-read-2\&amp;#34;, statefulset_kubernetes_io_pod_name=\&amp;#34;loki-read-2\&amp;#34;, stream=\&amp;#34;stderr\&amp;#34;}&amp;#34;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;nv&#34;&gt;level&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;=&lt;/span&gt;info &lt;span class=&#34;nv&#34;&gt;ts&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;=&lt;/span&gt;2023-04-01T03:18:30.427244754Z &lt;span class=&#34;nv&#34;&gt;caller&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;=&lt;/span&gt;flush.go:168 &lt;span class=&#34;nv&#34;&gt;msg&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;=&lt;/span&gt;&lt;span class=&#34;s2&#34;&gt;&amp;#34;flushing stream&amp;#34;&lt;/span&gt; &lt;span class=&#34;nv&#34;&gt;user&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;=&lt;/span&gt;self-monitoring &lt;span class=&#34;nv&#34;&gt;fp&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;=&lt;/span&gt;33d14d11bfd98f55 &lt;span class=&#34;nv&#34;&gt;immediate&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;=&lt;/span&gt;&lt;span class=&#34;nb&#34;&gt;false&lt;/span&gt; &lt;span class=&#34;nv&#34;&gt;num_chunks&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;=&lt;/span&gt;&lt;span class=&#34;m&#34;&gt;1&lt;/span&gt; &lt;span class=&#34;nv&#34;&gt;labels&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;=&lt;/span&gt;&lt;span class=&#34;s2&#34;&gt;&amp;#34;{app_kubernetes_io_component=\&amp;#34;read\&amp;#34;, app_kubernetes_io_instance=\&amp;#34;loki\&amp;#34;, app_kubernetes_io_name=\&amp;#34;loki\&amp;#34;, app_kubernetes_io_part_of=\&amp;#34;memberlist\&amp;#34;, cluster=\&amp;#34;loki\&amp;#34;, container=\&amp;#34;loki\&amp;#34;, controller_revision_hash=\&amp;#34;loki-read-7749df4969\&amp;#34;, filename=\&amp;#34;/var/log/pods/loki_loki-read-2_a8fab5a2-e78b-4cff-9f8d-ba0ee5952a3c/loki/0.log\&amp;#34;, job=\&amp;#34;loki/loki-read\&amp;#34;, namespace=\&amp;#34;loki\&amp;#34;, pod=\&amp;#34;loki-read-2\&amp;#34;, statefulset_kubernetes_io_pod_name=\&amp;#34;loki-read-2\&amp;#34;, stream=\&amp;#34;stderr\&amp;#34;}&amp;#34;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;p&gt;공식문서 &lt;a href=&#34;https://grafana.com/docs/loki/latest/configuration/examples/&#34;&gt;예제 storage_config&lt;/a&gt; 가 최신 기준으로 업데이트된 것 같지 않다. 필자의 경우 배포 yaml로 구성을 설정하니 정상적으로 작동했다.&lt;/p&gt;
+&lt;p&gt;&lt;img loading=&#34;lazy&#34; 
+    src=&#34;https://HanHoRang31.github.io/./pkos-4-logging/s3-loki.png&#34; 
+    alt=&#34;s3-loki.png&#34; 
+     
+    width=585 
+    height=&#34;672&#34;  /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;S3 디렉토리에 chunk 폴더가 없다?&lt;/strong&gt;
+&lt;a href=&#34;https://github.com/grafana/loki/issues/1760&#34;&gt;이슈&lt;/a&gt; 에 따르면 멀티테넌트 구성에서 loki를 실행할때 인증이 비활성화하면 기본적으로 fake 폴더에 저장된다고 한다. fake폴더 안에는 정상적으로 chunk가 들어가있는 것을 확인할 수 있으나 다중 클러스터에서 배포시 loki 별로 인증이 필요할 것 같다.&lt;/p&gt;
+&lt;p&gt;&lt;img loading=&#34;lazy&#34; 
+    src=&#34;https://HanHoRang31.github.io/./pkos-4-logging/fake.png&#34; 
+    alt=&#34;fake.png&#34; 
+     
+    width=1540 
+    height=&#34;756&#34;  /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;dynamoDB에 인덱스를 저장하고 싶어요.&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;해결해야할 문제다. 현재 S3에 index값이 들어가는데 dynamodb에 옮겨야 한다. 헬름차트에 table-manager 설정이 두개(table-manager, tableManager)여서 설정이 안 먹힌다. 추가 원인으로는  깃허브 이슈( &lt;a href=&#34;https://github.com/grafana/loki/issues/5070&#34;&gt;https://github.com/grafana/loki/issues/5070&lt;/a&gt;)  설정값( extraArgs)인데 적용이 안된다. 추후 해결시 업데이트하겠다.&lt;/p&gt;
+&lt;p&gt;배포를 완료하면 로키 파드가 정상적으로 작동하는 것을 알 수 있다.&lt;/p&gt;
+&lt;p&gt;&lt;img loading=&#34;lazy&#34; 
+    src=&#34;https://HanHoRang31.github.io/./pkos-4-logging/loki-result.png&#34; 
+    alt=&#34;loki-result.png&#34; 
+     
+    width=1204 
+    height=&#34;336&#34;  /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img loading=&#34;lazy&#34; 
+    src=&#34;https://HanHoRang31.github.io/./pkos-4-logging/loki6.png&#34; 
+    alt=&#34;loki6.png&#34; 
+     
+    width=850 
+    height=&#34;685&#34;  /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;a href=&#34;http://loki-read-headless.loki.svc.cluster.local:3100/&#34;&gt;http://loki-read-headless.loki.svc.cluster.local:3100&lt;/a&gt;&lt;/p&gt;
+&lt;h3 id=&#34;promtail-설치&#34;&gt;
+    &lt;a href=&#34;#promtail-%ec%84%a4%ec%b9%98&#34; class=&#34;anchor&#34;&gt;
+        &lt;svg class=&#34;icon&#34; aria-hidden=&#34;true&#34; focusable=&#34;false&#34; height=&#34;16&#34; version=&#34;1.1&#34; viewBox=&#34;0 0 16 16&#34; width=&#34;16&#34;&gt;
+            &lt;path fill-rule=&#34;evenodd&#34;
+                d=&#34;M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z&#34;&gt;
+            &lt;/path&gt;
+        &lt;/svg&gt;
+    &lt;/a&gt;
+    Promtail 설치
+&lt;/h3&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
+&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code&gt;&lt;span class=&#34;lnt&#34;&gt;1
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;2
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;3
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;helm repo add grafana https://grafana.github.io/helm-charts
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;helm repo update
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;helm fetch grafana/promtail --untar --version 6.9.2
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;p&gt;Promtail 차트에서 따로 설정할 것은 없지만, 로키 연결과 로그 라인 파이프라인 구성 확인을 위해 집어넣는다.&lt;/p&gt;
+&lt;p&gt;&lt;img loading=&#34;lazy&#34; 
+    src=&#34;https://HanHoRang31.github.io/./pkos-4-logging/promtail1.png&#34; 
+    alt=&#34;promtail1.png&#34; 
+     
+    width=2756 
+    height=&#34;1452&#34;  /&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;config.clients.url : 로그 수집 후 전달한 로그 서버를 입력한다. 보통 로키 서버 설치시 설정되는 url로 지정된다.&lt;/li&gt;
+&lt;li&gt;config.snippets: 로그 라인 분석과 추출, 필터링하는 스테이지들의 작업을 정의한다. 원하는 로그 데이터 형식을 정의해서 입력하면 된다. &lt;a href=&#34;https://grafana.com/docs/loki/latest/clients/promtail/scraping/&#34;&gt;scraping 구문은 프로메테우스와 동일하다.&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
+&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code&gt;&lt;span class=&#34;lnt&#34;&gt;1
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;helm install promtail grafana/promtail -n loki --version 6.9.2
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;h3 id=&#34;로그-수집-테스트&#34;&gt;
+    &lt;a href=&#34;#%eb%a1%9c%ea%b7%b8-%ec%88%98%ec%a7%91-%ed%85%8c%ec%8a%a4%ed%8a%b8&#34; class=&#34;anchor&#34;&gt;
+        &lt;svg class=&#34;icon&#34; aria-hidden=&#34;true&#34; focusable=&#34;false&#34; height=&#34;16&#34; version=&#34;1.1&#34; viewBox=&#34;0 0 16 16&#34; width=&#34;16&#34;&gt;
+            &lt;path fill-rule=&#34;evenodd&#34;
+                d=&#34;M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z&#34;&gt;
+            &lt;/path&gt;
+        &lt;/svg&gt;
+    &lt;/a&gt;
+    로그 수집 테스트
+&lt;/h3&gt;
+&lt;p&gt;Promtail-Loki-Grafana 까지의 로그 수집을 테스트하겠다. 테스트를 위해 nginx 를 배포하고 파드 로그 확인과 그라파나(로키)에서 로그를 확인한다.&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
+&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code&gt;&lt;span class=&#34;lnt&#34;&gt;1
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;2
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;helm repo add bitnami https://charts.bitnami.com/bitnami
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;helm install nginx bitnami/nginx --version 13.2.23 -f nginx-values.yaml
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;p&gt;파드 로그는 파드가 올라간 노드 &lt;code&gt;/var/log/pods&lt;/code&gt; 에 저장되어 있다. 파드의 로그를 확인하고 그라파나 대시보드에서 로키가 해당 로그를 긁어오는지 확인하자.&lt;/p&gt;
+&lt;p&gt;&lt;img loading=&#34;lazy&#34; 
+    src=&#34;https://HanHoRang31.github.io/./pkos-4-logging/nginx1.png&#34; 
+    alt=&#34;nginx1.png&#34; 
+     
+    width=1804 
+    height=&#34;295&#34;  /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img loading=&#34;lazy&#34; 
+    src=&#34;https://HanHoRang31.github.io/./pkos-4-logging/nginx2.png&#34; 
+    alt=&#34;nginx2.png&#34; 
+     
+    width=1781 
+    height=&#34;975&#34;  /&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;[Explorer] → Job = default/nginx 설정 후 로그 확인&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;잘 들어온다! 이어서 파드 라이프사이클과 독립적으로 로그가 관리되는 지 확인하겠다.  nginx 파드를 삭제하고 파드 로그와 로키를 확인하겠다.&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
+&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code&gt;&lt;span class=&#34;lnt&#34;&gt;1
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;helm uninstall nginx
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;p&gt;아래 디렉토리를 확인하면 nginx 파드가 삭제되어 로그 디렉토리가 삭제된 것을 확인할 수 있다.&lt;/p&gt;
+&lt;p&gt;&lt;img loading=&#34;lazy&#34; 
+    src=&#34;https://HanHoRang31.github.io/./pkos-4-logging/nginx3.png&#34; 
+    alt=&#34;nginx3.png&#34; 
+     
+    width=2212 
+    height=&#34;534&#34;  /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img loading=&#34;lazy&#34; 
+    src=&#34;https://HanHoRang31.github.io/./pkos-4-logging/nginx4.png&#34; 
+    alt=&#34;nginx4.png&#34; 
+     
+    width=1794 
+    height=&#34;955&#34;  /&gt;&lt;/p&gt;
+&lt;p&gt;파드가 삭제되었지만 그라파나(로키) 에서 nginx 로그를 확인할 수 있다.&lt;/p&gt;
+&lt;h2 id=&#34;마치며&#34;&gt;
+    &lt;a href=&#34;#%eb%a7%88%ec%b9%98%eb%a9%b0&#34; class=&#34;anchor&#34;&gt;
+        &lt;svg class=&#34;icon&#34; aria-hidden=&#34;true&#34; focusable=&#34;false&#34; height=&#34;16&#34; version=&#34;1.1&#34; viewBox=&#34;0 0 16 16&#34; width=&#34;16&#34;&gt;
+            &lt;path fill-rule=&#34;evenodd&#34;
+                d=&#34;M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z&#34;&gt;
+            &lt;/path&gt;
+        &lt;/svg&gt;
+    &lt;/a&gt;
+    마치며
+&lt;/h2&gt;
+&lt;p&gt;그라파나 공식 문서를 참고하니 엔터프라이즈에 대한 지원만 활발한 느낌이다. 오픈소스로 설치시 연동 부분과 최신 버전 호환 문제로 테스트하는 데도 오랜 시간이 걸렸다. 특히 인덱스 데이터를 dynamodb 에 연동해야 했지만 설정 문제로 실패했고 S3에 인덱스, 청크 데이터를 저장시켰다. 이 부분은 공식 문서를 최신 버전으로 업데이트를 하거나 예가 나오면 업데이트하겠다.&lt;/p&gt;
+
+    </description>
+    </item>
+    
+    <item>
+    <title>[PKOS] GitOps ArgoCD DeepDive</title>
     <link>https://HanHoRang31.github.io/post/pkos2-3-gitops/</link>
     <pubDate>Sat, 25 Mar 2023 07:35:40 +0900</pubDate>
     <author>HanHoRnag</author>
@@ -2050,7 +2489,7 @@
     </item>
     
     <item>
-    <title>PKOS 2기 2주차 - 로컬스토리지 </title>
+    <title>[PKOS] 쿠버네티스 로컬스토리지와 Velero를 통한 백업 테스트</title>
     <link>https://HanHoRang31.github.io/post/pkos2-2-localstorage/</link>
     <pubDate>Sat, 18 Mar 2023 00:00:00 +0000</pubDate>
     <author>HanHoRnag</author>
@@ -3922,7 +4361,7 @@
     </item>
     
     <item>
-    <title>PKOS 2기 1주차 - kops</title>
+    <title>[PKOS] Kops로 클러스터 구축하기</title>
     <link>https://HanHoRang31.github.io/post/pkos2-1-kops/</link>
     <pubDate>Fri, 10 Mar 2023 00:00:00 +0000</pubDate>
     <author>HanHoRnag</author>

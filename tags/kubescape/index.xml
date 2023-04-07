@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>kubescape on HanHoRang Tech Blog</title>
+    <link>https://HanHoRang31.github.io/tags/kubescape/</link>
+    <description>Recent content in kubescape on HanHoRang Tech Blog</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-us</language>
+    <lastBuildDate>Fri, 07 Apr 2023 00:00:00 +0000</lastBuildDate><atom:link href="https://HanHoRang31.github.io/tags/kubescape/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>[PKOS]쿠버네티스 보안, Kubescape DeepDive</title>
+      <link>https://HanHoRang31.github.io/post/pkos-5-security/</link>
+      <pubDate>Fri, 07 Apr 2023 00:00:00 +0000</pubDate>
+      
+      <guid>https://HanHoRang31.github.io/post/pkos-5-security/</guid>
+      <description>1 2 Production Kubernetes Online Study (=PKOS)는 쿠버네티스 실무 실습 스터디입니다. CloudNet@ Gasida(가시다)이 진행하며, 책 &amp;#34;24단계 실습으로 정복하는 쿠버네티스&amp;#34;을 기반으로 진행하고 있습니다. 5주차 시간에는 모임장님께서 쿠버네티스 보안을 주제로 학습 내용을 공유해 주셨다. 이번 블로그 글에서는 쿠버네티스 보안에 대해 스터디한 내용을 공유하고자 한다.
+Kubernetes 4C Layer 쿠버네티스 공식문서에 따르면 쿠버네티스 보안은 4계층(클라우드/ 클러스터 / 컨테이너 / 코드)으로 구성되며, 각 계층에 대해 보안 관점이 필요하다고 한다.
+https://kubernetes.io/docs/concepts/security/overview/
+Cloud, Infra : 클라우드 계층에서는 쿠버네티스 클러스터가 실행되는 기반 인프라에 초점을 맞춘다.</description>
+    </item>
+    
+  </channel>
+</rss>

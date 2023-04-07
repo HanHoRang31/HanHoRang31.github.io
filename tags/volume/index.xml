@@ -8,7 +8,7 @@
     <language>en-us</language>
     <lastBuildDate>Sat, 18 Mar 2023 00:00:00 +0000</lastBuildDate><atom:link href="https://HanHoRang31.github.io/tags/volume/index.xml" rel="self" type="application/rss+xml" />
     <item>
-      <title>PKOS 2기 2주차 - 로컬스토리지 </title>
+      <title>[PKOS] 쿠버네티스 로컬스토리지와 Velero를 통한 백업 테스트</title>
       <link>https://HanHoRang31.github.io/post/pkos2-2-localstorage/</link>
       <pubDate>Sat, 18 Mar 2023 00:00:00 +0000</pubDate>
       

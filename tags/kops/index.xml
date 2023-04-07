@@ -6,19 +6,21 @@
     <description>Recent content in kops on HanHoRang Tech Blog</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <lastBuildDate>Sat, 01 Apr 2023 00:00:00 +0000</lastBuildDate><atom:link href="https://HanHoRang31.github.io/tags/kops/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Fri, 07 Apr 2023 00:00:00 +0000</lastBuildDate><atom:link href="https://HanHoRang31.github.io/tags/kops/index.xml" rel="self" type="application/rss+xml" />
     <item>
-      <title>PKOS 2기 4주차 - 쿠버네티스 로깅(kubernetes logging)</title>
-      <link>https://HanHoRang31.github.io/post/pkos2-4-logging/</link>
-      <pubDate>Sat, 01 Apr 2023 00:00:00 +0000</pubDate>
+      <title>[PKOS]쿠버네티스 보안, Kubescape DeepDive</title>
+      <link>https://HanHoRang31.github.io/post/pkos-5-security/</link>
+      <pubDate>Fri, 07 Apr 2023 00:00:00 +0000</pubDate>
       
-      <guid>https://HanHoRang31.github.io/post/pkos2-4-logging/</guid>
-      <description>로깅 (Loki &amp;amp; Promtail ) 1 2 Production Kubernetes Online Study (=PKOS)는 쿠버네티스 실무 실습 스터디입니다. CloudNet@ Gasida(가시다)이 진행하며, 책 &amp;#34;24단계 실습으로 정복하는 쿠버네티스&amp;#34;을 기반으로 진행하고 있습니다. Logging? 애플리케이션 실행 중 발생하는 이벤트, 작업, 오류 등의 정보를 기록하는 프로세스이다. 로깅의 주요 목적은 프로그램의 실행 상태를 추적하고, 문제 발생 시 원인을 찾기고, 내부 감사를 기록하기 위함이다. 로그 파일은 시간 순서대로 저장되며, 대부분의 경우 텍스트 파일 또는 데이터베이스에 저장된다.
-컨테이너화된 애플리케이션에 가장 쉽고 가장 널리 사용되는 로깅 방법은 표준 출력(stdout)과 표준 에러(stderr) 스트림에 작성하는 것이다.</description>
+      <guid>https://HanHoRang31.github.io/post/pkos-5-security/</guid>
+      <description>1 2 Production Kubernetes Online Study (=PKOS)는 쿠버네티스 실무 실습 스터디입니다. CloudNet@ Gasida(가시다)이 진행하며, 책 &amp;#34;24단계 실습으로 정복하는 쿠버네티스&amp;#34;을 기반으로 진행하고 있습니다. 5주차 시간에는 모임장님께서 쿠버네티스 보안을 주제로 학습 내용을 공유해 주셨다. 이번 블로그 글에서는 쿠버네티스 보안에 대해 스터디한 내용을 공유하고자 한다.
+Kubernetes 4C Layer 쿠버네티스 공식문서에 따르면 쿠버네티스 보안은 4계층(클라우드/ 클러스터 / 컨테이너 / 코드)으로 구성되며, 각 계층에 대해 보안 관점이 필요하다고 한다.
+https://kubernetes.io/docs/concepts/security/overview/
+Cloud, Infra : 클라우드 계층에서는 쿠버네티스 클러스터가 실행되는 기반 인프라에 초점을 맞춘다.</description>
     </item>
     
     <item>
-      <title>PKOS 2기 4주차 - 쿠버네티스 모니터링(Kubernetes Monitoring)</title>
+      <title>[PKOS] 고가용성 모니터링 시스템 구축하기</title>
       <link>https://HanHoRang31.github.io/post/pkos2-4-monitoring/</link>
       <pubDate>Sat, 01 Apr 2023 00:00:00 +0000</pubDate>
       
@@ -28,7 +30,17 @@
     </item>
     
     <item>
-      <title>PKOS 2기 3주차 - GitOps</title>
+      <title>[PKOS] 로깅 PLG 스택 - 최신 버전(Loki v2.8.0) 배포하기</title>
+      <link>https://HanHoRang31.github.io/post/pkos2-4-logging/</link>
+      <pubDate>Sat, 01 Apr 2023 00:00:00 +0000</pubDate>
+      
+      <guid>https://HanHoRang31.github.io/post/pkos2-4-logging/</guid>
+      <description>로깅 (Loki &amp;amp; Promtail ) 1 2 Production Kubernetes Online Study (=PKOS)는 쿠버네티스 실무 실습 스터디입니다. CloudNet@ Gasida(가시다)이 진행하며, 책 &amp;#34;24단계 실습으로 정복하는 쿠버네티스&amp;#34;을 기반으로 진행하고 있습니다. Logging? 애플리케이션 실행 중 발생하는 이벤트, 작업, 오류 등의 정보를 기록하는 프로세스이다. 로깅의 주요 목적은 프로그램의 실행 상태를 추적하고, 문제 발생 시 원인을 찾기고, 내부 감사를 기록하기 위함이다. 로그 파일은 시간 순서대로 저장되며, 대부분의 경우 텍스트 파일 또는 데이터베이스에 저장된다.
+컨테이너화된 애플리케이션에 가장 쉽고 가장 널리 사용되는 로깅 방법은 표준 출력(stdout)과 표준 에러(stderr) 스트림에 작성하는 것이다.</description>
+    </item>
+    
+    <item>
+      <title>[PKOS] GitOps ArgoCD DeepDive</title>
       <link>https://HanHoRang31.github.io/post/pkos2-3-gitops/</link>
       <pubDate>Sat, 25 Mar 2023 07:35:40 +0900</pubDate>
       
@@ -38,7 +50,7 @@ GitOps는 GIt을 진실의 원천(SSOT, Single Source of Truth) 으로 사용하
     </item>
     
     <item>
-      <title>PKOS 2기 2주차 - 로컬스토리지 </title>
+      <title>[PKOS] 쿠버네티스 로컬스토리지와 Velero를 통한 백업 테스트</title>
       <link>https://HanHoRang31.github.io/post/pkos2-2-localstorage/</link>
       <pubDate>Sat, 18 Mar 2023 00:00:00 +0000</pubDate>
       
@@ -47,7 +59,7 @@ GitOps는 GIt을 진실의 원천(SSOT, Single Source of Truth) 으로 사용하
     </item>
     
     <item>
-      <title>PKOS 2기 1주차 - kops</title>
+      <title>[PKOS] Kops로 클러스터 구축하기</title>
       <link>https://HanHoRang31.github.io/post/pkos2-1-kops/</link>
       <pubDate>Fri, 10 Mar 2023 00:00:00 +0000</pubDate>
       
