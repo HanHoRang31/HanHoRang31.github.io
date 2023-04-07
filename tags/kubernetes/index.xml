@@ -8,7 +8,7 @@
     <language>en-us</language>
     <lastBuildDate>Fri, 07 Apr 2023 00:00:00 +0000</lastBuildDate><atom:link href="https://HanHoRang31.github.io/tags/kubernetes/index.xml" rel="self" type="application/rss+xml" />
     <item>
-      <title>[PKOS]쿠버네티스 보안, Kubescape DeepDive</title>
+      <title>[PKOS] 쿠버네티스 보안과 Kubescape DeepDive</title>
       <link>https://HanHoRang31.github.io/post/pkos-5-security/</link>
       <pubDate>Fri, 07 Apr 2023 00:00:00 +0000</pubDate>
       
@@ -20,7 +20,7 @@ Cloud, Infra : 클라우드 계층에서는 쿠버네티스 클러스터가 실�
     </item>
     
     <item>
-      <title>[PKOS] 고가용성 모니터링 시스템 구축하기</title>
+      <title>[PKOS] 고가용성 모니터링 시스템 구축하기 with 프로메테우스, 타노스</title>
       <link>https://HanHoRang31.github.io/post/pkos2-4-monitoring/</link>
       <pubDate>Sat, 01 Apr 2023 00:00:00 +0000</pubDate>
       
@@ -30,7 +30,7 @@ Cloud, Infra : 클라우드 계층에서는 쿠버네티스 클러스터가 실�
     </item>
     
     <item>
-      <title>[PKOS] 로깅 PLG 스택 - 최신 버전(Loki v2.8.0) 배포하기</title>
+      <title>[PKOS] 로깅 PLG 스택, 최신 버전(Loki v2.8.0) 배포하기</title>
       <link>https://HanHoRang31.github.io/post/pkos2-4-logging/</link>
       <pubDate>Sat, 01 Apr 2023 00:00:00 +0000</pubDate>
       
@@ -40,7 +40,7 @@ Cloud, Infra : 클라우드 계층에서는 쿠버네티스 클러스터가 실�
     </item>
     
     <item>
-      <title>[PKOS] GitOps ArgoCD DeepDive</title>
+      <title>[PKOS] GitOps와 ArgoCD DeepDive</title>
       <link>https://HanHoRang31.github.io/post/pkos2-3-gitops/</link>
       <pubDate>Sat, 25 Mar 2023 07:35:40 +0900</pubDate>
       
