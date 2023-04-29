@@ -1,0 +1,886 @@
+<!DOCTYPE html>
+<html lang="en-us">
+    
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="theme-color" content="dark">
+    <title>Loki 최신버전(V2.8.0) DyanmoDB 연동하기 | HanHoRang Tech Blog</title>
+
+    
+    
+    
+    <meta property="og:site_name" content="HanHoRang Tech Blog by Tania in Hugo" />
+    <meta property="og:title" content="Loki 최신버전(V2.8.0) DyanmoDB 연동하기 | HanHoRang Tech Blog"/>
+    <meta itemprop="name" content="Loki 최신버전(V2.8.0) DyanmoDB 연동하기 | HanHoRang Tech Blog" />
+    <meta name="twitter:title" content="Loki 최신버전(V2.8.0) DyanmoDB 연동하기 | HanHoRang Tech Blog" />
+    <meta name="application-name" content="Loki 최신버전(V2.8.0) DyanmoDB 연동하기 | HanHoRang Tech Blog" /><meta name="twitter:card" content="summary"/>
+
+    <meta name="description" content="Loki 최신버전(V2.8.0) DyanmoDB 연동을 위한 트러블 슈팅" />
+    <meta name="twitter:description" content="Loki 최신버전(V2.8.0) DyanmoDB 연동을 위한 트러블 슈팅 "/>
+    <meta itemprop="description" content=" Loki 최신버전(V2.8.0) DyanmoDB 연동을 위한 트러블 슈팅 "/>
+    <meta property="og:description" content=" Loki 최신버전(V2.8.0) DyanmoDB 연동을 위한 트러블 슈팅 " />
+
+    
+
+<meta property="og:type" content="article" />
+<meta property="article:publisher" content="Hugo Tania" />
+<meta property="og:article:published_time" content=2023-04-14T00:00:00Z />
+<meta property="article:published_time" content=2023-04-14T00:00:00Z />
+
+
+  <meta property="og:article:author" content="Han ho rnag" />
+  <meta property="article:author" content="Han ho rnag" />
+  <meta name="author" content="Han ho rnag" />
+
+
+
+
+<script defer type="application/ld+json">
+  {
+    "@context": "http://schema.org",
+    "@type": "Article",
+    "headline": "Loki 최신버전(V2.8.0) DyanmoDB 연동하기",
+    "author": {
+      "@type": "Person",
+      "name": "Hugo Tania"
+    },
+    "datePublished": "2023-04-14",
+    "description": "Loki 최신버전(V2.8.0) DyanmoDB 연동을 위한 트러블 슈팅",
+    "wordCount":  1398 ,
+    "mainEntityOfPage": "True",
+    "dateModified": "2023-04-14",
+    "publisher": {
+      "@type": "Organization",
+      "name": "Hugo Tania",
+      "logo": {
+        "@type": "imageObject",
+        "url": "https:\/\/HanHoRang31.github.io\/favicon.ico"
+      }
+    }
+  }
+</script>
+
+
+
+    <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico" />
+    
+    <link rel="stylesheet" href="/sass/main.min.ab99ff095f832511e24ffb2fba2b51ad473b2f7e9301d674eba2c6c3a6e8bd81.css">
+    
+</head>
+    
+    <script>
+        (function() {
+            const colorSchemeKey = 'ThemeColorScheme';
+            if(!localStorage.getItem(colorSchemeKey)){
+                localStorage.setItem(colorSchemeKey, "auto");
+            }
+        })();
+    </script><script>
+    (function() {
+        const colorSchemeKey = 'ThemeColorScheme';
+        const colorSchemeItem = localStorage.getItem(colorSchemeKey);
+        const supportDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches === true;
+
+        if (colorSchemeItem == 'dark' || colorSchemeItem === 'auto' && supportDarkMode) {
+            
+
+            document.documentElement.dataset.userColorScheme = 'dark';
+        } else {
+            document.documentElement.dataset.userColorScheme = 'light';
+        }
+    })();
+</script>
+
+
+    <body class="dark">
+        <nav class="navbar">
+    <div class="container">
+        <div class="flex">
+            <div>
+                <a class="brand" href="/">
+                    
+                    
+                        <img src="/favicon.ico" />
+                    
+                    HanHoRang Tech Blog
+                    </a>
+            </div>
+            <div class="flex">
+                
+                <a href="/articles/">Articles</a>
+                
+                
+                    <button id="dark-mode-button">
+                    <svg class="light" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" aria-hidden="true" focusable="false" width="1em" height="1em" style="-ms-transform: rotate(360deg); -webkit-transform: rotate(360deg); transform: rotate(360deg);" preserveAspectRatio="xMidYMid meet" viewBox="0 0 36 36"><path fill="#FFD983" d="M30.312.776C32 19 20 32 .776 30.312c8.199 7.717 21.091 7.588 29.107-.429C37.9 21.867 38.03 8.975 30.312.776z"/><path d="M30.705 15.915a1.163 1.163 0 1 0 1.643 1.641a1.163 1.163 0 0 0-1.643-1.641zm-16.022 14.38a1.74 1.74 0 0 0 0 2.465a1.742 1.742 0 1 0 0-2.465zm13.968-2.147a2.904 2.904 0 0 1-4.108 0a2.902 2.902 0 0 1 0-4.107a2.902 2.902 0 0 1 4.108 0a2.902 2.902 0 0 1 0 4.107z" fill="#FFCC4D"/><rect x="0" y="0" width="36" height="36" fill="rgba(0, 0, 0, 0)" /></svg>
+                    <svg class="dark" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" aria-hidden="true" focusable="false" width="1em" height="1em" style="-ms-transform: rotate(360deg); -webkit-transform: rotate(360deg); transform: rotate(360deg);" preserveAspectRatio="xMidYMid meet" viewBox="0 0 36 36"><path fill="#FFD983" d="M16 2s0-2 2-2s2 2 2 2v2s0 2-2 2s-2-2-2-2V2zm18 14s2 0 2 2s-2 2-2 2h-2s-2 0-2-2s2-2 2-2h2zM4 16s2 0 2 2s-2 2-2 2H2s-2 0-2-2s2-2 2-2h2zm5.121-8.707s1.414 1.414 0 2.828s-2.828 0-2.828 0L4.878 8.708s-1.414-1.414 0-2.829c1.415-1.414 2.829 0 2.829 0l1.414 1.414zm21 21s1.414 1.414 0 2.828s-2.828 0-2.828 0l-1.414-1.414s-1.414-1.414 0-2.828s2.828 0 2.828 0l1.414 1.414zm-.413-18.172s-1.414 1.414-2.828 0s0-2.828 0-2.828l1.414-1.414s1.414-1.414 2.828 0s0 2.828 0 2.828l-1.414 1.414zm-21 21s-1.414 1.414-2.828 0s0-2.828 0-2.828l1.414-1.414s1.414-1.414 2.828 0s0 2.828 0 2.828l-1.414 1.414zM16 32s0-2 2-2s2 2 2 2v2s0 2-2 2s-2-2-2-2v-2z"/><circle fill="#FFD983" cx="18" cy="18" r="10"/><rect x="0" y="0" width="36" height="36" fill="rgba(0, 0, 0, 0)" /></svg>
+                    </button>
+                
+            </div>
+            </div>
+    </div>
+</nav>
+
+        <main>
+            
+<div class="container">
+    <article>
+        <header class="article-header">
+            <div class="thumb">
+                <div>
+                    <h1>Loki 최신버전(V2.8.0) DyanmoDB 연동하기</h1>
+                    <div class="post-meta">
+                        <div>
+                            
+                            
+                            By HanHoRnag | <time>April 14, 2023</time>
+                            | 7 minutes
+                        </div>
+                        <div class="tags">
+                            
+                            <a href="/tags/kans/">KANS</a>
+                            
+                            <a href="/tags/kops/">kops</a>
+                            
+                            <a href="/tags/cloud/">cloud</a>
+                            
+                            <a href="/tags/aws/">AWS</a>
+                            
+                            <a href="/tags/kubernetes/">kubernetes</a>
+                            
+                            <a href="/tags/plg/">PLG</a>
+                            
+                            <a href="/tags/loki/">loki</a>
+                            
+                            <a href="/tags/promtail/">promtail</a>
+                            
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </header>
+    </article>
+
+    <div class="article-post">
+    <p><a href="https://hanhorang31.github.io/post/pkos2-4-logging/">전글 Loki 최신 버전 설치하기</a>에서 인덱스 DB를 Dynamodb로 연동하지 못했다. 미련이 남아 스터디가 끝난 이후에도 여러 테스트를 해보았고, 마침내 연동을 성공하여 관련 경험을 공유한다.</p>
+<p>먼저, Loki에서 DynamoDB로 연동해야 하는 목적부터 알고 가자. 배경 지식 설명을 위해 Loki 의 지원 스토리지를 다시 확인하겠다.</p>
+<p><img loading="lazy" 
+    src="/./loki-2-8-0/loki4.png" 
+    alt="&lt;a href=&#34;https://grafana.com/docs/loki/latest/operations/storage/&#34;&gt;https://grafana.com/docs/loki/latest/operations/storage/&lt;/a&gt;" 
+     
+    width=822 
+    height="592"  /></p>
+<p><a href="https://grafana.com/docs/loki/latest/operations/storage/">https://grafana.com/docs/loki/latest/operations/storage/</a></p>
+<p>스토리지 연동 목록을 살펴보면 Loki 2.0 이상에서 싱글 스토어(boltdb-shipper)가 추가되었고 연동으로 추천하고 있다. (기본 스토리지도 싱글 스토어이다.) 이유를 살펴보니 비용 감소인데 로컬에서 인덱스를 저장하기 때문에 외부 스토리지에 대한 종속성이 줄기 때문이라 한다. 다만, 원격 저장소로 백업하고 복원하는데 추가 작업이 필요하다. (앞 글에서는 S3로 연동했으나 시간 텀이 15분 정도 있었음)</p>
+<p>비용은 발생하지만, DyanmoDB 연동 목적은 다음과 같다.</p>
+<ul>
+<li>복원력 : 실시간으로 데이터가 적재되어 로키 파드가 죽어도 데이터가 유지된다.</li>
+<li>확장성 : 멀티 클러스터에서의 실시간 로깅 확인 (로컬인 경우 S3에 적재가 가능하지만 시간 텀이 있다.)</li>
+</ul>
+<p>결론적으로, 소규모 프로젝트나 초기 설정에 초점을 맞추는 경우 BoltDB &amp; S3 옵션을 고려할 수 있다. 반면, 대규모 프로젝트나 장기적인 운영에 초점을 맞추는 경우 S3 &amp; DynamoDB 옵션이 더 적합하다.</p>
+<h1 id="연동-트러블슈팅">
+    <a href="#%ec%97%b0%eb%8f%99-%ed%8a%b8%eb%9f%ac%eb%b8%94%ec%8a%88%ed%8c%85" class="anchor">
+        <svg class="icon" aria-hidden="true" focusable="false" height="16" version="1.1" viewBox="0 0 16 16" width="16">
+            <path fill-rule="evenodd"
+                d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z">
+            </path>
+        </svg>
+    </a>
+    연동 트러블슈팅
+</h1>
+<p>DynamoDB 연동을 위해 해결했던 문제점은 두가지였다.  항목별로 살펴보겠다.</p>
+<ul>
+<li>Helm Value Override 문제</li>
+<li>Loki 스토리지 연동 설정 문제</li>
+</ul>
+<h2 id="helm-value-override-문제">
+    <a href="#helm-value-override-%eb%ac%b8%ec%a0%9c" class="anchor">
+        <svg class="icon" aria-hidden="true" focusable="false" height="16" version="1.1" viewBox="0 0 16 16" width="16">
+            <path fill-rule="evenodd"
+                d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z">
+            </path>
+        </svg>
+    </a>
+    Helm Value Override 문제
+</h2>
+<p>지난 글에서 스토리지 설정을 S3 및 기타 스토리지로 설정했음에도 기본 스토리지 (boltdb &amp; snipper) 가 설정되어 관련 문제를 확인하였다.  helm template 명령어를 통해서 스토리지 차트 랜더링을 확인하니 Values 오버라이드 값이 아닌 기본 값(boltdb &amp; snipper)이 입력되어 있는 것을 확인할 수 있다.</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">helm template loki grafana/loki  -f loki.yaml -n loki --version 4.8.0 &gt; result.yaml
+</span></span></code></pre></td></tr></table>
+</div>
+</div><div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span><span class="lnt">31
+</span><span class="lnt">32
+</span><span class="lnt">33
+</span><span class="lnt">34
+</span><span class="lnt">35
+</span><span class="lnt">36
+</span><span class="lnt">37
+</span><span class="lnt">38
+</span><span class="lnt">39
+</span><span class="lnt">40
+</span><span class="lnt">41
+</span><span class="lnt">42
+</span><span class="lnt">43
+</span><span class="lnt">44
+</span><span class="lnt">45
+</span><span class="lnt">46
+</span><span class="lnt">47
+</span><span class="lnt">48
+</span><span class="lnt">49
+</span><span class="lnt">50
+</span><span class="lnt">51
+</span><span class="lnt">52
+</span><span class="lnt">53
+</span><span class="lnt">54
+</span><span class="lnt">55
+</span><span class="lnt">56
+</span><span class="lnt">57
+</span><span class="lnt">58
+</span><span class="lnt">59
+</span><span class="lnt">60
+</span><span class="lnt">61
+</span><span class="lnt">62
+</span><span class="lnt">63
+</span><span class="lnt">64
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-yaml" data-lang="yaml"><span class="line"><span class="cl"><span class="c"># Source: loki/templates/configmap.yaml</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="nt">apiVersion</span><span class="p">:</span><span class="w"> </span><span class="l">v1</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="nt">kind</span><span class="p">:</span><span class="w"> </span><span class="l">ConfigMap</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="nt">metadata</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l">loki</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="nt">labels</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="nt">helm.sh/chart</span><span class="p">:</span><span class="w"> </span><span class="l">loki-4.8.0</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="nt">app.kubernetes.io/name</span><span class="p">:</span><span class="w"> </span><span class="l">loki</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="nt">app.kubernetes.io/instance</span><span class="p">:</span><span class="w"> </span><span class="l">loki</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="nt">app.kubernetes.io/version</span><span class="p">:</span><span class="w"> </span><span class="s2">&#34;2.7.3&#34;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="nt">app.kubernetes.io/managed-by</span><span class="p">:</span><span class="w"> </span><span class="l">Helm</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="nt">data</span><span class="p">:</span><span class="w"> </span><span class="c"># override 적용 안된다! </span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="nt">config.yaml</span><span class="p">:</span><span class="w"> </span><span class="p">|</span><span class="sd">
+</span></span></span><span class="line"><span class="cl"><span class="sd">    auth_enabled: false
+</span></span></span><span class="line"><span class="cl"><span class="sd">    common:
+</span></span></span><span class="line"><span class="cl"><span class="sd">      compactor_address: &#39;loki-read&#39;
+</span></span></span><span class="line"><span class="cl"><span class="sd">      path_prefix: /var/loki
+</span></span></span><span class="line"><span class="cl"><span class="sd">      replication_factor: 3
+</span></span></span><span class="line"><span class="cl"><span class="sd">      storage:
+</span></span></span><span class="line"><span class="cl"><span class="sd">        s3:
+</span></span></span><span class="line"><span class="cl"><span class="sd">          bucketnames: chunks
+</span></span></span><span class="line"><span class="cl"><span class="sd">          insecure: false
+</span></span></span><span class="line"><span class="cl"><span class="sd">          s3forcepathstyle: false
+</span></span></span><span class="line"><span class="cl"><span class="sd">    limits_config:
+</span></span></span><span class="line"><span class="cl"><span class="sd">      enforce_metric_name: false
+</span></span></span><span class="line"><span class="cl"><span class="sd">      max_cache_freshness_per_query: 10m
+</span></span></span><span class="line"><span class="cl"><span class="sd">      reject_old_samples: true
+</span></span></span><span class="line"><span class="cl"><span class="sd">      reject_old_samples_max_age: 168h
+</span></span></span><span class="line"><span class="cl"><span class="sd">      split_queries_by_interval: 15m
+</span></span></span><span class="line"><span class="cl"><span class="sd">    memberlist:
+</span></span></span><span class="line"><span class="cl"><span class="sd">      join_members:
+</span></span></span><span class="line"><span class="cl"><span class="sd">      - loki-memberlist
+</span></span></span><span class="line"><span class="cl"><span class="sd">    query_range:
+</span></span></span><span class="line"><span class="cl"><span class="sd">      align_queries_with_step: true
+</span></span></span><span class="line"><span class="cl"><span class="sd">    ruler:
+</span></span></span><span class="line"><span class="cl"><span class="sd">      storage:
+</span></span></span><span class="line"><span class="cl"><span class="sd">        s3:
+</span></span></span><span class="line"><span class="cl"><span class="sd">          bucketnames: ruler
+</span></span></span><span class="line"><span class="cl"><span class="sd">          insecure: false
+</span></span></span><span class="line"><span class="cl"><span class="sd">          s3forcepathstyle: false
+</span></span></span><span class="line"><span class="cl"><span class="sd">        type: s3
+</span></span></span><span class="line"><span class="cl"><span class="sd">    runtime_config:
+</span></span></span><span class="line"><span class="cl"><span class="sd">      file: /etc/loki/runtime-config/runtime-config.yaml
+</span></span></span><span class="line"><span class="cl"><span class="sd">    schema_config:
+</span></span></span><span class="line"><span class="cl"><span class="sd">      configs:
+</span></span></span><span class="line"><span class="cl"><span class="sd">      - from: &#34;2022-01-11&#34;
+</span></span></span><span class="line"><span class="cl"><span class="sd">        index:
+</span></span></span><span class="line"><span class="cl"><span class="sd">          period: 24h
+</span></span></span><span class="line"><span class="cl"><span class="sd">          prefix: loki_index_
+</span></span></span><span class="line"><span class="cl"><span class="sd">        object_store: s3
+</span></span></span><span class="line"><span class="cl"><span class="sd">        schema: v12
+</span></span></span><span class="line"><span class="cl"><span class="sd">        store: boltdb-shipper
+</span></span></span><span class="line"><span class="cl"><span class="sd">    server:
+</span></span></span><span class="line"><span class="cl"><span class="sd">      grpc_listen_port: 9095
+</span></span></span><span class="line"><span class="cl"><span class="sd">      http_listen_port: 3100
+</span></span></span><span class="line"><span class="cl"><span class="sd">    storage_config:
+</span></span></span><span class="line"><span class="cl"><span class="sd">      hedging:
+</span></span></span><span class="line"><span class="cl"><span class="sd">        at: 250ms
+</span></span></span><span class="line"><span class="cl"><span class="sd">        max_per_second: 20
+</span></span></span><span class="line"><span class="cl"><span class="sd">        up_to: 3
+</span></span></span><span class="line"><span class="cl"><span class="sd">    table_manager:
+</span></span></span><span class="line"><span class="cl"><span class="sd">      retention_deletes_enabled: false
+</span></span></span><span class="line"><span class="cl"><span class="sd">      retention_period: 0</span><span class="w">    
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="nn">---</span><span class="w">
+</span></span></span></code></pre></td></tr></table>
+</div>
+</div><ul>
+<li>스토리지 연동 부분인 data.config.yaml.schema_config 와 data.config.yaml.storage_config 에 기본 값이 적용되어 있는 것을 확인할 수 있다.</li>
+</ul>
+<p>원인은 Loki 헬름 차트에서 if 문법과 override 값에서 생긴 랜더링 문제로 확인된다. 관리성 문제로 overrider 파일의 값을 적용시키려 했지만, 적용되지 않았다. (헬름 차트에 정확한 순서 및 문법을 검사했음에도..)</p>
+<p>우회적 해결 방법으로 기본 차트 vaules.yaml 에 값을 직접 입력하였다.</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span><span class="lnt">31
+</span><span class="lnt">32
+</span><span class="lnt">33
+</span><span class="lnt">34
+</span><span class="lnt">35
+</span><span class="lnt">36
+</span><span class="lnt">37
+</span><span class="lnt">38
+</span><span class="lnt">39
+</span><span class="lnt">40
+</span><span class="lnt">41
+</span><span class="lnt">42
+</span><span class="lnt">43
+</span><span class="lnt">44
+</span><span class="lnt">45
+</span><span class="lnt">46
+</span><span class="lnt">47
+</span><span class="lnt">48
+</span><span class="lnt">49
+</span><span class="lnt">50
+</span><span class="lnt">51
+</span><span class="lnt">52
+</span><span class="lnt">53
+</span><span class="lnt">54
+</span><span class="lnt">55
+</span><span class="lnt">56
+</span><span class="lnt">57
+</span><span class="lnt">58
+</span><span class="lnt">59
+</span><span class="lnt">60
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-yaml" data-lang="yaml"><span class="line"><span class="cl"><span class="c"># vaule.yaml</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="nt">Loki</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="nn">...</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="nt">config</span><span class="p">:</span><span class="w"> </span><span class="p">|</span><span class="sd">
+</span></span></span><span class="line"><span class="cl"><span class="sd">  ....</span><span class="w">  
+</span></span></span><span class="line"><span class="cl"><span class="w">	</span><span class="nt">table_manager</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">	      </span><span class="nt">retention_deletes_enabled</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">	      </span><span class="nt">retention_period</span><span class="p">:</span><span class="w"> </span><span class="l">336h</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">	      </span><span class="nt">index_tables_provisioning</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">	        </span><span class="nt">provisioned_write_throughput</span><span class="p">:</span><span class="w"> </span><span class="m">5</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">	        </span><span class="nt">provisioned_read_throughput</span><span class="p">:</span><span class="w"> </span><span class="m">5</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">	      </span><span class="nt">chunk_tables_provisioning</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">	        </span><span class="nt">provisioned_write_throughput</span><span class="p">:</span><span class="w"> </span><span class="m">5</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">	        </span><span class="nt">provisioned_read_throughput</span><span class="p">:</span><span class="w"> </span><span class="m">5</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">   </span><span class="l">...</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="c"># vaule.yaml</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="nt">Loki</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="nn">...</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="c"># -- Check https://grafana.com/docs/loki/latest/configuration/#schema_config for more info on how to configure schemas</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="nt">schemaConfig</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="nt">configs</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span>- <span class="nt">from</span><span class="p">:</span><span class="w"> </span><span class="s2">&#34;2022-01-11&#34;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">      </span><span class="nt">store</span><span class="p">:</span><span class="w"> </span><span class="l">aws</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">      </span><span class="nt">object_store</span><span class="p">:</span><span class="w"> </span><span class="l">s3</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">      </span><span class="nt">schema</span><span class="p">:</span><span class="w"> </span><span class="l">v12</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">      </span><span class="nt">index</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="nt">prefix</span><span class="p">:</span><span class="w"> </span><span class="l">loki_</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="c"># -- Check https://grafana.com/docs/loki/latest/configuration/#ruler for more info on configuring ruler</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="nt">rulerConfig</span><span class="p">:</span><span class="w"> </span>{}<span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="c"># -- Structured loki configuration, takes precedence over `loki.config`, `loki.schemaConfig`, `loki.storageConfig`</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="nt">structuredConfig</span><span class="p">:</span><span class="w"> </span>{}<span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="c"># -- Additional query scheduler config</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="nt">query_scheduler</span><span class="p">:</span><span class="w"> </span>{}<span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="c"># -- Additional storage config</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="nt">storage_config</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="nt">hedging</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">      </span><span class="nt">at</span><span class="p">:</span><span class="w"> </span><span class="s2">&#34;250ms&#34;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">      </span><span class="nt">max_per_second</span><span class="p">:</span><span class="w"> </span><span class="m">20</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">      </span><span class="nt">up_to</span><span class="p">:</span><span class="w"> </span><span class="m">3</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="nt">aws</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">      </span><span class="nt">s3</span><span class="p">:</span><span class="w"> </span><span class="l">s3.ap-northeast-2.amazonaws.com</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">      </span><span class="nt">bucketnames</span><span class="p">:</span><span class="w"> </span><span class="l">han-loki</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">      </span><span class="nt">region</span><span class="p">:</span><span class="w"> </span><span class="l">ap-northeast-2</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">      </span><span class="nt">access_key_id</span><span class="p">:</span><span class="w"> </span><span class="l">&lt;access-key&gt; </span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">      </span><span class="nt">secret_access_key</span><span class="p">:</span><span class="w"> </span><span class="l">&lt;aws-secret-key&gt;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">      </span><span class="nt">dynamodb</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="nt">dynamodb_url</span><span class="p">:</span><span class="w"> </span><span class="l">dynamodb.ap-northeast-2.amazonaws.com</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="nn">...</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="nt">config</span><span class="p">:</span><span class="w"> </span><span class="p">|</span><span class="sd">
+</span></span></span><span class="line"><span class="cl"><span class="sd">  ....</span><span class="w">  
+</span></span></span><span class="line"><span class="cl"><span class="w">	</span><span class="nt">table_manager</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">	      </span><span class="nt">retention_deletes_enabled</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">	      </span><span class="nt">retention_period</span><span class="p">:</span><span class="w"> </span><span class="l">336h</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">	      </span><span class="nt">index_tables_provisioning</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">	        </span><span class="nt">provisioned_write_throughput</span><span class="p">:</span><span class="w"> </span><span class="m">5</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">	        </span><span class="nt">provisioned_read_throughput</span><span class="p">:</span><span class="w"> </span><span class="m">5</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">	      </span><span class="nt">chunk_tables_provisioning</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">	        </span><span class="nt">provisioned_write_throughput</span><span class="p">:</span><span class="w"> </span><span class="m">5</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">	        </span><span class="nt">provisioned_read_throughput</span><span class="p">:</span><span class="w"> </span><span class="m">5</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">   </span><span class="l">...</span><span class="w">
+</span></span></span></code></pre></td></tr></table>
+</div>
+</div><pre tabindex="0"><code>
+## Loki 스토리지 연동 설정 문제
+
+DynamoDB 스토리지로 선택이 되나, loki-read Pod에서 다음의 연동 오류가 발생한다.
+
+```bash
+level=info ts=2023-04-16T13:31:40.414190216Z caller=http.go:279 org_id=fake msg=&#34;ended tailing logs&#34; tenant=fake selectors=&#34;{stream=\&#34;stdout\&#34;,pod=\&#34;loki-canary-c8s22\&#34;}&#34;
+level=info ts=2023-04-16T13:31:50.419151688Z caller=http.go:276 org_id=fake msg=&#34;starting to tail logs&#34; tenant=fake selectors=&#34;{stream=\&#34;stdout\&#34;,pod=\&#34;loki-canary-c8s22\&#34;}&#34;
+level=error ts=2023-04-16T13:31:50.422289139Z caller=series_index_store.go:583 org_id=fake msg=&#34;error querying storage&#34; err=&#34;QueryPages error: table=loki_: MissingRegion: could not find region configuration&#34;
+level=error ts=2023-04-16T13:31:50.422642663Z caller=series_index_store.go:583 org_id=fake msg=&#34;error querying storage&#34; err=&#34;QueryPages error: table=loki_: MissingRegion: could not find region configuration&#34;
+level=info ts=2023-04-16T13:31:50.422757665Z caller=http.go:279 org_id=fake msg=&#34;ended tailing logs&#34; tenant=fake selectors=&#34;{stream=\&#34;stdout\&#34;,pod=\&#34;loki-canary-c8s22\&#34;}&#34;
+level=info ts=2023-04-16T13:32:00.112792136Z caller=http.go:276 org_id=fake msg=&#34;starting to tail logs&#34; tenant=fake selectors=&#34;{stream=\&#34;stdout\&#34;,pod=\&#34;loki-canary-q52t8\&#34;}&#34;
+level=error ts=2023-04-16T13:32:00.11538504Z caller=series_index_store.go:583 org_id=fake msg=&#34;error querying storage&#34; err=&#34;QueryPages error: table=loki_: MissingRegion: could not find region configuration&#34;
+level=error ts=2023-04-16T13:32:00.115479121Z caller=series_index_store.go:583 org_id=fake msg=&#34;error querying storage&#34; err=&#34;QueryPages error: table=loki_: MissingRegion: could not find region configuration&#34;
+</code></pre><p>해당 이슈는 Loki 깃허브에서 확인이 가능했으나 답변이 없었다.</p>
+<p><img loading="lazy" 
+    src="/./loki-2-8-0/dynamodb-issue.png" 
+    alt="&lt;a href=&#34;https://github.com/grafana/loki/issues/1957&#34;&gt;https://github.com/grafana/loki/issues/1957&lt;/a&gt;" 
+     
+    width=1894 
+    height="1466"  /></p>
+<p><a href="https://github.com/grafana/loki/issues/1957">https://github.com/grafana/loki/issues/1957</a></p>
+<p>원인은 Loki DynamoDB 스토리지 설정으로 생긴 문제였다. 깃 이슈를 확인하면 Loki 공식문서에서 제공하는 파라미터를 통해 설정한 것을 확인할 수 있었는데, <strong>그대로 따라하면 오류가 발생한다.</strong></p>
+<p><img loading="lazy" 
+    src="/./loki-2-8-0/loki-parameter.png" 
+    alt="&lt;a href=&#34;https://grafana.com/docs/loki/latest/configuration/#aws_storage_config&#34;&gt;https://grafana.com/docs/loki/latest/configuration/#aws_storage_config&lt;/a&gt;" 
+     
+    width=2840 
+    height="1574"  /></p>
+<p><a href="https://grafana.com/docs/loki/latest/configuration/#aws_storage_config">https://grafana.com/docs/loki/latest/configuration/#aws_storage_config</a></p>
+<p>필자의 경우 에러 메세지를 기반으로 소스 코드를 분석했다. 결론적으로는 DynamoDB Struct에 Region 설정값이 없어서 생긴 오류였다.  코드 분석 과정은 다음과 같다.</p>
+<p>에러 메세지을 찾아 확인하니 <strong><code>ValidateEndpointHandler</code></strong> 함수에서 발생하는 에러였다.
+해당 함수는 AWS SDK의 일부로 AWS 서비스 요청에 대한 엔드포인트와 리전 정보를 검증하는 함수이다.</p>
+<p><img loading="lazy" 
+    src="/./loki-2-8-0/code-dynamo.png" 
+    alt="code-dynamo.png" 
+     
+    width=2484 
+    height="1294"  /></p>
+<p>해당 함수의 호출은 AWS 클라이언트를 생성하고, 이를 사용하여 서비스 요청을 시작할 때 발생한다. 각 스토리지  S3, DyanmoDB 클라이언트 구조체는 다음과 같은데 S3에는 region이 있지만, Dynamodb 에서는 해당 변수가 없었다.</p>
+<p><img loading="lazy" 
+    src="/./loki-2-8-0/code-s3.png" 
+    alt="code-s3.png" 
+     
+    width=1804 
+    height="772"  /></p>
+<p>아래와 같이 DynamoDB는 변수 dynamdb.dynamodb_url 이 Endpoint 및 시크릿 키를 입력받도록 되어 있다.  이는 Loki 버전 업데이트 전(Version 2.0 이하)의 변수 입력과 동일하다.  필자가 추정하건데 차트와 연동하여 스토리지 변수 설정 부분은 S3, GCS, Azure 만 업데이트되어 있는 것 같다.</p>
+<p><img loading="lazy" 
+    src="/./loki-2-8-0/dynamodb-code.png" 
+    alt="dynamodb-code.png" 
+     
+    width=1870 
+    height="1162"  /></p>
+<p>오류 해결은 간단하다. Loki 스토리지 예제를 참고하여 DynamoDB_URL에 Region 과 AWS 키 값 형식을 확인하며 차트에 반영하면 된다. Loki 스토리지 예제는 다음과 같이 확인할 수 있었다.</p>
+<p><img loading="lazy" 
+    src="/./loki-2-8-0/dynamodb-example.png" 
+    alt="&lt;a href=&#34;https://grafana.com/docs/loki/latest/configuration/examples/&#34;&gt;https://grafana.com/docs/loki/latest/configuration/examples/&lt;/a&gt;" 
+     
+    width=2238 
+    height="1234"  /></p>
+<p><a href="https://grafana.com/docs/loki/latest/configuration/examples/">https://grafana.com/docs/loki/latest/configuration/examples/</a></p>
+<p>이를 반영하여 최종적으로 수정한 차트는 다음과 같다.</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span><span class="lnt">31
+</span><span class="lnt">32
+</span><span class="lnt">33
+</span><span class="lnt">34
+</span><span class="lnt">35
+</span><span class="lnt">36
+</span><span class="lnt">37
+</span><span class="lnt">38
+</span><span class="lnt">39
+</span><span class="lnt">40
+</span><span class="lnt">41
+</span><span class="lnt">42
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-yaml" data-lang="yaml"><span class="line"><span class="cl"><span class="c"># values.yaml</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="nt">Loki</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="nn">...</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="nn">...</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="nt">config</span><span class="p">:</span><span class="w"> </span><span class="p">|</span><span class="sd">
+</span></span></span><span class="line"><span class="cl"><span class="sd">  ....</span><span class="w">  
+</span></span></span><span class="line"><span class="cl"><span class="w">	</span><span class="nt">table_manager</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">	      </span><span class="nt">retention_deletes_enabled</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">	      </span><span class="nt">retention_period</span><span class="p">:</span><span class="w"> </span><span class="l">336h</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">	      </span><span class="nt">index_tables_provisioning</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">	        </span><span class="nt">provisioned_write_throughput</span><span class="p">:</span><span class="w"> </span><span class="m">5</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">	        </span><span class="nt">provisioned_read_throughput</span><span class="p">:</span><span class="w"> </span><span class="m">5</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">	      </span><span class="nt">chunk_tables_provisioning</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">	        </span><span class="nt">provisioned_write_throughput</span><span class="p">:</span><span class="w"> </span><span class="m">5</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">	        </span><span class="nt">provisioned_read_throughput</span><span class="p">:</span><span class="w"> </span><span class="m">5</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">   </span><span class="l">...</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="c"># -- Check https://grafana.com/docs/loki/latest/configuration/#schema_config for more info on how to configure schemas</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="nt">schemaConfig</span><span class="p">:</span><span class="w"> 
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="nt">configs</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span>- <span class="nt">from</span><span class="p">:</span><span class="w"> </span><span class="s2">&#34;2022-01-11&#34;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">      </span><span class="nt">store</span><span class="p">:</span><span class="w"> </span><span class="l">aws</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">      </span><span class="nt">object_store</span><span class="p">:</span><span class="w"> </span><span class="l">s3</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">      </span><span class="nt">schema</span><span class="p">:</span><span class="w"> </span><span class="l">v12</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">      </span><span class="nt">index</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="nt">prefix</span><span class="p">:</span><span class="w"> </span><span class="l">loki_</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="l">...</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="c"># -- Check https://grafana.com/docs/loki/latest/configuration/#ruler for more info on configuring ruler</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="nt">rulerConfig</span><span class="p">:</span><span class="w"> </span>{}<span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="c"># -- Structured loki configuration, takes precedence over `loki.config`, `loki.schemaConfig`, `loki.storageConfig`</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="nt">structuredConfig</span><span class="p">:</span><span class="w"> </span>{}<span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="c"># -- Additional query scheduler config</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="nt">query_scheduler</span><span class="p">:</span><span class="w"> </span>{}<span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="c"># -- Additional storage config</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="nt">storage_config</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="nt">hedging</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">      </span><span class="nt">at</span><span class="p">:</span><span class="w"> </span><span class="s2">&#34;250ms&#34;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">      </span><span class="nt">max_per_second</span><span class="p">:</span><span class="w"> </span><span class="m">20</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">      </span><span class="nt">up_to</span><span class="p">:</span><span class="w"> </span><span class="m">3</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="nt">aws</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">      </span><span class="nt">s3</span><span class="p">:</span><span class="w"> </span><span class="l">s3://&lt;AWS-ACCESS-KEY&gt;:&lt;AWS-SECRET-KEY&gt;@ap-northeast-2/han-loki</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">      </span><span class="nt">dynamodb</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="nt">dynamodb_url</span><span class="p">:</span><span class="w"> </span><span class="l">dynamodb:///&lt;AWS-ACCESS-KEY&gt;:&lt;AWS-SECRET-KEY&gt;@ap-northeast-2</span><span class="w">
+</span></span></span></code></pre></td></tr></table>
+</div>
+</div><ul>
+<li>앞선 깃 이슈에서 dynamodb_url에 <code>inmemory:///</code> 로 변수를 설정하는 것이 있었는데 이는 가상의 인메모리로 구현시 사용된다고 한다.  연동시 헷갈리지 말자</li>
+</ul>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-yaml" data-lang="yaml"><span class="line"><span class="cl"><span class="c"># values-loki.yaml</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="nt">tableManager</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="nt">enabled</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="nt">test</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="nt">enabled</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="nt">monitoring</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="nt">lokiCanary</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="nt">enabled</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="nt">selfMonitoring</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="nt">enabled</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="nt">loki</span><span class="p">:</span><span class="w"> 
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="nt">auth_enabled</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span><span class="w">
+</span></span></span></code></pre></td></tr></table>
+</div>
+</div><ul>
+<li>Loki Config 부분을 제외하고는 오버라이드가 가능하여 나머지 설정 부분은 다음과 같이 설정하였다.</li>
+</ul>
+<h2 id="배포-확인">
+    <a href="#%eb%b0%b0%ed%8f%ac-%ed%99%95%ec%9d%b8" class="anchor">
+        <svg class="icon" aria-hidden="true" focusable="false" height="16" version="1.1" viewBox="0 0 16 16" width="16">
+            <path fill-rule="evenodd"
+                d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z">
+            </path>
+        </svg>
+    </a>
+    배포 확인
+</h2>
+<p>차트 배포를 통해 연동을 해보자.</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">kubectl create ns loki
+</span></span><span class="line"><span class="cl">helm repo add grafana https://grafana.github.io/helm-charts
+</span></span><span class="line"><span class="cl">helm repo update
+</span></span><span class="line"><span class="cl">helm install loki grafana/loki -f values.yaml -f values-loki.yaml -n loki --version 4.8.0
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>배포 후 AWS 콘솔에서 확인하면 S3에는 청크가 DynamoDB에는 인덱스가 저장되는 것을 확인할 수 있다.</p>
+<p><strong>S3 Chunk 확인</strong></p>
+<p><img loading="lazy" 
+    src="/./loki-2-8-0/fake-.png" 
+    alt="fake-.png" 
+     
+    width=2206 
+    height="1010"  /></p>
+<p><img loading="lazy" 
+    src="/./loki-2-8-0/loki-success-s3.png" 
+    alt="loki-success-s3.png" 
+     
+    width=2256 
+    height="1350"  /></p>
+<p><strong>DynamoDB 인덱스 조회 확인</strong></p>
+<p><img loading="lazy" 
+    src="/./loki-2-8-0/index-.png" 
+    alt="index-.png" 
+     
+    width=2156 
+    height="1098"  /></p>
+<p>성공이다..! 돌고 돌아 공식 문서에서의 예제로 연동에 성공하였다. 헬름 차트 랜더링과ㅊ 파라미터 변수의 예제를 꼭 확인하도록 하자!</p>
+<h1 id="운영시-고려사항">
+    <a href="#%ec%9a%b4%ec%98%81%ec%8b%9c-%ea%b3%a0%eb%a0%a4%ec%82%ac%ed%95%ad" class="anchor">
+        <svg class="icon" aria-hidden="true" focusable="false" height="16" version="1.1" viewBox="0 0 16 16" width="16">
+            <path fill-rule="evenodd"
+                d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z">
+            </path>
+        </svg>
+    </a>
+    운영시 고려사항
+</h1>
+<p>배포 과정에서 고려사항이 있어 추가로 남겨둔다.</p>
+<h2 id="스토리지-사용-비용">
+    <a href="#%ec%8a%a4%ed%86%a0%eb%a6%ac%ec%a7%80-%ec%82%ac%ec%9a%a9-%eb%b9%84%ec%9a%a9" class="anchor">
+        <svg class="icon" aria-hidden="true" focusable="false" height="16" version="1.1" viewBox="0 0 16 16" width="16">
+            <path fill-rule="evenodd"
+                d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z">
+            </path>
+        </svg>
+    </a>
+    스토리지 사용 비용
+</h2>
+<p>첫 쨰로 <strong>비용</strong>이다. DynamoDB 연동시 기본 읽기용량이 100, 쓰기용량이 25로 설정되어 있다. 비용 계산를 확인 하자면 다음과 같다.</p>
+<p>한국 DynamoDB 비용</p>
+<ul>
+<li>쓰기 요청 유닛(WRU): 1,000,000 건당 $1.3556</li>
+<li>읽기 요청 유닛(RRU): 1,000,000 건당 $0.271</li>
+</ul>
+<p>기본 읽기용량이 100, 쓰기용량이 25로 설정된 경우, 용량 단위에 대한 실제 요청 수를 알아야 한다.</p>
+<p>예를 들어, 시간당 10,000건의 쓰기 요청과 50,000건의 읽기 요청이 있다고 가정하겠다.</p>
+<ol>
+<li>쓰기 요청 비용: 10,000 WRU x ($1.3556 / 1,000,000) = $0.013556</li>
+<li>읽기 요청 비용: 50,000 RRU x ($0.271 / 1,000,000) = $0.01355</li>
+</ol>
+<p>총 비용은  $0.013556 + $0.01355 = $0.027106 (1h) 이다.</p>
+<p>운영 환경에서 배포시 시스템 규모를 파악하여 쓰기 및 읽기 요청에 따라 용량을 설정하도록 하자. 용량 설정은 위 차트에서의 table_manager 에서 설정이 가능하다. 필자는 5로 설정했었다.</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-yaml" data-lang="yaml"><span class="line"><span class="cl"><span class="c"># values.yaml</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="nt">Loki</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="nn">...</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="nn">...</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="nt">config</span><span class="p">:</span><span class="w"> </span><span class="p">|</span><span class="sd">
+</span></span></span><span class="line"><span class="cl"><span class="sd">  ....</span><span class="w">  
+</span></span></span><span class="line"><span class="cl"><span class="w">	</span><span class="nt">table_manager</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">	      </span><span class="nt">retention_deletes_enabled</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">	      </span><span class="nt">retention_period</span><span class="p">:</span><span class="w"> </span><span class="l">336h</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">	      </span><span class="nt">index_tables_provisioning</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">	        </span><span class="nt">provisioned_write_throughput</span><span class="p">:</span><span class="w"> </span><span class="m">5</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">	        </span><span class="nt">provisioned_read_throughput</span><span class="p">:</span><span class="w"> </span><span class="m">5</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">	      </span><span class="nt">chunk_tables_provisioning</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">	        </span><span class="nt">provisioned_write_throughput</span><span class="p">:</span><span class="w"> </span><span class="m">5</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">	        </span><span class="nt">provisioned_read_throughput</span><span class="p">:</span><span class="w"> </span><span class="m">5</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">   </span><span class="l">...</span><span class="w">
+</span></span></span></code></pre></td></tr></table>
+</div>
+</div>
+    </div>
+</div>
+
+<div class="container">
+    
+    <nav class="flex container suggested">
+        
+        <a rel="prev" href="/post/pkos-5-security/" title="Previous post (older)">
+            <span>Previous</span>
+            [PKOS] 쿠버네티스 보안과 Kubescape DeepDive
+            </a>
+        
+        
+        
+        <a rel="next" href="/post/tech-private-docker/" title="Next post (newer)">
+            <span>Next</span>
+            [테크 따라잡기] EKS에서 고가용성 Private Docker Registry(Harbor) 구축하기
+            </a> 
+        
+    </nav>
+    
+</div>
+ 
+<div class="container">
+    
+    <script src="https://giscus.app/client.js" 
+        data-repo="WingLim/hugo-tania"
+        data-repo-id="MDEwOlJlcG9zaXRvcnkzMTYyNjQzMDc="
+        
+        data-category="Comments"
+        data-category-id="DIC_kwDOEtnPc84B_WKP"
+        
+        data-mapping="pathname"
+        data-reactions-enabled="1"
+        data-emit-metadata="0"
+        data-theme="light"
+        crossorigin="anonymous"
+        async
+        >
+</script>
+
+<script>
+    function setGiscusTeheme(theme) {
+        let giscus = document.querySelector('.giscus iframe');
+        if (giscus) {
+            giscus.contentWindow.postMessage(
+                {
+                    giscus: {
+                        setConfig: {
+                            theme: theme
+                        }
+                    }
+                },
+                'https://giscus.app'
+            )
+        }
+    }
+
+    addEventListener('message', event => {
+        if (event.origin !== 'https://giscus.app') return;
+        setGiscusTeheme(document.documentElement.dataset.userColorScheme)
+    });
+
+    window.addEventListener('onColorSchemeChange', (e) => {
+        setGiscusTeheme(e.detail)
+    })
+</script>
+
+</div>
+
+</main>
+
+
+        </main>
+        <footer class="footer flex">
+    <section class="container">
+        <nav class="footer-links">
+            
+            <a href="/index.xml">RSS</a>
+            
+        </nav>
+
+        
+    </section>
+    <script defer src="/ts/features.706a523ba43e6d0427c7fdf2b9d05dbd0920d3f12942b453690b495cb2522743.js" 
+    data-enable-footnotes="true"
+    ></script>
+</footer>
+
+    </body>
+</html>
