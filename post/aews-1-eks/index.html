@@ -48,7 +48,7 @@
     },
     "datePublished": "2023-04-29",
     "description": "EKS 구성 아키텍처와 옵션 확인 및 Private EKS 클러스터 배포하기",
-    "wordCount":  0 ,
+    "wordCount":  4083 ,
     "mainEntityOfPage": "True",
     "dateModified": "2023-04-29",
     "publisher": {
@@ -135,7 +135,7 @@
                             
                             
                             By HanHoRnag | <time>April 29, 2023</time>
-                            | 0 minutes
+                            | 20 minutes
                         </div>
                         <div class="tags">
                             
@@ -157,7 +157,1340 @@
     </article>
 
     <div class="article-post">
-    
+    <div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-markdown" data-lang="markdown"><span class="line"><span class="cl">AWS EKS Workshop Study (=AEWS)는 EKS Workshop 실습 스터디입니다.
+</span></span><span class="line"><span class="cl">CloudNet@ Gasida(가시다)이 진행하며,공개된 AWS EKS Workshop을 기반으로 진행하고 있습니다.
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h1 id="eks-">
+    <a href="#eks-" class="anchor">
+        <svg class="icon" aria-hidden="true" focusable="false" height="16" version="1.1" viewBox="0 0 16 16" width="16">
+            <path fill-rule="evenodd"
+                d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z">
+            </path>
+        </svg>
+    </a>
+    EKS ?
+</h1>
+<p>Amazon Elastic Kubernetes Service(EKS)는 AWS에서 제공하는 관리형 Kubernetes 서비스다. EKS를 사용하면 Kubernetes 클러스터를 생성, 운영 및 유지 관리할 수 있다.</p>
+<p><img loading="lazy" 
+    src="/./aews-1-eks/eks-.png" 
+    alt="&lt;a href=&#34;https://catalog.us-east-1.prod.workshops.aws/workshops/9c0aa9ab-90a9-44a6-abe1-8dff360ae428/ko-KR/10-intro/200-eks&#34;&gt;https://catalog.us-east-1.prod.workshops.aws/workshops/9c0aa9ab-90a9-44a6-abe1-8dff360ae428/ko-KR/10-intro/200-eks&lt;/a&gt;" 
+     
+    width=460 
+    height="354"  /></p>
+<p><a href="https://catalog.us-east-1.prod.workshops.aws/workshops/9c0aa9ab-90a9-44a6-abe1-8dff360ae428/ko-KR/10-intro/200-eks">https://catalog.us-east-1.prod.workshops.aws/workshops/9c0aa9ab-90a9-44a6-abe1-8dff360ae428/ko-KR/10-intro/200-eks</a></p>
+<p>EKS의 주요 특징은 다음과 같다.</p>
+<ul>
+<li>관리형 서비스: EKS는 Kubernetes 컨트롤 플레인이나 데이터 플레인를 설치, 운영 및 유지 관리시켜주는 서비스이다. 사용자가 인프라 설치, 운영, 유지 관리를 할 필요가 없다.</li>
+<li>높은 가용성: EKS는 여러 AWS 가용 영역(데이터 센터의 물리적 위치)에 걸쳐 컨트롤 플레인과 데이터 플레인를 분산시켜 서비스의 안정성을 제공한다. 이는 단일 장재 지점을 제거하도록 설계되었으며 자동 관리되는 컨트롤 플레인의 경우 리전 내 개별 가용 영역에서 최소 2개이상의API 서버 노드를 실행한다.</li>
+<li>AWS 서비스 통합: 타 AWS ECR(도커 레지스트리), ELB(네트워크 로드밸런싱), IAM(보안), VPC(네트워크)와 같은 AWS 서비스와 통합되어 컨테이너 이미지 저장, 로드 밸런싱, 인증 및 격리를 쉽게 관리할 수 있다.</li>
+<li>오픈 소스 Kubernetes 호환성: 최신 버전의 오픈 소스 Kubernetes를 사용하여 기존 플러그인과 도구를 그대로 활용할 수 있다.</li>
+<li>지원 버전 : 23년 4월 현재 kubernetes 버전 중 1.22~1.26 지원을 지원 중이다. 버전 출시 주기는 연 3회이며 각 버전은 12개월 동안 지원된다. 지원이 끝난 버전들은 자동으로 EKS가 업데이트시킨다.</li>
+</ul>
+<p><br/><br/></p>
+<h1 id="eks-아키텍처">
+    <a href="#eks-%ec%95%84%ed%82%a4%ed%85%8d%ec%b2%98" class="anchor">
+        <svg class="icon" aria-hidden="true" focusable="false" height="16" version="1.1" viewBox="0 0 16 16" width="16">
+            <path fill-rule="evenodd"
+                d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z">
+            </path>
+        </svg>
+    </a>
+    EKS 아키텍처
+</h1>
+<p>EKS 아키텍처는 크게 컨트롤 플레인(마스터 노드)과 데이터 플레인(워커 노드)로 나뉜다. 아키텍처 그림은  <a href="https://awskoreamarketingasset.s3.amazonaws.com/2022%20Summit/pdf/T14S4_Amazon%20EKS%20%EB%A7%88%EC%9D%B4%EA%B7%B8%EB%A0%88%EC%9D%B4%EC%85%98%20%EC%9A%94%EC%A0%90%20%EC%A0%95%EB%A6%AC.pdf">스터디에서 공유해주신 2022 AWS 마이그레이션 요점 정리 pdf</a>를 기반으로 살펴보겠다.
+<br/><br/></p>
+<h2 id="컨트롤-플레인">
+    <a href="#%ec%bb%a8%ed%8a%b8%eb%a1%a4-%ed%94%8c%eb%a0%88%ec%9d%b8" class="anchor">
+        <svg class="icon" aria-hidden="true" focusable="false" height="16" version="1.1" viewBox="0 0 16 16" width="16">
+            <path fill-rule="evenodd"
+                d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z">
+            </path>
+        </svg>
+    </a>
+    컨트롤 플레인
+</h2>
+<p>EKS에서는 Kubernetes 컨트롤 플레인의 가용성과 내구성을 손상시킬 수 있는 단일 장애 지점을 제거하도록 설계되었다. 컨트롤 플레인은 API 서버 노드, etcd 클러스터로 구성된다.</p>
+<p><img loading="lazy" 
+    src="/./aews-1-eks/control2.png" 
+    alt="control2.png" 
+     
+    width=1198 
+    height="567"  /></p>
+<ul>
+<li>API 서버:  쿠버네티스 클러스터의 모든 작업을 처리하고 상태를 저장하는 중앙 허브이다. RESTful API를 통해 통신하며, 사용자 요청에 따라 클러스터의 상태를 변경하거나 정보를 반환시켜준다.</li>
+<li>etcd: etcd는 쿠버네티스 클러스터에서 사용하는 분산 키-값 저장소이다. 쿠버네티스의 모든 설정 데이터와 클러스터 상태 정보를 저장한다.</li>
+<li>각 API 서버와 etcd는 개별 가용 영역에서 최소 2개 이상의 클러스터로 구성되어 실행된다. 이를 통해 단일 가용 영역의 이벤트가 EKS 클러스터 가용성에 영향을 미치지 않는다.</li>
+<li>각 가용 영역에서는 NAT 게이트웨이를 통해 프라이빗 서브넷에서 실행되며 사용자는 해당 노드에 접근할 수 없다. 또한 API 서버는 NLB로 ETCD는 ELB를 사용하여 컨트롤 플레인 서버의 부하를 분산시킨다.</li>
+<li>API 서버와 ETCD 클러스터는 오토스케일링 그룹으로 구성되어 조건(클러스터 규모 , API 서버 및 etcd에 대한 요청 증가)에 따라 자동으로 리소스가 확장된다.</li>
+</ul>
+<br/>
+<h2 id="데이터-플레인">
+    <a href="#%eb%8d%b0%ec%9d%b4%ed%84%b0-%ed%94%8c%eb%a0%88%ec%9d%b8" class="anchor">
+        <svg class="icon" aria-hidden="true" focusable="false" height="16" version="1.1" viewBox="0 0 16 16" width="16">
+            <path fill-rule="evenodd"
+                d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z">
+            </path>
+        </svg>
+    </a>
+    데이터 플레인
+</h2>
+<p>데이터 플레인은 쿠버네티스 클러스터 내에서 워크로드를 실행하고 관리되는 서버다. 아키텍처는 다음과 같다.</p>
+<p><img loading="lazy" 
+    src="/./aews-1-eks/data2.png" 
+    alt="data2.png" 
+     
+    width=1197 
+    height="570"  /></p>
+<ul>
+<li>kubelet: 노드 에이전트이다. kubelet은 API 서버로부터 파드를 실행하고 관리해야 하는 명령을 받아 서버에 반영시켜준다. 또 실행 중인 파드와 컨테이너를 관리하고, 상태를 모니터링하며, 필요한 경우 API 서버에 상태 정보를 보고하는 역할을 수행한다.</li>
+<li>kube-proxy: 네트워크 프록시 및 로드 밸런서이다. kube-proxy는 쿠버네티스 서비스에 대한 요청을 적절한 파드로 전달하고, 파드 간의 통신을 관리한다. EKS 의 기본 네트워크 CNI로는 VPC-CNI가 실행된다.</li>
+</ul>
+<br/>
+<br/> 
+<p>또한, 사용자의 요구에 맞게 데이터 플레인의 구성 옵션을 설정할 수 있다.  구성 옵션별 세부 정보는 다음 그림과 같다.</p>
+<p><img loading="lazy" 
+    src="/./aews-1-eks/SRM-MNG.jpeg" 
+    alt="SRM-MNG.jpeg" 
+     
+    width=1836 
+    height="626"  /></p>
+<p><img loading="lazy" 
+    src="/./aews-1-eks/SRM-Fargate.jpeg" 
+    alt="&lt;a href=&#34;https://aws.github.io/aws-eks-best-practices/reliability/docs/&#34;&gt;https://aws.github.io/aws-eks-best-practices/reliability/docs/&lt;/a&gt;" 
+     
+    width=1872 
+    height="646"  /></p>
+<p><a href="https://aws.github.io/aws-eks-best-practices/reliability/docs/">https://aws.github.io/aws-eks-best-practices/reliability/docs/</a></p>
+<p>그림에서 비교한 것과 같이 사용자 책임 레벨에 따라 3가지로 구분된다.</p>
+<ul>
+<li>Self Managed Workers :사용자가 직접 노드를 구성하고 관리하는 방식이다. 구체적으로는 Custom AMI를 통해 작업자 노드를 생성하며 AMI와 노드의 패치 및 업그레이드를 사용자가 직접 관리한다.</li>
+<li>Managed Node groups : AWS가 노드를 자동으로 프로비저닝하고, 업데이트 및 유지 관리를 처리한다.</li>
+<li>EKS Fargate : 서버리스 컴퓨팅 옵션이다. Micro VM를 이용하여 Pod별 VM이 할당된다. AWS가 설정에 맞게 파드 레벨의 스케일링을 자동으로 처리한다.</li>
+</ul>
+<p><br/><br/><br/></p>
+<h2 id="cluster-endpoint-access">
+    <a href="#cluster-endpoint-access" class="anchor">
+        <svg class="icon" aria-hidden="true" focusable="false" height="16" version="1.1" viewBox="0 0 16 16" width="16">
+            <path fill-rule="evenodd"
+                d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z">
+            </path>
+        </svg>
+    </a>
+    Cluster Endpoint Access
+</h2>
+<p>EKS 클러스터의 API 서버에 대한 접근을 제어하는 설정이다. 클러스터 엔드포인트를 설정함으로써, 클러스터에 대한 접근을 필요한 범위로 제한하여 보안을 강화할 수 있다. 옵션은 3가지 존재한다.</p>
+<ul>
+<li>
+<p>Public : 클러스터 엔드포인트가 Public IP로 할당되어 인터넷에서 접근이 가능한 설정이다. 클러스터 내부에서도 IGW 를 통해 Public IP와 통신한다.</p>
+<p><img loading="lazy" 
+    src="/./aews-1-eks/public.png" 
+    alt="public.png" 
+     
+    width=1173 
+    height="565"  /></p>
+<p>해당 옵션은 AWS 콘솔에서 확인 가능하다. Public 설정시 다음과 같이 접근이 가능하다.</p>
+<p><img loading="lazy" 
+    src="/./aews-1-eks/public2.png" 
+    alt="public2.png" 
+     
+    width=1818 
+    height="864"  /></p>
+<p><img loading="lazy" 
+    src="/./aews-1-eks/public1.png" 
+    alt="public1.png" 
+     
+    width=921 
+    height="215"  /></p>
+<p>위와 같이 인터넷을 통해 접근이 가능하여 접근성을 높일 수 있다.</p>
+</li>
+<li>
+<p>Public Private : 워크노드 내부에서는 Private(VPC 내부망에서만 접근 가능)로, API 접근은 Public(인터넷을 통한 접근 가능)으로만 통신이 가능하다. 워크 노드에서 민감데이터 노출을 막기 위해 Private subnet(사설망)에 위치시킨 경우 사용할 수 있는 옵션이다.</p>
+<p><img loading="lazy" 
+    src="/./aews-1-eks/public-private.png" 
+    alt="public-private.png" 
+     
+    width=1177 
+    height="565"  /></p>
+</li>
+<li>
+<p>Private : API 서버 엔드포인트 또한 허용된 VPC에서만 접근이 가능한 설정이다.</p>
+<p><img loading="lazy" 
+    src="/./aews-1-eks/private.png" 
+    alt="private.png" 
+     
+    width=1174 
+    height="567"  /></p>
+<p>해당 옵션으로 사용시 API Server URL은 Route53 privated hosted zone으로 변경되어 VPC 내부에서만 통신이 가능하다. 해당 URL은 AWS 콘솔의 EKS나 kubectl -v=6 옵션으로 확인이 가능하다.</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl"><span class="c1"># API Server URL(Route53 privated hosted zone)</span>
+</span></span><span class="line"><span class="cl"><span class="o">(</span>terraform-eks@my-eks:N/A<span class="o">)</span> <span class="o">[</span>root@myeks-host example<span class="o">]</span><span class="c1"># kubectl get pods -A  -v=6</span>
+</span></span><span class="line"><span class="cl">I0428 14:26:36.609385   <span class="m">27821</span> loader.go:374<span class="o">]</span> Config loaded from file:  /root/.kube/config
+</span></span><span class="line"><span class="cl">I0428 14:26:37.276259   <span class="m">27821</span> round_trippers.go:553<span class="o">]</span> GET https://232B71CC97744BC94C09D40801D073B0.yl4.ap-northeast-2.eks.amazonaws.com/api/v1/pods?limit<span class="o">=</span><span class="m">500</span> <span class="m">200</span> OK in <span class="m">661</span> milliseconds
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>위 <code>[https://232B71CC97744BC94C09D40801D073B0.yl4.ap-northeast-2.eks.amazonaws.com](https://232B71CC97744BC94C09D40801D073B0.yl4.ap-northeast-2.eks.amazonaws.com)</code> 가 API server URL이다.  해당 URL은 EKS 컨트롤 노드가 소유하고 있는 네트워크 인터페이스를 통해 통신된다. 통칭 EKS owned ENI는 AWS 콘솔에서 확인이 가능하다.</p>
+<p><img loading="lazy" 
+    src="/./aews-1-eks/eni.png" 
+    alt="eni.png" 
+     
+    width=1628 
+    height="858"  /></p>
+<p>네트워크 인터페이스에서 클러스터를 배포한 VPC를 입력하여 인스턴스 ID가 존재하지 않고(- 표시), 설명에 Amazone EKS cluster-name 으로 표시된 것이 EKS owned ENI 이다. 인스턴스 소유자 또한 AWS 소유자 번호가 다른 것을 확인할 수 있는데 AWS가 직접 관리하는 컨트롤 노드의 소유자 번호이기 때문이다.</p>
+</li>
+</ul>
+<p><br/><br/><br/></p>
+<h1 id="eks-배포-방식">
+    <a href="#eks-%eb%b0%b0%ed%8f%ac-%eb%b0%a9%ec%8b%9d" class="anchor">
+        <svg class="icon" aria-hidden="true" focusable="false" height="16" version="1.1" viewBox="0 0 16 16" width="16">
+            <path fill-rule="evenodd"
+                d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z">
+            </path>
+        </svg>
+    </a>
+    EKS 배포 방식
+</h1>
+<p>EKS 배포 방식은 Manual, Command line utility, Infrastructure as Code 에 따라 구성할 수 있다.</p>
+<ul>
+<li>Manual : AWS Management Console 에서 직접 구성</li>
+<li>Command line utility : 커맨드 명령어를 통한 구성 (AWS CLI, eksctl)</li>
+<li>Infrastructure as Code : 코드를 통한 구성(Terrafrom, AWS CDK 등)</li>
+</ul>
+<p>이번 블로그 글에서는 <code>eksctl</code> 를 통해 클러스터를 구성하겠다.
+<br/></p>
+<h2 id="eksctl-">
+    <a href="#eksctl-" class="anchor">
+        <svg class="icon" aria-hidden="true" focusable="false" height="16" version="1.1" viewBox="0 0 16 16" width="16">
+            <path fill-rule="evenodd"
+                d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z">
+            </path>
+        </svg>
+    </a>
+    eksctl ?
+</h2>
+<p>Amazon EKS (Elastic Kubernetes Service) 클러스터를 생성하고 관리하기 위한 명령줄 인터페이스(CLI) 툴이다. eksctl를 통해 클러스터를 구성 및 삭제, 업데이트할 수 있으며 VPC, 서브넷, 리소스 생성을 위한 정책 생성 등의 작업을 쉽게 처리할 수 있다. <a href="https://eksctl.io/">공식 문서</a>를 통해 다양한 인프라 환경에서의 EKS 구성을 참고할 수 있다.</p>
+<p>아쉬운 점은 EKS에서만 구축이 된다는 점이다. 추후 다른 클러스터나 멀티 클러스터 구축시 다른 툴을 사용하자.</p>
+<p>추가로 사용해보니.. eksctl는 형상관리가 불가능하다. 한 번 배포 이후에는 eksctl 구성 파일을 통해 추가 작업이 불가능하다. eksctl를 통해 기존의 리소스 변경이 불가능하며 추가만 가능하다.
+<br/></p>
+<h2 id="eksctl-를-통한-eks-배포">
+    <a href="#eksctl-%eb%a5%bc-%ed%86%b5%ed%95%9c-eks-%eb%b0%b0%ed%8f%ac" class="anchor">
+        <svg class="icon" aria-hidden="true" focusable="false" height="16" version="1.1" viewBox="0 0 16 16" width="16">
+            <path fill-rule="evenodd"
+                d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z">
+            </path>
+        </svg>
+    </a>
+    eksctl 를 통한 EKS 배포
+</h2>
+<p>eksctl를 통해 EKS Private Cluster 를 배포하겠다. 구성 아키텍처는 다음과 같다.</p>
+<p><img loading="lazy" 
+    src="/./aews-1-eks/eks-arch.png" 
+    alt="eks-arch.png" 
+     
+    width=1101 
+    height="661"  /></p>
+<p>노드 그룹은 unmanaged node group 으로, Cluster endpoint 는 Private로 구성하였다. 아키텍처에서 화살표는 통신 아키텍처이다.</p>
+<ul>
+<li>EKS Admin(빨간선) : 베스천 서버를 통해 EKS API Server로 접근하여 EKS를 관리하는 과정이다.</li>
+<li>Private Worker node(보라선): Private cluster 로 구성되어 EKS control node ENI를 통해 EKS Control node와 통신한다.</li>
+</ul>
+<p>배포 과정은 다음과 같이 진행하겠다.</p>
+<ol>
+<li>cloudformation를 통한 베스천 서버 배포</li>
+<li>eksctl를 통한 EKS 배포</li>
+</ol>
+<p><br/><br/></p>
+<h3 id="1-aws-cloudformation를-통한-베스천-서버-배포">
+    <a href="#1-aws-cloudformation%eb%a5%bc-%ed%86%b5%ed%95%9c-%eb%b2%a0%ec%8a%a4%ec%b2%9c-%ec%84%9c%eb%b2%84-%eb%b0%b0%ed%8f%ac" class="anchor">
+        <svg class="icon" aria-hidden="true" focusable="false" height="16" version="1.1" viewBox="0 0 16 16" width="16">
+            <path fill-rule="evenodd"
+                d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z">
+            </path>
+        </svg>
+    </a>
+    1. AWS Cloudformation를 통한 베스천 서버 배포
+</h3>
+<p>AWS Cloudformation을 통해 VPC 구성 및 베스천 서버를 배포하고 eksctl 설치 및 관리 패키지를 설치하겠다. Cloudformation 스크립트는 스터디에서 공유해주신 것을 기반으로 내용을 추가하였다.</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl"><span class="c1"># yaml 파일 다운로드</span>
+</span></span><span class="line"><span class="cl">curl -O https://github.com/HanHoRang31/blog-share/blob/main/aews-eksctl/cloudformation-bastion.yaml
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>구성 코드에서 Private 클러스터 구축을 위한 중요 부분과 베스천 서버의 패키지 구성 정보를 확인하겠다. 먼저 Private 클러스터 구축을 위해 필요한 보안 그룹은 다음과 같다.</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span><span class="lnt">31
+</span><span class="lnt">32
+</span><span class="lnt">33
+</span><span class="lnt">34
+</span><span class="lnt">35
+</span><span class="lnt">36
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-yaml" data-lang="yaml"><span class="line"><span class="cl"><span class="c"># cloudformation-bastion</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="c"># 파라미터 </span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="nn">...</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="c"># 베스천 서버 보안 그룹 설정 </span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="c"># EKSCTL-Host</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="nt">EKSEC2SG</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="nt">Type</span><span class="p">:</span><span class="w"> </span><span class="l">AWS::EC2::SecurityGroup</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="nt">Properties</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">      </span><span class="nt">GroupDescription</span><span class="p">:</span><span class="w"> </span><span class="l">eksctl-host Security Group</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">      </span><span class="nt">VpcId</span><span class="p">:</span><span class="w"> </span>!<span class="l">Ref EksVPC</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">      </span><span class="nt">Tags</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span>- <span class="nt">Key</span><span class="p">:</span><span class="w"> </span><span class="l">Name</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">          </span><span class="nt">Value</span><span class="p">:</span><span class="w"> </span>!<span class="l">Sub ${ClusterBaseName}-HOST-SG</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">      </span><span class="nt">SecurityGroupIngress</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">      </span>- <span class="nt">IpProtocol</span><span class="p">:</span><span class="w"> </span><span class="l">tcp</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="nt">FromPort</span><span class="p">:</span><span class="w"> </span><span class="s1">&#39;22&#39;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="nt">ToPort</span><span class="p">:</span><span class="w"> </span><span class="s1">&#39;22&#39;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="nt">CidrIp</span><span class="p">:</span><span class="w"> </span>!<span class="l">Ref SgIngressSshCidr</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="c"># 베스천 서버에서 EKS 배포를 위한 보안 그룹 설정 </span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="nt">ControlPlaneSecurityGroup</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="nt">DependsOn</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">      </span>- <span class="l">EKSEC2SG</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="nt">Type</span><span class="p">:</span><span class="w"> </span><span class="l">AWS::EC2::SecurityGroup</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="nt">Properties</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">      </span><span class="nt">GroupDescription</span><span class="p">:</span><span class="w"> </span><span class="l">Cluster communication with worker nodes</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">      </span><span class="nt">VpcId</span><span class="p">:</span><span class="w"> </span>!<span class="l">Ref EksVPC</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">      </span><span class="nt">SecurityGroupIngress</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span>- <span class="nt">IpProtocol</span><span class="p">:</span><span class="w"> </span><span class="l">tcp</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">          </span><span class="nt">FromPort</span><span class="p">:</span><span class="w"> </span><span class="m">443</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">          </span><span class="nt">ToPort</span><span class="p">:</span><span class="w"> </span><span class="m">443</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">          </span><span class="nt">SourceSecurityGroupId</span><span class="p">:</span><span class="w"> </span>!<span class="l">Ref EKSEC2SG</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">      </span><span class="nt">Tags</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span>- <span class="nt">Key</span><span class="p">:</span><span class="w"> </span><span class="l">Name</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">          </span><span class="nt">Value</span><span class="p">:</span><span class="w"> </span>!<span class="l">Sub ${ClusterBaseName} Control Plane Security Group</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="nn">...</span><span class="w">
+</span></span></span></code></pre></td></tr></table>
+</div>
+</div><p>Private Cluster 구축으로 중요 사항은 두 가지이다.</p>
+<ul>
+<li><code>EKSEC2SG</code>  : 베스천 서버에 대한 보안 그룹 설정 부분이다. 해당 부분을 통해 베스천 서버에 접근할 수 있는 IP 범위를 제한할 수 있다. 코드 내 SgIngressSshCidr 에서 지정한 IP를 제한하며 해당 값은 배포 명령어로 override 을 통해 값을 수정할 수 있다.</li>
+<li><code>ControlPlaneSecurityGroup</code> :  컨트롤 플레인과 워크 노드간 통신을 위한 보안 그룹 설정 부분이다. 코드에서는 베스천 서버와의 통신을 위해 443 포트의 보안 그룹을 추가하였다.</li>
+</ul>
+<p>userdata를 확인하면 베스천 서버에 설치되는 패키지를 확인할 수 있다. 설치 명령어는 다음과 같다.</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span><span class="lnt">31
+</span><span class="lnt">32
+</span><span class="lnt">33
+</span><span class="lnt">34
+</span><span class="lnt">35
+</span><span class="lnt">36
+</span><span class="lnt">37
+</span><span class="lnt">38
+</span><span class="lnt">39
+</span><span class="lnt">40
+</span><span class="lnt">41
+</span><span class="lnt">42
+</span><span class="lnt">43
+</span><span class="lnt">44
+</span><span class="lnt">45
+</span><span class="lnt">46
+</span><span class="lnt">47
+</span><span class="lnt">48
+</span><span class="lnt">49
+</span><span class="lnt">50
+</span><span class="lnt">51
+</span><span class="lnt">52
+</span><span class="lnt">53
+</span><span class="lnt">54
+</span><span class="lnt">55
+</span><span class="lnt">56
+</span><span class="lnt">57
+</span><span class="lnt">58
+</span><span class="lnt">59
+</span><span class="lnt">60
+</span><span class="lnt">61
+</span><span class="lnt">62
+</span><span class="lnt">63
+</span><span class="lnt">64
+</span><span class="lnt">65
+</span><span class="lnt">66
+</span><span class="lnt">67
+</span><span class="lnt">68
+</span><span class="lnt">69
+</span><span class="lnt">70
+</span><span class="lnt">71
+</span><span class="lnt">72
+</span><span class="lnt">73
+</span><span class="lnt">74
+</span><span class="lnt">75
+</span><span class="lnt">76
+</span><span class="lnt">77
+</span><span class="lnt">78
+</span><span class="lnt">79
+</span><span class="lnt">80
+</span><span class="lnt">81
+</span><span class="lnt">82
+</span><span class="lnt">83
+</span><span class="lnt">84
+</span><span class="lnt">85
+</span><span class="lnt">86
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-yaml" data-lang="yaml"><span class="line"><span class="cl"><span class="nn">...</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="nt">UserData</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="nt">Fn::Base64</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span>!<span class="l">Sub |</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="c">#!/bin/bash</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="l">hostnamectl --static set-hostname &#34;${ClusterBaseName}-host&#34;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="c"># Config convenience</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="l">echo &#39;alias vi=vim&#39; &gt;&gt; /etc/profile</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="l">echo &#34;sudo su -&#34; &gt;&gt; /home/ec2-user/.bashrc</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="c"># Change Timezone</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="l">sed -i &#34;s/UTC/Asia\/Seoul/g&#34; /etc/sysconfig/clock</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="l">ln -sf /usr/share/zoneinfo/Asia/Seoul /etc/localtime</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="c"># Install Packages</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="l">cd /root</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="l">yum -y install tree jq git htop lynx</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="c"># Install kubectl &amp; helm</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="c">#curl -O https://s3.us-west-2.amazonaws.com/amazon-eks/1.26.2/2023-03-17/bin/linux/amd64/kubectl</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="l">curl -O https://s3.us-west-2.amazonaws.com/amazon-eks/1.25.7/2023-03-17/bin/linux/amd64/kubectl</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="l">install -o root -g root -m 0755 kubectl /usr/local/bin/kubectl</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="l">curl -s https://raw.githubusercontent.com/helm/helm/master/scripts/get-helm-3 | bash</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="c"># Install eksctl</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="l">curl --silent --location &#34;https://github.com/weaveworks/eksctl/releases/latest/download/eksctl_$(uname -s)_amd64.tar.gz&#34; | tar xz -C /tmp</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="l">mv /tmp/eksctl /usr/local/bin</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="c"># Install aws cli v2</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="l">curl &#34;https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip&#34; -o &#34;awscliv2.zip&#34;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="l">unzip awscliv2.zip &gt;/dev/null 2&gt;&amp;1</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="l">sudo ./aws/install</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="l">complete -C &#39;/usr/local/bin/aws_completer&#39; aws</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="l">echo &#39;export AWS_PAGER=&#34;&#34;&#39; &gt;&gt;/etc/profile</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="l">export AWS_DEFAULT_REGION=${AWS::Region}</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="l">echo &#34;export AWS_DEFAULT_REGION=$AWS_DEFAULT_REGION&#34; &gt;&gt; /etc/profile</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="c"># Install YAML Highlighter</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="l">wget https://github.com/andreazorzetto/yh/releases/download/v0.4.0/yh-linux-amd64.zip</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="l">unzip yh-linux-amd64.zip</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="l">mv yh /usr/local/bin/</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="c"># Install krew</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="l">curl -LO https://github.com/kubernetes-sigs/krew/releases/download/v0.4.3/krew-linux_amd64.tar.gz</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="l">tar zxvf krew-linux_amd64.tar.gz</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="l">./krew-linux_amd64 install krew</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="l">export PATH=&#34;$PATH:/root/.krew/bin&#34;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="l">echo &#39;export PATH=&#34;$PATH:/root/.krew/bin&#34;&#39; &gt;&gt; /etc/profile</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="c"># Install kube-ps1</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="l">echo &#39;source &lt;(kubectl completion bash)&#39; &gt;&gt; /etc/profile</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="l">echo &#39;alias k=kubectl&#39; &gt;&gt; /etc/profile</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="l">echo &#39;complete -F __start_kubectl k&#39; &gt;&gt; /etc/profile</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="l">git clone https://github.com/jonmosco/kube-ps1.git /root/kube-ps1</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="l">cat &lt;&lt;&#34;EOT&#34; &gt;&gt; /root/.bash_profile</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="l">source /root/kube-ps1/kube-ps1.sh</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="l">KUBE_PS1_SYMBOL_ENABLE=false</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="l">function get_cluster_short() {</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="l">echo &#34;$1&#34; | cut -d . -f1</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span>}<span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="l">KUBE_PS1_CLUSTER_FUNCTION=get_cluster_short</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="l">KUBE_PS1_SUFFIX=&#39;) &#39;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="l">PS1=&#39;$(kube_ps1)&#39;$PS1</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="l">EOT</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="c"># Install krew plugin</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="l">kubectl krew install ctx ns get-all </span><span class="w"> </span><span class="c"># ktop df-pv mtail tree</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="c"># Install Docker</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="l">amazon-linux-extras install docker -y</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="l">systemctl start docker &amp;&amp; systemctl enable docker</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="c"># Install nerdctl </span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="l">wget https://github.com/containerd/nerdctl/releases/download/v1.3.1/nerdctl-1.3.1-linux-amd64.tar.gz</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="l">tar -xzf nerdctl-1.3.1-linux-amd64.tar.gz </span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="l">sudo mv nerdctl /usr/local/bin/</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="c"># CLUSTER_NAME</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="l">export CLUSTER_NAME=${ClusterBaseName}</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="l">echo &#34;export CLUSTER_NAME=$CLUSTER_NAME&#34; &gt;&gt; /etc/profile</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="c"># Create SSH Keypair</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="l">ssh-keygen -t rsa -N &#34;&#34; -f /root/.ssh/id_rsa</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="nn">...</span><span class="w">
+</span></span></span></code></pre></td></tr></table>
+</div>
+</div><ul>
+<li>몇 가지 alias와 환경 설정을 추가하고, 시스템의 시간대를 Asia/Seoul로 변경한다.</li>
+<li>필요한 패키지들(tree, jq, git, htop, lynx, kubectl, helm, eksctl, AWS CLI v2, yh, krew, docker, nerdctl, kube-ps1)을 설치한다.</li>
+<li>클러스터 이름을 설정하고, SSH 키 페어를 생성한다.</li>
+</ul>
+<p>배포는 다음과 같은 파라미터를 통해 진행하였다.</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">aws cloudformation deploy --template-file myeks-1week.yaml --stack-name myeks --parameter-overrides <span class="nv">KeyName</span><span class="o">=</span>eks-terraform-key --region ap-northeast-2
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>배포 완료 후 다음의 명령어를 통해 베스천 서버에 접근하고 EKS 배포 과정으로 넘어가겠다.</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">ssh -i eks-terraform-key.pem ec2-user@<span class="k">$(</span>aws cloudformation describe-stacks --stack-name myeks --query <span class="s1">&#39;Stacks[*].Outputs[0].OutputValue&#39;</span> --output text<span class="k">)</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p><br/><br/></p>
+<h3 id="2-eksctl를-통한-eks-배포">
+    <a href="#2-eksctl%eb%a5%bc-%ed%86%b5%ed%95%9c-eks-%eb%b0%b0%ed%8f%ac" class="anchor">
+        <svg class="icon" aria-hidden="true" focusable="false" height="16" version="1.1" viewBox="0 0 16 16" width="16">
+            <path fill-rule="evenodd"
+                d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z">
+            </path>
+        </svg>
+    </a>
+    2. eksctl를 통한 EKS 배포
+</h3>
+<p>베스천 서버에 접속하여 AWS 인증 정보를 입력하자.</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl"><span class="o">[</span>root@myeks-host example<span class="o">]</span><span class="c1"># aws configure </span>
+</span></span><span class="line"><span class="cl">AWS Access Key ID <span class="o">[</span>None<span class="o">]</span>: ACCESS-KEY
+</span></span><span class="line"><span class="cl">AWS Secret Access Key <span class="o">[</span>None<span class="o">]</span>: SECRET-KEY
+</span></span><span class="line"><span class="cl">Default region name <span class="o">[</span>None<span class="o">]</span>:  ap-northeast-2
+</span></span><span class="line"><span class="cl">Default output format <span class="o">[</span>None<span class="o">]</span>: json
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>AWS 인증 정보 입력 후 eksctl를 통해 private cluster 구성하자. 구성 내용은 다음과 같다.</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span><span class="lnt">31
+</span><span class="lnt">32
+</span><span class="lnt">33
+</span><span class="lnt">34
+</span><span class="lnt">35
+</span><span class="lnt">36
+</span><span class="lnt">37
+</span><span class="lnt">38
+</span><span class="lnt">39
+</span><span class="lnt">40
+</span><span class="lnt">41
+</span><span class="lnt">42
+</span><span class="lnt">43
+</span><span class="lnt">44
+</span><span class="lnt">45
+</span><span class="lnt">46
+</span><span class="lnt">47
+</span><span class="lnt">48
+</span><span class="lnt">49
+</span><span class="lnt">50
+</span><span class="lnt">51
+</span><span class="lnt">52
+</span><span class="lnt">53
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-yaml" data-lang="yaml"><span class="line"><span class="cl"><span class="nt">apiVersion</span><span class="p">:</span><span class="w"> </span><span class="l">eksctl.io/v1alpha5</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="nt">kind</span><span class="p">:</span><span class="w"> </span><span class="l">ClusterConfig</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="nt">metadata</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l">my-eks</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="nt">region</span><span class="p">:</span><span class="w"> </span><span class="l">ap-northeast-2</span><span class="w"> </span><span class="c"># 지역 설정(서울) </span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="nt">version</span><span class="p">:</span><span class="w"> </span><span class="s2">&#34;1.25&#34;</span><span class="w">  </span><span class="c"># 클러스터 버전</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="nt">vpc</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="nt">id</span><span class="p">:</span><span class="w"> </span><span class="l">vpc-05a960a0837da1328</span><span class="w"> </span><span class="c"># 베스천 서버 VPC ID (아래 내용 참고)</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="nt">cidr</span><span class="p">:</span><span class="w"> </span><span class="m">192.168.0.0</span><span class="l">/16 #</span><span class="w"> </span><span class="c"># 베스천 서버 VPC CIDR (아래 내용 참고)</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="nt">securityGroup</span><span class="p">:</span><span class="w"> </span><span class="l">sg-0c59ddf1a9a73edc9</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="nt">nat</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="nt">gateway</span><span class="p">:</span><span class="w"> </span><span class="l">HighlyAvailable</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="nt">subnets</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="nt">public</span><span class="p">:</span><span class="w"> 
+</span></span></span><span class="line"><span class="cl"><span class="w">      </span><span class="nt">public-2a</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="nt">id</span><span class="p">:</span><span class="w"> </span><span class="l">subnet-06391e7ab56a8ae9c</span><span class="w"> </span><span class="c"># 서브넷 ID (아래 내용 참고)</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="nt">cidr</span><span class="p">:</span><span class="w"> </span><span class="m">192.168.1.0</span><span class="l">/24</span><span class="w"> </span><span class="c"># 서브넷 CIDR (아래 내용 참고)</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">      </span><span class="nt">public-2c</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="nt">id</span><span class="p">:</span><span class="w"> </span><span class="l">subnet-00c193bd6e515a79b</span><span class="w"> </span><span class="c"># 서브넷 ID (아래 내용 참고)</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="nt">cidr</span><span class="p">:</span><span class="w"> </span><span class="m">192.168.2.0</span><span class="l">/24</span><span class="w"> </span><span class="c"># 서브넷 CIDR (아래 내용 참고) </span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="nt">private</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">      </span><span class="nt">private-2a</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="nt">id</span><span class="p">:</span><span class="w"> </span><span class="l">subnet-02d592518f7ae0755</span><span class="w"> </span><span class="c"># 서브넷 ID (아래 내용 참고) </span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="nt">cidr</span><span class="p">:</span><span class="w"> </span><span class="m">192.168.3.0</span><span class="l">/24</span><span class="w"> </span><span class="c"># 서브넷 CIDR (아래 내용 참고) </span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">      </span><span class="nt">private-2c</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="nt">id</span><span class="p">:</span><span class="w"> </span><span class="l">subnet-0dcfc3b165e7b355d</span><span class="w"> </span><span class="c"># 서브넷 ID (아래 내용 참고) </span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="nt">cidr</span><span class="p">:</span><span class="w"> </span><span class="m">192.168.4.0</span><span class="l">/24</span><span class="w"> </span><span class="c"># 서브넷 CIDR (아래 내용 참고) </span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="nt">clusterEndpoints</span><span class="p">:</span><span class="w">  </span><span class="c"># 클러스터 엔드포인트 액세스 설정 부분 </span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="nt">publicAccess</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span><span class="w">  </span><span class="c"># 공용 액세스 비활성화</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="nt">privateAccess</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="w">  </span><span class="c"># 사설 액세스 활성화</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="nt">nodeGroups</span><span class="p">:</span><span class="w"> 
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span>- <span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l">ng-1</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="nt">instanceType</span><span class="p">:</span><span class="w"> </span><span class="l">m5.xlarge </span><span class="w"> </span><span class="c"># 인스턴스 유형</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="nt">desiredCapacity</span><span class="p">:</span><span class="w"> </span><span class="m">3</span><span class="w">  </span><span class="c"># 원하는 노드 수</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="nt">privateNetworking</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="w">  </span><span class="c"># 사설 네트워크 사용</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="nt">ssh</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">      </span><span class="nt">publicKeyName</span><span class="p">:</span><span class="w"> </span><span class="l">ec2-key</span><span class="w"> </span><span class="c"># ec2 보안 키 </span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="nt">availabilityZones</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">      </span>- <span class="l">ap-northeast-2a</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">      </span>- <span class="l">ap-northeast-2c</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="nt">iam</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">      </span><span class="nt">withAddonPolicies</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="nt">imageBuilder</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="w">  </span><span class="c"># 이미지 빌더 정책 활성화</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="nt">albIngress</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="w">  </span><span class="c"># ALB 인그레스 정책 활성화</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="nt">cloudWatch</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="w">  </span><span class="c"># CloudWatch 정책 활성화</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="nt">autoScaler</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="w">  </span><span class="c"># 오토 스케일러 정책 활성화</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="nt">instanceName</span><span class="p">:</span><span class="w"> </span><span class="l">EKS-WORKER-TEST</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="nt">volumeSize</span><span class="p">:</span><span class="w"> </span><span class="m">30</span><span class="w">  </span><span class="c"># 볼륨 크기 설정</span><span class="w">
+</span></span></span></code></pre></td></tr></table>
+</div>
+</div><p>구성 내용 중  VPC, Subnet ID, CIDR은 AWS Console에서 확인할 수 있다.  VPC → Resource Road Map 을 통해 연결된 서브넷 및 라우팅 정보를 확인할 수 있다. 정보가 필요한 리소스를 클릭하면 바로 넘어가진다.</p>
+<p><img loading="lazy" 
+    src="/./aews-1-eks/vpc-.png" 
+    alt="vpc-.png" 
+     
+    width=1855 
+    height="864"  /></p>
+<p><img loading="lazy" 
+    src="/./aews-1-eks/subnet.png" 
+    alt="subnet.png" 
+     
+    width=1597 
+    height="640"  /></p>
+<p>보안 그룹 ID 는 EC2→ 보안 그룹에서 Name <code>myeks Control Plane Security Group</code> 에서 확인할 수 있다.</p>
+<p><img loading="lazy" 
+    src="/./aews-1-eks/control-sg.png" 
+    alt="control-sg.png" 
+     
+    width=1586 
+    height="839"  /></p>
+<p>구성 입력 후 eksctl 명령어를 통해 클러스터를 구축하겠다.</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">eksctl create cluster -f private-cluster.yaml
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p><img loading="lazy" 
+    src="/./aews-1-eks/create-cluster.png" 
+    alt="create-cluster.png" 
+     
+    width=2378 
+    height="978"  /></p>
+<p>배포는 약 20분정도 소요된다.  구성 후 클러스터 API 서버 접근을 위한 인증 정보가 필요하다. 인증 정보는 다음의 eksctl 명령어를 통해 저장할 수 있다.</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl"><span class="o">(</span>terraform-eks@my-eks-2:N/A<span class="o">)</span> <span class="o">[</span>root@myeks-host example<span class="o">]</span><span class="c1"># eksctl utils write-kubeconfig --name my-eks --region ap-northeast-2</span>
+</span></span><span class="line"><span class="cl">Flag --name has been deprecated, use --cluster
+</span></span><span class="line"><span class="cl">2023-04-29 19:59:36 <span class="o">[</span>✔<span class="o">]</span>  saved kubeconfig as <span class="s2">&#34;/root/.kube/config&#34;</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>배포 확인을 위해 파드 리스트를 확인해보자.</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl"><span class="o">(</span>terraform-eks@my-eks:N/A<span class="o">)</span> <span class="o">[</span>root@myeks-host example<span class="o">]</span><span class="c1"># kubectl get pods -A </span>
+</span></span><span class="line"><span class="cl">NAMESPACE     NAME                       READY   STATUS    RESTARTS   AGE
+</span></span><span class="line"><span class="cl">kube-system   aws-node-4kms4             1/1     Running   <span class="m">0</span>          109m
+</span></span><span class="line"><span class="cl">kube-system   aws-node-8r2fq             1/1     Running   <span class="m">0</span>          109m
+</span></span><span class="line"><span class="cl">kube-system   aws-node-hsgmr             1/1     Running   <span class="m">0</span>          109m
+</span></span><span class="line"><span class="cl">kube-system   aws-node-nf758             1/1     Running   <span class="m">0</span>          109m
+</span></span><span class="line"><span class="cl">kube-system   coredns-76b4dcc5cc-4mbw2   1/1     Running   <span class="m">0</span>          127m
+</span></span><span class="line"><span class="cl">kube-system   coredns-76b4dcc5cc-vfpgp   1/1     Running   <span class="m">0</span>          127m
+</span></span><span class="line"><span class="cl">kube-system   kube-proxy-68vgc           1/1     Running   <span class="m">0</span>          109m
+</span></span><span class="line"><span class="cl">kube-system   kube-proxy-lgltk           1/1     Running   <span class="m">0</span>          109m
+</span></span><span class="line"><span class="cl">kube-system   kube-proxy-lqngn           1/1     Running   <span class="m">0</span>          109m
+</span></span><span class="line"><span class="cl">kube-system   kube-proxy-vl4tb           1/1     Running   <span class="m">0</span>          109m
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>앞서 공유한 베스천 서버 인프라 구성 파일과 eks 구성 파일을 통해 진행하면 아무 문제 없이 구성이 완료될 것이다. 아래 내용은 필자가 private cluster 구성 중 생긴 에러로 트러블슈팅한 내용이다. 혹시 구성 중 에러가 발생한다면 다음 내용을 참고하자.</p>
+<p><br/><br/><br/></p>
+<h3 id="트러블슈팅">
+    <a href="#%ed%8a%b8%eb%9f%ac%eb%b8%94%ec%8a%88%ed%8c%85" class="anchor">
+        <svg class="icon" aria-hidden="true" focusable="false" height="16" version="1.1" viewBox="0 0 16 16" width="16">
+            <path fill-rule="evenodd"
+                d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z">
+            </path>
+        </svg>
+    </a>
+    트러블슈팅
+</h3>
+<blockquote>
+<p>클러스터 배포 중 timeout 발생과 워크 노드 클러스터 조인</p>
+</blockquote>
+<p>워크 노드 조인 중 에러가 생긴 에러이다. 에러 메세지는 다음과 같다.</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span><span class="lnt">31
+</span><span class="lnt">32
+</span><span class="lnt">33
+</span><span class="lnt">34
+</span><span class="lnt">35
+</span><span class="lnt">36
+</span><span class="lnt">37
+</span><span class="lnt">38
+</span><span class="lnt">39
+</span><span class="lnt">40
+</span><span class="lnt">41
+</span><span class="lnt">42
+</span><span class="lnt">43
+</span><span class="lnt">44
+</span><span class="lnt">45
+</span><span class="lnt">46
+</span><span class="lnt">47
+</span><span class="lnt">48
+</span><span class="lnt">49
+</span><span class="lnt">50
+</span><span class="lnt">51
+</span><span class="lnt">52
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl"><span class="o">(</span>N/A:N/A<span class="o">)</span> <span class="o">[</span>root@myeks-host example<span class="o">]</span><span class="c1"># eksctl create cluster -f private-cluster.yaml </span>
+</span></span><span class="line"><span class="cl">2023-04-28 12:24:04 <span class="o">[</span>ℹ<span class="o">]</span>  eksctl version 0.138.0
+</span></span><span class="line"><span class="cl">2023-04-28 12:24:04 <span class="o">[</span>ℹ<span class="o">]</span>  using region ap-northeast-2
+</span></span><span class="line"><span class="cl">2023-04-28 12:24:04 <span class="o">[</span>!<span class="o">]</span>  warning, having public access disallowed will subsequently interfere with some features of eksctl. This will require running subsequent eksctl <span class="o">(</span>and Kubernetes<span class="o">)</span> commands/API calls from within the VPC.  Running these in the VPC requires making updates to some AWS resources.  See: https://docs.aws.amazon.com/eks/latest/userguide/cluster-endpoint.html <span class="k">for</span> more details
+</span></span><span class="line"><span class="cl">2023-04-28 12:24:05 <span class="o">[</span>✔<span class="o">]</span>  using existing VPC <span class="o">(</span>vpc-06210c8560709c761<span class="o">)</span> and subnets <span class="o">(</span>private:map<span class="o">[</span>private-2a:<span class="o">{</span>subnet-0cceb4f7117a82214 ap-northeast-2a 192.168.3.0/24 <span class="m">0</span> <span class="o">}</span> private-2c:<span class="o">{</span>subnet-0c19b6b58320fce0a ap-northeast-2c 192.168.4.0/24 <span class="m">0</span> <span class="o">}]</span> public:map<span class="o">[</span>public-2a:<span class="o">{</span>subnet-023a838543987d725 ap-northeast-2a 192.168.1.0/24 <span class="m">0</span> <span class="o">}</span> public-2c:<span class="o">{</span>subnet-09e710a10ef0fb5ef ap-northeast-2c 192.168.2.0/24 <span class="m">0</span> <span class="o">}])</span>
+</span></span><span class="line"><span class="cl">2023-04-28 12:24:05 <span class="o">[</span>!<span class="o">]</span>  custom VPC/subnets will be used<span class="p">;</span> <span class="k">if</span> resulting cluster doesn<span class="s1">&#39;t function as expected, make sure to review the configuration of VPC/subnets
+</span></span></span><span class="line"><span class="cl"><span class="s1">2023-04-28 12:24:05 [ℹ]  nodegroup &#34;ng-2&#34; will use &#34;ami-0fdcb707922882aef&#34; [AmazonLinux2/1.25]
+</span></span></span><span class="line"><span class="cl"><span class="s1">2023-04-28 12:24:05 [ℹ]  using EC2 key pair &#34;eks-terraform-key&#34;
+</span></span></span><span class="line"><span class="cl"><span class="s1">2023-04-28 12:24:05 [ℹ]  using Kubernetes version 1.25
+</span></span></span><span class="line"><span class="cl"><span class="s1">2023-04-28 12:24:05 [ℹ]  creating EKS cluster &#34;my-eks&#34; in &#34;ap-northeast-2&#34; region with un-managed nodes
+</span></span></span><span class="line"><span class="cl"><span class="s1">2023-04-28 12:24:05 [ℹ]  1 nodegroup (ng-2) was included (based on the include/exclude rules)
+</span></span></span><span class="line"><span class="cl"><span class="s1">2023-04-28 12:24:05 [ℹ]  will create a CloudFormation stack for cluster itself and 1 nodegroup stack(s)
+</span></span></span><span class="line"><span class="cl"><span class="s1">2023-04-28 12:24:05 [ℹ]  will create a CloudFormation stack for cluster itself and 0 managed nodegroup stack(s)
+</span></span></span><span class="line"><span class="cl"><span class="s1">2023-04-28 12:24:05 [ℹ]  if you encounter any issues, check CloudFormation console or try &#39;</span>eksctl utils describe-stacks --region<span class="o">=</span>ap-northeast-2 --cluster<span class="o">=</span>my-eks<span class="s1">&#39;
+</span></span></span><span class="line"><span class="cl"><span class="s1">2023-04-28 12:24:05 [ℹ]  Kubernetes API endpoint access will use provided values {publicAccess=false, privateAccess=true} for cluster &#34;my-eks&#34; in &#34;ap-northeast-2&#34;
+</span></span></span><span class="line"><span class="cl"><span class="s1">2023-04-28 12:24:05 [ℹ]  CloudWatch logging will not be enabled for cluster &#34;my-eks&#34; in &#34;ap-northeast-2&#34;
+</span></span></span><span class="line"><span class="cl"><span class="s1">2023-04-28 12:24:05 [ℹ]  you can enable it with &#39;</span>eksctl utils update-cluster-logging --enable-types<span class="o">={</span>SPECIFY-YOUR-LOG-TYPES-HERE <span class="o">(</span>e.g. all<span class="o">)}</span> --region<span class="o">=</span>ap-northeast-2 --cluster<span class="o">=</span>my-eks<span class="err">&#39;</span>
+</span></span><span class="line"><span class="cl">2023-04-28 12:24:05 <span class="o">[</span>ℹ<span class="o">]</span>  
+</span></span><span class="line"><span class="cl"><span class="m">2</span> sequential tasks: <span class="o">{</span> create cluster control plane <span class="s2">&#34;my-eks&#34;</span>, 
+</span></span><span class="line"><span class="cl">    <span class="m">2</span> sequential sub-tasks: <span class="o">{</span> 
+</span></span><span class="line"><span class="cl">        <span class="nb">wait</span> <span class="k">for</span> control plane to become ready,
+</span></span><span class="line"><span class="cl">        create nodegroup <span class="s2">&#34;ng-2&#34;</span>,
+</span></span><span class="line"><span class="cl">    <span class="o">}</span> 
+</span></span><span class="line"><span class="cl"><span class="o">}</span>
+</span></span><span class="line"><span class="cl">2023-04-28 12:24:05 <span class="o">[</span>ℹ<span class="o">]</span>  building cluster stack <span class="s2">&#34;eksctl-my-eks-cluster&#34;</span>
+</span></span><span class="line"><span class="cl">2023-04-28 12:24:05 <span class="o">[</span>ℹ<span class="o">]</span>  deploying stack <span class="s2">&#34;eksctl-my-eks-cluster&#34;</span>
+</span></span><span class="line"><span class="cl">2023-04-28 12:24:35 <span class="o">[</span>ℹ<span class="o">]</span>  waiting <span class="k">for</span> CloudFormation stack <span class="s2">&#34;eksctl-my-eks-cluster&#34;</span>
+</span></span><span class="line"><span class="cl">2023-04-28 12:25:05 <span class="o">[</span>ℹ<span class="o">]</span>  waiting <span class="k">for</span> CloudFormation stack <span class="s2">&#34;eksctl-my-eks-cluster&#34;</span>
+</span></span><span class="line"><span class="cl">2023-04-28 12:26:05 <span class="o">[</span>ℹ<span class="o">]</span>  waiting <span class="k">for</span> CloudFormation stack <span class="s2">&#34;eksctl-my-eks-cluster&#34;</span>
+</span></span><span class="line"><span class="cl">2023-04-28 12:27:06 <span class="o">[</span>ℹ<span class="o">]</span>  waiting <span class="k">for</span> CloudFormation stack <span class="s2">&#34;eksctl-my-eks-cluster&#34;</span>
+</span></span><span class="line"><span class="cl">2023-04-28 12:28:06 <span class="o">[</span>ℹ<span class="o">]</span>  waiting <span class="k">for</span> CloudFormation stack <span class="s2">&#34;eksctl-my-eks-cluster&#34;</span>
+</span></span><span class="line"><span class="cl">2023-04-28 12:29:06 <span class="o">[</span>ℹ<span class="o">]</span>  waiting <span class="k">for</span> CloudFormation stack <span class="s2">&#34;eksctl-my-eks-cluster&#34;</span>
+</span></span><span class="line"><span class="cl">2023-04-28 12:30:06 <span class="o">[</span>ℹ<span class="o">]</span>  waiting <span class="k">for</span> CloudFormation stack <span class="s2">&#34;eksctl-my-eks-cluster&#34;</span>
+</span></span><span class="line"><span class="cl">2023-04-28 12:31:06 <span class="o">[</span>ℹ<span class="o">]</span>  waiting <span class="k">for</span> CloudFormation stack <span class="s2">&#34;eksctl-my-eks-cluster&#34;</span>
+</span></span><span class="line"><span class="cl">2023-04-28 12:32:06 <span class="o">[</span>ℹ<span class="o">]</span>  waiting <span class="k">for</span> CloudFormation stack <span class="s2">&#34;eksctl-my-eks-cluster&#34;</span>
+</span></span><span class="line"><span class="cl">2023-04-28 12:33:06 <span class="o">[</span>ℹ<span class="o">]</span>  waiting <span class="k">for</span> CloudFormation stack <span class="s2">&#34;eksctl-my-eks-cluster&#34;</span>
+</span></span><span class="line"><span class="cl">2023-04-28 12:34:06 <span class="o">[</span>ℹ<span class="o">]</span>  waiting <span class="k">for</span> CloudFormation stack <span class="s2">&#34;eksctl-my-eks-cluster&#34;</span>
+</span></span><span class="line"><span class="cl">2023-04-28 12:36:06 <span class="o">[</span>ℹ<span class="o">]</span>  building nodegroup stack <span class="s2">&#34;eksctl-my-eks-nodegroup-ng-2&#34;</span>
+</span></span><span class="line"><span class="cl">2023-04-28 12:36:06 <span class="o">[</span>ℹ<span class="o">]</span>  --nodes-min<span class="o">=</span><span class="m">2</span> was <span class="nb">set</span> automatically <span class="k">for</span> nodegroup ng-2
+</span></span><span class="line"><span class="cl">2023-04-28 12:36:06 <span class="o">[</span>ℹ<span class="o">]</span>  --nodes-max<span class="o">=</span><span class="m">2</span> was <span class="nb">set</span> automatically <span class="k">for</span> nodegroup ng-2
+</span></span><span class="line"><span class="cl">2023-04-28 12:36:07 <span class="o">[</span>ℹ<span class="o">]</span>  deploying stack <span class="s2">&#34;eksctl-my-eks-nodegroup-ng-2&#34;</span>
+</span></span><span class="line"><span class="cl">2023-04-28 12:36:07 <span class="o">[</span>ℹ<span class="o">]</span>  waiting <span class="k">for</span> CloudFormation stack <span class="s2">&#34;eksctl-my-eks-nodegroup-ng-2&#34;</span>
+</span></span><span class="line"><span class="cl">2023-04-28 12:39:43 <span class="o">[</span>ℹ<span class="o">]</span>  waiting <span class="k">for</span> CloudFormation stack <span class="s2">&#34;eksctl-my-eks-nodegroup-ng-2&#34;</span>
+</span></span><span class="line"><span class="cl">2023-04-28 12:39:43 <span class="o">[</span>ℹ<span class="o">]</span>  waiting <span class="k">for</span> the control plane to become ready
+</span></span><span class="line"><span class="cl">2023-04-28 12:39:44 <span class="o">[</span>✔<span class="o">]</span>  saved kubeconfig as <span class="s2">&#34;/root/.kube/config&#34;</span>
+</span></span><span class="line"><span class="cl">2023-04-28 12:39:44 <span class="o">[</span>ℹ<span class="o">]</span>  no tasks
+</span></span><span class="line"><span class="cl">2023-04-28 12:39:44 <span class="o">[</span>✔<span class="o">]</span>  all EKS cluster resources <span class="k">for</span> <span class="s2">&#34;my-eks&#34;</span> have been created
+</span></span><span class="line"><span class="cl">2023-04-28 12:39:44 <span class="o">[</span>ℹ<span class="o">]</span>  adding identity <span class="s2">&#34;arn:aws:iam::955963799952:role/eksctl-my-eks-nodegroup-ng-2-NodeInstanceRole-283XKKCXM9GT&#34;</span> to auth ConfigMap
+</span></span><span class="line"><span class="cl">2023-04-28 12:39:44 <span class="o">[</span>ℹ<span class="o">]</span>  nodegroup <span class="s2">&#34;ng-2&#34;</span> has <span class="m">0</span> node<span class="o">(</span>s<span class="o">)</span>
+</span></span><span class="line"><span class="cl">2023-04-28 12:39:44 <span class="o">[</span>ℹ<span class="o">]</span>  waiting <span class="k">for</span> at least <span class="m">2</span> node<span class="o">(</span>s<span class="o">)</span> to become ready in <span class="s2">&#34;ng-2&#34;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">Error: timed out waiting <span class="k">for</span> at least <span class="m">2</span> nodes to join the cluster and become ready in <span class="s2">&#34;ng-2&#34;</span>: context deadline exceeded
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>보통 타임에러로 표시되며 kubectl 명령어를 확인하면 워크 노드가 조인이 안되어 파드가 정상적으로 배포되지 않는 것을 확인할 수 있다.</p>
+<p><img loading="lazy" 
+    src="/./aews-1-eks/error2.png" 
+    alt="error2.png" 
+     
+    width=1606 
+    height="156"  /></p>
+<p>해당 내용은 <a href="https://github.com/weaveworks/eksctl/issues/3283">깃 이슈</a>에서 참고할 수 있지만 답을 찾을 수 없어 며칠을 고생했다. 원인은 EKS 보안 그룹 설정이였다. 앞서 베스천서버 구성시 EKS 통신을 위한 보안 그룹을 설정하였는데 추가를 안하면 EKS 워크 노드와 베스천 서버와의 통신이 안되어 조인이 안된다. EKS 보안 그룹을 설정하고 다시 EKS를 배포하자.</p>
+<p><br/><br/></p>
+<blockquote>
+<p>API 서버 접근이 안되는 경우</p>
+</blockquote>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl"><span class="o">(</span>N/A:N/A<span class="o">)</span> <span class="o">[</span>root@myeks-host example<span class="o">]</span><span class="c1"># eksctl create cluster -f private-cluster.yaml </span>
+</span></span><span class="line"><span class="cl">2023-04-27 19:45:28 <span class="o">[</span>ℹ<span class="o">]</span>  eksctl version 0.138.0
+</span></span><span class="line"><span class="cl">2023-04-27 19:45:28 <span class="o">[</span>ℹ<span class="o">]</span>  using region ap-northeast-2
+</span></span><span class="line"><span class="cl">2023-04-27 19:45:28 <span class="o">[</span>!<span class="o">]</span>  warning, having public access disallowed will subsequently interfere with some features of eksctl. This will require running subsequent eksctl <span class="o">(</span>and Kubernetes<span class="o">)</span> commands/API calls from within the VPC.  Running these in the VPC requires making updates to some AWS resources.  See: https://docs.aws.amazon.com/eks/latest/userguide/cluster-endpoint.html <span class="k">for</span> more details
+</span></span><span class="line"><span class="cl">2023-04-27 19:45:28 <span class="o">[</span>ℹ<span class="o">]</span>  setting availability zones to <span class="o">[</span>ap-northeast-2a ap-northeast-2b ap-northeast-2d<span class="o">]</span>
+</span></span><span class="line"><span class="cl">2023-04-27 19:45:28 <span class="o">[</span>ℹ<span class="o">]</span>  subnets <span class="k">for</span> ap-northeast-2a - public:192.168.0.0/19 private:192.168.96.0/19
+</span></span><span class="line"><span class="cl">2023-04-27 19:45:28 <span class="o">[</span>ℹ<span class="o">]</span>  subnets <span class="k">for</span> ap-northeast-2b - public:192.168.32.0/19 private:192.168.128.0/19
+</span></span><span class="line"><span class="cl">2023-04-27 19:45:28 <span class="o">[</span>ℹ<span class="o">]</span>  subnets <span class="k">for</span> ap-northeast-2d - public:192.168.64.0/19 private:192.168.160.0/19
+</span></span><span class="line"><span class="cl">2023-04-27 19:45:28 <span class="o">[</span>ℹ<span class="o">]</span>  nodegroup <span class="s2">&#34;EKS-PRIVATE-NODE&#34;</span> will use <span class="s2">&#34;ami-0fdcb707922882aef&#34;</span> <span class="o">[</span>AmazonLinux2/1.25<span class="o">]</span>
+</span></span><span class="line"><span class="cl">2023-04-27 19:45:28 <span class="o">[</span>ℹ<span class="o">]</span>  using Kubernetes version 1.25
+</span></span><span class="line"><span class="cl">2023-04-27 19:45:28 <span class="o">[</span>ℹ<span class="o">]</span>  creating EKS cluster <span class="s2">&#34;my-private-eks&#34;</span> in <span class="s2">&#34;ap-northeast-2&#34;</span> region with un-managed nodes
+</span></span><span class="line"><span class="cl">...
+</span></span><span class="line"><span class="cl">Error: getting auth ConfigMap: Get <span class="s2">&#34;https://AA1694EDA538EFE2ADC5FCCABBB4F745.gr7.ap-northeast-2.eks.amazonaws.com/api/v1/namespaces/kube-system/configmaps/aws-auth&#34;</span>: dial tcp 192.168.175.32:443: i/o timeout
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="o">(</span>terraform-eks@my-private-eks:N/A<span class="o">)</span> <span class="o">[</span>root@myeks-host example<span class="o">]</span><span class="c1"># kubectl get pods -A </span>
+</span></span><span class="line"><span class="cl">Unable to connect to the server: dial tcp 192.168.134.188:443: i/o timeout
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>→ 앞에도 다뤘지만 Timeout 의 대부분의 원인이 보안 그룹이다. 이 경우는 클러스터 구성 파일에서 베스천 서버의 보안그룹을 설정하지 않아서 생긴 문제였다. 클러스터 구성에서 베스천 서버에 대한 보안 그룹(아웃 바운드 베스천서버 443 포트)을 설정하면 된다. 클러스터 구성에서 보안 그룹 설정은 AWS 콘솔 → EKS에서 가능하다.</p>
+<p><img loading="lazy" 
+    src="/./aews-1-eks/eks-sgh.png" 
+    alt="eks-sgh.png" 
+     
+    width=1817 
+    height="894"  /></p>
+<p><br/><br/></p>
+<blockquote>
+<p>AWS CLI 및 eksctl 결과 i/o timeout</p>
+</blockquote>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl"><span class="o">(</span>N/A:N/A<span class="o">)</span> <span class="o">[</span>root@myeks-host example<span class="o">]</span><span class="c1"># eksctl get cluster --region ap-northeast-2</span>
+</span></span><span class="line"><span class="cl">Error: checking AWS STS access – cannot get role ARN <span class="k">for</span> current session: operation error STS: GetCallerIdentity, https response error StatusCode: 0, RequestID: , request send failed, Post <span class="s2">&#34;https://sts.ap-northeast-2.amazonaws.com/&#34;</span>: dial tcp 52.95.192.98:443: i/o timeout
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>마찬가지로 보안 그룹 문제였다. 베스천 서버의 아웃바운드에 0.0.0.0/0를 추가하면 해결된다.</p>
+<p><br/><br/></p>
+<blockquote>
+<p>콘솔에서 컴퓨팅 리소스 확인이 안되는 경우</p>
+</blockquote>
+<p>다음 그림과 같이 EKS 배포이후 AWS 콘솔에서 워크 노드가 표시되지 않는 경우이다.</p>
+<p><img loading="lazy" 
+    src="/./aews-1-eks/configmap-eks.png" 
+    alt="configmap-eks.png" 
+     
+    width=1839 
+    height="861"  /></p>
+<p>원인은 EKS 클러스터 사용자 정보에 AWS 사용자 정보가 없기 때문이다. 다음과 같이 추가하도록 하자.</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">kubectl edit cm/aws-auth -n kube-system
+</span></span></code></pre></td></tr></table>
+</div>
+</div><div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-yaml" data-lang="yaml"><span class="line"><span class="cl"><span class="c"># Please edit the object below. Lines beginning with a &#39;#&#39; will be ignored,</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="c"># and an empty file will abort the edit. If an error occurs while saving this file will be</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="c"># reopened with the relevant failures.</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="c">#</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="nt">apiVersion</span><span class="p">:</span><span class="w"> </span><span class="l">v1</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="nt">data</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="nt">mapRoles</span><span class="p">:</span><span class="w"> </span><span class="p">|</span><span class="sd">
+</span></span></span><span class="line"><span class="cl"><span class="sd">    - groups:
+</span></span></span><span class="line"><span class="cl"><span class="sd">      - system:bootstrappers
+</span></span></span><span class="line"><span class="cl"><span class="sd">      - system:nodes
+</span></span></span><span class="line"><span class="cl"><span class="sd">      rolearn: arn:aws:iam::000000000:role/eksctl-my-eks-nodegroup-ng-1-NodeInstanceRole-ZG7JVL5Z4IPU
+</span></span></span><span class="line"><span class="cl"><span class="sd">      username: system:node:{{EC2PrivateDNSName}}</span><span class="w">    
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="nt">mapUsers</span><span class="p">:</span><span class="w"> </span><span class="p">|</span><span class="sd">
+</span></span></span><span class="line"><span class="cl"><span class="sd">    - userarn: arn:aws:iam:000000000:user/hanhorang  # AWS 인증에서 사용한 IAM 사용자 arn를 입력하자.
+</span></span></span><span class="line"><span class="cl"><span class="sd">      username: hanhorang
+</span></span></span><span class="line"><span class="cl"><span class="sd">      groups:
+</span></span></span><span class="line"><span class="cl"><span class="sd">        - system:masters</span><span class="w">    
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="nt">kind</span><span class="p">:</span><span class="w"> </span><span class="l">ConfigMap</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="nt">metadata</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l">aws-auth</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="nt">namespace</span><span class="p">:</span><span class="w"> </span><span class="l">kube-system</span><span class="w">
+</span></span></span></code></pre></td></tr></table>
+</div>
+</div><ul>
+<li>
+<p>mapUsers에서 IAM 사용자 arn을 추가하면 해결된다.</p>
+<p><br/><br/></p>
+</li>
+</ul>
+<h2 id="클러스터--구성-확인">
+    <a href="#%ed%81%b4%eb%9f%ac%ec%8a%a4%ed%84%b0--%ea%b5%ac%ec%84%b1-%ed%99%95%ec%9d%b8" class="anchor">
+        <svg class="icon" aria-hidden="true" focusable="false" height="16" version="1.1" viewBox="0 0 16 16" width="16">
+            <path fill-rule="evenodd"
+                d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z">
+            </path>
+        </svg>
+    </a>
+    클러스터  구성 확인
+</h2>
+<p>클러스터 구성 후 클러스터 정보와 인스턴스 정보를 확인하겠다.</p>
+<br/>
+<p><strong>클러스터 구성 확인</strong></p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl"><span class="c1"># 클러스터 확인 </span>
+</span></span><span class="line"><span class="cl"><span class="o">(</span>terraform-eks@my-eks:N/A<span class="o">)</span> <span class="o">[</span>root@myeks-host example<span class="o">]</span><span class="c1"># eksctl get cluster </span>
+</span></span><span class="line"><span class="cl">NAME            REGION          EKSCTL CREATED
+</span></span><span class="line"><span class="cl">my-eks          ap-northeast-2  True
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1"># 클러스터 노드 그룹 확인 </span>
+</span></span><span class="line"><span class="cl"><span class="o">(</span>terraform-eks@my-eks:N/A<span class="o">)</span> <span class="o">[</span>root@myeks-host example<span class="o">]</span><span class="c1"># eksctl get  nodegroup --cluster my-eks</span>
+</span></span><span class="line"><span class="cl">CLUSTER NODEGROUP       STATUS          CREATED                 MIN SIZE        MAX SIZE        DESIRED CAPACITY        INSTANCE TYPE   IMAGE ID                ASG NAMETYPE
+</span></span><span class="line"><span class="cl">my-eks  ng-1            CREATE_COMPLETE 2023-04-29T09:05:31Z    <span class="m">4</span>               <span class="m">4</span>               <span class="m">4</span>                       m5.xlarge       ami-0fdcb707922882aef   eksctl-my-eks-nodegroup-ng-1-NodeGroup-IWPRDQX6J0CG     unmanaged
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1"># 클러스터 접근 정보 확인 및 노드 확인 </span>
+</span></span><span class="line"><span class="cl"><span class="o">(</span>terraform-eks@my-eks:N/A<span class="o">)</span> <span class="o">[</span>root@myeks-host example<span class="o">]</span><span class="c1"># kubectl get nodes -v6</span>
+</span></span><span class="line"><span class="cl">I0429 20:21:39.855710    <span class="m">5753</span> loader.go:374<span class="o">]</span> Config loaded from file:  /root/.kube/config
+</span></span><span class="line"><span class="cl">I0429 20:21:40.631509    <span class="m">5753</span> round_trippers.go:553<span class="o">]</span> GET https://8F53A6D3D93C1D751527688A7CB07659.yl4.ap-northeast-2.eks.amazonaws.com/api/v1/nodes?limit<span class="o">=</span><span class="m">500</span> <span class="m">200</span> OK in <span class="m">769</span> milliseconds
+</span></span><span class="line"><span class="cl">NAME                                               STATUS   ROLES    AGE    VERSION
+</span></span><span class="line"><span class="cl">ip-192-168-3-31.ap-northeast-2.compute.internal    Ready    &lt;none&gt;   131m   v1.25.7-eks-a59e1f0
+</span></span><span class="line"><span class="cl">ip-192-168-3-59.ap-northeast-2.compute.internal    Ready    &lt;none&gt;   131m   v1.25.7-eks-a59e1f0
+</span></span><span class="line"><span class="cl">ip-192-168-4-195.ap-northeast-2.compute.internal   Ready    &lt;none&gt;   131m   v1.25.7-eks-a59e1f0
+</span></span><span class="line"><span class="cl">ip-192-168-4-250.ap-northeast-2.compute.internal   Ready    &lt;none&gt;   131m   v1.25.7-eks-a59e1f0
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1"># 클러스터 정보 확인</span>
+</span></span><span class="line"><span class="cl">kubectl cluster-info dump
+</span></span><span class="line"><span class="cl">...
+</span></span></code></pre></td></tr></table>
+</div>
+</div><br/>
+<p><strong>베스천 서버에서 워크 노드 접근을 위한 보안 그룹 설정</strong></p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span><span class="lnt">31
+</span><span class="lnt">32
+</span><span class="lnt">33
+</span><span class="lnt">34
+</span><span class="lnt">35
+</span><span class="lnt">36
+</span><span class="lnt">37
+</span><span class="lnt">38
+</span><span class="lnt">39
+</span><span class="lnt">40
+</span><span class="lnt">41
+</span><span class="lnt">42
+</span><span class="lnt">43
+</span><span class="lnt">44
+</span><span class="lnt">45
+</span><span class="lnt">46
+</span><span class="lnt">47
+</span><span class="lnt">48
+</span><span class="lnt">49
+</span><span class="lnt">50
+</span><span class="lnt">51
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1"># 인스턴스 IP 확인 </span>
+</span></span><span class="line"><span class="cl">terraform-eks@my-eks:N/A<span class="o">)</span> <span class="o">[</span>root@myeks-host example<span class="o">]</span><span class="c1"># aws ec2 describe-instances --query &#34;Reservations[*].Instances[*].{PublicIPAdd:PublicIpAddress,PrivateIPAdd:PrivateIpAddress,InstanceName:Tags[?Key==&#39;Name&#39;]|[0].Value,Status:State.Name}&#34; --filters Name=instance-state-name,Values=running --output table</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">-------------------------------------------------------------------
+</span></span><span class="line"><span class="cl"><span class="p">|</span>                        DescribeInstances                        <span class="p">|</span>
+</span></span><span class="line"><span class="cl">+-----------------+-----------------+------------------+----------+
+</span></span><span class="line"><span class="cl"><span class="p">|</span>  InstanceName   <span class="p">|</span>  PrivateIPAdd   <span class="p">|</span>   PublicIPAdd    <span class="p">|</span> Status   <span class="p">|</span>
+</span></span><span class="line"><span class="cl">+-----------------+-----------------+------------------+----------+
+</span></span><span class="line"><span class="cl"><span class="p">|</span>  EKS-WORKER-TEST<span class="p">|</span>  192.168.4.230  <span class="p">|</span>  None            <span class="p">|</span>  running <span class="p">|</span>
+</span></span><span class="line"><span class="cl"><span class="p">|</span>  EKS-WORKER     <span class="p">|</span>  192.168.4.195  <span class="p">|</span>  None            <span class="p">|</span>  running <span class="p">|</span>
+</span></span><span class="line"><span class="cl"><span class="p">|</span>  EKS-WORKER     <span class="p">|</span>  192.168.4.250  <span class="p">|</span>  None            <span class="p">|</span>  running <span class="p">|</span>
+</span></span><span class="line"><span class="cl"><span class="p">|</span>  EKS-WORKER     <span class="p">|</span>  192.168.3.59   <span class="p">|</span>  None            <span class="p">|</span>  running <span class="p">|</span>
+</span></span><span class="line"><span class="cl"><span class="p">|</span>  EKS-WORKER     <span class="p">|</span>  192.168.3.31   <span class="p">|</span>  None            <span class="p">|</span>  running <span class="p">|</span>
+</span></span><span class="line"><span class="cl"><span class="p">|</span>  myeks-host     <span class="p">|</span>  192.168.1.100  <span class="p">|</span>  43.201.102.195  <span class="p">|</span>  running <span class="p">|</span>
+</span></span><span class="line"><span class="cl">+-----------------+-----------------+------------------+----------+
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1"># 워크 노드로 Ping을 하나 안된다. </span>
+</span></span><span class="line"><span class="cl"><span class="o">(</span>terraform-eks@my-eks:N/A<span class="o">)</span> <span class="o">[</span>root@myeks-host example<span class="o">]</span><span class="c1"># ping 192.168.3.31 </span>
+</span></span><span class="line"><span class="cl">PING 192.168.3.31 <span class="o">(</span>192.168.3.31<span class="o">)</span> 56<span class="o">(</span>84<span class="o">)</span> bytes of data. 
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1"># 노드 보안그룹 ID 확인하여 베스천 서버 IP를 추가하자</span>
+</span></span><span class="line"><span class="cl"><span class="o">(</span>terraform-eks@my-eks:N/A<span class="o">)</span> <span class="o">[</span>root@myeks-host example<span class="o">]</span><span class="c1"># aws ec2 describe-security-groups --filters Name=group-name,Values=*nodegroup* --query &#34;SecurityGroups[*].[GroupId]&#34; --output text</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">sg-0bf33458f7e193841
+</span></span><span class="line"><span class="cl">sg-0f4cd52a07786b9fb
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1"># --group-id 에 위 보안 그룹 하나 입력 </span>
+</span></span><span class="line"><span class="cl"><span class="o">(</span>terraform-eks@my-eks:N/A<span class="o">)</span> <span class="o">[</span>root@myeks-host example<span class="o">]</span><span class="c1"># aws ec2 authorize-security-group-ingress --group-id sg-0f4cd52a07786b9fb  --protocol &#39;-1&#39; --cidr 192.168.1.100/32</span>
+</span></span><span class="line"><span class="cl"><span class="o">{</span>
+</span></span><span class="line"><span class="cl">    <span class="s2">&#34;Return&#34;</span>: true,
+</span></span><span class="line"><span class="cl">    <span class="s2">&#34;SecurityGroupRules&#34;</span>: <span class="o">[</span>
+</span></span><span class="line"><span class="cl">        <span class="o">{</span>
+</span></span><span class="line"><span class="cl">            <span class="s2">&#34;SecurityGroupRuleId&#34;</span>: <span class="s2">&#34;sgr-01bca8eecf69c86b6&#34;</span>,
+</span></span><span class="line"><span class="cl">            <span class="s2">&#34;GroupId&#34;</span>: <span class="s2">&#34;sg-0f4cd52a07786b9fb&#34;</span>,
+</span></span><span class="line"><span class="cl">            <span class="s2">&#34;GroupOwnerId&#34;</span>: <span class="s2">&#34;955963799952&#34;</span>,
+</span></span><span class="line"><span class="cl">            <span class="s2">&#34;IsEgress&#34;</span>: false,
+</span></span><span class="line"><span class="cl">            <span class="s2">&#34;IpProtocol&#34;</span>: <span class="s2">&#34;-1&#34;</span>,
+</span></span><span class="line"><span class="cl">            <span class="s2">&#34;FromPort&#34;</span>: -1,
+</span></span><span class="line"><span class="cl">            <span class="s2">&#34;ToPort&#34;</span>: -1,
+</span></span><span class="line"><span class="cl">            <span class="s2">&#34;CidrIpv4&#34;</span>: <span class="s2">&#34;192.168.1.100/32&#34;</span>
+</span></span><span class="line"><span class="cl">        <span class="o">}</span>
+</span></span><span class="line"><span class="cl">    <span class="o">]</span>
+</span></span><span class="line"><span class="cl"><span class="o">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1"># 접근 확인 </span>
+</span></span><span class="line"><span class="cl"><span class="o">(</span>terraform-eks@my-eks:N/A<span class="o">)</span> <span class="o">[</span>root@myeks-host example<span class="o">]</span><span class="c1"># ping 192.168.3.31</span>
+</span></span><span class="line"><span class="cl">PING 192.168.3.31 <span class="o">(</span>192.168.3.31<span class="o">)</span> 56<span class="o">(</span>84<span class="o">)</span> bytes of data.
+</span></span><span class="line"><span class="cl"><span class="m">64</span> bytes from 192.168.3.31: <span class="nv">icmp_seq</span><span class="o">=</span><span class="m">1</span> <span class="nv">ttl</span><span class="o">=</span><span class="m">255</span> <span class="nv">time</span><span class="o">=</span>0.176 ms
+</span></span><span class="line"><span class="cl"><span class="m">64</span> bytes from 192.168.3.31: <span class="nv">icmp_seq</span><span class="o">=</span><span class="m">2</span> <span class="nv">ttl</span><span class="o">=</span><span class="m">255</span> <span class="nv">time</span><span class="o">=</span>0.152 ms
+</span></span><span class="line"><span class="cl"><span class="m">64</span> bytes from 192.168.3.31: <span class="nv">icmp_seq</span><span class="o">=</span><span class="m">3</span> <span class="nv">ttl</span><span class="o">=</span><span class="m">255</span> <span class="nv">time</span><span class="o">=</span>0.144 ms
+</span></span></code></pre></td></tr></table>
+</div>
+</div><br/>
+<p><strong>인스턴스 정보 확인</strong></p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span><span class="lnt">31
+</span><span class="lnt">32
+</span><span class="lnt">33
+</span><span class="lnt">34
+</span><span class="lnt">35
+</span><span class="lnt">36
+</span><span class="lnt">37
+</span><span class="lnt">38
+</span><span class="lnt">39
+</span><span class="lnt">40
+</span><span class="lnt">41
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl"><span class="c1"># kubelet 확인 </span>
+</span></span><span class="line"><span class="cl">systemctl status kubelet
+</span></span><span class="line"><span class="cl">● kubelet.service - Kubernetes Kubelet
+</span></span><span class="line"><span class="cl">   Loaded: loaded <span class="o">(</span>/etc/systemd/system/kubelet.service<span class="p">;</span> enabled<span class="p">;</span> vendor preset: disabled<span class="o">)</span>
+</span></span><span class="line"><span class="cl">  Drop-In: /etc/systemd/system/kubelet.service.d
+</span></span><span class="line"><span class="cl">           └─10-kubelet-args.conf, 30-kubelet-extra-args.conf
+</span></span><span class="line"><span class="cl">   Active: active <span class="o">(</span>running<span class="o">)</span> since Sat 2023-04-29 09:08:56 UTC<span class="p">;</span> 2h 49min ago
+</span></span><span class="line"><span class="cl">     Docs: https://github.com/kubernetes/kubernetes
+</span></span><span class="line"><span class="cl">  Process: <span class="m">3176</span> <span class="nv">ExecStartPre</span><span class="o">=</span>/sbin/iptables -P FORWARD ACCEPT -w <span class="m">5</span> <span class="o">(</span><span class="nv">code</span><span class="o">=</span>exited, <span class="nv">status</span><span class="o">=</span>0/SUCCESS<span class="o">)</span>
+</span></span><span class="line"><span class="cl"> Main PID: <span class="m">3178</span> <span class="o">(</span>kubelet<span class="o">)</span>
+</span></span><span class="line"><span class="cl">    Tasks: <span class="m">16</span>
+</span></span><span class="line"><span class="cl">   Memory: 77.3M
+</span></span><span class="line"><span class="cl">   CGroup: /runtime.slice/kubelet.service
+</span></span><span class="line"><span class="cl">           └─3178 /usr/bin/kubelet --config /etc/kubernetes/kubelet/kubelet-config.json --kubeconfig /var/lib/kubelet/kubeconfig --container-runtime-endpoint unix://...
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">Apr <span class="m">29</span> 11:52:06 ip-192-168-3-31.ap-northeast-2.compute.internal kubelet<span class="o">[</span>3178<span class="o">]</span>: I0429 11:52:06.377073    <span class="m">3178</span> kubelet.go:2117<span class="o">]</span> <span class="s2">&#34;SyncLoop ADD&#34;</span> <span class="nv">source</span><span class="o">=</span><span class="s2">&#34;api&#34;</span> <span class="nv">pods</span><span class="o">=</span>...sncki<span class="o">]</span>
+</span></span><span class="line"><span class="cl">Apr <span class="m">29</span> 11:52:06 ip-192-168-3-31.ap-northeast-2.compute.internal kubelet<span class="o">[</span>3178<span class="o">]</span>: I0429 11:52:06.377103    <span class="m">3178</span> topology_manager.go:205<span class="o">]</span> <span class="s2">&#34;Topology Admit Handler&#34;</span>
+</span></span><span class="line"><span class="cl">Apr <span class="m">29</span> 11:52:06 ip-192-168-3-31.ap-northeast-2.compute.internal kubelet<span class="o">[</span>3178<span class="o">]</span>: I0429 11:52:06.513465    <span class="m">3178</span> reconciler.go:357<span class="o">]</span> <span class="s2">&#34;operationExecutor.VerifyControllerAt...
+</span></span></span><span class="line"><span class="cl"><span class="s2">Apr 29 11:52:06 ip-192-168-3-31.ap-northeast-2.compute.internal kubelet[3178]: I0429 11:52:06.614154    3178 reconciler.go:269] &#34;</span>operationExecutor.MountVolume starte...
+</span></span><span class="line"><span class="cl">Apr <span class="m">29</span> 11:52:06 ip-192-168-3-31.ap-northeast-2.compute.internal kubelet<span class="o">[</span>3178<span class="o">]</span>: I0429 11:52:06.632046    <span class="m">3178</span> operation_generator.go:730<span class="o">]</span> <span class="s2">&#34;MountVolume.SetUp succeeded...
+</span></span></span><span class="line"><span class="cl"><span class="s2">Apr 29 11:52:06 ip-192-168-3-31.ap-northeast-2.compute.internal kubelet[3178]: I0429 11:52:06.703987    3178 util.go:30] &#34;</span>No sandbox <span class="k">for</span> pod can be found. Need...sncki<span class="s2">&#34;
+</span></span></span><span class="line"><span class="cl"><span class="s2">Apr 29 11:52:06 ip-192-168-3-31.ap-northeast-2.compute.internal kubelet[3178]: I0429 11:52:06.791915    3178 provider.go:102] Refreshing cache for provider: *c...ovider
+</span></span></span><span class="line"><span class="cl"><span class="s2">Apr 29 11:52:06 ip-192-168-3-31.ap-northeast-2.compute.internal kubelet[3178]: I0429 11:52:06.792001    3178 provider.go:82] Docker config file not found: coul...t   /]
+</span></span></span><span class="line"><span class="cl"><span class="s2">Apr 29 11:52:07 ip-192-168-3-31.ap-northeast-2.compute.internal kubelet[3178]: I0429 11:52:07.235202    3178 kubelet.go:2155] &#34;</span>SyncLoop <span class="o">(</span>PLEG<span class="o">)</span>: event <span class="k">for</span> pod<span class="s2">&#34; ...a6526}
+</span></span></span><span class="line"><span class="cl"><span class="s2">Apr 29 11:52:11 ip-192-168-3-31.ap-northeast-2.compute.internal kubelet[3178]: I0429 11:52:11.242075    3178 kubelet.go:2155] &#34;</span>SyncLoop <span class="o">(</span>PLEG<span class="o">)</span>: event <span class="k">for</span> pod<span class="s2">&#34; ...4351a}
+</span></span></span><span class="line"><span class="cl"><span class="s2">Hint: Some lines were ellipsized, use -l to show in full.
+</span></span></span><span class="line"><span class="cl"><span class="s2">
+</span></span></span><span class="line"><span class="cl"><span class="s2"># 볼륨 확인 
+</span></span></span><span class="line"><span class="cl"><span class="s2">lsblk
+</span></span></span><span class="line"><span class="cl"><span class="s2">NAME          MAJ:MIN RM SIZE RO TYPE MOUNTPOINT
+</span></span></span><span class="line"><span class="cl"><span class="s2">nvme0n1       259:0    0  30G  0 disk 
+</span></span></span><span class="line"><span class="cl"><span class="s2">├─nvme0n1p1   259:1    0  30G  0 part /
+</span></span></span><span class="line"><span class="cl"><span class="s2">└─nvme0n1p128 259:2    0   1M  0 part 
+</span></span></span><span class="line"><span class="cl"><span class="s2">
+</span></span></span><span class="line"><span class="cl"><span class="s2"># 컨테이너 런타임 확인 
+</span></span></span><span class="line"><span class="cl"><span class="s2">ps axf |grep /usr/bin/containerd
+</span></span></span><span class="line"><span class="cl"><span class="s2"> 3013 ?        Ssl    0:46 /usr/bin/containerd
+</span></span></span><span class="line"><span class="cl"><span class="s2"> 4269 ?        Sl     0:10 /usr/bin/containerd-shim-runc-v2 -namespace k8s.io -id 0ea51c82eb135fca4bdae99f89e8f5804d1e144efb857e8fae310a9d7039e21a -address /run/containerd/containerd.sock
+</span></span></span><span class="line"><span class="cl"><span class="s2"> 4270 ?        Sl     0:02 /usr/bin/containerd-shim-runc-v2 -namespace k8s.io -id f723a90d2f436d77f37789bc29e26fcdbca82ca575bfacde43be2a0978573634 -address /run/containerd/containerd.sock
+</span></span></span><span class="line"><span class="cl"><span class="s2">24478 ?        Sl     0:00 /usr/bin/containerd-shim-runc-v2 -namespace k8s.io -id c1657f716d01283e8e7aa183f6583ec4c96af3d1d19b081004d1c565015a6526 -address /run/containerd/containerd.sock
+</span></span></span><span class="line"><span class="cl"><span class="s2">26752 ?        S+     0:00          \_ grep --color=auto /usr/bin/containerd 
+</span></span></span></code></pre></td></tr></table>
+</div>
+</div><p><br/><br/></p>
+<h1 id="참고">
+    <a href="#%ec%b0%b8%ea%b3%a0" class="anchor">
+        <svg class="icon" aria-hidden="true" focusable="false" height="16" version="1.1" viewBox="0 0 16 16" width="16">
+            <path fill-rule="evenodd"
+                d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z">
+            </path>
+        </svg>
+    </a>
+    참고
+</h1>
+<p><a href="https://awskoreamarketingasset.s3.amazonaws.com/2022%20Summit/pdf/T14S4_Amazon%20EKS%20%EB%A7%88%EC%9D%B4%EA%B7%B8%EB%A0%88%EC%9D%B4%EC%85%98%20%EC%9A%94%EC%A0%90%20%EC%A0%95%EB%A6%AC.pdf">https://awskoreamarketingasset.s3.amazonaws.com/2022 Summit/pdf/T14S4_Amazon EKS 마이그레이션 요점 정리.pdf</a></p>
+<p><a href="https://341123.tistory.com/m/6">https://341123.tistory.com/m/6</a></p>
+
     </div>
 </div>
 
