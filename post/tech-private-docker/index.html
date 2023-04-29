@@ -48,7 +48,7 @@
     },
     "datePublished": "2023-04-21",
     "description": "harbor 와 minio 연동을 통한 고가용성 도커 레지스트리 구축하기",
-    "wordCount":  0 ,
+    "wordCount":  2234 ,
     "mainEntityOfPage": "True",
     "dateModified": "2023-04-21",
     "publisher": {
@@ -135,7 +135,7 @@
                             
                             
                             By HanHoRnag | <time>April 21, 2023</time>
-                            | 0 minutes
+                            | 11 minutes
                         </div>
                         <div class="tags">
                             
@@ -159,7 +159,655 @@
     </article>
 
     <div class="article-post">
-    
+    <div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-yaml" data-lang="yaml"><span class="line"><span class="cl"><span class="p">[</span><span class="l">테크 따라잡기]는 IT 기업 기술 스택 사례를 참고하여 구현하고 정리하는 시리즈입니다. </span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="l">오로지 기술 성장을 위해 작성할 예정이며 스터디 과정에서 얻는 인사이트를 공유하고자 합니다. </span><span class="w">
+</span></span></span></code></pre></td></tr></table>
+</div>
+</div><p>도커 레지스트리인 Harbor에 대해 사용 사례를 조사하던 중 배울 것이 <a href="https://engineering.linecorp.com/ko/blog/harbor-for-private-docker-registry">많은 테크 블로그 글</a>을 발견하였다. 그대로 글로만 보기에는 필자가 아쉬워서 직접 구현하고 구현 과정에서 얻는 인사이트를 공유하고자 블로그 글을 작성하였다. 참고한 테크 블로그는 <a href="https://engineering.linecorp.com/ko/blog/harbor-for-private-docker-registry">다음의 링크</a>에서 확인이 가능하다.</p>
+<p><img loading="lazy" 
+    src="/./tech-private-docker/Line.png" 
+    alt="&lt;a href=&#34;https://engineering.linecorp.com/ko/blog/harbor-for-private-docker-registry&#34;&gt;https://engineering.linecorp.com/ko/blog/harbor-for-private-docker-registry&lt;/a&gt;" 
+     
+    width=864 
+    height="791"  /></p>
+<p><a href="https://engineering.linecorp.com/ko/blog/harbor-for-private-docker-registry">https://engineering.linecorp.com/ko/blog/harbor-for-private-docker-registry</a></p>
+<p>블로그 글을 요약하자면, Private Docker Registry로 Harbor를 선택하여 구성하였고, 오픈소스 오브젝트 스토리지인 Minio를 통해 스토리지 고가용성을 보장하였다. 또한 사내 LDAP 서버를 이용하여 직원 정보를 Harbor와 연계하여 로그인 정보를 연계하였다고 한다.</p>
+<p>기술 구현의 큰 틀은 같지만, 쿠버네티스 환경(AWS EKS)에서 Harbor를 배포하고 도커 이미지 백엔드 저장소로 Minio 사용하고자 한다. 또한 고가용성을 가지기 위해 다중 지역별 볼륨을 분산시키고, 백업에 대한 아키텍처를 설계하고 구현할 것이다. 아키텍처를 구현하면서 고민한 부분도 공유할 예정이다.</p>
+<h1 id="harbor">
+    <a href="#harbor" class="anchor">
+        <svg class="icon" aria-hidden="true" focusable="false" height="16" version="1.1" viewBox="0 0 16 16" width="16">
+            <path fill-rule="evenodd"
+                d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z">
+            </path>
+        </svg>
+    </a>
+    Harbor
+</h1>
+<p>Harbor는 CNCF에서의 레벨이 마지막 레벨인 <strong>Graduation(졸업) 단계</strong>인 오픈소스 도커 레지스트리이다. 도커 레지스트리 기능으로 안정성, 유용성, 커뮤니티 지원 등 여러 측면에서 충분한 성숙도를 갖춘 것으로 인정받았으며 필요 사례에 맞게 커스터 마이징이 가능하다. 대표적인 기능으로는 멀티 레파티토리 지원, 보안 스캔, 사용자 관리 권한, 이미지 사이클 관리, 마이그레이션, 저장소 복제, 스토리지 백업, 미러링 기능이 있다.</p>
+<p>기능면에서 미러링과 복제가 헷갈릴 수 있는데 목적이 분명 다르다. 미러링은 실시간 동기화를 통해 고가용성과 데이터 안정성을 보장하는 기능인 반면, 복제는 데이터 분산, 백업 및 로드 분산을 위해 주기적으로 또는 수동으로 데이터를 복사하는 방식이다.</p>
+<p><img loading="lazy" 
+    src="/./tech-private-docker/harbor.png" 
+    alt="&lt;a href=&#34;https://landscape.cncf.io/guide#provisioning--container-registry&#34;&gt;https://landscape.cncf.io/guide#provisioning&amp;ndash;container-registry&lt;/a&gt;" 
+     
+    width=780 
+    height="642"  /></p>
+<p><a href="https://landscape.cncf.io/guide#provisioning--container-registry">https://landscape.cncf.io/guide#provisioning&ndash;container-registry</a></p>
+<p>아키텍처는 다음과 같다. 중앙 하늘색 네모 부분이 harbor 구성 요소이다. 크게 네트워크단, 서비스단, 데이터 액세스 계층으로 구성된다.</p>
+<p><img loading="lazy" 
+    src="/./tech-private-docker/architecture.png" 
+    alt="&lt;a href=&#34;https://github.com/goharbor/harbor/wiki/Architecture-Overview-of-Harbor&#34;&gt;https://github.com/goharbor/harbor/wiki/Architecture-Overview-of-Harbor&lt;/a&gt;" 
+     
+    width=2312 
+    height="1162"  /></p>
+<p><a href="https://github.com/goharbor/harbor/wiki/Architecture-Overview-of-Harbor">https://github.com/goharbor/harbor/wiki/Architecture-Overview-of-Harbor</a></p>
+<ul>
+<li>네트워크 계층(Proxy) :  Nginx 서버에 의해 형성된 리버스 프록시이다. 하버의 서비스 구성 요소는 모두 이 역방향 프록시 뒤에 있으며 Proxy를 통해 전달된다. 이를 통해 로드 밸런싱, 보안, SSL/TLS 부하 관리, 캐싱 부하 개선, 압축 개선등의 이점을 얻을 수 있다.</li>
+<li>서비스 계층(Core) : Harbor Core는 프로젝트 관리, 사용자 인증 및 권한 관리, 시스템 설정 관리, 오케스트레이션 및 이벤트 처리와 같은 다양한 핵심 기능을 담당하는 중심 컴포넌트이다. 세부 기능은 다음과 같다.
+<ol>
+<li>프로젝트 관리: Harbor Core는 프로젝트의 생성, 수정, 삭제 및 구성을 관리한다. 프로젝트는 사용자가 컨테이너 이미지와 Helm 차트를 구성 및 관리할 수 있는 논리적 상위 레벨의 단위이다</li>
+<li>사용자 인증 및 권한 관리: Harbor Core는 사용자 인증 및 권한 관리를 수행한다. 이를 통해 특정 프로젝트에 대한 접근 권한을 제어할 수 있으며, 사용자는 자신의 권한 범위 내에서 이미지 및 차트를 관리할 수 있다. Harbor는 여러 인증 방식을 지원하며, 외부 인증 시스템과의 통합도 가능하다.</li>
+<li>시스템 설정: Harbor Core는 전체 시스템에 대한 다양한 설정을 관리한다. 이에는 공통 설정, 네트워크 설정, 스토리지 설정, 보안 설정, 로깅 및 모니터링 설정 등이 포함된다.</li>
+<li>오케스트레이션: Harbor Core는 다른 서비스 컴포넌트와의 상호 작용을 조정한다. 예를 들어 이미지 스캔 요청이 들어오면, 해당 작업을 Job Service에 전달하고, 결과를 사용자에게 전달한다.</li>
+<li>이벤트 처리: Harbor Core는 시스템 내부의 이벤트를 처리하며, 필요한 경우 다른 컴포넌트와 상호 작용하여 작업을 수행한다. 이러한 이벤트에는 이미지 및 차트의 생성, 수정, 삭제 등이 포함된다.</li>
+</ol>
+</li>
+<li>데이터 액세스 계층(Data Access Layer) : 3가지로 구성되며 kv-storage(Redis 작업 데이터에 대한 캐싱 스토리지), Local / Remote Storage(도커 레지스트리 저장소) , SQL Database(PostgreSQL 프로젝트, 사용자, 역할, 복제 정책, 태그 보존 정책, 스캐너, 차트 및 이미지와 같은 Harbor 모델의 관련 메타데이터를 저장)을 수행한다.</li>
+</ul>
+<p>공식문서에 따르면 Harbor는 기본적으로 상태 비저장 상태이며 파드간 복제가 가능하여 파드 HA를 제공한다. 하지만 스토리지 계층 레벨에서는 사용자가 고가용성 PostgreSQL, 애플리케이션 데이터 및 PVC를 위한 Redis 클러스터 또는 이미지 및 차트를 저장하기 위한 스토리지를 구축해야 한다.</p>
+<p><img loading="lazy" 
+    src="/./tech-private-docker/ha.png" 
+    alt="&lt;a href=&#34;https://goharbor.io/docs/1.10/install-config/harbor-ha-helm/&#34;&gt;https://goharbor.io/docs/1.10/install-config/harbor-ha-helm/&lt;/a&gt;" 
+     
+    width=1603 
+    height="897"  /></p>
+<p><a href="https://goharbor.io/docs/1.10/install-config/harbor-ha-helm/">https://goharbor.io/docs/1.10/install-config/harbor-ha-helm/</a></p>
+<p>이에 따라 스토리지 계층에서의 고가용성을 구성하고자 한다. Harbor 헬름 차트를 확인하면 스토리지 관련 설정부분이 6개이다. 각 스토리지은 다음과 같다.</p>
+<ol>
+<li>Registry: Docker 레지스트리 스토리지이다. 컨테이너 이미지 및 Helm 차트와 같은 아티팩트를 저장하고 관리한다.</li>
+<li>ChartMuseum: Helm 차트 레포지토리 스토리지이다.  Helm 차트를 저장하고 제공하는 데 사용된다.</li>
+<li>JobService: JobService의 로그 및 작업 데이터를 저장한다. JobService는 이미지 레플리케이션, 가비지 수집, 스캔 작업 등의 작업을 수행한다.</li>
+<li>Database: Harbor의 메타데이터를 저장하는 PostgreSQL 데이터베이스이다. 프로젝트, 사용자, 권한 및 구성 정보와 같은 메타데이터를 저장한다</li>
+<li>Redis: Harbor에서 사용하는 캐싱 및 메시지 큐 서비스이다.</li>
+<li>Trivy: 컨테이너 이미지의 취약점 스캔을 수행하는 오픈 소스 스캐너이다. 이 구성 요소의 볼륨은 취약점 데이터베이스 및 스캔 결과를 저장한다.</li>
+</ol>
+<p>6개의 스토리지 중 고가용성 구성을 위한 <strong>스토리지는 3개</strong>이다.</p>
+<ul>
+<li>Registry : 도커 이미지 저장소</li>
+<li>ChartMuseum  : helm 차트 저장소</li>
+<li>Database : Harbor 메타데이터 저장소</li>
+</ul>
+<p>Harbor에서는 스토리지로 block storage, file storage, object stroage 로 설정이 가능하다. 다만, 저장소의 성능 및 활용 특성으로 저장소별 스토리지를 설정해야 한다. 헬름 차트를 확인하면 도커 이미지 저장소는 object 스토리지로 나머지 저장소는 블록 스토리지로 설정 추천하는데 이유는 다음과 같다.</p>
+<p>도커 이미지 저장소를 object storage(예: Amazon S3)로 사용하는 이유:</p>
+<ul>
+<li>확장성: Object storage는 거의 무제한의 저장 용량을 제공하므로, 많은 도커 이미지를 저장할 수 있다.</li>
+<li>내구성: Object storage는 데이터를 여러 물리적 위치에 자동으로 복제하므로, 데이터 손실의 위험이 낮다.</li>
+<li>비용 효율: 일반적으로 object storage는 용량 당 비용이 낮고, 저장된 데이터에 따라 비용이 증가한다.</li>
+</ul>
+<p>기타 저장소를 블록 스토리지(예: AWS EBS)로 저장하는 이유:</p>
+<ul>
+<li>높은 IOPS: EBS는 높은 IOPS(Input/Output Operations Per Second) 성능을 제공하므로, 데이터베이스 작업에 적합하다.</li>
+<li>지연 시간 최소화:  블록 스토리지는 데이터베이스 작업에 필요한 빠른 읽기/쓰기 작업이 가능하다.</li>
+<li>일관된 성능: EBS는 일관된 성능을 제공하여 데이터베이스 작업의 안정성을 보장한다.</li>
+<li>스냅샷 및 백업: EBS 볼륨의 스냅샷을 쉽게 생성할 수 있으며, 데이터베이스 백업 및 복구를 용이하게 한다.</li>
+</ul>
+<p>추천 스토리지에 따라 스토리지 구성할 것인데 도커 이미지 저장소로는 Minio 오브젝트 스토리지를 사용할 것이다. 그리고 나머지 저장소는 AWS EBS를 사용할 것이다. 또한 백업을 위해 오픈소스 백업 솔루션인 Velero를 사용할 것이다. 종합하여 AWS 아키텍처를 구성하자면 다음과 같다.</p>
+<p><img loading="lazy" 
+    src="/./tech-private-docker/eks2.drawio_%283%29.png" 
+    alt="eks2.drawio (3).png" 
+     
+    width=1101 
+    height="951"  /></p>
+<p>통신 시나리오에 따라 색깔을 달리 표현했다.이어서 통신 시나리오 및 세부 컴포넌트(MiniO)을 알아보겠다.</p>
+<ul>
+<li>users (보라선) : Harbor에 접속해서 도커 이미지를 확인할 수 있는 개발자 및 레지스트리 관리자이다. Harbor 도메인을 통해 ELB를 거쳐 harbor ingress 로 통신한다.</li>
+<li>Storage(파랑선) : 스토리지 볼륨 연계도이다. 설계 목적과 같이 Harbor Registry 저장소는 Minio로 나머지 저장소는 PV(EBS) 로 적재했다.</li>
+<li>Backup(초록선) : 백업 툴인 Velero를 통해 S3 에 데이터를 백업시킨다.</li>
+<li>Admin(빨강선) : 인프라 관리자는 Bestion server에 접속하여 쿠버네티스 및 인프라를 관리한다.</li>
+</ul>
+<h2 id="minio">
+    <a href="#minio" class="anchor">
+        <svg class="icon" aria-hidden="true" focusable="false" height="16" version="1.1" viewBox="0 0 16 16" width="16">
+            <path fill-rule="evenodd"
+                d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z">
+            </path>
+        </svg>
+    </a>
+    Minio
+</h2>
+<p><a href="https://min.io/">MinIO</a> 는 AWS의 S3 SDK와 호환되는 오픈소스 Object Storage이다. Minio 모드 중 Distributed Mode는 Minio의 분산 모드로, 여러 서버 또는 노드 간에 데이터를 분산 저장하고 관리할 수 있다. 분산 모드는 높은 가용성, 내구성, 그리고 스케일 아웃 확장성을 제공한다.</p>
+<p>구성시 중요한 점으로 Distributed MinIO 의 디스크이다. 분산 모드에서는 최소 4개의 디스크가 필요하다. 분산스토리지의 데이터 복구 기능으로 Erasure Coding 알고리즘을 채택하기 때문인데 원본 데이터를 여러 조각으로 나누고, 각 조각에 대해 패리티 정보를 생성하여 분산 저장한다. 이에따라 데이터 복구에 N/2 데이터 블록과 N/2 패리티 블록 조건을 만족해야 하며 최소 4개 이상의 디스크를 사용하는 것을 권장하기 때문이다. 이렇게 구성하면 최대 패리티에서 MinIO는 삭제 세트당 최대 절반의 드라이브 손실을 허용할 수 있다.</p>
+<h1 id="배포">
+    <a href="#%eb%b0%b0%ed%8f%ac" class="anchor">
+        <svg class="icon" aria-hidden="true" focusable="false" height="16" version="1.1" viewBox="0 0 16 16" width="16">
+            <path fill-rule="evenodd"
+                d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z">
+            </path>
+        </svg>
+    </a>
+    배포
+</h1>
+<blockquote>
+<p>설치 환경 : EKS 클러스터 (k8s 1.24), AWS Ubuntu 인스턴스
+솔루션 최소 요구 사항
+Harbor (CPU  2 core , 4GB, 40 GB)
+Distributed MinIO ( CPU  1~2 core, 2~4GB, 분산 Minio)
+Velero ( CPU  1 core, 1GB, 디스크 공간 알아서..)
+원활한 테스트를 위해  약 CPU 5 core 이상, 메모리 8기가 이상이 필요하다.
+필자의 경우  워크노드를 c5a.2xlarge 로 3개($0.344 *2) 설성하여 테스트를 진행하였다.</p>
+</blockquote>
+<h2 id="distributed-minio-배포">
+    <a href="#distributed-minio-%eb%b0%b0%ed%8f%ac" class="anchor">
+        <svg class="icon" aria-hidden="true" focusable="false" height="16" version="1.1" viewBox="0 0 16 16" width="16">
+            <path fill-rule="evenodd"
+                d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z">
+            </path>
+        </svg>
+    </a>
+    Distributed MinIO 배포
+</h2>
+<p>설치는 <a href="https://artifacthub.io/packages/helm/bitnami/minio">minio helm 참고</a>하여 구성하였다.</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">helm repo add minio https://charts.bitnami.com/bitnami
+</span></span><span class="line"><span class="cl">helm repo update
+</span></span><span class="line"><span class="cl">helm fetch minio/minio --untar --version 12.2.1
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>구성 옵션별로 수정은 다음과 같다.</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span><span class="lnt">31
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl"><span class="c1"># values-minio.yaml </span>
+</span></span><span class="line"><span class="cl">mode: distributed
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">auth:
+</span></span><span class="line"><span class="cl">  rootUser: admin
+</span></span><span class="line"><span class="cl">  rootPassword: <span class="s2">&#34;admin1234&#34;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">statefulset:
+</span></span><span class="line"><span class="cl">  replicaCount: <span class="m">2</span>
+</span></span><span class="line"><span class="cl">  zones: <span class="m">2</span>
+</span></span><span class="line"><span class="cl">  drivesPerNode: <span class="m">1</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">provisioning:
+</span></span><span class="line"><span class="cl">  config: 
+</span></span><span class="line"><span class="cl">    - name: region
+</span></span><span class="line"><span class="cl">      options:
+</span></span><span class="line"><span class="cl">        name: ap-northeast-2
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">ingress:
+</span></span><span class="line"><span class="cl">  enabled: <span class="nb">true</span> 
+</span></span><span class="line"><span class="cl">  hostname: minio.hanhorang.link
+</span></span><span class="line"><span class="cl">  path: /*
+</span></span><span class="line"><span class="cl">  annotations:
+</span></span><span class="line"><span class="cl">    kubernetes.io/ingress.class: alb
+</span></span><span class="line"><span class="cl">    alb.ingress.kubernetes.io/scheme: internet-facing
+</span></span><span class="line"><span class="cl">    alb.ingress.kubernetes.io/target-type: ip
+</span></span><span class="line"><span class="cl">    alb.ingress.kubernetes.io/listen-ports: <span class="s1">&#39;[{&#34;HTTPS&#34;:443}, {&#34;HTTP&#34;:80}, {&#34;HTTPS&#34;:9090}]&#39;</span>
+</span></span><span class="line"><span class="cl">    alb.ingress.kubernetes.io/certificate-arn: <span class="o">{</span>ACM arn 입력<span class="o">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">persistence:
+</span></span><span class="line"><span class="cl">  storageClass: <span class="s2">&#34;kops-csi-1-21&#34;</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><ul>
+<li>분산 모드에서 인스턴스 설정은 statuefulset에서 설정한다.
+<ul>
+<li><code>replicaCount</code>: 각 zones당 실행되는 실행되는 파드의 수를 설정한다.</li>
+<li><code>zones</code>: AWS의 가용영역이라 생각하면 된다. 분산스토리지로 사용할 영역 개수를 지정한다.</li>
+<li><code>drivesPerNode</code>: 각 워커 노드에 연결된 디스크 수를 1개로 설정한다. 이 설정에 따라 각 MinIO 파드는 하나의 디스크를 사용하게 된다.</li>
+</ul>
+</li>
+</ul>
+<p>배포</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">kubectl create ns minio
+</span></span><span class="line"><span class="cl">helm install minio minio/minio -f values-minio.yaml -n minio --version 12.2.1
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>배포 완료후,  도메인으로 접속하여 확인해보자. 도메인은 헬름 차트의 ingress.hostname에 입력한 값이다.</p>
+<p><img loading="lazy" 
+    src="/./tech-private-docker/minio1.png" 
+    alt="minio1.png" 
+     
+    width=918 
+    height="727"  /></p>
+<p>어드민 계정은 차트에서 admin / admin1234 로 설정되어 있다. 로그인을 하자.</p>
+<p>로그인이 완료되면 다음과 같은 화면을 확인할 수 있다.</p>
+<p><img loading="lazy" 
+    src="/./tech-private-docker/minio2.png" 
+    alt="minio2.png" 
+     
+    width=913 
+    height="914"  /></p>
+<p>Harbor 연동을 위하여 접속한 Minio 에서 버킷 생성과 Access Key를 발급받아야 한다. 버킷 이름과 Access keys는 Harbor 구성 헬름 차트에서 필요하다.</p>
+<ul>
+<li>
+<p>버킷 생성</p>
+<p>초기 화면 Object Brower 에서 버킷 생성이 가능하다.</p>
+</li>
+<li>
+<p>Access Key 발급</p>
+<p>Access Keys 에서 발급받자.</p>
+<p><img loading="lazy" 
+    src="/./tech-private-docker/Minio3.png" 
+    alt="Minio3.png" 
+     
+    width=407 
+    height="452"  /></p>
+<p>Create 버튼 잊지말고 클릭하자.</p>
+<p>Access Key 발급 후 MINIO 동작 권한을 등록해야 한다. 생성한 키를 클릭하면 정책 입력 칸이 나온다.  아래 정책을 입력하도록 하자.</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-json" data-lang="json"><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="nt">&#34;Version&#34;</span><span class="p">:</span> <span class="s2">&#34;2012-10-17&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">    <span class="nt">&#34;Statement&#34;</span><span class="p">:</span> <span class="p">[</span>
+</span></span><span class="line"><span class="cl">        <span class="p">{</span>
+</span></span><span class="line"><span class="cl">            <span class="nt">&#34;Effect&#34;</span><span class="p">:</span> <span class="s2">&#34;Allow&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">            <span class="nt">&#34;Action&#34;</span><span class="p">:</span> <span class="p">[</span>
+</span></span><span class="line"><span class="cl">                <span class="s2">&#34;admin:*&#34;</span>
+</span></span><span class="line"><span class="cl">            <span class="p">]</span>
+</span></span><span class="line"><span class="cl">        <span class="p">},</span>
+</span></span><span class="line"><span class="cl">        <span class="p">{</span>
+</span></span><span class="line"><span class="cl">            <span class="nt">&#34;Effect&#34;</span><span class="p">:</span> <span class="s2">&#34;Allow&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">            <span class="nt">&#34;Action&#34;</span><span class="p">:</span> <span class="p">[</span>
+</span></span><span class="line"><span class="cl">                <span class="s2">&#34;kms:*&#34;</span>
+</span></span><span class="line"><span class="cl">            <span class="p">]</span>
+</span></span><span class="line"><span class="cl">        <span class="p">},</span>
+</span></span><span class="line"><span class="cl">        <span class="p">{</span>
+</span></span><span class="line"><span class="cl">            <span class="nt">&#34;Effect&#34;</span><span class="p">:</span> <span class="s2">&#34;Allow&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">            <span class="nt">&#34;Action&#34;</span><span class="p">:</span> <span class="p">[</span>
+</span></span><span class="line"><span class="cl">                <span class="s2">&#34;s3:*&#34;</span>
+</span></span><span class="line"><span class="cl">            <span class="p">],</span>
+</span></span><span class="line"><span class="cl">            <span class="nt">&#34;Resource&#34;</span><span class="p">:</span> <span class="p">[</span>
+</span></span><span class="line"><span class="cl">                <span class="s2">&#34;arn:aws:s3:::*&#34;</span>
+</span></span><span class="line"><span class="cl">            <span class="p">]</span>
+</span></span><span class="line"><span class="cl">        <span class="p">}</span>
+</span></span><span class="line"><span class="cl">    <span class="p">]</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div></li>
+</ul>
+<h2 id="harbor-배포">
+    <a href="#harbor-%eb%b0%b0%ed%8f%ac" class="anchor">
+        <svg class="icon" aria-hidden="true" focusable="false" height="16" version="1.1" viewBox="0 0 16 16" width="16">
+            <path fill-rule="evenodd"
+                d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z">
+            </path>
+        </svg>
+    </a>
+    Harbor 배포
+</h2>
+<p>Harbor 구성도 마찬가지로 helm로 배포할 것이다. 먼저 헬름 차트를 가져오겠다.</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">helm repo add harbor https://helm.goharbor.io
+</span></span><span class="line"><span class="cl">helm repo update 
+</span></span><span class="line"><span class="cl"><span class="c1"># 차트 얻기</span>
+</span></span><span class="line"><span class="cl">helm show values **harbor/harbor** &gt; values.yaml
+</span></span></code></pre></td></tr></table>
+</div>
+</div><div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span><span class="lnt">31
+</span><span class="lnt">32
+</span><span class="lnt">33
+</span><span class="lnt">34
+</span><span class="lnt">35
+</span><span class="lnt">36
+</span><span class="lnt">37
+</span><span class="lnt">38
+</span><span class="lnt">39
+</span><span class="lnt">40
+</span><span class="lnt">41
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-yaml" data-lang="yaml"><span class="line"><span class="cl"><span class="c">#values-harbor.yaml </span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="c"># network 설정</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="nt">expose</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="nt">tls</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="nt">certSource</span><span class="p">:</span><span class="w"> </span><span class="l">none</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="nt">ingress</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="nt">hosts</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">      </span><span class="nt">core</span><span class="p">:</span><span class="w"> </span><span class="l">harbor.hanhorang.link</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">      </span><span class="nt">notary</span><span class="p">:</span><span class="w"> </span><span class="l">notary.hanhorang.link</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="nt">controller</span><span class="p">:</span><span class="w"> </span><span class="l">alb</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="nt">className</span><span class="p">:</span><span class="w"> </span><span class="l">alb</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="nt">annotations</span><span class="p">:</span><span class="w"> 
+</span></span></span><span class="line"><span class="cl"><span class="w">      </span><span class="nt">alb.ingress.kubernetes.io/scheme</span><span class="p">:</span><span class="w"> </span><span class="l">internet-facing</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">      </span><span class="nt">alb.ingress.kubernetes.io/target-type</span><span class="p">:</span><span class="w"> </span><span class="l">ip</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">      </span><span class="nt">alb.ingress.kubernetes.io/listen-ports</span><span class="p">:</span><span class="w"> </span><span class="s1">&#39;[{&#34;HTTPS&#34;:443}, {&#34;HTTP&#34;:80}]&#39;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">      </span><span class="nt">alb.ingress.kubernetes.io/certificate-arn</span><span class="p">:</span><span class="w"> </span>{<span class="l">ACM arn 입력}</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="nt">externalURL</span><span class="p">:</span><span class="w"> </span><span class="l">https://harbor.hanhorang.link</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="c"># Storage 설정 </span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="nt">persistence</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="nt">persistentVolumeClaim</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="nt">registry</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">      </span><span class="nt">storageClass</span><span class="p">:</span><span class="w"> </span><span class="s2">&#34;kops-csi-1-21&#34;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="nt">chartmuseum</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">      </span><span class="nt">storageClass</span><span class="p">:</span><span class="w"> </span><span class="s2">&#34;kops-csi-1-21&#34;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="nt">database</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">      </span><span class="nt">storageClass</span><span class="p">:</span><span class="w"> </span><span class="s2">&#34;kops-csi-1-21&#34;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">   
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="nt">imageChartStorage</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="nt">disableredirect</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="l">s3 </span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="nt">s3</span><span class="p">:</span><span class="w"> 
+</span></span></span><span class="line"><span class="cl"><span class="w">      </span><span class="nt">region</span><span class="p">:</span><span class="w"> </span><span class="l">ap-northeast-2</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">      </span><span class="nt">bucket</span><span class="p">:</span><span class="w"> </span><span class="l">registry </span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">      </span><span class="nt">accesskey</span><span class="p">:</span><span class="w"> </span><span class="l">&lt;minio-access-key&gt;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">      </span><span class="nt">secretkey</span><span class="p">:</span><span class="w"> </span><span class="l">&lt;minio-secret-key&gt;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">      </span><span class="nt">regionendpoint</span><span class="p">:</span><span class="w"> </span><span class="l">http://minio.minio.svc.cluster.local:9000</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="c"># HA </span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="nt">core</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="nt">replicas</span><span class="p">:</span><span class="w"> </span><span class="m">3</span><span class="w">
+</span></span></span></code></pre></td></tr></table>
+</div>
+</div><ul>
+<li>스토리지 연동은 persistence에서 진행한다. registry 부분 연동은 imageChartStorage에서 설정한다.</li>
+<li>imageChartStorage.s3 에서 minio 에서 발급받은 키를 입력한다.</li>
+<li>imageChartStorage.s3.regionpoint 는 minio 의 DNS 정보를 입력했다. 인그래스로 설정이 가능하나, 다음과 같은 에러로 DNS 로 설정하였다.  네트워크 설정으로 오류 발생시 다음의 메세지를 확인하자.</li>
+</ul>
+<p>🧐 <strong>minio 네트워크 설정 관련 트러블슈팅</strong></p>
+<p><code>regionendpoint 설정</code>에 따라 에러가 발생하여 정리한다.</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">kubectl logs harbor-core-5b7864c575-rnfm9 -n harbor
+</span></span></code></pre></td></tr></table>
+</div>
+</div><ul>
+<li>
+<p>regionendpoint: <code>minio.hanhorang.link</code> 의 경우
+도메인은 minio의 ALB 도메인 주소이다.  Minio 는 S3와 호환되는 SDK를 가지고 있다. 아래 로그 메세지의 경우 포트를 지정하지 않아 생긴 오류다.</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">2023-03-21T16:59:40Z <span class="o">[</span>ERROR<span class="o">]</span> <span class="o">[</span>/server/v2.0/handler/project.go:509<span class="o">][</span><span class="nv">requestID</span><span class="o">=</span><span class="s2">&#34;2236a0c4-55cd-4e5c-989d-1b9f941efb25&#34;</span><span class="o">]</span>: failed to populate properties <span class="k">for</span> project library, error: get chart count of project <span class="m">1</span> failed: http error: code 500, message InvalidArgument: S3 API Requests must be made to API port.
+</span></span><span class="line"><span class="cl">        status code: 400, request id: , host id: 
+</span></span><span class="line"><span class="cl">2023-03-21T16:59:40Z <span class="o">[</span>ERROR<span class="o">]</span> <span class="o">[</span>/server/v2.0/handler/project.go:509<span class="o">][</span><span class="nv">requestID</span><span class="o">=</span><span class="s2">&#34;2236a0c4-55cd-4e5c-989d-1b9f941efb25&#34;</span><span class="o">]</span>: failed to populate properties <span class="k">for</span> project test, error: get chart count of project <span class="m">2</span> failed: http error: code 500, message InvalidArgument: S3 API Requests must be made to API port.
+</span></span><span class="line"><span class="cl">        status code: 400, request id: , host id: 
+</span></span><span class="line"><span class="cl">2023-03-21T16:59:42Z <span class="o">[</span>ERROR<span class="o">]</span> <span class="o">[</span>/lib/http/error.go:56<span class="o">]</span>: <span class="o">{</span><span class="s2">&#34;errors&#34;</span>:<span class="o">[{</span><span class="s2">&#34;code&#34;</span>:<span class="s2">&#34;UNKNOWN&#34;</span>,<span class="s2">&#34;message&#34;</span>:<span class="s2">&#34;get chart count of project 2 failed: http error: code 500, message InvalidArgument: S3 API Requests must be made to API port.\n\tstatus code: 400, request id: , host id: &#34;</span><span class="o">}]}</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div></li>
+<li>
+<p>regionendpoint: <code>minio.hanhorang.link:9000</code> 경우
+포트 9000을 추가하니 Timeout이 발생한다. harbor ALB에서 다시 minio ALB로 거치는 과정에서 시간이 초과된 것으로 예상된다.</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">2023-03-21T16:55:40Z <span class="o">[</span>ERROR<span class="o">]</span> <span class="o">[</span>/server/v2.0/handler/project.go:509<span class="o">][</span><span class="nv">requestID</span><span class="o">=</span><span class="s2">&#34;a0aed46e-4d11-4459-af04-2efa9f94cbf3&#34;</span><span class="o">]</span>: failed to populate properties <span class="k">for</span> project library, error: get chart count of project <span class="m">1</span> failed: get content failed: send request GET /library/index.yaml failed: Get <span class="s2">&#34;http://harbor-chartmuseum/library/index.yaml&#34;</span>: context deadline exceeded <span class="o">(</span>Client.Timeout exceeded <span class="k">while</span> awaiting headers<span class="o">)</span>
+</span></span><span class="line"><span class="cl">2023-03-21T16:55:40Z <span class="o">[</span>ERROR<span class="o">]</span> <span class="o">[</span>/server/v2.0/handler/project.go:509<span class="o">][</span><span class="nv">requestID</span><span class="o">=</span><span class="s2">&#34;a0aed46e-4d11-4459-af04-2efa9f94cbf3&#34;</span><span class="o">]</span>: failed to populate properties <span class="k">for</span> project test, error: get chart count of project <span class="m">2</span> failed: get content failed: send request GET /test/index.yaml failed: Get <span class="s2">&#34;http://harbor-chartmuseum/test/index.yaml&#34;</span>: context deadline exceeded <span class="o">(</span>Client.Timeout exceeded <span class="k">while</span> awaiting headers<span class="o">)</span>
+</span></span><span class="line"><span class="cl">2023-03-21T16:55:56Z <span class="o">[</span>ERROR<span class="o">]</span> <span class="o">[</span>/server/v2.0/handler/project.go:509<span class="o">][</span><span class="nv">requestID</span><span class="o">=</span><span class="s2">&#34;8e0c7248-9425-4862-b066-9b4b29151105&#34;</span><span class="o">]</span>: failed to populate properties <span class="k">for</span> project test, error: get chart count of project <span class="m">2</span> failed: get content failed: send request GET /test/index.yaml failed: Get <span class="s2">&#34;http://harbor-chartmuseum/test/index.yaml&#34;</span>: context deadline exceeded <span class="o">(</span>Client.Timeout exceeded <span class="k">while</span> awaiting headers<span class="o">)</span>
+</span></span><span class="line"><span class="cl">2023-03-21T16:55:56Z <span class="o">[</span>ERROR<span class="o">]</span> <span class="o">[</span>/server/v2.0/handler/project.go:509<span class="o">][</span><span class="nv">requestID</span><span class="o">=</span><span class="s2">&#34;8e0c7248-9425-4862-b066-9b4b29151105&#34;</span><span class="o">]</span>: failed to populate properties <span class="k">for</span> project library, error: get chart count of project <span class="m">1</span> failed: get content failed: send request GET /library/index.yaml failed: Get <span class="s2">&#34;http://harbor-chartmuseum/library/index.yaml&#34;</span>: context deadline exceeded <span class="o">(</span>Client.Timeout exceeded <span class="k">while</span> awaiting headers<span class="o">)</span>
+</span></span><span class="line"><span class="cl">2023-03-21T16:56:29Z <span class="o">[</span>ERROR<span class="o">]</span> <span class="o">[</span>/lib/http/error.go:56<span class="o">]</span>: <span class="o">{</span><span class="s2">&#34;errors&#34;</span>:<span class="o">[{</span><span class="s2">&#34;code&#34;</span>:<span class="s2">&#34;UNKNOWN&#34;</span>,<span class="s2">&#34;message&#34;</span>:<span class="s2">&#34;get chart count of project 2 failed: get content failed: send request GET /test/index.yaml failed: Get \&#34;http://harbor-chartmuseum/test/index.yaml\&#34;: context deadline exceeded (Client.Timeout exceeded while awaiting headers)&#34;</span><span class="o">}]}</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div></li>
+<li>
+<p>regionendpoint: <code>minio.minio.svc.cluster.local:9000</code> 경우</p>
+<p>도메인 연결의 최소로 하기 위해 CoreDNS를 사용했다. 그러나 HTTP 설정으로 에러가 발생했다.</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">2023-03-21T16:35:45Z <span class="o">[</span>ERROR<span class="o">]</span> <span class="o">[</span>/lib/http/error.go:56<span class="o">]</span>: <span class="o">{</span><span class="s2">&#34;errors&#34;</span>:<span class="o">[{</span><span class="s2">&#34;code&#34;</span>:<span class="s2">&#34;UNKNOWN&#34;</span>,<span class="s2">&#34;message&#34;</span>:<span class="s2">&#34;get chart count of project 2 failed: http error: code 500, message RequestError: send request failed\ncaused by: Get \&#34;https://minio.minio.svc.cluster.local:9000/minio-test?prefix=test\&#34;: http: server gave HTTP response to HTTPS client&#34;</span><span class="o">}]}</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div></li>
+<li>
+<p>regionendpoint: <code>http://minio.hanhorang.link:9000</code></p>
+<p>HTTP를 붙이니 정상적으로 연동이 확인된다. 쿠버네티스 내부에서 연결하는 것이라 HTTPS 트래픽 부하를 최소화하는 목적으로 HTTP를 사용하여 설정했다.</p>
+</li>
+</ul>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">kubectl create ns harbor
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">helm install harbor harbor/harbor -f values-harbor.yaml --namespace harbor --version 1.11.0
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h3 id="배포-확인">
+    <a href="#%eb%b0%b0%ed%8f%ac-%ed%99%95%ec%9d%b8" class="anchor">
+        <svg class="icon" aria-hidden="true" focusable="false" height="16" version="1.1" viewBox="0 0 16 16" width="16">
+            <path fill-rule="evenodd"
+                d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z">
+            </path>
+        </svg>
+    </a>
+    배포 확인
+</h3>
+<p>헬름차트에서 입력 harbor 도메인으로 접근하면 로그인 화면이 나온다. 초기 admin 유저의 접속 정보는 admin / Harbor12345 이다. 로그인하면 레지스트리 정보가 나온다.</p>
+<p><img loading="lazy" 
+    src="/./tech-private-docker/harbor1.png" 
+    alt="harbor.png" 
+     
+    width=909 
+    height="653"  /></p>
+<p><img loading="lazy" 
+    src="/./tech-private-docker/harbor-login.png" 
+    alt="harbor-login.png" 
+     
+    width=910 
+    height="686"  /></p>
+<p>New Project 버튼을 눌러 레지스트리 프로젝트에 버킷을 생성하자</p>
+<p><img loading="lazy" 
+    src="/./tech-private-docker/harbor-create.png" 
+    alt="harbor-create.png" 
+     
+    width=576 
+    height="413"  /></p>
+<h3 id="연동-테스트">
+    <a href="#%ec%97%b0%eb%8f%99-%ed%85%8c%ec%8a%a4%ed%8a%b8" class="anchor">
+        <svg class="icon" aria-hidden="true" focusable="false" height="16" version="1.1" viewBox="0 0 16 16" width="16">
+            <path fill-rule="evenodd"
+                d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z">
+            </path>
+        </svg>
+    </a>
+    연동 테스트
+</h3>
+<p>임의의 도커 이미지 PULL &amp; PUSH 하여 Harbor 레지스트리, Minio 버킷에 데이터가 저장되는 지 확인해보자.</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">docker pull nginx <span class="o">&amp;&amp;</span> docker pull busybox <span class="o">&amp;&amp;</span> docker images
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">docker tag busybox harbor.<span class="nv">$KOPS_CLUSTER_NAME</span>/test/busybox:0.1
+</span></span><span class="line"><span class="cl"><span class="nb">echo</span> <span class="s1">&#39;Harbor12345&#39;</span> &gt; harborpw.txt
+</span></span><span class="line"><span class="cl">cat harborpw.txt <span class="p">|</span> docker login harbor.<span class="nv">$KOPS_CLUSTER_NAME</span> -u admin --password-stdin
+</span></span><span class="line"><span class="cl">WARNING! Your password will be stored unencrypted in /root/.docker/config.json.
+</span></span><span class="line"><span class="cl">Configure a credential helper to remove this warning. See
+</span></span><span class="line"><span class="cl">https://docs.docker.com/engine/reference/commandline/login/#credentials-store
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">Login Succeeded
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">docker push harbor.<span class="nv">$KOPS_CLUSTER_NAME</span>/test/busybox:0.1
+</span></span><span class="line"><span class="cl">The push refers to repository <span class="o">[</span>harbor.hanhorang.link/test/busybox<span class="o">]</span>
+</span></span><span class="line"><span class="cl">baacf561cfff: Pushed 
+</span></span><span class="line"><span class="cl">0.1: digest: sha256:acaddd9ed544f7baf3373064064a51250b14cfe3ec604d65765a53da5958e5f5 size: <span class="m">528</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p><img loading="lazy" 
+    src="/./tech-private-docker/harbor-push.png" 
+    alt="harbor-push.png" 
+     
+    width=1858 
+    height="651"  /></p>
+<p><img loading="lazy" 
+    src="/./tech-private-docker/minio-push.png" 
+    alt="minio-push.png" 
+     
+    width=1854 
+    height="967"  /></p>
+<p>Harbor에 이미지가 저장되고 이어서 minio 버킷에 하버 데이터가 저장된 것을 확인할 수 있다!</p>
+<h3 id="이어서">
+    <a href="#%ec%9d%b4%ec%96%b4%ec%84%9c" class="anchor">
+        <svg class="icon" aria-hidden="true" focusable="false" height="16" version="1.1" viewBox="0 0 16 16" width="16">
+            <path fill-rule="evenodd"
+                d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z">
+            </path>
+        </svg>
+    </a>
+    이어서
+</h3>
+<p>이번 블로그 글에서는 Harbor와 minio를 통해 EKS에서 고가용성 Private Docker Registry(Harbor) 구축을 하였다. 아키텍처 설계를 하면서 스토리지 특성에 대해 딥하게 다룰 수 있는 계기가 되었고, CNCF의 졸업 레벨의 시스템(Harbor)의 아키텍처를 구체적으로 분석할 수 있었다. 느끼는 거지만 간단하면서도 각 컴포넌트가 세부적으로 분산되어 처리된다는 점과 스토리지 연동 부분에서 사례 참고가 되었다.</p>
+<p>아키텍처 구축이 끝이 아니다. 운영 레벨의 기능들이 남았다. 다음 글에서는 Velero를 통한 백업과 LDAP 서버와의 연동, Harbor의 기능들에 대해 살펴보겠다.</p>
+
     </div>
 </div>
 

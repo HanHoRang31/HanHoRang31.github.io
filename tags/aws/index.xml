@@ -20,6 +20,29 @@ EKS의 주요 특징은 다음과 같다.
     </item>
     
     <item>
+      <title>[테크 따라잡기] EKS에서 고가용성 Private Docker Registry(Harbor) 구축하기</title>
+      <link>https://HanHoRang31.github.io/post/tech-private-docker/</link>
+      <pubDate>Fri, 21 Apr 2023 00:00:00 +0000</pubDate>
+      
+      <guid>https://HanHoRang31.github.io/post/tech-private-docker/</guid>
+      <description>1 2 [테크 따라잡기]는 IT 기업 기술 스택 사례를 참고하여 구현하고 정리하는 시리즈입니다. 오로지 기술 성장을 위해 작성할 예정이며 스터디 과정에서 얻는 인사이트를 공유하고자 합니다. 도커 레지스트리인 Harbor에 대해 사용 사례를 조사하던 중 배울 것이 많은 테크 블로그 글을 발견하였다. 그대로 글로만 보기에는 필자가 아쉬워서 직접 구현하고 구현 과정에서 얻는 인사이트를 공유하고자 블로그 글을 작성하였다. 참고한 테크 블로그는 다음의 링크에서 확인이 가능하다.
+https://engineering.linecorp.com/ko/blog/harbor-for-private-docker-registry
+블로그 글을 요약하자면, Private Docker Registry로 Harbor를 선택하여 구성하였고, 오픈소스 오브젝트 스토리지인 Minio를 통해 스토리지 고가용성을 보장하였다.</description>
+    </item>
+    
+    <item>
+      <title>Loki 최신버전(V2.8.0) DyanmoDB 연동하기</title>
+      <link>https://HanHoRang31.github.io/post/loki-2-8-0/</link>
+      <pubDate>Fri, 14 Apr 2023 00:00:00 +0000</pubDate>
+      
+      <guid>https://HanHoRang31.github.io/post/loki-2-8-0/</guid>
+      <description>전글 Loki 최신 버전 설치하기에서 인덱스 DB를 Dynamodb로 연동하지 못했다. 미련이 남아 스터디가 끝난 이후에도 여러 테스트를 해보았고, 마침내 연동을 성공하여 관련 경험을 공유한다.
+먼저, Loki에서 DynamoDB로 연동해야 하는 목적부터 알고 가자. 배경 지식 설명을 위해 Loki 의 지원 스토리지를 다시 확인하겠다.
+https://grafana.com/docs/loki/latest/operations/storage/
+스토리지 연동 목록을 살펴보면 Loki 2.0 이상에서 싱글 스토어(boltdb-shipper)가 추가되었고 연동으로 추천하고 있다. (기본 스토리지도 싱글 스토어이다.) 이유를 살펴보니 비용 감소인데 로컬에서 인덱스를 저장하기 때문에 외부 스토리지에 대한 종속성이 줄기 때문이라 한다.</description>
+    </item>
+    
+    <item>
       <title>[PKOS] 쿠버네티스 보안과 Kubescape DeepDive</title>
       <link>https://HanHoRang31.github.io/post/pkos-5-security/</link>
       <pubDate>Fri, 07 Apr 2023 00:00:00 +0000</pubDate>

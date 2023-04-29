@@ -1,24 +1,12 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
-    <title>eks on HanHoRang Tech Blog</title>
-    <link>https://HanHoRang31.github.io/tags/eks/</link>
-    <description>Recent content in eks on HanHoRang Tech Blog</description>
+    <title>minio on HanHoRang Tech Blog</title>
+    <link>https://HanHoRang31.github.io/tags/minio/</link>
+    <description>Recent content in minio on HanHoRang Tech Blog</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <lastBuildDate>Sat, 29 Apr 2023 07:35:40 +0900</lastBuildDate><atom:link href="https://HanHoRang31.github.io/tags/eks/index.xml" rel="self" type="application/rss+xml" />
-    <item>
-      <title>[AEWS] EKS 아키텍처와 Private EKS 클러스터 배포하기</title>
-      <link>https://HanHoRang31.github.io/post/aews-1-eks/</link>
-      <pubDate>Sat, 29 Apr 2023 07:35:40 +0900</pubDate>
-      
-      <guid>https://HanHoRang31.github.io/post/aews-1-eks/</guid>
-      <description>1 2 AWS EKS Workshop Study (=AEWS)는 EKS Workshop 실습 스터디입니다. CloudNet@ Gasida(가시다)이 진행하며,공개된 AWS EKS Workshop을 기반으로 진행하고 있습니다. EKS ? Amazon Elastic Kubernetes Service(EKS)는 AWS에서 제공하는 관리형 Kubernetes 서비스다. EKS를 사용하면 Kubernetes 클러스터를 생성, 운영 및 유지 관리할 수 있다.
-https://catalog.us-east-1.prod.workshops.aws/workshops/9c0aa9ab-90a9-44a6-abe1-8dff360ae428/ko-KR/10-intro/200-eks
-EKS의 주요 특징은 다음과 같다.
-관리형 서비스: EKS는 Kubernetes 컨트롤 플레인이나 데이터 플레인를 설치, 운영 및 유지 관리시켜주는 서비스이다. 사용자가 인프라 설치, 운영, 유지 관리를 할 필요가 없다.</description>
-    </item>
-    
+    <lastBuildDate>Fri, 21 Apr 2023 00:00:00 +0000</lastBuildDate><atom:link href="https://HanHoRang31.github.io/tags/minio/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>[테크 따라잡기] EKS에서 고가용성 Private Docker Registry(Harbor) 구축하기</title>
       <link>https://HanHoRang31.github.io/post/tech-private-docker/</link>
