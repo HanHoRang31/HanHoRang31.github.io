@@ -232,26 +232,26 @@
 </span><span class="lnt">19
 </span></code></pre></td>
 <td class="lntd">
-<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">nodeGroups:
-</span></span><span class="line"><span class="cl">  - name: ng-1
-</span></span><span class="line"><span class="cl">    instanceType: m5.xlarge
-</span></span><span class="line"><span class="cl">    desiredCapacity: <span class="m">1</span>
-</span></span><span class="line"><span class="cl">    iam:
-</span></span><span class="line"><span class="cl">			<span class="c1"># addon 정책 부여 </span>
-</span></span><span class="line"><span class="cl">      withAddonPolicies:
-</span></span><span class="line"><span class="cl">				imageBuilder: <span class="nb">true</span>  <span class="c1"># 이미지 빌더: 사용자 정의 컨테이너 이미지를 빌드하고 관리하는 도구</span>
-</span></span><span class="line"><span class="cl">				autoScaler: <span class="nb">true</span>  <span class="c1"># 오토 스케일러: 클러스터 내에서 자동으로 노드 및 파드 크기를 조정</span>
-</span></span><span class="line"><span class="cl">				externalDNS: <span class="nb">true</span>  <span class="c1"># 외부 DNS: 쿠버네티스 서비스와 인그레스 리소스에 대한 외부 DNS 레코드를 관리</span>
-</span></span><span class="line"><span class="cl">				certManager: <span class="nb">true</span>  <span class="c1"># 인증서 관리자: 쿠버네티스 클러스터 내에서 TLS 인증서를 자동으로 발급 및 관리</span>
-</span></span><span class="line"><span class="cl">				appMesh: <span class="nb">true</span>  <span class="c1"># 앱 메시: 마이크로서비스 간 통신을 관리하고 모니터링하는 서비스 메시</span>
-</span></span><span class="line"><span class="cl">				appMeshPreview: <span class="nb">true</span>  <span class="c1"># 앱 메시 프리뷰: 앱 메시의 베타 기능을 미리 사용할 수 있게 해주는 프리뷰 버전</span>
-</span></span><span class="line"><span class="cl">				ebs: <span class="nb">true</span>  <span class="c1"># Amazon EBS CSI 드라이버: 쿠버네티스 클러스터에서 Amazon EBS 볼륨을 사용할 수 있게 함</span>
-</span></span><span class="line"><span class="cl">				fsx: <span class="nb">true</span>  <span class="c1"># Amazon FSx CSI 드라이버: 쿠버네티스 클러스터에서 Amazon FSx 파일 시스템을 사용할 수 있게 함</span>
-</span></span><span class="line"><span class="cl">				efs: <span class="nb">true</span>  <span class="c1"># Amazon EFS CSI 드라이버: 쿠버네티스 클러스터에서 Amazon EFS 파일 시스템을 사용할 수 있게 함</span>
-</span></span><span class="line"><span class="cl">				awsLoadBalancerController: <span class="nb">true</span>  <span class="c1"># AWS 로드 밸런서 컨트롤러: AWS 로드 밸런서를 쿠버네티스 서비스와 통합</span>
-</span></span><span class="line"><span class="cl">				xRay: <span class="nb">true</span>  <span class="c1"># AWS X-Ray: 분산 애플리케이션의 성능 문제를 분석하고 디버깅하는 서비스</span>
-</span></span><span class="line"><span class="cl">				cloudWatch: <span class="nb">true</span>  <span class="c1"># Amazon CloudWatch: AWS 리소스 및 애플리케이션의 모니터링 및 관측을 제공</span>
-</span></span></code></pre></td></tr></table>
+<pre tabindex="0" class="chroma"><code class="language-yaml" data-lang="yaml"><span class="line"><span class="cl"><span class="nt">nodeGroups</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span>- <span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l">ng-1</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="nt">instanceType</span><span class="p">:</span><span class="w"> </span><span class="l">m5.xlarge</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="nt">desiredCapacity</span><span class="p">:</span><span class="w"> </span><span class="m">1</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="nt">iam</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="c"># addon 정책 부여 </span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="nt">withAddonPolicies</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">      </span><span class="nt">imageBuilder: true  # 이미지 빌더</span><span class="p">:</span><span class="w"> </span><span class="l">사용자 정의 컨테이너 이미지를 빌드하고 관리하는 도구</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">      </span><span class="nt">autoScaler: true  # 오토 스케일러</span><span class="p">:</span><span class="w"> </span><span class="l">클러스터 내에서 자동으로 노드 및 파드 크기를 조정</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">      </span><span class="nt">externalDNS: true  # 외부 DNS</span><span class="p">:</span><span class="w"> </span><span class="l">쿠버네티스 서비스와 인그레스 리소스에 대한 외부 DNS 레코드를 관리</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">      </span><span class="nt">certManager: true  # 인증서 관리자</span><span class="p">:</span><span class="w"> </span><span class="l">쿠버네티스 클러스터 내에서 TLS 인증서를 자동으로 발급 및 관리</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">      </span><span class="nt">appMesh: true  # 앱 메시</span><span class="p">:</span><span class="w"> </span><span class="l">마이크로서비스 간 통신을 관리하고 모니터링하는 서비스 메시</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">      </span><span class="nt">appMeshPreview: true  # 앱 메시 프리뷰</span><span class="p">:</span><span class="w"> </span><span class="l">앱 메시의 베타 기능을 미리 사용할 수 있게 해주는 프리뷰 버전</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">      </span><span class="nt">ebs: true  # Amazon EBS CSI 드라이버</span><span class="p">:</span><span class="w"> </span><span class="l">쿠버네티스 클러스터에서 Amazon EBS 볼륨을 사용할 수 있게 함</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">      </span><span class="nt">fsx: true  # Amazon FSx CSI 드라이버</span><span class="p">:</span><span class="w"> </span><span class="l">쿠버네티스 클러스터에서 Amazon FSx 파일 시스템을 사용할 수 있게 함</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">      </span><span class="nt">efs: true  # Amazon EFS CSI 드라이버</span><span class="p">:</span><span class="w"> </span><span class="l">쿠버네티스 클러스터에서 Amazon EFS 파일 시스템을 사용할 수 있게 함</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">      </span><span class="nt">awsLoadBalancerController: true  # AWS 로드 밸런서 컨트롤러</span><span class="p">:</span><span class="w"> </span><span class="l">AWS 로드 밸런서를 쿠버네티스 서비스와 통합</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">      </span><span class="nt">xRay: true  # AWS X-Ray</span><span class="p">:</span><span class="w"> </span><span class="l">분산 애플리케이션의 성능 문제를 분석하고 디버깅하는 서비스</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">      </span><span class="nt">cloudWatch: true  # Amazon CloudWatch</span><span class="p">:</span><span class="w"> </span><span class="l">AWS 리소스 및 애플리케이션의 모니터링 및 관측을 제공</span><span class="w">
+</span></span></span></code></pre></td></tr></table>
 </div>
 </div><p>eksctl 를 통해 설치된 정책은 AWS 콘솔에서 확인이 가능하다.</p>
 <p><img loading="lazy" 
@@ -470,8 +470,8 @@
 <pre tabindex="0" class="chroma"><code><span class="lnt">1
 </span></code></pre></td>
 <td class="lntd">
-<pre tabindex="0" class="chroma"><code class="language-yaml" data-lang="yaml"><span class="line"><span class="cl"><span class="l">eksctl create ng --cluster my-eks -f spot-ng.yaml</span><span class="w">
-</span></span></span></code></pre></td></tr></table>
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">eksctl create ng --cluster my-eks -f spot-ng.yaml
+</span></span></code></pre></td></tr></table>
 </div>
 </div><p><img loading="lazy" 
     src="/./spot-and-kubeflow/spot3.png" 
@@ -1143,25 +1143,25 @@
 </span><span class="lnt">19
 </span></code></pre></td>
 <td class="lntd">
-<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl"><span class="c1"># vi aws-ebs-csi-driver-trust-policy.json</span>
-</span></span><span class="line"><span class="cl"><span class="o">{</span>
-</span></span><span class="line"><span class="cl">    <span class="s2">&#34;Version&#34;</span>: <span class="s2">&#34;2012-10-17&#34;</span>,
-</span></span><span class="line"><span class="cl">    <span class="s2">&#34;Statement&#34;</span>: <span class="o">[</span>
-</span></span><span class="line"><span class="cl">      <span class="o">{</span>
-</span></span><span class="line"><span class="cl">        <span class="s2">&#34;Effect&#34;</span>: <span class="s2">&#34;Allow&#34;</span>,
-</span></span><span class="line"><span class="cl">        <span class="s2">&#34;Principal&#34;</span>: <span class="o">{</span>
-</span></span><span class="line"><span class="cl">          <span class="s2">&#34;Federated&#34;</span>: <span class="s2">&#34;arn:aws:iam::955963799952:oidc-provider/oidc.eks.ap-northeast-2.amazonaws.com/id/D378D41514C8714C26A69DF6ECC0A999&#34;</span>
-</span></span><span class="line"><span class="cl">        <span class="o">}</span>,
-</span></span><span class="line"><span class="cl">        <span class="s2">&#34;Action&#34;</span>: <span class="s2">&#34;sts:AssumeRoleWithWebIdentity&#34;</span>,
-</span></span><span class="line"><span class="cl">        <span class="s2">&#34;Condition&#34;</span>: <span class="o">{</span>
-</span></span><span class="line"><span class="cl">          <span class="s2">&#34;StringEquals&#34;</span>: <span class="o">{</span>
-</span></span><span class="line"><span class="cl">            <span class="s2">&#34;oidc.eks.ap-northeast-2.amazonaws.com/id/D378D41514C8714C26A69DF6ECC0A999:aud&#34;</span>: <span class="s2">&#34;sts.amazonaws.com&#34;</span>,
-</span></span><span class="line"><span class="cl">            <span class="s2">&#34;oidc.eks.ap-northeast-2.amazonaws.com/id/D378D41514C8714C26A69DF6ECC0A999:sub&#34;</span>: <span class="s2">&#34;system:serviceaccount:kube-system:ebs-csi-controller-sa&#34;</span>
-</span></span><span class="line"><span class="cl">          <span class="o">}</span>
-</span></span><span class="line"><span class="cl">        <span class="o">}</span>
-</span></span><span class="line"><span class="cl">      <span class="o">}</span>
-</span></span><span class="line"><span class="cl">    <span class="o">]</span>
-</span></span><span class="line"><span class="cl">  <span class="o">}</span>
+<pre tabindex="0" class="chroma"><code class="language-json" data-lang="json"><span class="line"><span class="cl"><span class="err">#</span> <span class="err">vi</span> <span class="err">aws-ebs-csi-driver-trust-policy.json</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="nt">&#34;Version&#34;</span><span class="p">:</span> <span class="s2">&#34;2012-10-17&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">    <span class="nt">&#34;Statement&#34;</span><span class="p">:</span> <span class="p">[</span>
+</span></span><span class="line"><span class="cl">      <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="nt">&#34;Effect&#34;</span><span class="p">:</span> <span class="s2">&#34;Allow&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">        <span class="nt">&#34;Principal&#34;</span><span class="p">:</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">          <span class="nt">&#34;Federated&#34;</span><span class="p">:</span> <span class="s2">&#34;arn:aws:iam::955963799952:oidc-provider/oidc.eks.ap-northeast-2.amazonaws.com/id/D378D41514C8714C26A69DF6ECC0A999&#34;</span>
+</span></span><span class="line"><span class="cl">        <span class="p">},</span>
+</span></span><span class="line"><span class="cl">        <span class="nt">&#34;Action&#34;</span><span class="p">:</span> <span class="s2">&#34;sts:AssumeRoleWithWebIdentity&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">        <span class="nt">&#34;Condition&#34;</span><span class="p">:</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">          <span class="nt">&#34;StringEquals&#34;</span><span class="p">:</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">            <span class="nt">&#34;oidc.eks.ap-northeast-2.amazonaws.com/id/D378D41514C8714C26A69DF6ECC0A999:aud&#34;</span><span class="p">:</span> <span class="s2">&#34;sts.amazonaws.com&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">            <span class="nt">&#34;oidc.eks.ap-northeast-2.amazonaws.com/id/D378D41514C8714C26A69DF6ECC0A999:sub&#34;</span><span class="p">:</span> <span class="s2">&#34;system:serviceaccount:kube-system:ebs-csi-controller-sa&#34;</span>
+</span></span><span class="line"><span class="cl">          <span class="p">}</span>
+</span></span><span class="line"><span class="cl">        <span class="p">}</span>
+</span></span><span class="line"><span class="cl">      <span class="p">}</span>
+</span></span><span class="line"><span class="cl">    <span class="p">]</span>
+</span></span><span class="line"><span class="cl">  <span class="p">}</span>
 </span></span></code></pre></td></tr></table>
 </div>
 </div><div class="highlight"><div class="chroma">
