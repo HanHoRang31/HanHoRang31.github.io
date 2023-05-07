@@ -48,7 +48,7 @@
     },
     "datePublished": "2023-05-06",
     "description": "eksctl를 통한 Kubeflow 인프라 구성과 배포하기",
-    "wordCount":  4119 ,
+    "wordCount":  4258 ,
     "mainEntityOfPage": "True",
     "dateModified": "2023-05-06",
     "publisher": {
@@ -702,6 +702,55 @@
 </span><span class="lnt">179
 </span><span class="lnt">180
 </span><span class="lnt">181
+</span><span class="lnt">182
+</span><span class="lnt">183
+</span><span class="lnt">184
+</span><span class="lnt">185
+</span><span class="lnt">186
+</span><span class="lnt">187
+</span><span class="lnt">188
+</span><span class="lnt">189
+</span><span class="lnt">190
+</span><span class="lnt">191
+</span><span class="lnt">192
+</span><span class="lnt">193
+</span><span class="lnt">194
+</span><span class="lnt">195
+</span><span class="lnt">196
+</span><span class="lnt">197
+</span><span class="lnt">198
+</span><span class="lnt">199
+</span><span class="lnt">200
+</span><span class="lnt">201
+</span><span class="lnt">202
+</span><span class="lnt">203
+</span><span class="lnt">204
+</span><span class="lnt">205
+</span><span class="lnt">206
+</span><span class="lnt">207
+</span><span class="lnt">208
+</span><span class="lnt">209
+</span><span class="lnt">210
+</span><span class="lnt">211
+</span><span class="lnt">212
+</span><span class="lnt">213
+</span><span class="lnt">214
+</span><span class="lnt">215
+</span><span class="lnt">216
+</span><span class="lnt">217
+</span><span class="lnt">218
+</span><span class="lnt">219
+</span><span class="lnt">220
+</span><span class="lnt">221
+</span><span class="lnt">222
+</span><span class="lnt">223
+</span><span class="lnt">224
+</span><span class="lnt">225
+</span><span class="lnt">226
+</span><span class="lnt">227
+</span><span class="lnt">228
+</span><span class="lnt">229
+</span><span class="lnt">230
 </span></code></pre></td>
 <td class="lntd">
 <pre tabindex="0" class="chroma"><code class="language-yaml" data-lang="yaml"><span class="line"><span class="cl"><span class="c"># Cost-Optimized EKS cluster for Kubeflow with spot GPU instances and node scale down to zero</span><span class="w">
@@ -736,21 +785,47 @@
 </span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="c"># Add all possible AZs to ensure nodes can be spun up in any AZ later on. </span><span class="w">
 </span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="c"># THIS CAN&#39;T BE CHANGED LATER. YOU WILL HAVE TO CREATE A NEW CLUSTER TO ADD NEW AZ SUPPORT.</span><span class="w">
 </span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="c"># This list applies to the whole cluster and isn&#39;t specific to nodegroups</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="nt">availabilityZones</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">&#34;ap-northeast-2a&#34;</span><span class="p">,</span><span class="w"> </span><span class="s2">&#34;ap-northeast-2b&#34;</span><span class="p">,</span><span class="w">  </span><span class="s2">&#34;ap-northeast-2d&#34;</span><span class="p">,</span><span class="w">  </span><span class="s2">&#34;ap-northeast-2f&#34;</span><span class="p">]</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="nt">vpc</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="nt">id</span><span class="p">:</span><span class="w"> </span><span class="l">vpc-04686564a10b92c9c</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="nt">cidr</span><span class="p">:</span><span class="w"> </span><span class="m">192.168.0.0</span><span class="l">/16</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="nt">securityGroup</span><span class="p">:</span><span class="w"> </span><span class="l">sg-0ea8529af823353e9</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="nt">nat</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="nt">gateway</span><span class="p">:</span><span class="w"> </span><span class="l">HighlyAvailable</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="nt">subnets</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="nt">public</span><span class="p">:</span><span class="w"> 
+</span></span></span><span class="line"><span class="cl"><span class="w">      </span><span class="nt">public-2a</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="nt">id</span><span class="p">:</span><span class="w"> </span><span class="l">subnet-03eeb6d32aa5397bf</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="nt">cidr</span><span class="p">:</span><span class="w"> </span><span class="m">192.168.1.0</span><span class="l">/24</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">      </span><span class="nt">public-2c</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="nt">id</span><span class="p">:</span><span class="w"> </span><span class="l">subnet-023bc1a3fce0cde07</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="nt">cidr</span><span class="p">:</span><span class="w"> </span><span class="m">192.168.2.0</span><span class="l">/24</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="nt">private</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">      </span><span class="nt">private-2a</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="nt">id</span><span class="p">:</span><span class="w"> </span><span class="l">subnet-02c160be5273d5171</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="nt">cidr</span><span class="p">:</span><span class="w"> </span><span class="m">192.168.3.0</span><span class="l">/24</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">      </span><span class="nt">private-2c</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="nt">id</span><span class="p">:</span><span class="w"> </span><span class="l">subnet-018a370a44f973ac4</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="nt">cidr</span><span class="p">:</span><span class="w"> </span><span class="m">192.168.4.0</span><span class="l">/24</span><span class="w">
 </span></span></span><span class="line"><span class="cl"><span class="w">
 </span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="nt">iam</span><span class="p">:</span><span class="w"> 
 </span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="nt">withOIDC</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">
 </span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="nt">nodeGroups</span><span class="p">:</span><span class="w">
 </span></span></span><span class="line"><span class="cl"><span class="w">  </span>- <span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l">ng-1</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="nt">desiredCapacity</span><span class="p">:</span><span class="w"> </span><span class="m">5</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="nt">desiredCapacity</span><span class="p">:</span><span class="w"> </span><span class="m">4</span><span class="w">
 </span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="nt">minSize</span><span class="p">:</span><span class="w"> </span><span class="m">0</span><span class="w">
 </span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="nt">maxSize</span><span class="p">:</span><span class="w"> </span><span class="m">10</span><span class="w">
 </span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="c"># Set one nodegroup with 100GB volumes for Kubeflow to get deployed. </span><span class="w">
 </span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="c"># Kubeflow requirement states 1-2 Nodes with 100GB volume attached to the node. </span><span class="w">
 </span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="nt">volumeSize</span><span class="p">:</span><span class="w"> </span><span class="m">100</span><span class="w">
 </span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="nt">volumeType</span><span class="p">:</span><span class="w"> </span><span class="l">gp2</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="nt">instanceType</span><span class="p">:</span><span class="w"> </span><span class="l">m6g.xlarge</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="nt">availabilityZones</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">&#34;ap-northeast-2a&#34;</span><span class="p">]</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="nt">instanceType</span><span class="p">:</span><span class="w"> </span><span class="l">c5n.xlarge</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="nt">privateNetworking</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="w"> 
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="nt">ssh</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">      </span><span class="nt">publicKeyName</span><span class="p">:</span><span class="w"> </span><span class="l">eks-terraform-key</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="nt">availabilityZones</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">      </span>- <span class="l">ap-northeast-2a</span><span class="w">
 </span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="nt">labels</span><span class="p">:</span><span class="w">
 </span></span></span><span class="line"><span class="cl"><span class="w">      </span><span class="nt">node-class</span><span class="p">:</span><span class="w"> </span><span class="s2">&#34;worker-node&#34;</span><span class="w">
 </span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="nt">tags</span><span class="p">:</span><span class="w">
@@ -762,12 +837,13 @@
 </span></span></span><span class="line"><span class="cl"><span class="w">      </span><span class="nt">k8s.io/cluster-autoscaler/my-eks-kubeflow</span><span class="p">:</span><span class="w"> </span><span class="s2">&#34;owned&#34;</span><span class="w">
 </span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="nt">iam</span><span class="p">:</span><span class="w">
 </span></span></span><span class="line"><span class="cl"><span class="w">      </span><span class="nt">withAddonPolicies</span><span class="p">:</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="nt">albIngress</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="nt">awsLoadBalancerController</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="w">
 </span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="nt">autoScaler</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="w">
 </span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="nt">cloudWatch</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="w">
 </span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="nt">efs</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="w">
 </span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="nt">ebs</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="w"> 
 </span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="nt">externalDNS</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">
 </span></span></span><span class="line"><span class="cl"><span class="w">
 </span></span></span><span class="line"><span class="cl"><span class="w">  </span>- <span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="m">1</span>-<span class="l">gpu-spot-p2-xlarge</span><span class="w">
 </span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="nt">minSize</span><span class="p">:</span><span class="w"> </span><span class="m">0</span><span class="w">
@@ -787,7 +863,11 @@
 </span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="c"># Stick to one AZ for all GPU nodes. </span><span class="w">
 </span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="c"># In case of termination, this will prevent volumes from being unavailable </span><span class="w">
 </span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="c"># if the new instance got spun up in another AZ.</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="nt">availabilityZones</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">&#34;ap-northeast-2a&#34;</span><span class="p">]</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="nt">privateNetworking</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="w"> 
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="nt">ssh</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">      </span><span class="nt">publicKeyName</span><span class="p">:</span><span class="w"> </span><span class="l">eks-terraform-key</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="nt">availabilityZones</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">      </span>- <span class="l">ap-northeast-2a</span><span class="w">
 </span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="nt">taints</span><span class="p">:</span><span class="w">
 </span></span></span><span class="line"><span class="cl"><span class="w">      </span>- <span class="nt">key</span><span class="p">:</span><span class="w"> </span><span class="l">spotInstance</span><span class="w">
 </span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="nt">value</span><span class="p">:</span><span class="w"> </span><span class="s2">&#34;true&#34;</span><span class="w">
@@ -803,7 +883,7 @@
 </span></span></span><span class="line"><span class="cl"><span class="w">      </span><span class="nt">withAddonPolicies</span><span class="p">:</span><span class="w">
 </span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="nt">autoScaler</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="w">
 </span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="nt">cloudWatch</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="nt">albIngress</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="nt">awsLoadBalancerController</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="w">
 </span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="nt">efs</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="w">
 </span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="nt">ebs</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="w"> 
 </span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="nt">externalDNS</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="w">
@@ -826,7 +906,11 @@
 </span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="c"># Stick to one AZ for all GPU nodes. </span><span class="w">
 </span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="c"># In case of termination, this will prevent volumes from being unavailable </span><span class="w">
 </span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="c"># if the new instance got spun up in another AZ.</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="nt">availabilityZones</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">&#34;ap-northeast-2a&#34;</span><span class="p">]</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="nt">privateNetworking</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="w"> 
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="nt">ssh</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">      </span><span class="nt">publicKeyName</span><span class="p">:</span><span class="w"> </span><span class="l">eks-terraform-key</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="nt">availabilityZones</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">      </span>- <span class="l">ap-northeast-2a</span><span class="w">
 </span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="nt">taints</span><span class="p">:</span><span class="w">
 </span></span></span><span class="line"><span class="cl"><span class="w">      </span>- <span class="nt">key</span><span class="p">:</span><span class="w"> </span><span class="l">spotInstance</span><span class="w">
 </span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="nt">value</span><span class="p">:</span><span class="w"> </span><span class="s2">&#34;true&#34;</span><span class="w">
@@ -842,7 +926,7 @@
 </span></span></span><span class="line"><span class="cl"><span class="w">      </span><span class="nt">withAddonPolicies</span><span class="p">:</span><span class="w">
 </span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="nt">autoScaler</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="w">
 </span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="nt">cloudWatch</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="nt">albIngress</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="nt">awsLoadBalancerController</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="w">
 </span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="nt">efs</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="w">
 </span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="nt">ebs</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="w"> 
 </span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="nt">externalDNS</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="w">
@@ -865,7 +949,11 @@
 </span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="c"># Stick to one AZ for all GPU nodes. </span><span class="w">
 </span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="c"># In case of termination, this will prevent volumes from being unavailable </span><span class="w">
 </span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="c"># if the new instance got spun up in another AZ.</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="nt">availabilityZones</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">&#34;ap-northeast-2a&#34;</span><span class="p">]</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="nt">privateNetworking</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="w"> 
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="nt">ssh</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">      </span><span class="nt">publicKeyName</span><span class="p">:</span><span class="w"> </span><span class="l">eks-terraform-key</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="nt">availabilityZones</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">      </span>- <span class="l">ap-northeast-2a</span><span class="w">
 </span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="nt">taints</span><span class="p">:</span><span class="w">
 </span></span></span><span class="line"><span class="cl"><span class="w">      </span>- <span class="nt">key</span><span class="p">:</span><span class="w"> </span><span class="l">spotInstance</span><span class="w">
 </span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="nt">value</span><span class="p">:</span><span class="w"> </span><span class="s2">&#34;true&#34;</span><span class="w">
@@ -881,10 +969,20 @@
 </span></span></span><span class="line"><span class="cl"><span class="w">      </span><span class="nt">withAddonPolicies</span><span class="p">:</span><span class="w">
 </span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="nt">autoScaler</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="w">
 </span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="nt">cloudWatch</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="nt">albIngress</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="nt">awsLoadBalancerController</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="w">
 </span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="nt">efs</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="w">
 </span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="nt">ebs</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="w"> 
 </span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="nt">externalDNS</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="nt">addons</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span>- <span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l">vpc-cni</span><span class="w"> </span><span class="c"># no version is specified so it deploys the default version</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="nt">version</span><span class="p">:</span><span class="w"> </span><span class="l">v1.12.6-eksbuild.1</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="nt">attachPolicyARNs</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span>- <span class="l">arn:aws:iam::aws:policy/AmazonEKS_CNI_Policy</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span>- <span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l">kube-proxy</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="nt">version</span><span class="p">:</span><span class="w"> </span><span class="l">latest</span><span class="w"> </span><span class="c"># auto discovers the latest available</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span>- <span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l">coredns</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="nt">version</span><span class="p">:</span><span class="w"> </span><span class="l">latest</span><span class="w"> </span><span class="c"># v1.9.3-eksbuild.2</span><span class="w">
 </span></span></span></code></pre></td></tr></table>
 </div>
 </div><ul>
