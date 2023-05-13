@@ -25,7 +25,7 @@ https://grafana.com/docs/loki/latest/operations/storage/
       <pubDate>Fri, 07 Apr 2023 00:00:00 +0000</pubDate>
       
       <guid>https://HanHoRang31.github.io/post/pkos-5-security/</guid>
-      <description>1 2 Production Kubernetes Online Study (=PKOS)는 쿠버네티스 실무 실습 스터디입니다. CloudNet@ Gasida(가시다)이 진행하며, 책 &amp;#34;24단계 실습으로 정복하는 쿠버네티스&amp;#34;을 기반으로 진행하고 있습니다. 5주차 시간에는 모임장님께서 쿠버네티스 보안을 주제로 학습 내용을 공유해 주셨다. 이번 블로그 글에서는 쿠버네티스 보안에 대해 스터디한 내용을 공유하고자 한다.
+      <description>1 2 Production Kubernetes Online Study (=PKOS)는 쿠버네티스 실무 실습 스터디입니다. CloudNet@ Gasida(가시다)님이 진행하시며, 책 &amp;#34;24단계 실습으로 정복하는 쿠버네티스&amp;#34;을 기반으로 진행하고 있습니다. 5주차 시간에는 모임장님께서 쿠버네티스 보안을 주제로 학습 내용을 공유해 주셨다. 이번 블로그 글에서는 쿠버네티스 보안에 대해 스터디한 내용을 공유하고자 한다.
 Kubernetes 4C Layer 쿠버네티스 공식문서에 따르면 쿠버네티스 보안은 4계층(클라우드/ 클러스터 / 컨테이너 / 코드)으로 구성되며, 각 계층에 대해 보안 관점이 필요하다고 한다.
 https://kubernetes.io/docs/concepts/security/overview/
 Cloud, Infra : 클라우드 계층에서는 쿠버네티스 클러스터가 실행되는 기반 인프라에 초점을 맞춘다.</description>
@@ -37,7 +37,7 @@ Cloud, Infra : 클라우드 계층에서는 쿠버네티스 클러스터가 실�
       <pubDate>Sat, 01 Apr 2023 00:00:00 +0000</pubDate>
       
       <guid>https://HanHoRang31.github.io/post/pkos2-4-monitoring/</guid>
-      <description>1 2 Production Kubernetes Online Study (=PKOS)는 쿠버네티스 실무 실습 스터디입니다. CloudNet@ Gasida(가시다)이 진행하며, 책 &amp;#34;24단계 실습으로 정복하는 쿠버네티스&amp;#34;을 기반으로 진행하고 있습니다. 스터디 4주차 시간에는 쿠버네티스 모니터링과 로깅 시스템을 구축하여 기능들을 살펴보았다. 이번 블로그 글에서는 모니터링 시스템에 대해 심화 학습한 내용들을 공유하고자 한다.
+      <description>1 2 Production Kubernetes Online Study (=PKOS)는 쿠버네티스 실무 실습 스터디입니다. CloudNet@ Gasida(가시다)님이 진행하시며, 책 &amp;#34;24단계 실습으로 정복하는 쿠버네티스&amp;#34;을 기반으로 진행하고 있습니다. 스터디 4주차 시간에는 쿠버네티스 모니터링과 로깅 시스템을 구축하여 기능들을 살펴보았다. 이번 블로그 글에서는 모니터링 시스템에 대해 심화 학습한 내용들을 공유하고자 한다.
 모니터링은 어떤 대상을 감시, 감찰한다는 뜻으로 모니터링의 목적은 지속적인 감시, 감찰을 통해 대상의 상태나 가용성, 변화 등을 확인하고 대비하는 것이다. 모니터링의 개념처럼 쿠버네티스 모니터링도 똑같다. 쿠버네티스에서 특정 기간에 측정한 일련의 숫자(메트릭)에 대해 감시와 감찰을 통해 대상의 상태나 가용성 변화를 확인하고 대비한다고 보면 되겠다.</description>
     </item>
     
@@ -47,7 +47,7 @@ Cloud, Infra : 클라우드 계층에서는 쿠버네티스 클러스터가 실�
       <pubDate>Sat, 01 Apr 2023 00:00:00 +0000</pubDate>
       
       <guid>https://HanHoRang31.github.io/post/pkos2-4-logging/</guid>
-      <description>로깅 (Loki &amp;amp; Promtail ) 1 2 Production Kubernetes Online Study (=PKOS)는 쿠버네티스 실무 실습 스터디입니다. CloudNet@ Gasida(가시다)이 진행하며, 책 &amp;#34;24단계 실습으로 정복하는 쿠버네티스&amp;#34;을 기반으로 진행하고 있습니다. Logging? 애플리케이션 실행 중 발생하는 이벤트, 작업, 오류 등의 정보를 기록하는 프로세스이다. 로깅의 주요 목적은 프로그램의 실행 상태를 추적하고, 문제 발생 시 원인을 찾기고, 내부 감사를 기록하기 위함이다. 로그 파일은 시간 순서대로 저장되며, 대부분의 경우 텍스트 파일 또는 데이터베이스에 저장된다.
+      <description>로깅 (Loki &amp;amp; Promtail ) 1 2 Production Kubernetes Online Study (=PKOS)는 쿠버네티스 실무 실습 스터디입니다. CloudNet@ Gasida(가시다)님이 진행하시며, 책 &amp;#34;24단계 실습으로 정복하는 쿠버네티스&amp;#34;을 기반으로 진행하고 있습니다. Logging? 애플리케이션 실행 중 발생하는 이벤트, 작업, 오류 등의 정보를 기록하는 프로세스이다. 로깅의 주요 목적은 프로그램의 실행 상태를 추적하고, 문제 발생 시 원인을 찾기고, 내부 감사를 기록하기 위함이다. 로그 파일은 시간 순서대로 저장되며, 대부분의 경우 텍스트 파일 또는 데이터베이스에 저장된다.
 컨테이너화된 애플리케이션에 가장 쉽고 가장 널리 사용되는 로깅 방법은 표준 출력(stdout)과 표준 에러(stderr) 스트림에 작성하는 것이다.</description>
     </item>
     
@@ -57,7 +57,7 @@ Cloud, Infra : 클라우드 계층에서는 쿠버네티스 클러스터가 실�
       <pubDate>Sat, 25 Mar 2023 07:35:40 +0900</pubDate>
       
       <guid>https://HanHoRang31.github.io/post/pkos2-3-gitops/</guid>
-      <description>1 2 Production Kubernetes Online Study (=PKOS)는 쿠버네티스 실무 실습 스터디입니다. CloudNet@ Gasida(가시다)이 진행하며, 책 &amp;#34;24단계 실습으로 정복하는 쿠버네티스&amp;#34;을 기반으로 진행하고 있습니다. 3주차 시간에는 Gitlab 과 ArgoCD를 배포하여 Gitops 시스템을 구축하였다. 이번 블로그 글에서는 GitOPS 시스템에 대한 실습 내용들을 정리하고 공유하고자 한다.
+      <description>1 2 Production Kubernetes Online Study (=PKOS)는 쿠버네티스 실무 실습 스터디입니다. CloudNet@ Gasida(가시다)님이 진행하시며, 책 &amp;#34;24단계 실습으로 정복하는 쿠버네티스&amp;#34;을 기반으로 진행하고 있습니다. 3주차 시간에는 Gitlab 과 ArgoCD를 배포하여 Gitops 시스템을 구축하였다. 이번 블로그 글에서는 GitOPS 시스템에 대한 실습 내용들을 정리하고 공유하고자 한다.
 GitOps는 GIt을 진실의 원천(SSOT, Single Source of Truth) 으로 사용하는 인프라와 애플리케이션 배포 관리 방식이다. 진실의 원천이라는 말은 Git에서만 소스를 관리할 수 있게 하여 단일 진실 원천을 구현한다는 말이다.</description>
     </item>
     
@@ -67,7 +67,7 @@ GitOps는 GIt을 진실의 원천(SSOT, Single Source of Truth) 으로 사용하
       <pubDate>Sat, 18 Mar 2023 00:00:00 +0000</pubDate>
       
       <guid>https://HanHoRang31.github.io/post/pkos2-2-localstorage/</guid>
-      <description>1 2 Production Kubernetes Online Study (=PKOS)는 쿠버네티스 실무 실습 스터디입니다. CloudNet@ Gasida(가시다)이 진행하며, 책 &amp;#34;24단계 실습으로 정복하는 쿠버네티스&amp;#34;을 기반으로 진행하고 있습니다. 2주차 스터디에서는 쿠버네티스의 네트워크와 스토리지를 중점적으로 공부하였다. 분량이 많아 네트워크와 스토리지를 나눠서 블로그를 작성할 예정이다. 이번 블로그 글에서는 로컬 스토리지에 대해 공유하겠다. 일반적으로 로컬 스토리지는 IOPS 성능이 특화되어 있지만 노드에 종속되어 있어 고가용성이나 스토리지 기능에 제한이 있다. 이러한 제한을 없애기 위한 과정으로 로컬 스토리지의 Hostpath, local 볼륨을 마운트하여 테스트를 진행할 것이고, 마지막으로는 로컬 볼륨에서 고가용성과 스토리지 기능(백업)을 가진 Mysql 데이터베이스를 구성하겠다.</description>
+      <description>1 2 Production Kubernetes Online Study (=PKOS)는 쿠버네티스 실무 실습 스터디입니다. CloudNet@ Gasida(가시다)님이 진행하시며, 책 &amp;#34;24단계 실습으로 정복하는 쿠버네티스&amp;#34;을 기반으로 진행하고 있습니다. 2주차 스터디에서는 쿠버네티스의 네트워크와 스토리지를 중점적으로 공부하였다. 분량이 많아 네트워크와 스토리지를 나눠서 블로그를 작성할 예정이다. 이번 블로그 글에서는 로컬 스토리지에 대해 공유하겠다. 일반적으로 로컬 스토리지는 IOPS 성능이 특화되어 있지만 노드에 종속되어 있어 고가용성이나 스토리지 기능에 제한이 있다. 이러한 제한을 없애기 위한 과정으로 로컬 스토리지의 Hostpath, local 볼륨을 마운트하여 테스트를 진행할 것이고, 마지막으로는 로컬 볼륨에서 고가용성과 스토리지 기능(백업)을 가진 Mysql 데이터베이스를 구성하겠다.</description>
     </item>
     
     <item>
@@ -76,7 +76,7 @@ GitOps는 GIt을 진실의 원천(SSOT, Single Source of Truth) 으로 사용하
       <pubDate>Fri, 10 Mar 2023 00:00:00 +0000</pubDate>
       
       <guid>https://HanHoRang31.github.io/post/pkos2-1-kops/</guid>
-      <description>1 2 Production Kubernetes Online Study (=PKOS)는 쿠버네티스 실무 실습 스터디입니다. CloudNet@ Gasida(가시다)이 진행하며, 책 &amp;#34;24단계 실습으로 정복하는 쿠버네티스&amp;#34;을 기반으로 진행하고 있습니다. PKOS 1주차 스터디 내용과 느낌점을 정리하고자 한다. 스터디하면서 매번 느끼는 거지만 정말 괴수분들 너무 많고, 배울 점이 정말 많다… 특히 모임장님이신 가시다님의 스터디 내용은 볼 때마다 감탄만 나온다. 쿠버네티스에 대한 원리와 세부 컴포넌트에 대한 명령어까지 배운 점이 많다. 본 글에서는 필자가 배운 내용을 정리함과 동시에 개념에 대해 몰랐던 부분이나, 트러블슈팅에 대한 내용을 중점적으로 정리하였다.</description>
+      <description>1 2 Production Kubernetes Online Study (=PKOS)는 쿠버네티스 실무 실습 스터디입니다. CloudNet@ Gasida(가시다)님이 진행하시며, 책 &amp;#34;24단계 실습으로 정복하는 쿠버네티스&amp;#34;을 기반으로 진행하고 있습니다. PKOS 1주차 스터디 내용과 느낌점을 정리하고자 한다. 스터디하면서 매번 느끼는 거지만 정말 괴수분들 너무 많고, 배울 점이 정말 많다… 특히 모임장님이신 가시다님의 스터디 내용은 볼 때마다 감탄만 나온다. 쿠버네티스에 대한 원리와 세부 컴포넌트에 대한 명령어까지 배운 점이 많다. 본 글에서는 필자가 배운 내용을 정리함과 동시에 개념에 대해 몰랐던 부분이나, 트러블슈팅에 대한 내용을 중점적으로 정리하였다.</description>
     </item>
     
   </channel>

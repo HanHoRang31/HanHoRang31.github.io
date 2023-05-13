@@ -13,7 +13,7 @@
       <pubDate>Sat, 01 Apr 2023 00:00:00 +0000</pubDate>
       
       <guid>https://HanHoRang31.github.io/post/pkos2-4-monitoring/</guid>
-      <description>1 2 Production Kubernetes Online Study (=PKOS)는 쿠버네티스 실무 실습 스터디입니다. CloudNet@ Gasida(가시다)이 진행하며, 책 &amp;#34;24단계 실습으로 정복하는 쿠버네티스&amp;#34;을 기반으로 진행하고 있습니다. 스터디 4주차 시간에는 쿠버네티스 모니터링과 로깅 시스템을 구축하여 기능들을 살펴보았다. 이번 블로그 글에서는 모니터링 시스템에 대해 심화 학습한 내용들을 공유하고자 한다.
+      <description>1 2 Production Kubernetes Online Study (=PKOS)는 쿠버네티스 실무 실습 스터디입니다. CloudNet@ Gasida(가시다)님이 진행하시며, 책 &amp;#34;24단계 실습으로 정복하는 쿠버네티스&amp;#34;을 기반으로 진행하고 있습니다. 스터디 4주차 시간에는 쿠버네티스 모니터링과 로깅 시스템을 구축하여 기능들을 살펴보았다. 이번 블로그 글에서는 모니터링 시스템에 대해 심화 학습한 내용들을 공유하고자 한다.
 모니터링은 어떤 대상을 감시, 감찰한다는 뜻으로 모니터링의 목적은 지속적인 감시, 감찰을 통해 대상의 상태나 가용성, 변화 등을 확인하고 대비하는 것이다. 모니터링의 개념처럼 쿠버네티스 모니터링도 똑같다. 쿠버네티스에서 특정 기간에 측정한 일련의 숫자(메트릭)에 대해 감시와 감찰을 통해 대상의 상태나 가용성 변화를 확인하고 대비한다고 보면 되겠다.</description>
     </item>
     
@@ -23,7 +23,7 @@
       <pubDate>Sat, 01 Apr 2023 00:00:00 +0000</pubDate>
       
       <guid>https://HanHoRang31.github.io/post/pkos2-4-logging/</guid>
-      <description>로깅 (Loki &amp;amp; Promtail ) 1 2 Production Kubernetes Online Study (=PKOS)는 쿠버네티스 실무 실습 스터디입니다. CloudNet@ Gasida(가시다)이 진행하며, 책 &amp;#34;24단계 실습으로 정복하는 쿠버네티스&amp;#34;을 기반으로 진행하고 있습니다. Logging? 애플리케이션 실행 중 발생하는 이벤트, 작업, 오류 등의 정보를 기록하는 프로세스이다. 로깅의 주요 목적은 프로그램의 실행 상태를 추적하고, 문제 발생 시 원인을 찾기고, 내부 감사를 기록하기 위함이다. 로그 파일은 시간 순서대로 저장되며, 대부분의 경우 텍스트 파일 또는 데이터베이스에 저장된다.
+      <description>로깅 (Loki &amp;amp; Promtail ) 1 2 Production Kubernetes Online Study (=PKOS)는 쿠버네티스 실무 실습 스터디입니다. CloudNet@ Gasida(가시다)님이 진행하시며, 책 &amp;#34;24단계 실습으로 정복하는 쿠버네티스&amp;#34;을 기반으로 진행하고 있습니다. Logging? 애플리케이션 실행 중 발생하는 이벤트, 작업, 오류 등의 정보를 기록하는 프로세스이다. 로깅의 주요 목적은 프로그램의 실행 상태를 추적하고, 문제 발생 시 원인을 찾기고, 내부 감사를 기록하기 위함이다. 로그 파일은 시간 순서대로 저장되며, 대부분의 경우 텍스트 파일 또는 데이터베이스에 저장된다.
 컨테이너화된 애플리케이션에 가장 쉽고 가장 널리 사용되는 로깅 방법은 표준 출력(stdout)과 표준 에러(stderr) 스트림에 작성하는 것이다.</description>
     </item>
     

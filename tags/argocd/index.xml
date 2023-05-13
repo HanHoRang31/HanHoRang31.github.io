@@ -13,7 +13,7 @@
       <pubDate>Sat, 25 Mar 2023 07:35:40 +0900</pubDate>
       
       <guid>https://HanHoRang31.github.io/post/pkos2-3-gitops/</guid>
-      <description>1 2 Production Kubernetes Online Study (=PKOS)는 쿠버네티스 실무 실습 스터디입니다. CloudNet@ Gasida(가시다)이 진행하며, 책 &amp;#34;24단계 실습으로 정복하는 쿠버네티스&amp;#34;을 기반으로 진행하고 있습니다. 3주차 시간에는 Gitlab 과 ArgoCD를 배포하여 Gitops 시스템을 구축하였다. 이번 블로그 글에서는 GitOPS 시스템에 대한 실습 내용들을 정리하고 공유하고자 한다.
+      <description>1 2 Production Kubernetes Online Study (=PKOS)는 쿠버네티스 실무 실습 스터디입니다. CloudNet@ Gasida(가시다)님이 진행하시며, 책 &amp;#34;24단계 실습으로 정복하는 쿠버네티스&amp;#34;을 기반으로 진행하고 있습니다. 3주차 시간에는 Gitlab 과 ArgoCD를 배포하여 Gitops 시스템을 구축하였다. 이번 블로그 글에서는 GitOPS 시스템에 대한 실습 내용들을 정리하고 공유하고자 한다.
 GitOps는 GIt을 진실의 원천(SSOT, Single Source of Truth) 으로 사용하는 인프라와 애플리케이션 배포 관리 방식이다. 진실의 원천이라는 말은 Git에서만 소스를 관리할 수 있게 하여 단일 진실 원천을 구현한다는 말이다.</description>
     </item>
     
