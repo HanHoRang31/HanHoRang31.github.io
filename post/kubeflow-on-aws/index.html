@@ -1,0 +1,1033 @@
+<!DOCTYPE html>
+<html lang="en-us">
+    
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="theme-color" content="dark">
+    <title>[AEWS] Kubeflow on AWS | HanHoRang Tech Blog</title>
+
+    
+    
+    
+    <meta property="og:site_name" content="HanHoRang Tech Blog by Tania in Hugo" />
+    <meta property="og:title" content="[AEWS] Kubeflow on AWS | HanHoRang Tech Blog"/>
+    <meta itemprop="name" content="[AEWS] Kubeflow on AWS | HanHoRang Tech Blog" />
+    <meta name="twitter:title" content="[AEWS] Kubeflow on AWS | HanHoRang Tech Blog" />
+    <meta name="application-name" content="[AEWS] Kubeflow on AWS | HanHoRang Tech Blog" /><meta name="twitter:card" content="summary"/>
+
+    <meta name="description" content="EKS에서 Kubeflow addon 사용하기" />
+    <meta name="twitter:description" content="EKS에서 Kubeflow addon 사용하기 "/>
+    <meta itemprop="description" content=" EKS에서 Kubeflow addon 사용하기 "/>
+    <meta property="og:description" content=" EKS에서 Kubeflow addon 사용하기 " />
+
+    
+
+<meta property="og:type" content="article" />
+<meta property="article:publisher" content="Hugo Tania" />
+<meta property="og:article:published_time" content=2023-05-12T07:35:40&#43;0900 />
+<meta property="article:published_time" content=2023-05-12T07:35:40&#43;0900 />
+
+
+  <meta property="og:article:author" content="Han ho rnag" />
+  <meta property="article:author" content="Han ho rnag" />
+  <meta name="author" content="Han ho rnag" />
+
+
+
+
+<script defer type="application/ld+json">
+  {
+    "@context": "http://schema.org",
+    "@type": "Article",
+    "headline": "[AEWS] Kubeflow on AWS",
+    "author": {
+      "@type": "Person",
+      "name": "Hugo Tania"
+    },
+    "datePublished": "2023-05-12",
+    "description": "EKS에서 Kubeflow addon 사용하기",
+    "wordCount":  2093 ,
+    "mainEntityOfPage": "True",
+    "dateModified": "2023-05-12",
+    "publisher": {
+      "@type": "Organization",
+      "name": "Hugo Tania",
+      "logo": {
+        "@type": "imageObject",
+        "url": "https:\/\/HanHoRang31.github.io\/favicon.ico"
+      }
+    }
+  }
+</script>
+
+
+
+    <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico" />
+    
+    <link rel="stylesheet" href="/sass/main.min.ab99ff095f832511e24ffb2fba2b51ad473b2f7e9301d674eba2c6c3a6e8bd81.css">
+    
+</head>
+    
+    <script>
+        (function() {
+            const colorSchemeKey = 'ThemeColorScheme';
+            if(!localStorage.getItem(colorSchemeKey)){
+                localStorage.setItem(colorSchemeKey, "auto");
+            }
+        })();
+    </script><script>
+    (function() {
+        const colorSchemeKey = 'ThemeColorScheme';
+        const colorSchemeItem = localStorage.getItem(colorSchemeKey);
+        const supportDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches === true;
+
+        if (colorSchemeItem == 'dark' || colorSchemeItem === 'auto' && supportDarkMode) {
+            
+
+            document.documentElement.dataset.userColorScheme = 'dark';
+        } else {
+            document.documentElement.dataset.userColorScheme = 'light';
+        }
+    })();
+</script>
+
+
+    <body class="dark">
+        <nav class="navbar">
+    <div class="container">
+        <div class="flex">
+            <div>
+                <a class="brand" href="/">
+                    
+                    
+                        <img src="/favicon.ico" />
+                    
+                    HanHoRang Tech Blog
+                    </a>
+            </div>
+            <div class="flex">
+                
+                <a href="/articles/">Articles</a>
+                
+                
+                    <button id="dark-mode-button">
+                    <svg class="light" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" aria-hidden="true" focusable="false" width="1em" height="1em" style="-ms-transform: rotate(360deg); -webkit-transform: rotate(360deg); transform: rotate(360deg);" preserveAspectRatio="xMidYMid meet" viewBox="0 0 36 36"><path fill="#FFD983" d="M30.312.776C32 19 20 32 .776 30.312c8.199 7.717 21.091 7.588 29.107-.429C37.9 21.867 38.03 8.975 30.312.776z"/><path d="M30.705 15.915a1.163 1.163 0 1 0 1.643 1.641a1.163 1.163 0 0 0-1.643-1.641zm-16.022 14.38a1.74 1.74 0 0 0 0 2.465a1.742 1.742 0 1 0 0-2.465zm13.968-2.147a2.904 2.904 0 0 1-4.108 0a2.902 2.902 0 0 1 0-4.107a2.902 2.902 0 0 1 4.108 0a2.902 2.902 0 0 1 0 4.107z" fill="#FFCC4D"/><rect x="0" y="0" width="36" height="36" fill="rgba(0, 0, 0, 0)" /></svg>
+                    <svg class="dark" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" aria-hidden="true" focusable="false" width="1em" height="1em" style="-ms-transform: rotate(360deg); -webkit-transform: rotate(360deg); transform: rotate(360deg);" preserveAspectRatio="xMidYMid meet" viewBox="0 0 36 36"><path fill="#FFD983" d="M16 2s0-2 2-2s2 2 2 2v2s0 2-2 2s-2-2-2-2V2zm18 14s2 0 2 2s-2 2-2 2h-2s-2 0-2-2s2-2 2-2h2zM4 16s2 0 2 2s-2 2-2 2H2s-2 0-2-2s2-2 2-2h2zm5.121-8.707s1.414 1.414 0 2.828s-2.828 0-2.828 0L4.878 8.708s-1.414-1.414 0-2.829c1.415-1.414 2.829 0 2.829 0l1.414 1.414zm21 21s1.414 1.414 0 2.828s-2.828 0-2.828 0l-1.414-1.414s-1.414-1.414 0-2.828s2.828 0 2.828 0l1.414 1.414zm-.413-18.172s-1.414 1.414-2.828 0s0-2.828 0-2.828l1.414-1.414s1.414-1.414 2.828 0s0 2.828 0 2.828l-1.414 1.414zm-21 21s-1.414 1.414-2.828 0s0-2.828 0-2.828l1.414-1.414s1.414-1.414 2.828 0s0 2.828 0 2.828l-1.414 1.414zM16 32s0-2 2-2s2 2 2 2v2s0 2-2 2s-2-2-2-2v-2z"/><circle fill="#FFD983" cx="18" cy="18" r="10"/><rect x="0" y="0" width="36" height="36" fill="rgba(0, 0, 0, 0)" /></svg>
+                    </button>
+                
+            </div>
+            </div>
+    </div>
+</nav>
+
+        <main>
+            
+<div class="container">
+    <article>
+        <header class="article-header">
+            <div class="thumb">
+                <div>
+                    <h1>[AEWS] Kubeflow on AWS</h1>
+                    <div class="post-meta">
+                        <div>
+                            
+                            
+                            By HanHoRnag | <time>May 12, 2023</time>
+                            | 10 minutes
+                        </div>
+                        <div class="tags">
+                            
+                            <a href="/tags/kans/">KANS</a>
+                            
+                            <a href="/tags/kubeflow/">kubeflow</a>
+                            
+                            <a href="/tags/cloud/">cloud</a>
+                            
+                            <a href="/tags/aws/">AWS</a>
+                            
+                            <a href="/tags/eksctl/">eksctl</a>
+                            
+                            <a href="/tags/eks/">eks</a>
+                            
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </header>
+    </article>
+
+    <div class="article-post">
+    <div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-markdown" data-lang="markdown"><span class="line"><span class="cl">AWS EKS Workshop Study (=AEWS)는 EKS Workshop 실습 스터디입니다.
+</span></span><span class="line"><span class="cl">CloudNet@ Gasida(가시다)이 진행하며,공개된 AWS EKS Workshop을 기반으로 진행하고 있습니다.
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>지난 블로그 글에 이어서 kubeflow 를 스터디한 내용을 공유하고자 한다. 오늘 주제는 kubeflow 의 인프라 요소로 왜 쿠버네티스에서 머신러닝을 쓰는 것이 좋은 가와 kubeflow 가 AWS 클라우드(EKS)에 올라갔을 때 어떤 이점이 있는 지 확인하겠다.</p>
+<h2 id="ml-on-kubernetes">
+    <a href="#ml-on-kubernetes" class="anchor">
+        <svg class="icon" aria-hidden="true" focusable="false" height="16" version="1.1" viewBox="0 0 16 16" width="16">
+            <path fill-rule="evenodd"
+                d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z">
+            </path>
+        </svg>
+    </a>
+    ML on kubernetes
+</h2>
+<p>먼저, 쿠버네티스는 머신러닝 워크플로우를 지원하는 데 매우 유용한 플랫폼으로 이유는 다음과 같이 확인할 수가 있다. (참고 : ChatGPT)</p>
+<ol>
+<li><strong>확장성:</strong> 쿠버네티스는 애플리케이션을 클러스터의 다양한 노드에 자동으로 분산시키는 능력을 가지고 있다. 이는 머신러닝 모델을 학습하거나 예측을 생성할 때 필요한 컴퓨팅 자원을 자동으로 확장하고 축소할 수 있다는 것을 의미한다.</li>
+<li><strong>포터빌리티와 다중 클라우드 지원:</strong> 쿠버네티스는 여러 클라우드 제공 업체에 걸쳐 동일한 방식으로 애플리케이션을 배포하고 관리하는 데 도움이 된다. 이는 머신러닝 워크플로우를 어디서든 쉽게 이동하고 배포할 수 있음을 의미한다.</li>
+<li><strong>자동화와 오케스트레이션:</strong> 쿠버네티스는 컨테이너화 된 애플리케이션의 배포, 확장 및 관리를 자동화한다. 이는 머신러닝 파이프라인의 복잡한 워크플로우를 쉽게 관리하고 오케스트레이션할 수 있음을 의미한다.</li>
+<li><strong>자원 관리:</strong> 쿠버네티스는 CPU, 메모리 등의 자원을 효과적으로 관리하여 각 애플리케이션에 필요한 자원을 제공한다. 이는 머신러닝 워크플로우에서 중요한 역할이다.</li>
+<li><strong>커뮤니티와 에코시스템:</strong> 쿠버네티스는 강력한 커뮤니티와 에코시스템을 가지고 있다. 여기에는 머신러닝에 특화된 도구와 프레임워크를 쿠버네티스에 쉽게 통합할 수 있는 Kubeflow와 같은 프로젝트가 포함된다.</li>
+</ol>
+<p>여기서 가장 중요하게 볼 점은 4번인 것 같다. 머신러닝의 모델 학습 과정에서 분산 처리로 학습을 진행하면 속도가 선형적으로 빨라지기 때문이다.</p>
+<p><img loading="lazy" 
+    src="/./kubeflow-on-aws/kubeflow-addno3.png" 
+    alt="&lt;a href=&#34;https://www.youtube.com/watch?v=qctwfYZKK8M&amp;amp;t=528s&#34;&gt;https://www.youtube.com/watch?v=qctwfYZKK8M&amp;amp;t=528s&lt;/a&gt;" 
+     
+    width=955 
+    height="571"  /></p>
+<p><a href="https://www.youtube.com/watch?v=qctwfYZKK8M&amp;t=528s">https://www.youtube.com/watch?v=qctwfYZKK8M&amp;t=528s</a></p>
+<p>쿠버네티스가 머신러닝 플랫폼에 유용한 플랫폼인 것을 확인했지만, 어떻게 쿠버네티스에서 머신러닝 플랫폼을 머신러닝 과학자나 분석가 분들에게 제공할 것에 대한 의문이 남는다. 여기에 대한 해결점이 지난 시간에 구축한 kubeflow 인데 ML 플랫폼을 한 데 모아 묶어 설치하고 인터넷 링크를 통해 쉽게 제공할 수 있기 때문이다.</p>
+<p><img loading="lazy" 
+    src="/./kubeflow-on-aws/kubeflow-addon2.png" 
+    alt="kubeflow-addon2.png" 
+     
+    width=1444 
+    height="766"  /></p>
+<p><a href="https://www.youtube.com/watch?v=6GYuRy84M1o&amp;t=67s">https://www.youtube.com/watch?v=6GYuRy84M1o&amp;t=67s</a></p>
+<h2 id="kubeflow-on-aws">
+    <a href="#kubeflow-on-aws" class="anchor">
+        <svg class="icon" aria-hidden="true" focusable="false" height="16" version="1.1" viewBox="0 0 16 16" width="16">
+            <path fill-rule="evenodd"
+                d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z">
+            </path>
+        </svg>
+    </a>
+    Kubeflow on AWS
+</h2>
+<p>kubeflow on AWS 라는 말은 kubeflow를 EKS에서 배포했을 때를 얘기한다. kubeflow on AWS 로 올리면 AWS 서비스와의 통합을 통해 운영 오버헤드를 줄이면서 안전성, 보안, 이식성, 확장성이 우수한 ML 시스템을 구축할 수 있다.</p>
+<p><img loading="lazy" 
+    src="/./kubeflow-on-aws/kubeflow-addon1.png" 
+    alt="kubeflow-addon1.png" 
+     
+    width=1537 
+    height="854"  /></p>
+<p>AWS 서비스 통합을 구체적으로 예를 들자면 다음과 같다.</p>
+<ul>
+<li>사용하기 쉬운 파이프라인 아티팩트 스토어를 위한 Amazon Simple Storage Service(Amazon S3)</li>
+<li>높은 확장성의 파이프라인 및 메타데이터 스토어를 위한 Amazon Relational Database Service(Amazon RDS)</li>
+<li>훈련 성능 향상 목적의 간단하고 확장 가능한 서버리스 파일 스토리지 솔루션을 위한 <a href="https://aws.amazon.com/ko/efs/">Amazon Elastic File System</a>/<a href="https://aws.amazon.com/ko/fsx/lustre/">Amazon FSx for Lustre</a></li>
+<li>애플리케이션 액세스에 필요한 보안 암호 보호를 위한 AWS Secrets Manager</li>
+<li>영구 로그 관리를 위한 AWS CloudWatch</li>
+<li>고도로 최적화된 Jupyter 노트북 서버 이미지를 위한 <a href="https://docs.aws.amazon.com/deep-learning-containers/latest/devguide/what-is-dlc.html">AWS Deep Learning Containers</a></li>
+<li>HTTPS를 경유하는 안전한 외부 트래픽 관리를 위한 AWS Application Load Balancer</li>
+<li>TLS를 통한 사용자 인증을 위한 AWS Cognito</li>
+</ul>
+<p>자세한 서비스 통합 방법 관련하여 <a href="https://awslabs.github.io/kubeflow-manifests/docs/add-ons/">Kubeflow 공식문서</a>를 참고하도록 하자.</p>
+<p>이번 장에서는 지난 시간에 구축한 kubeflow에 AWS 로드밸런서 서비스인 AWS Application Load Balancer 와 파일 스토리지인 EFS를 추가로 구축하는 방법을 공유하겠다.</p>
+<h2 id="aws-alb-및-external-dns-연결">
+    <a href="#aws-alb-%eb%b0%8f-external-dns-%ec%97%b0%ea%b2%b0" class="anchor">
+        <svg class="icon" aria-hidden="true" focusable="false" height="16" version="1.1" viewBox="0 0 16 16" width="16">
+            <path fill-rule="evenodd"
+                d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z">
+            </path>
+        </svg>
+    </a>
+    AWS ALB 및 External DNS 연결
+</h2>
+<p>kubeflow에 AWS ALB을 연결하여 클러스터 외부 인터넷 망에서 HTTPS로 접근하도록 설정하겠다. 이에 대한 사전 작업으로 개인 도메인과 인증서가 필요하다. 필자의 경우 AWS Route53에서 도메인을 구매하였고, AWS ACM을 통해 인증서를 발급받았다. 사전 작업에 대한 내용은 <a href="https://awslabs.github.io/kubeflow-manifests/docs/add-ons/load-balancer/guide/">kubeflow on AWS 공식문서</a>를 참고하자.</p>
+<p>이어서 EKS 클러스터에 ALB controller 설치가 필요하다.  다음의 스크립트를 통해 진행하자.</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span><span class="lnt">31
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl"><span class="c1"># ALB controller 정책 설치</span>
+</span></span><span class="line"><span class="cl">curl -o iam_policy.json https://raw.githubusercontent.com/kubernetes-sigs/aws-load-balancer-controller/v2.4.7/docs/install/iam_policy.json
+</span></span><span class="line"><span class="cl">aws iam create-policy --policy-name AWSLoadBalancerControllerIAMPolicy --policy-document file://iam_policy.json
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1"># 정책 arn 생성 확인 </span>
+</span></span><span class="line"><span class="cl"><span class="nv">ACCOUNT_ID</span><span class="o">={</span>AWS 계정 넘버<span class="o">}</span> 
+</span></span><span class="line"><span class="cl">aws iam get-policy --policy-arn arn:aws:iam::<span class="nv">$ACCOUNT_ID</span>:policy/AWSLoadBalancerControllerIAMPolicy --query <span class="s1">&#39;Policy.Arn&#39;</span>
+</span></span><span class="line"><span class="cl">---
+</span></span><span class="line"><span class="cl"><span class="s2">&#34;arn:aws:iam::955963799952:policy/AWSLoadBalancerControllerIAMPolicy&#34;</span> 
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1"># OIDC 서비스 어카운트 생성</span>
+</span></span><span class="line"><span class="cl"><span class="nv">CLUSTER_NAME</span><span class="o">={</span>EKS 클러스터 이름<span class="o">}</span> 
+</span></span><span class="line"><span class="cl">eksctl create iamserviceaccount --cluster<span class="o">=</span><span class="nv">$CLUSTER_NAME</span> --namespace<span class="o">=</span>kube-system --name<span class="o">=</span>aws-load-balancer-controller <span class="se">\
+</span></span></span><span class="line"><span class="cl"><span class="se"></span>--attach-policy-arn<span class="o">=</span>arn:aws:iam::<span class="nv">$ACCOUNT_ID</span>:policy/AWSLoadBalancerControllerIAMPolicy --override-existing-serviceaccounts --approve
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1"># OIDC 서비스 어카운트 확인 </span>
+</span></span><span class="line"><span class="cl">kubectl edit sa/aws-load-balancer-controller  -n kube-system
+</span></span><span class="line"><span class="cl">---
+</span></span><span class="line"><span class="cl">apiVersion: v1
+</span></span><span class="line"><span class="cl">kind: ServiceAccount
+</span></span><span class="line"><span class="cl">metadata:
+</span></span><span class="line"><span class="cl">  annotations: <span class="c1"># annotation 확인 </span>
+</span></span><span class="line"><span class="cl">    eks.amazonaws.com/role-arn: arn:aws:iam::955963799952:role/eksctl-my-eks-kubeflow-addon-iamserviceaccou-Role1-18M1QX0LI36SU
+</span></span><span class="line"><span class="cl">  creationTimestamp: <span class="s2">&#34;2023-05-12T13:22:02Z&#34;</span>
+</span></span><span class="line"><span class="cl">  labels:
+</span></span><span class="line"><span class="cl">    app.kubernetes.io/managed-by: eksctl
+</span></span><span class="line"><span class="cl">  name: aws-load-balancer-controller
+</span></span><span class="line"><span class="cl">  namespace: kube-system
+</span></span><span class="line"><span class="cl">  resourceVersion: <span class="s2">&#34;42768&#34;</span>
+</span></span><span class="line"><span class="cl">  uid: 00393ee1-e469-4bd3-bd4e-6a10303a3f76
+</span></span><span class="line"><span class="cl">~
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>서비스 어카운트 연동이 확인이 되었으면 ALB 을 설치하겠다. 설치는 Helm을 통해 진행했다.</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span><span class="lnt">31
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl"><span class="c1"># 클러스터 이름 설정 </span>
+</span></span><span class="line"><span class="cl"><span class="nv">CLUSTER_NAME</span><span class="o">=</span>my-eks-kubeflow
+</span></span><span class="line"><span class="cl"><span class="nb">printf</span> <span class="s1">&#39;clusterName=&#39;</span><span class="nv">$CLUSTER_NAME</span><span class="s1">&#39;&#39;</span> &gt; awsconfigs/common/aws-alb-ingress-controller/base/params.env
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1"># Install Load Balancer Controoler</span>
+</span></span><span class="line"><span class="cl">kustomize build awsconfigs/common/aws-alb-ingress-controller/base <span class="p">|</span> kubectl apply -f -
+</span></span><span class="line"><span class="cl">kubectl <span class="nb">wait</span> --for <span class="nv">condition</span><span class="o">=</span>established crd/ingressclassparams.elbv2.k8s.aws
+</span></span><span class="line"><span class="cl">kustomize build awsconfigs/common/aws-alb-ingress-controller/base <span class="p">|</span> kubectl apply -f -
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1"># ALB 파드 확인 </span>
+</span></span><span class="line"><span class="cl">kubectl get pods -A
+</span></span><span class="line"><span class="cl">---
+</span></span><span class="line"><span class="cl">NAMESPACE     NAME                                            READY   STATUS    RESTARTS   AGE
+</span></span><span class="line"><span class="cl">kube-system   aws-load-balancer-controller-7857849d69-qc9nr   1/1     Running   <span class="m">0</span>          24m
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1"># ALB 로그 확인</span>
+</span></span><span class="line"><span class="cl">kubectl logs pods/aws-load-balancer-controller-7857849d69-qc9nr -n kube-system
+</span></span><span class="line"><span class="cl">---
+</span></span><span class="line"><span class="cl"><span class="o">{</span><span class="s2">&#34;level&#34;</span>:<span class="s2">&#34;info&#34;</span>,<span class="s2">&#34;ts&#34;</span>:<span class="s2">&#34;2023-05-08T05:59:45Z&#34;</span>,<span class="s2">&#34;msg&#34;</span>:<span class="s2">&#34;version&#34;</span>,<span class="s2">&#34;GitVersion&#34;</span>:<span class="s2">&#34;v2.5.1&#34;</span>,<span class="s2">&#34;GitCommit&#34;</span>:<span class="s2">&#34;06abaed66e17a411ba064f34e6018b889780ac66&#34;</span>,<span class="s2">&#34;BuildDate&#34;</span>:<span class="s2">&#34;2023-04-17T22:36:53+0000&#34;</span><span class="o">}</span>
+</span></span><span class="line"><span class="cl"><span class="o">{</span><span class="s2">&#34;level&#34;</span>:<span class="s2">&#34;info&#34;</span>,<span class="s2">&#34;ts&#34;</span>:<span class="s2">&#34;2023-05-08T05:59:45Z&#34;</span>,<span class="s2">&#34;logger&#34;</span>:<span class="s2">&#34;controller-runtime.metrics&#34;</span>,<span class="s2">&#34;msg&#34;</span>:<span class="s2">&#34;Metrics server is starting to listen&#34;</span>,<span class="s2">&#34;addr&#34;</span>:<span class="s2">&#34;:8080&#34;</span><span class="o">}</span>
+</span></span><span class="line"><span class="cl"><span class="o">{</span><span class="s2">&#34;level&#34;</span>:<span class="s2">&#34;info&#34;</span>,<span class="s2">&#34;ts&#34;</span>:<span class="s2">&#34;2023-05-08T05:59:45Z&#34;</span>,<span class="s2">&#34;logger&#34;</span>:<span class="s2">&#34;setup&#34;</span>,<span class="s2">&#34;msg&#34;</span>:<span class="s2">&#34;adding health check for controller&#34;</span><span class="o">}</span>
+</span></span><span class="line"><span class="cl"><span class="o">{</span><span class="s2">&#34;level&#34;</span>:<span class="s2">&#34;info&#34;</span>,<span class="s2">&#34;ts&#34;</span>:<span class="s2">&#34;2023-05-08T05:59:45Z&#34;</span>,<span class="s2">&#34;logger&#34;</span>:<span class="s2">&#34;controller-runtime.webhook&#34;</span>,<span class="s2">&#34;msg&#34;</span>:<span class="s2">&#34;Registering webhook&#34;</span>,<span class="s2">&#34;path&#34;</span>:<span class="s2">&#34;/mutate-v1-pod&#34;</span><span class="o">}</span>
+</span></span><span class="line"><span class="cl"><span class="o">{</span><span class="s2">&#34;level&#34;</span>:<span class="s2">&#34;info&#34;</span>,<span class="s2">&#34;ts&#34;</span>:<span class="s2">&#34;2023-05-08T05:59:45Z&#34;</span>,<span class="s2">&#34;logger&#34;</span>:<span class="s2">&#34;controller-runtime.webhook&#34;</span>,<span class="s2">&#34;msg&#34;</span>:<span class="s2">&#34;Registering webhook&#34;</span>,<span class="s2">&#34;path&#34;</span>:<span class="s2">&#34;/mutate-v1-service&#34;</span><span class="o">}</span>
+</span></span><span class="line"><span class="cl"><span class="o">{</span><span class="s2">&#34;level&#34;</span>:<span class="s2">&#34;info&#34;</span>,<span class="s2">&#34;ts&#34;</span>:<span class="s2">&#34;2023-05-08T05:59:45Z&#34;</span>,<span class="s2">&#34;logger&#34;</span>:<span class="s2">&#34;controller-runtime.webhook&#34;</span>,<span class="s2">&#34;msg&#34;</span>:<span class="s2">&#34;Registering webhook&#34;</span>,<span class="s2">&#34;path&#34;</span>:<span class="s2">&#34;/validate-elbv2-k8s-aws-v1beta1-ingressclassparams&#34;</span><span class="o">}</span>
+</span></span><span class="line"><span class="cl"><span class="o">{</span><span class="s2">&#34;level&#34;</span>:<span class="s2">&#34;info&#34;</span>,<span class="s2">&#34;ts&#34;</span>:<span class="s2">&#34;2023-05-08T05:59:45Z&#34;</span>,<span class="s2">&#34;logger&#34;</span>:<span class="s2">&#34;controller-runtime.webhook&#34;</span>,<span class="s2">&#34;msg&#34;</span>:<span class="s2">&#34;Registering webhook&#34;</span>,<span class="s2">&#34;path&#34;</span>:<span class="s2">&#34;/mutate-elbv2-k8s-aws-v1beta1-targetgroupbinding&#34;</span><span class="o">}</span>
+</span></span><span class="line"><span class="cl"><span class="o">{</span><span class="s2">&#34;level&#34;</span>:<span class="s2">&#34;info&#34;</span>,<span class="s2">&#34;ts&#34;</span>:<span class="s2">&#34;2023-05-08T05:59:45Z&#34;</span>,<span class="s2">&#34;logger&#34;</span>:<span class="s2">&#34;controller-runtime.webhook&#34;</span>,<span class="s2">&#34;msg&#34;</span>:<span class="s2">&#34;Registering webhook&#34;</span>,<span class="s2">&#34;path&#34;</span>:<span class="s2">&#34;/validate-elbv2-k8s-aws-v1beta1-targetgroupbinding&#34;</span><span class="o">}</span>
+</span></span><span class="line"><span class="cl"><span class="o">{</span><span class="s2">&#34;level&#34;</span>:<span class="s2">&#34;info&#34;</span>,<span class="s2">&#34;ts&#34;</span>:<span class="s2">&#34;2023-05-08T05:59:45Z&#34;</span>,<span class="s2">&#34;logger&#34;</span>:<span class="s2">&#34;controller-runtime.webhook&#34;</span>,<span class="s2">&#34;msg&#34;</span>:<span class="s2">&#34;Registering webhook&#34;</span>,<span class="s2">&#34;path&#34;</span>:<span class="s2">&#34;/validate-networking-v1-ingress&#34;</span><span class="o">}</span>
+</span></span><span class="line"><span class="cl"><span class="o">{</span><span class="s2">&#34;level&#34;</span>:<span class="s2">&#34;info&#34;</span>,<span class="s2">&#34;ts&#34;</span>:<span class="s2">&#34;2023-05-08T05:59:45Z&#34;</span>,<span class="s2">&#34;logger&#34;</span>:<span class="s2">&#34;setup&#34;</span>,<span class="s2">&#34;msg&#34;</span>:<span class="s2">&#34;starting podInfo repo&#34;</span><span class="o">}</span>
+</span></span><span class="line"><span class="cl"><span class="o">{</span><span class="s2">&#34;level&#34;</span>:<span class="s2">&#34;info&#34;</span>,<span class="s2">&#34;ts&#34;</span>:<span class="s2">&#34;2023-05-08T05:59:47Z&#34;</span>,<span class="s2">&#34;logger&#34;</span>:<span class="s2">&#34;controller-runtime.webhook.webhooks&#34;</span>,<span class="s2">&#34;msg&#34;</span>:<span class="s2">&#34;Starting webhook server&#34;</span><span class="o">}</span>
+</span></span><span class="line"><span class="cl"><span class="o">{</span><span class="s2">&#34;level&#34;</span>:<span class="s2">&#34;info&#34;</span>,<span class="s2">&#34;ts&#34;</span>:<span class="s2">&#34;2023-05-08T05:59:47Z&#34;</span>,<span class="s2">&#34;msg&#34;</span>:<span class="s2">&#34;Starting server&#34;</span>,<span class="s2">&#34;kind&#34;</span>:<span class="s2">&#34;health probe&#34;</span>,<span class="s2">&#34;addr&#34;</span>:<span class="s2">&#34;[::]:61779&#34;</span><span class="o">}</span>
+</span></span><span class="line"><span class="cl">...
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>이어서 External DNS 를 설치하자.  다음의 스크립트를 기반으로 OIDC 정책 연동부터 진행하자.</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span><span class="lnt">31
+</span><span class="lnt">32
+</span><span class="lnt">33
+</span><span class="lnt">34
+</span><span class="lnt">35
+</span><span class="lnt">36
+</span><span class="lnt">37
+</span><span class="lnt">38
+</span><span class="lnt">39
+</span><span class="lnt">40
+</span><span class="lnt">41
+</span><span class="lnt">42
+</span><span class="lnt">43
+</span><span class="lnt">44
+</span><span class="lnt">45
+</span><span class="lnt">46
+</span><span class="lnt">47
+</span><span class="lnt">48
+</span><span class="lnt">49
+</span><span class="lnt">50
+</span><span class="lnt">51
+</span><span class="lnt">52
+</span><span class="lnt">53
+</span><span class="lnt">54
+</span><span class="lnt">55
+</span><span class="lnt">56
+</span><span class="lnt">57
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl"><span class="c1"># vi iam_external_policy.json 생성</span>
+</span></span><span class="line"><span class="cl">cat <span class="s">&lt;&lt;EOT &gt; iam_external_policy.json
+</span></span></span><span class="line"><span class="cl"><span class="s">{
+</span></span></span><span class="line"><span class="cl"><span class="s">  &#34;Version&#34;: &#34;2012-10-17&#34;,
+</span></span></span><span class="line"><span class="cl"><span class="s">  &#34;Statement&#34;: [
+</span></span></span><span class="line"><span class="cl"><span class="s">    {
+</span></span></span><span class="line"><span class="cl"><span class="s">      &#34;Effect&#34;: &#34;Allow&#34;,
+</span></span></span><span class="line"><span class="cl"><span class="s">      &#34;Action&#34;: [
+</span></span></span><span class="line"><span class="cl"><span class="s">        &#34;route53:ChangeResourceRecordSets&#34;
+</span></span></span><span class="line"><span class="cl"><span class="s">      ],
+</span></span></span><span class="line"><span class="cl"><span class="s">      &#34;Resource&#34;: [
+</span></span></span><span class="line"><span class="cl"><span class="s">        &#34;arn:aws:route53:::hostedzone/*&#34;
+</span></span></span><span class="line"><span class="cl"><span class="s">      ]
+</span></span></span><span class="line"><span class="cl"><span class="s">    },
+</span></span></span><span class="line"><span class="cl"><span class="s">    {
+</span></span></span><span class="line"><span class="cl"><span class="s">      &#34;Effect&#34;: &#34;Allow&#34;,
+</span></span></span><span class="line"><span class="cl"><span class="s">      &#34;Action&#34;: [
+</span></span></span><span class="line"><span class="cl"><span class="s">        &#34;route53:ListHostedZones&#34;,
+</span></span></span><span class="line"><span class="cl"><span class="s">        &#34;route53:ListResourceRecordSets&#34;
+</span></span></span><span class="line"><span class="cl"><span class="s">      ],
+</span></span></span><span class="line"><span class="cl"><span class="s">      &#34;Resource&#34;: [
+</span></span></span><span class="line"><span class="cl"><span class="s">        &#34;*&#34;
+</span></span></span><span class="line"><span class="cl"><span class="s">      ]
+</span></span></span><span class="line"><span class="cl"><span class="s">    }
+</span></span></span><span class="line"><span class="cl"><span class="s">  ]
+</span></span></span><span class="line"><span class="cl"><span class="s">}
+</span></span></span><span class="line"><span class="cl"><span class="s">EOT</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">aws iam create-policy --policy-name <span class="s2">&#34;AllowExternalDNSUpdates&#34;</span> --policy-document file://iam_external_policy.json.json
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1"># 정책 arn 생성 확인 </span>
+</span></span><span class="line"><span class="cl">aws iam get-policy --policy-arn arn:aws:iam::<span class="nv">$ACCOUNT_ID</span>:policy/AllowExternalDNSUpdates --query <span class="s1">&#39;Policy.Arn&#39;</span>
+</span></span><span class="line"><span class="cl">---
+</span></span><span class="line"><span class="cl"><span class="s2">&#34;arn:aws:iam::955963799952:policy/AllowExternalDNSUpdates&#34;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1"># OIDC 서비스 어카운트 생성 </span>
+</span></span><span class="line"><span class="cl">eksctl create iamserviceaccount --cluster<span class="o">=</span><span class="nv">$CLUSTER_NAME</span> --namespace<span class="o">=</span>kube-system --name<span class="o">=</span>external-dns <span class="se">\
+</span></span></span><span class="line"><span class="cl"><span class="se"></span>--attach-policy-arn<span class="o">=</span>arn:aws:iam::<span class="nv">$ACCOUNT_ID</span>:policy/AllowExternalDNSUpdates --override-existing-serviceaccounts --approve
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1"># OIDC 서비스 어카운트 확인 </span>
+</span></span><span class="line"><span class="cl">kubectl edit sa/external-dns -n kube-system
+</span></span><span class="line"><span class="cl">---
+</span></span><span class="line"><span class="cl">apiVersion: v1
+</span></span><span class="line"><span class="cl">kind: ServiceAccount
+</span></span><span class="line"><span class="cl">metadata: 
+</span></span><span class="line"><span class="cl">  annotations: <span class="c1"># 마찬가지로 연동 확인이 가능하다. </span>
+</span></span><span class="line"><span class="cl">    eks.amazonaws.com/role-arn: arn:aws:iam::955963799952:role/eksctl-hanhorang-addon-iamserviceaccount-kub-Role1-499RATDKJVJU
+</span></span><span class="line"><span class="cl">    kubectl.kubernetes.io/last-applied-configuration: <span class="p">|</span>
+</span></span><span class="line"><span class="cl">      <span class="o">{</span><span class="s2">&#34;apiVersion&#34;</span>:<span class="s2">&#34;v1&#34;</span>,<span class="s2">&#34;kind&#34;</span>:<span class="s2">&#34;ServiceAccount&#34;</span>,<span class="s2">&#34;metadata&#34;</span>:<span class="o">{</span><span class="s2">&#34;annotations&#34;</span>:<span class="o">{}</span>,<span class="s2">&#34;labels&#34;</span>:<span class="o">{</span><span class="s2">&#34;app.kubernetes.io/name&#34;</span>:<span class="s2">&#34;external-dns&#34;</span><span class="o">}</span>,<span class="s2">&#34;name&#34;</span>:<span class="s2">&#34;external-dns&#34;</span>,<span class="s2">&#34;namespace&#34;</span>:<span class="s2">&#34;kube-system&#34;</span><span class="o">}}</span>
+</span></span><span class="line"><span class="cl">  creationTimestamp: <span class="s2">&#34;2023-05-08T06:02:38Z&#34;</span>
+</span></span><span class="line"><span class="cl">  labels:
+</span></span><span class="line"><span class="cl">    app.kubernetes.io/managed-by: eksctl
+</span></span><span class="line"><span class="cl">    app.kubernetes.io/name: external-dns
+</span></span><span class="line"><span class="cl">  name: external-dns
+</span></span><span class="line"><span class="cl">  namespace: kube-system
+</span></span><span class="line"><span class="cl">  resourceVersion: <span class="s2">&#34;13937&#34;</span>
+</span></span><span class="line"><span class="cl">  uid: 67ce20cc-6545-486c-b525-450be6311d65
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>external DNS을 연동하기 위해서는 <strong>도메인</strong>이 필요하다. 앞서 Route53에서 생성한 도메인을 연동하자.</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl"><span class="c1"># MyDomain=&lt;자신의 도메인&gt;</span>
+</span></span><span class="line"><span class="cl"><span class="nv">MyDomain</span><span class="o">=</span>hanhorang.link 
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1"># 자신의 Route 53 도메인 ID 조회 및 변수 지정</span>
+</span></span><span class="line"><span class="cl"><span class="nv">MyDnzHostedZoneId</span><span class="o">=</span><span class="k">$(</span>aws route53 list-hosted-zones-by-name --dns-name <span class="s2">&#34;</span><span class="si">${</span><span class="nv">MyDomain</span><span class="si">}</span><span class="s2">.&#34;</span> --query <span class="s2">&#34;HostedZones[0].Id&#34;</span> --output text<span class="k">)</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1"># ExternalDNS 배포</span>
+</span></span><span class="line"><span class="cl">curl -s -O https://raw.githubusercontent.com/gasida/PKOS/main/aews/externaldns.yaml
+</span></span><span class="line"><span class="cl">cat externaldns.yaml <span class="p">|</span> yh
+</span></span><span class="line"><span class="cl"><span class="nv">MyDomain</span><span class="o">=</span><span class="nv">$MyDomain</span> <span class="nv">MyDnzHostedZoneId</span><span class="o">=</span><span class="nv">$MyDnzHostedZoneId</span> envsubst &lt; externaldns.yaml <span class="p">|</span> kubectl apply -
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1"># 로그 확인 </span>
+</span></span><span class="line"><span class="cl">kubectl get pods -A
+</span></span><span class="line"><span class="cl">---
+</span></span><span class="line"><span class="cl">kube-system   external-dns-6b5bbbf9d-l7ms2                    1/1     Running   <span class="m">0</span>          <span class="m">4</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">kubectl logs pods/external-dns-6b5bbbf9d-l7ms2 -n kube-system
+</span></span><span class="line"><span class="cl">---
+</span></span><span class="line"><span class="cl"><span class="nv">time</span><span class="o">=</span><span class="s2">&#34;2023-05-08T06:02:43Z&#34;</span> <span class="nv">level</span><span class="o">=</span>info <span class="nv">msg</span><span class="o">=</span><span class="s2">&#34;config: {APIServerURL: KubeConfig: RequestTimeout:30s DefaultTargets:[] ContourLoadBalancerService:heptio-contour/contour GlooNamespace:gloo-system SkipperRouteGroupVersion:zalando.org/v1 Sources:[service ingress] Namespace: AnnotationFilter: LabelFilter: FQDNTemplate: CombineFQDNAndAnnotation:false IgnoreHostnameAnnotation:false IgnoreIngressTLSSpec:false IgnoreIngressRulesSpec:false GatewayNamespace: GatewayLabelFilter: Compatibility: PublishInternal:false PublishHostIP:false AlwaysPublishNotReadyAddresses:false ConnectorSourceServer:localhost:8080 Provider:aws GoogleProject: GoogleBatchChangeSize:1000 GoogleBatchChangeInterval:1s GoogleZoneVisibility: DomainFilter:[hanhorang.link] ExcludeDomains:[] RegexDomainFilter: RegexDomainExclusion: ZoneNameFilter:[] ZoneIDFilter:[] TargetNetFilter:[] ExcludeTargetNets:[] AlibabaCloudConfigFile:/etc/kubernetes/alibaba-cloud.json AlibabaCloudZoneType: AWSZoneType:public AWSZoneTagFilter:[] AWSAssumeRole: AWSAssumeRoleExternalID: AWSBatchChangeSize:1000 AWSBatchChangeInterval:1s AWSEvaluateTargetHealth:true AWSAPIRetries:3 AWSPreferCNAME:false AWSZoneCacheDuration:0s AWSSDServiceCleanup:false AzureConfigFile:/etc/kubernetes/azure.json AzureResourceGroup: AzureSubscriptionID: AzureUserAssignedIdentityClientID: BluecatDNSConfiguration: BluecatConfigFile:/etc/kubernetes/bluecat.json BluecatDNSView: BluecatGatewayHost: BluecatRootZone: BluecatDNSServerName: BluecatDNSDeployType:no-deploy BluecatSkipTLSVerify:false CloudflareProxied:false CloudflareDNSRecordsPerPage:100 CoreDNSPrefix:/skydns/ RcodezeroTXTEncrypt:false AkamaiServiceConsumerDomain: AkamaiClientToken: AkamaiClientSecret: AkamaiAccessToken: AkamaiEdgercPath: AkamaiEdgercSection: InfobloxGridHost: InfobloxWapiPort:443 InfobloxWapiUsername:admin InfobloxWapiPassword: InfobloxWapiVersion:2.3.1 InfobloxSSLVerify:true InfobloxView: InfobloxMaxResults:0 InfobloxFQDNRegEx: InfobloxNameRegEx: InfobloxCreatePTR:false InfobloxCacheDuration:0 DynCustomerName: DynUsername: DynPassword: DynMinTTLSeconds:0 OCIConfigFile:/etc/kubernetes/oci.yaml InMemoryZones:[] OVHEndpoint:ovh-eu OVHApiRateLimit:20 PDNSServer:http://localhost:8081 PDNSAPIKey: PDNSTLSEnabled:false TLSCA: TLSClientCert: TLSClientCertKey: Policy:sync Registry:txt TXTOwnerID:/hostedzone/Z08463751O7YNWD79KKIX TXTPrefix: TXTSuffix: Interval:1m0s MinEventSyncInterval:5s Once:false DryRun:false UpdateEvents:false LogFormat:text MetricsAddress::7979 LogLevel:info TXTCacheInterval:0s TXTWildcardReplacement: ExoscaleEndpoint:https://api.exoscale.ch/dns ExoscaleAPIKey: ExoscaleAPISecret: CRDSourceAPIVersion:externaldns.k8s.io/v1alpha1 CRDSourceKind:DNSEndpoint ServiceTypeFilter:[] CFAPIEndpoint: CFUsername: CFPassword: RFC2136Host: RFC2136Port:0 RFC2136Zone: RFC2136Insecure:false RFC2136GSSTSIG:false RFC2136KerberosRealm: RFC2136KerberosUsername: RFC2136KerberosPassword: RFC2136TSIGKeyName: RFC2136TSIGSecret: RFC2136TSIGSecretAlg: RFC2136TAXFR:false RFC2136MinTTL:0s RFC2136BatchChangeSize:50 NS1Endpoint: NS1IgnoreSSL:false NS1MinTTLSeconds:0 TransIPAccountName: TransIPPrivateKeyFile: DigitalOceanAPIPageSize:50 ManagedDNSRecordTypes:[A CNAME] GoDaddyAPIKey: GoDaddySecretKey: GoDaddyTTL:0 GoDaddyOTE:false OCPRouterName: IBMCloudProxied:false IBMCloudConfigFile:/etc/kubernetes/ibmcloud.json TencentCloudConfigFile:/etc/kubernetes/tencent-cloud.json TencentCloudZoneType: PiholeServer: PiholePassword: PiholeTLSInsecureSkipVerify:false PluralCluster: PluralProvider:}&#34;</span>
+</span></span><span class="line"><span class="cl"><span class="nv">time</span><span class="o">=</span><span class="s2">&#34;2023-05-08T06:02:43Z&#34;</span> <span class="nv">level</span><span class="o">=</span>info <span class="nv">msg</span><span class="o">=</span><span class="s2">&#34;Instantiating new Kubernetes client&#34;</span>
+</span></span><span class="line"><span class="cl"><span class="nv">time</span><span class="o">=</span><span class="s2">&#34;2023-05-08T06:02:43Z&#34;</span> <span class="nv">level</span><span class="o">=</span>info <span class="nv">msg</span><span class="o">=</span><span class="s2">&#34;Using inCluster-config based on serviceaccount-token&#34;</span>
+</span></span><span class="line"><span class="cl"><span class="nv">time</span><span class="o">=</span><span class="s2">&#34;2023-05-08T06:02:43Z&#34;</span> <span class="nv">level</span><span class="o">=</span>info <span class="nv">msg</span><span class="o">=</span><span class="s2">&#34;Created Kubernetes client https://10.100.0.1:443&#34;</span>
+</span></span><span class="line"><span class="cl"><span class="nv">time</span><span class="o">=</span><span class="s2">&#34;2023-05-08T06:02:45Z&#34;</span> <span class="nv">level</span><span class="o">=</span>info <span class="nv">msg</span><span class="o">=</span><span class="s2">&#34;Applying provider record filter for domains: [hanhorang.link. .hanhorang.link.]&#34;</span>
+</span></span><span class="line"><span class="cl"><span class="nv">time</span><span class="o">=</span><span class="s2">&#34;2023-05-08T06:02:45Z&#34;</span> <span class="nv">level</span><span class="o">=</span>info <span class="nv">msg</span><span class="o">=</span><span class="s2">&#34;All records are already up to date&#34;</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl"><span class="nb">export</span> <span class="nv">certArn</span><span class="o">=</span> ACM 인증서 arn 
+</span></span><span class="line"><span class="cl"><span class="c1"># 경로 kubeflow-manifests</span>
+</span></span><span class="line"><span class="cl"><span class="nb">printf</span> <span class="s1">&#39;certArn=&#39;</span><span class="nv">$certArn</span><span class="s1">&#39;&#39;</span> &gt; awsconfigs/common/istio-ingress/overlays/https/params.env 
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1"># istio certArn 설정 업데이트</span>
+</span></span><span class="line"><span class="cl">kustomize build awsconfigs/common/istio-ingress/overlays/https <span class="p">|</span> kubectl apply -f - 
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1"># 정상 등록 확인</span>
+</span></span><span class="line"><span class="cl">kubectl get ingress -n istio-system istio-ingress
+</span></span><span class="line"><span class="cl">---
+</span></span><span class="line"><span class="cl">NAME            CLASS    HOSTS   ADDRESS                                                                        PORTS   AGE
+</span></span><span class="line"><span class="cl">istio-ingress   &lt;none&gt;   *       k8s-istiosys-istioing-663e16c023-2114118481.ap-northeast-2.elb.amazonaws.com   <span class="m">80</span>      43s 
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>이어서 도메인 등록이 필요하다. 다음의 경로 <code>tests/e2e/utils/load_balancer/config.yaml</code> 에서 파일을 수정하자.</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-yaml" data-lang="yaml"><span class="line"><span class="cl"><span class="nt">cluster</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l">my-eks-kubeflow</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="nt">region</span><span class="p">:</span><span class="w"> </span><span class="l">ap-northeast-2</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="nt">kubeflow</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="nt">alb</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="nt">scheme</span><span class="p">:</span><span class="w"> </span><span class="l">internet-facing</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="nt">route53</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="nt">rootDomain</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="nt">hostedZoneId</span><span class="p">:</span><span class="w"> </span><span class="l">Z08463751O7YNWD79KKIX</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l">hanhorang.link</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="nt">subDomain</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l">platform.hanhorang.link</span><span class="w">
+</span></span></span></code></pre></td></tr></table>
+</div>
+</div><p>적용 명령어는 다음과 같다.</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span><span class="lnt">8
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl"><span class="c1"># 경로 kubeflow-manifests </span>
+</span></span><span class="line"><span class="cl"><span class="c1"># 설치 스크립트 패키지 설치 </span>
+</span></span><span class="line"><span class="cl"><span class="nb">cd</span> tests/e2e
+</span></span><span class="line"><span class="cl">pip3 install -r requirements.txt
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1"># 경로 확인! </span>
+</span></span><span class="line"><span class="cl"><span class="c1"># 반드시 kubeflow-manifests/tests/e2e 에서 진행하자. (파이썬 e2e 모듈 인식)</span>
+</span></span><span class="line"><span class="cl"><span class="nv">PYTHONPATH</span><span class="o">=</span>.. python3 utils/load_balancer/setup_load_balancer.py
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>업데이트가 진행되었으면<code>tests/e2e/utils/load_balancer/config.yaml</code> 파일을 다시 확인하자. 등록한 도메인과 certARN을 확인할 수 있다.</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-yaml" data-lang="yaml"><span class="line"><span class="cl"><span class="nt">cluster</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l">my-eks-kubeflow</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="nt">region</span><span class="p">:</span><span class="w"> </span><span class="l">ap-northeast-2</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="nt">kubeflow</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="nt">alb</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="nt">dns</span><span class="p">:</span><span class="w"> </span><span class="l">k8s-istiosys-istioing-663e16c023-2114118481.ap-northeast-2.elb.amazonaws.com</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="nt">scheme</span><span class="p">:</span><span class="w"> </span><span class="l">internet-facing</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="nt">serviceAccount</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">      </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l">aws-load-balancer-controller</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">      </span><span class="nt">namespace</span><span class="p">:</span><span class="w"> </span><span class="l">kube-system</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">      </span><span class="nt">policyArn</span><span class="p">:</span><span class="w"> </span><span class="l">arn:aws:iam::955963799952:policy/alb_ingress_controller_my-eks-kubeflow3tdc061n5e</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="nt">route53</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="nt">rootDomain</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="nt">certARN</span><span class="p">:</span><span class="w"> </span><span class="l">arn:aws:acm:ap-northeast-2:955963799952:certificate/274b725c-c1ad-4528-a593-e0030aaa62f9</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="nt">hostedZoneId</span><span class="p">:</span><span class="w"> </span><span class="l">Z08463751O7YNWD79KKIX</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l">hanhorang.link</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="nt">subDomain</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="nt">certARN</span><span class="p">:</span><span class="w"> </span><span class="l">arn:aws:acm:ap-northeast-2:955963799952:certificate/09d02797-709e-4c9b-9b95-8eef6fee7e3f</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="nt">hostedZoneId</span><span class="p">:</span><span class="w"> </span><span class="l">Z08293761OELZZQTGI41U</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l">platform.hanhorang.link</span><span class="w">
+</span></span></span></code></pre></td></tr></table>
+</div>
+</div><p>약 5분~10분이후 다음의 서브도메인 (kubeflow.platform.hanhorang.link) 에 접속하면 정상적으로 연결된 것을 확인할 수 있다.</p>
+<p><img loading="lazy" 
+    src="/./kubeflow-on-aws/kubeflow6.png" 
+    alt="kubeflow6.png" 
+     
+    width=932 
+    height="454"  /></p>
+<h2 id="efs-연결">
+    <a href="#efs-%ec%97%b0%ea%b2%b0" class="anchor">
+        <svg class="icon" aria-hidden="true" focusable="false" height="16" version="1.1" viewBox="0 0 16 16" width="16">
+            <path fill-rule="evenodd"
+                d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z">
+            </path>
+        </svg>
+    </a>
+    EFS 연결
+</h2>
+<p>EFS(Amazon Elastic File System)는 AWS에서 제공하는 파일 스토리지이다. 파일 스토리지인 만큼 여러 노드에서 접근이 가능하여 머신러닝같은 워크 플로우에 자주 추천하는 서비스이다. kubeflow에서도 EFS를 활용할 수 있는데 활용하여 얻는 이점은 다음과 같다. (참고 ChatGPT)</p>
+<ol>
+<li><strong>분산 학습:</strong> EFS를 사용하면 여러 노드가 동일한 파일 시스템에 접근할 수 있다. 모든 노드가 동일한 데이터에 접근하고, 중간 학습 결과를 공유하면서 동시에 작업을 수행할 수 있어 학습 속도가 빨라진다..</li>
+<li><strong>데이터 공유와 재사용:</strong> EFS는 클러스터의 모든 노드에서 동시에 접근할 수 있는 중앙화된 저장 공간을 제공한다. 이는 데이터를 쉽게 공유하고 재사용할 수 있게 하므로, 데이터 관리를 단순화하고 머신러닝 워크플로우를 효율적으로 만든다.</li>
+<li><strong>확장성:</strong> EFS는 자동으로 확장되고 축소되므로, 데이터 저장량에 대해 걱정할 필요가 없다. 또한, 데이터는 여러 가용 영역에 걸쳐 복제되므로, 내구성과 가용성도 보장된다.</li>
+<li><strong>지속적인 저장소:</strong> EFS는 지속적인 스토리지를 제공한다. 즉, 파드가 종료되거나 노드에 문제가 생겨도 데이터는 안전하게 보호된다. 이는 머신러닝 훈련에서 중요한데, 훈련 중인 모델의 체크포인트를 저장하고 필요할 때 언제든지 복구할 수 있기 때문이다.</li>
+</ol>
+<p>아래는 EFS 연결시 각 워커 노드에서 작동하는 아키텍처이다. EFS 특성에 맞게 각 노드가 스토리지를 공유하여 사용하는 것을 알 수 있다.</p>
+<p><img loading="lazy" 
+    src="/./kubeflow-on-aws/addon-4.png" 
+    alt="addon-4.png" 
+     
+    width=1476 
+    height="855"  /></p>
+<p>EFS 연결을 위해서는 EFS 프로비저닝이 필요하다. EFS 프로비저닝 방법은 정적, 동적 두가지로 이번 글에서는 동적으로 생성하겠다.</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl"><span class="c1"># IAM 정책 생성</span>
+</span></span><span class="line"><span class="cl">curl -s -O https://raw.githubusercontent.com/kubernetes-sigs/aws-efs-csi-driver/master/docsiam-policy-example.json
+</span></span><span class="line"><span class="cl">aws iam create-policy --policy-name AmazonEKS_EFS_CSI_Driver_Policy --policy-document file://iam-policy-example.json
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1"># ISRA 설정 : 고객관리형 정책 AmazonEKS_EFS_CSI_Driver_Policy 사용</span>
+</span></span><span class="line"><span class="cl">eksctl create iamserviceaccount <span class="se">\
+</span></span></span><span class="line"><span class="cl"><span class="se"></span>  --name efs-csi-controller-sa <span class="se">\
+</span></span></span><span class="line"><span class="cl"><span class="se"></span>  --namespace kube-system <span class="se">\
+</span></span></span><span class="line"><span class="cl"><span class="se"></span>  --cluster <span class="si">${</span><span class="nv">CLUSTER_NAME</span><span class="si">}</span> <span class="se">\
+</span></span></span><span class="line"><span class="cl"><span class="se"></span>  --attach-policy-arn arn:aws:iam::<span class="si">${</span><span class="nv">ACCOUNT_ID</span><span class="si">}</span>:policy/AmazonEKS_EFS_CSI_Driver_Policy <span class="se">\
+</span></span></span><span class="line"><span class="cl"><span class="se"></span>  --approve
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1"># 적용 확인, annotation </span>
+</span></span><span class="line"><span class="cl">kubectl get sa -n kube-system efs-csi-controller-sa -o yaml <span class="p">|</span> head -5
+</span></span><span class="line"><span class="cl">---
+</span></span><span class="line"><span class="cl">apiVersion: v1
+</span></span><span class="line"><span class="cl">kind: ServiceAccount
+</span></span><span class="line"><span class="cl">metadata:
+</span></span><span class="line"><span class="cl">  annotations: <span class="c1"># 적용 확인</span>
+</span></span><span class="line"><span class="cl">    eks.amazonaws.com/role-arn: arn:aws:iam::955963799952:role/eksctl-my-eks-kubeflow-addon-iamserviceaccou-Role1-1TAOJ41
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1"># efs csi driver 설치</span>
+</span></span><span class="line"><span class="cl">helm repo add aws-efs-csi-driver https://kubernetes-sigs.github.io/aws-efs-csi-driver/
+</span></span><span class="line"><span class="cl">helm repo update
+</span></span><span class="line"><span class="cl">helm upgrade -i aws-efs-csi-driver aws-efs-csi-driver/aws-efs-csi-driver <span class="se">\
+</span></span></span><span class="line"><span class="cl"><span class="se"></span>    --namespace kube-system <span class="se">\
+</span></span></span><span class="line"><span class="cl"><span class="se"></span>    --set image.repository<span class="o">=</span>602401143452.dkr.ecr.ap-northeast-2.amazonaws.com/eks/aws-efs-csi-driver <span class="se">\
+</span></span></span><span class="line"><span class="cl"><span class="se"></span>    --set controller.serviceAccount.create<span class="o">=</span><span class="nb">false</span> <span class="se">\
+</span></span></span><span class="line"><span class="cl"><span class="se"></span>    --set controller.serviceAccount.name<span class="o">=</span>efs-csi-controller-sa
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>EFS 프로비저닝 전 EFS 스토리지 생성이 필요하다.  스토리지 생성 단계 전 EKS CIDR 보안 그룹 추가(NFS 트래픽 허용)가 필요하다. 아래 스크립트를 통해 보안 그룹을 생성하고 EFS 파일 시스템을 생성하겠다.</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span><span class="lnt">31
+</span><span class="lnt">32
+</span><span class="lnt">33
+</span><span class="lnt">34
+</span><span class="lnt">35
+</span><span class="lnt">36
+</span><span class="lnt">37
+</span><span class="lnt">38
+</span><span class="lnt">39
+</span><span class="lnt">40
+</span><span class="lnt">41
+</span><span class="lnt">42
+</span><span class="lnt">43
+</span><span class="lnt">44
+</span><span class="lnt">45
+</span><span class="lnt">46
+</span><span class="lnt">47
+</span><span class="lnt">48
+</span><span class="lnt">49
+</span><span class="lnt">50
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1"># 보안 그룹 생성을 위한 네트워크 변수 설정</span>
+</span></span><span class="line"><span class="cl"><span class="nv">vpc_id</span><span class="o">=</span><span class="k">$(</span>aws eks describe-cluster <span class="se">\
+</span></span></span><span class="line"><span class="cl"><span class="se"></span>    --name my-eks-kubeflow <span class="se">\
+</span></span></span><span class="line"><span class="cl"><span class="se"></span>    --query <span class="s2">&#34;cluster.resourcesVpcConfig.vpcId&#34;</span> <span class="se">\
+</span></span></span><span class="line"><span class="cl"><span class="se"></span>    --output text<span class="k">)</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="nv">cidr_range</span><span class="o">=</span><span class="k">$(</span>aws ec2 describe-vpcs <span class="se">\
+</span></span></span><span class="line"><span class="cl"><span class="se"></span>    --vpc-ids <span class="nv">$vpc_id</span> <span class="se">\
+</span></span></span><span class="line"><span class="cl"><span class="se"></span>    --query <span class="s2">&#34;Vpcs[].CidrBlock&#34;</span> <span class="se">\
+</span></span></span><span class="line"><span class="cl"><span class="se"></span>    --output text <span class="se">\
+</span></span></span><span class="line"><span class="cl"><span class="se"></span>    --region ap-northeast-2<span class="k">)</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1"># 보안 그룹 생성</span>
+</span></span><span class="line"><span class="cl"><span class="nv">security_group_id</span><span class="o">=</span><span class="k">$(</span>aws ec2 create-security-group <span class="se">\
+</span></span></span><span class="line"><span class="cl"><span class="se"></span>    --group-name MyEfsSecurityGroup <span class="se">\
+</span></span></span><span class="line"><span class="cl"><span class="se"></span>    --description <span class="s2">&#34;My EFS security group&#34;</span> <span class="se">\
+</span></span></span><span class="line"><span class="cl"><span class="se"></span>    --vpc-id <span class="nv">$vpc_id</span> <span class="se">\
+</span></span></span><span class="line"><span class="cl"><span class="se"></span>    --output text<span class="k">)</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1"># NFS 트래픽 허용 </span>
+</span></span><span class="line"><span class="cl">aws ec2 authorize-security-group-ingress <span class="se">\
+</span></span></span><span class="line"><span class="cl"><span class="se"></span>    --group-id <span class="nv">$security_group_id</span> <span class="se">\
+</span></span></span><span class="line"><span class="cl"><span class="se"></span>    --protocol tcp <span class="se">\
+</span></span></span><span class="line"><span class="cl"><span class="se"></span>    --port <span class="m">2049</span> <span class="se">\
+</span></span></span><span class="line"><span class="cl"><span class="se"></span>    --cidr <span class="nv">$cidr_range</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1"># EFS 파일 시스템 생성</span>
+</span></span><span class="line"><span class="cl"><span class="nv">file_system_id</span><span class="o">=</span><span class="k">$(</span>aws efs create-file-system <span class="se">\
+</span></span></span><span class="line"><span class="cl"><span class="se"></span>    --region ap-northeast-2 <span class="se">\
+</span></span></span><span class="line"><span class="cl"><span class="se"></span>    --performance-mode generalPurpose <span class="se">\
+</span></span></span><span class="line"><span class="cl"><span class="se"></span>    --query <span class="s1">&#39;FileSystemId&#39;</span> <span class="se">\
+</span></span></span><span class="line"><span class="cl"><span class="se"></span>    --output text<span class="k">)</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1"># EFS 확인 </span>
+</span></span><span class="line"><span class="cl"><span class="nb">echo</span> <span class="nv">$file_system_id</span>
+</span></span><span class="line"><span class="cl">--
+</span></span><span class="line"><span class="cl">fs-01eea8c4de75fcd80
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1"># 스토리지 클래스 생성 </span>
+</span></span><span class="line"><span class="cl"><span class="nv">EfsFsId</span><span class="o">=</span><span class="k">$(</span>aws efs describe-file-systems --query <span class="s2">&#34;FileSystems[*].FileSystemId&#34;</span> --output text<span class="k">)</span> 
+</span></span><span class="line"><span class="cl">curl -s -O https://raw.githubusercontent.com/kubernetes-sigs/aws-efs-csi-driver/master/examples/kubernetes/dynamic_provisioning/specs/storageclass.yaml
+</span></span><span class="line"><span class="cl">sed -i <span class="s2">&#34;s/fs-92107410/</span><span class="nv">$EfsFsId</span><span class="s2">/g&#34;</span> storageclass.yaml
+</span></span><span class="line"><span class="cl">kubectl apply -f storageclass.yaml
+</span></span><span class="line"><span class="cl">kubectl get sc efs-sc
+</span></span><span class="line"><span class="cl">--
+</span></span><span class="line"><span class="cl">NAME               PROVISIONER             RECLAIMPOLICY   VOLUMEBINDINGMODE      ALLOWVOLUMEEXPANSION   AGE
+</span></span><span class="line"><span class="cl">ebs-sc <span class="o">(</span>default<span class="o">)</span>   ebs.csi.aws.com         Delete          WaitForFirstConsumer   <span class="nb">false</span>                  6h48m
+</span></span><span class="line"><span class="cl">efs-sc             efs.csi.aws.com         Delete          Immediate              <span class="nb">false</span>                  25s
+</span></span><span class="line"><span class="cl">gp2                kubernetes.io/aws-ebs   Delete          WaitForFirstConsumer   <span class="nb">false</span>                  7h37m
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>kubeflow 대시보드에 접속하여 EFS 스토리지를 생성해보자. 기본 아이디와 비밀번호는  <a href="mailto:user@example.com">user@example.com</a> , 12341234 이다.</p>
+<p><img loading="lazy" 
+    src="/./kubeflow-on-aws/kubeflow-login1.png" 
+    alt="kubeflow-login1.png" 
+     
+    width=883 
+    height="422"  /></p>
+<p>로그인 이후 왼쪽 메뉴 [Volumes] → [New Volume] 클릭 후 Storage Class 확인시 <code>efs-sc</code> 를 확인할 수 있다.</p>
+<p><img loading="lazy" 
+    src="/./kubeflow-on-aws/efs2.png" 
+    alt="efs2.png" 
+     
+    width=1853 
+    height="813"  /></p>
+<p>생성된 볼륨은 콘솔 및 터미널에서 확인이 가능하다.</p>
+<p><img loading="lazy" 
+    src="/./kubeflow-on-aws/Efs3.png" 
+    alt="Efs3.png" 
+     
+    width=914 
+    height="380"  /></p>
+<p><img loading="lazy" 
+    src="/./kubeflow-on-aws/efs4.png" 
+    alt="efs4.png" 
+     
+    width=2088 
+    height="236"  /></p>
+<p>생성한 볼륨은 jupyter notebook 생성시 데이터 볼륨 설정해서 볼륨 지정이 가능하다</p>
+<p><img loading="lazy" 
+    src="/./kubeflow-on-aws/efs5.png" 
+    alt="efs5.png" 
+     
+    width=1839 
+    height="965"  /></p>
+<p>이후 EFS 볼륨을 사용하는 기계 학습 훈련의 예제는 <a href="https://github.com/aws-samples/amazon-efs-developer-zone/tree/main/application-integration/container/eks/kubeflow">GitHub</a>에 따라 진행하도록 하자.</p>
+<h2 id="마치며">
+    <a href="#%eb%a7%88%ec%b9%98%eb%a9%b0" class="anchor">
+        <svg class="icon" aria-hidden="true" focusable="false" height="16" version="1.1" viewBox="0 0 16 16" width="16">
+            <path fill-rule="evenodd"
+                d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z">
+            </path>
+        </svg>
+    </a>
+    마치며
+</h2>
+<p>Kubeflow on AWS 관련하여 ALB 와 EFS를 연동하여 테스트를 해보았다. 다음 시간에는 kubeflow를 통해 파이프라인을 통한 모델 생성 및 이를 기반한 API deployment 등등 ML 쪽 예제를 다룰 예정이다. 또한 못 다룬 이야기지만 kubeflow 학습시 노드 확장성으로 (노드 셀렉터, 어피니티)를 통해 노드가 자동 확장된다는데 이 점에 대해서도 확인할 생각이다.</p>
+
+    </div>
+</div>
+
+<div class="container">
+    
+    <nav class="flex container suggested">
+        
+        <a rel="prev" href="/post/spot-and-kubeflow/" title="Previous post (older)">
+            <span>Previous</span>
+            [AEWS] EKS Spot 인스턴스와 Kubeflow 배포하기
+            </a>
+        
+        
+        
+        <a rel="next" href="/post/aews-eks-vpc-1/" title="Next post (newer)">
+            <span>Next</span>
+            [AEWS] EKS VPC CNI Deep Dive
+            </a> 
+        
+    </nav>
+    
+</div>
+ 
+<div class="container">
+    
+    <script src="https://giscus.app/client.js" 
+        data-repo="WingLim/hugo-tania"
+        data-repo-id="MDEwOlJlcG9zaXRvcnkzMTYyNjQzMDc="
+        
+        data-category="Comments"
+        data-category-id="DIC_kwDOEtnPc84B_WKP"
+        
+        data-mapping="pathname"
+        data-reactions-enabled="1"
+        data-emit-metadata="0"
+        data-theme="light"
+        crossorigin="anonymous"
+        async
+        >
+</script>
+
+<script>
+    function setGiscusTeheme(theme) {
+        let giscus = document.querySelector('.giscus iframe');
+        if (giscus) {
+            giscus.contentWindow.postMessage(
+                {
+                    giscus: {
+                        setConfig: {
+                            theme: theme
+                        }
+                    }
+                },
+                'https://giscus.app'
+            )
+        }
+    }
+
+    addEventListener('message', event => {
+        if (event.origin !== 'https://giscus.app') return;
+        setGiscusTeheme(document.documentElement.dataset.userColorScheme)
+    });
+
+    window.addEventListener('onColorSchemeChange', (e) => {
+        setGiscusTeheme(e.detail)
+    })
+</script>
+
+</div>
+
+</main>
+
+
+        </main>
+        <footer class="footer flex">
+    <section class="container">
+        <nav class="footer-links">
+            
+            <a href="/index.xml">RSS</a>
+            
+        </nav>
+
+        
+    </section>
+    <script defer src="/ts/features.706a523ba43e6d0427c7fdf2b9d05dbd0920d3f12942b453690b495cb2522743.js" 
+    data-enable-footnotes="true"
+    ></script>
+</footer>
+
+    </body>
+</html>

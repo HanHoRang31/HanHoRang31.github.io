@@ -6,7 +6,17 @@
     <description>Recent content in eksctl on HanHoRang Tech Blog</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <lastBuildDate>Sat, 06 May 2023 00:00:00 +0000</lastBuildDate><atom:link href="https://HanHoRang31.github.io/tags/eksctl/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Fri, 12 May 2023 07:35:40 +0900</lastBuildDate><atom:link href="https://HanHoRang31.github.io/tags/eksctl/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>[AEWS] Kubeflow on AWS</title>
+      <link>https://HanHoRang31.github.io/post/kubeflow-on-aws/</link>
+      <pubDate>Fri, 12 May 2023 07:35:40 +0900</pubDate>
+      
+      <guid>https://HanHoRang31.github.io/post/kubeflow-on-aws/</guid>
+      <description>1 2 AWS EKS Workshop Study (=AEWS)는 EKS Workshop 실습 스터디입니다. CloudNet@ Gasida(가시다)이 진행하며,공개된 AWS EKS Workshop을 기반으로 진행하고 있습니다. 지난 블로그 글에 이어서 kubeflow 를 스터디한 내용을 공유하고자 한다. 오늘 주제는 kubeflow 의 인프라 요소로 왜 쿠버네티스에서 머신러닝을 쓰는 것이 좋은 가와 kubeflow 가 AWS 클라우드(EKS)에 올라갔을 때 어떤 이점이 있는 지 확인하겠다.
+ML on kubernetes 먼저, 쿠버네티스는 머신러닝 워크플로우를 지원하는 데 매우 유용한 플랫폼으로 이유는 다음과 같이 확인할 수가 있다.</description>
+    </item>
+    
     <item>
       <title>[AEWS] EKS Spot 인스턴스와 Kubeflow 배포하기</title>
       <link>https://HanHoRang31.github.io/post/spot-and-kubeflow/</link>

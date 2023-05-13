@@ -1,0 +1,2280 @@
+<!DOCTYPE html>
+<html lang="en-us">
+    
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="theme-color" content="dark">
+    <title>[AEWS] EKS VPC CNI Deep Dive | HanHoRang Tech Blog</title>
+
+    
+    
+    
+    <meta property="og:site_name" content="HanHoRang Tech Blog by Tania in Hugo" />
+    <meta property="og:title" content="[AEWS] EKS VPC CNI Deep Dive | HanHoRang Tech Blog"/>
+    <meta itemprop="name" content="[AEWS] EKS VPC CNI Deep Dive | HanHoRang Tech Blog" />
+    <meta name="twitter:title" content="[AEWS] EKS VPC CNI Deep Dive | HanHoRang Tech Blog" />
+    <meta name="application-name" content="[AEWS] EKS VPC CNI Deep Dive | HanHoRang Tech Blog" /><meta name="twitter:card" content="summary"/>
+
+    <meta name="description" content="EKS VPC 와 EKS Workshop Netwroking 실습" />
+    <meta name="twitter:description" content="EKS VPC 와 EKS Workshop Netwroking 실습 "/>
+    <meta itemprop="description" content=" EKS VPC 와 EKS Workshop Netwroking 실습 "/>
+    <meta property="og:description" content=" EKS VPC 와 EKS Workshop Netwroking 실습 " />
+
+    
+
+<meta property="og:type" content="article" />
+<meta property="article:publisher" content="Hugo Tania" />
+<meta property="og:article:published_time" content=2023-05-12T07:35:40&#43;0900 />
+<meta property="article:published_time" content=2023-05-12T07:35:40&#43;0900 />
+
+
+  <meta property="og:article:author" content="Han ho rnag" />
+  <meta property="article:author" content="Han ho rnag" />
+  <meta name="author" content="Han ho rnag" />
+
+
+
+
+<script defer type="application/ld+json">
+  {
+    "@context": "http://schema.org",
+    "@type": "Article",
+    "headline": "[AEWS] EKS VPC CNI Deep Dive",
+    "author": {
+      "@type": "Person",
+      "name": "Hugo Tania"
+    },
+    "datePublished": "2023-05-12",
+    "description": "EKS VPC 와 EKS Workshop Netwroking 실습",
+    "wordCount":  5189 ,
+    "mainEntityOfPage": "True",
+    "dateModified": "2023-05-12",
+    "publisher": {
+      "@type": "Organization",
+      "name": "Hugo Tania",
+      "logo": {
+        "@type": "imageObject",
+        "url": "https:\/\/HanHoRang31.github.io\/favicon.ico"
+      }
+    }
+  }
+</script>
+
+
+
+    <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico" />
+    
+    <link rel="stylesheet" href="/sass/main.min.ab99ff095f832511e24ffb2fba2b51ad473b2f7e9301d674eba2c6c3a6e8bd81.css">
+    
+</head>
+    
+    <script>
+        (function() {
+            const colorSchemeKey = 'ThemeColorScheme';
+            if(!localStorage.getItem(colorSchemeKey)){
+                localStorage.setItem(colorSchemeKey, "auto");
+            }
+        })();
+    </script><script>
+    (function() {
+        const colorSchemeKey = 'ThemeColorScheme';
+        const colorSchemeItem = localStorage.getItem(colorSchemeKey);
+        const supportDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches === true;
+
+        if (colorSchemeItem == 'dark' || colorSchemeItem === 'auto' && supportDarkMode) {
+            
+
+            document.documentElement.dataset.userColorScheme = 'dark';
+        } else {
+            document.documentElement.dataset.userColorScheme = 'light';
+        }
+    })();
+</script>
+
+
+    <body class="dark">
+        <nav class="navbar">
+    <div class="container">
+        <div class="flex">
+            <div>
+                <a class="brand" href="/">
+                    
+                    
+                        <img src="/favicon.ico" />
+                    
+                    HanHoRang Tech Blog
+                    </a>
+            </div>
+            <div class="flex">
+                
+                <a href="/articles/">Articles</a>
+                
+                
+                    <button id="dark-mode-button">
+                    <svg class="light" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" aria-hidden="true" focusable="false" width="1em" height="1em" style="-ms-transform: rotate(360deg); -webkit-transform: rotate(360deg); transform: rotate(360deg);" preserveAspectRatio="xMidYMid meet" viewBox="0 0 36 36"><path fill="#FFD983" d="M30.312.776C32 19 20 32 .776 30.312c8.199 7.717 21.091 7.588 29.107-.429C37.9 21.867 38.03 8.975 30.312.776z"/><path d="M30.705 15.915a1.163 1.163 0 1 0 1.643 1.641a1.163 1.163 0 0 0-1.643-1.641zm-16.022 14.38a1.74 1.74 0 0 0 0 2.465a1.742 1.742 0 1 0 0-2.465zm13.968-2.147a2.904 2.904 0 0 1-4.108 0a2.902 2.902 0 0 1 0-4.107a2.902 2.902 0 0 1 4.108 0a2.902 2.902 0 0 1 0 4.107z" fill="#FFCC4D"/><rect x="0" y="0" width="36" height="36" fill="rgba(0, 0, 0, 0)" /></svg>
+                    <svg class="dark" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" aria-hidden="true" focusable="false" width="1em" height="1em" style="-ms-transform: rotate(360deg); -webkit-transform: rotate(360deg); transform: rotate(360deg);" preserveAspectRatio="xMidYMid meet" viewBox="0 0 36 36"><path fill="#FFD983" d="M16 2s0-2 2-2s2 2 2 2v2s0 2-2 2s-2-2-2-2V2zm18 14s2 0 2 2s-2 2-2 2h-2s-2 0-2-2s2-2 2-2h2zM4 16s2 0 2 2s-2 2-2 2H2s-2 0-2-2s2-2 2-2h2zm5.121-8.707s1.414 1.414 0 2.828s-2.828 0-2.828 0L4.878 8.708s-1.414-1.414 0-2.829c1.415-1.414 2.829 0 2.829 0l1.414 1.414zm21 21s1.414 1.414 0 2.828s-2.828 0-2.828 0l-1.414-1.414s-1.414-1.414 0-2.828s2.828 0 2.828 0l1.414 1.414zm-.413-18.172s-1.414 1.414-2.828 0s0-2.828 0-2.828l1.414-1.414s1.414-1.414 2.828 0s0 2.828 0 2.828l-1.414 1.414zm-21 21s-1.414 1.414-2.828 0s0-2.828 0-2.828l1.414-1.414s1.414-1.414 2.828 0s0 2.828 0 2.828l-1.414 1.414zM16 32s0-2 2-2s2 2 2 2v2s0 2-2 2s-2-2-2-2v-2z"/><circle fill="#FFD983" cx="18" cy="18" r="10"/><rect x="0" y="0" width="36" height="36" fill="rgba(0, 0, 0, 0)" /></svg>
+                    </button>
+                
+            </div>
+            </div>
+    </div>
+</nav>
+
+        <main>
+            
+<div class="container">
+    <article>
+        <header class="article-header">
+            <div class="thumb">
+                <div>
+                    <h1>[AEWS] EKS VPC CNI Deep Dive</h1>
+                    <div class="post-meta">
+                        <div>
+                            
+                            
+                            By HanHoRnag | <time>May 12, 2023</time>
+                            | 25 minutes
+                        </div>
+                        <div class="tags">
+                            
+                            <a href="/tags/kans/">KANS</a>
+                            
+                            <a href="/tags/eks/">eks</a>
+                            
+                            <a href="/tags/cloud/">cloud</a>
+                            
+                            <a href="/tags/aws/">AWS</a>
+                            
+                            <a href="/tags/kubernetes/">kubernetes</a>
+                            
+                            <a href="/tags/vpc/">vpc</a>
+                            
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </header>
+    </article>
+
+    <div class="article-post">
+    <div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-markdown" data-lang="markdown"><span class="line"><span class="cl">AWS EKS Workshop Study (=AEWS)는 EKS Workshop 실습 스터디입니다.
+</span></span><span class="line"><span class="cl">CloudNet@ Gasida(가시다)이 진행하며,공개된 AWS EKS Workshop을 기반으로 진행하고 있습니다.
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h2 id="eks-vpc-cni">
+    <a href="#eks-vpc-cni" class="anchor">
+        <svg class="icon" aria-hidden="true" focusable="false" height="16" version="1.1" viewBox="0 0 16 16" width="16">
+            <path fill-rule="evenodd"
+                d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z">
+            </path>
+        </svg>
+    </a>
+    EKS VPC CNI
+</h2>
+<p>CNI(Container Network Interface) 란 네트워크 플러그인 인터페이스로 k8s 네트워크 환경을 구성해준다. EKS 에서는 기본 CNI로 VPC를 사용한다. 여기서 VPC는 AWS 네트워크 서비스인 AWS VPC로 VPC CIDR을 이용하여 파드 IP 할당 및 통신을 지원한다.</p>
+<p><img loading="lazy" 
+    src="/./aews-eks-vpc-1/vpc1.png" 
+    alt="vpc1.png" 
+     
+    width=1044 
+    height="408"  /></p>
+<p>EKS 에서 CNI를 VPC로 사용하면 대표적으로 얻을 수 있는 이점은 두 가지이다.</p>
+<ul>
+<li>
+<p>노드 대역과 파드 대역이 동일하여 다른 노드간 통신시 오버레이가 없어 통신 오버헤드가 감소한다.</p>
+<p><img loading="lazy" 
+    src="/./aews-eks-vpc-1/vpc2.png" 
+    alt="vpc2.png" 
+     
+    width=2000 
+    height="627"  /></p>
+<p>다른 CNI(Caclico)는 노드와 파드 IP 대역이 달라 노드 간 통신에 오버레이를 사용하는 반면 VPC CNI는 대역이 같아 오버레이없이 원본 패킷 그대로 통신한다.</p>
+</li>
+<li>
+<p>AWS VPC 의 연동 서비스 (VPC 서브넷, 보안 그룹)를 사용하여 트래픽 제어가 가능하다.</p>
+</li>
+</ul>
+<h2 id="네트워크-세부-정보-확인하기">
+    <a href="#%eb%84%a4%ed%8a%b8%ec%9b%8c%ed%81%ac-%ec%84%b8%eb%b6%80-%ec%a0%95%eb%b3%b4-%ed%99%95%ec%9d%b8%ed%95%98%ea%b8%b0" class="anchor">
+        <svg class="icon" aria-hidden="true" focusable="false" height="16" version="1.1" viewBox="0 0 16 16" width="16">
+            <path fill-rule="evenodd"
+                d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z">
+            </path>
+        </svg>
+    </a>
+    네트워크 세부 정보 확인하기
+</h2>
+<p>VPC CNI에 대해 세부적으로 확인해보겠다. VPC CNI는 aws-cni 파드를 통해 각 노드에 배포된다. 이를 확인하여 네트워크 기본 정보를 확인하겠다.</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span><span class="lnt">31
+</span><span class="lnt">32
+</span><span class="lnt">33
+</span><span class="lnt">34
+</span><span class="lnt">35
+</span><span class="lnt">36
+</span><span class="lnt">37
+</span><span class="lnt">38
+</span><span class="lnt">39
+</span><span class="lnt">40
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl"><span class="c1"># CNI 버전 정보 확인</span>
+</span></span><span class="line"><span class="cl">kubectl describe daemonset aws-node --namespace kube-system <span class="p">|</span> grep Image <span class="p">|</span> cut -d <span class="s2">&#34;/&#34;</span> -f <span class="m">2</span>
+</span></span><span class="line"><span class="cl">---
+</span></span><span class="line"><span class="cl">amazon-k8s-cni-init:v1.12.6-eksbuild.1
+</span></span><span class="line"><span class="cl">amazon-k8s-cni:v1.12.6-eksbuild.1
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1"># VPC MODE 확인 </span>
+</span></span><span class="line"><span class="cl">kubectl describe cm -n kube-system kube-proxy-config <span class="p">|</span> grep mode
+</span></span><span class="line"><span class="cl">---
+</span></span><span class="line"><span class="cl">mode: <span class="s2">&#34;iptables&#34;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1"># 노드 IP 및 PUBLIC IP 확인</span>
+</span></span><span class="line"><span class="cl">aws ec2 describe-instances --query <span class="s2">&#34;Reservations[*].Instances[*].{PublicIPAdd:PublicIpAddress,PrivateIPAdd:PrivateIpAddress,InstanceName:Tags[?Key==&#39;Name&#39;]|[0].Value,Status:State.Name}&#34;</span> --filters <span class="nv">Name</span><span class="o">=</span>instance-state-name,Values<span class="o">=</span>running --output table
+</span></span><span class="line"><span class="cl">---
+</span></span><span class="line"><span class="cl">-------------------------------------------------------------------------
+</span></span><span class="line"><span class="cl"><span class="p">|</span>                           DescribeInstances                           <span class="p">|</span>
+</span></span><span class="line"><span class="cl">+------------------------+----------------+------------------+----------+
+</span></span><span class="line"><span class="cl"><span class="p">|</span>      InstanceName      <span class="p">|</span> PrivateIPAdd   <span class="p">|</span>   PublicIPAdd    <span class="p">|</span> Status   <span class="p">|</span>
+</span></span><span class="line"><span class="cl">+------------------------+----------------+------------------+----------+
+</span></span><span class="line"><span class="cl"><span class="p">|</span>  hanhorang-ng1-Node    <span class="p">|</span>  192.168.3.162 <span class="p">|</span>  15.164.220.246  <span class="p">|</span>  running <span class="p">|</span>
+</span></span><span class="line"><span class="cl"><span class="p">|</span>  hanhorang-ng1-Node    <span class="p">|</span>  192.168.2.16  <span class="p">|</span>  3.34.30.94      <span class="p">|</span>  running <span class="p">|</span>
+</span></span><span class="line"><span class="cl"><span class="p">|</span>  hanhorang-bastion-EC2 <span class="p">|</span>  192.168.1.100 <span class="p">|</span>  13.125.121.220  <span class="p">|</span>  running <span class="p">|</span>
+</span></span><span class="line"><span class="cl"><span class="p">|</span>  hanhorang-ng1-Node    <span class="p">|</span>  192.168.1.5   <span class="p">|</span>  3.36.127.19     <span class="p">|</span>  running <span class="p">|</span>
+</span></span><span class="line"><span class="cl">+------------------------+----------------+------------------+----------+ 
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1"># </span>
+</span></span><span class="line"><span class="cl">kubectl get pods -n kube-system -o wide 
+</span></span><span class="line"><span class="cl">---
+</span></span><span class="line"><span class="cl">NAME                                            READY   STATUS    RESTARTS   AGE    IP              NODE                                               NOMINATED NODE   READINESS GATES
+</span></span><span class="line"><span class="cl">aws-load-balancer-controller-7857849d69-qc9nr   1/1     Running   <span class="m">0</span>          146m   192.168.1.190   ip-192-168-1-5.ap-northeast-2.compute.internal     &lt;none&gt;           &lt;none&gt;
+</span></span><span class="line"><span class="cl">aws-load-balancer-controller-7857849d69-qjvkk   1/1     Running   <span class="m">0</span>          146m   192.168.3.186   ip-192-168-3-162.ap-northeast-2.compute.internal   &lt;none&gt;           &lt;none&gt;
+</span></span><span class="line"><span class="cl">aws-node-l2twq                                  1/1     Running   <span class="m">0</span>          170m   192.168.1.5     ip-192-168-1-5.ap-northeast-2.compute.internal     &lt;none&gt;           &lt;none&gt;
+</span></span><span class="line"><span class="cl">aws-node-tj9xl                                  1/1     Running   <span class="m">0</span>          170m   192.168.3.162   ip-192-168-3-162.ap-northeast-2.compute.internal   &lt;none&gt;           &lt;none&gt;
+</span></span><span class="line"><span class="cl">aws-node-v9m8g                                  1/1     Running   <span class="m">0</span>          170m   192.168.2.16    ip-192-168-2-16.ap-northeast-2.compute.internal    &lt;none&gt;           &lt;none&gt;
+</span></span><span class="line"><span class="cl">coredns-6777fcd775-2qq92                        1/1     Running   <span class="m">0</span>          168m   192.168.2.227   ip-192-168-2-16.ap-northeast-2.compute.internal    &lt;none&gt;           &lt;none&gt;
+</span></span><span class="line"><span class="cl">coredns-6777fcd775-rhqdp                        1/1     Running   <span class="m">0</span>          168m   192.168.1.254   ip-192-168-1-5.ap-northeast-2.compute.internal     &lt;none&gt;           &lt;none&gt;
+</span></span><span class="line"><span class="cl">external-dns-6b5bbbf9d-l7ms2                    1/1     Running   <span class="m">0</span>          143m   192.168.2.221   ip-192-168-2-16.ap-northeast-2.compute.internal    &lt;none&gt;           &lt;none&gt;
+</span></span><span class="line"><span class="cl">kube-proxy-bbgr9                                1/1     Running   <span class="m">0</span>          168m   192.168.3.162   ip-192-168-3-162.ap-northeast-2.compute.internal   &lt;none&gt;           &lt;none&gt;
+</span></span><span class="line"><span class="cl">kube-proxy-nm8ls                                1/1     Running   <span class="m">0</span>          169m   192.168.2.16    ip-192-168-2-16.ap-northeast-2.compute.internal    &lt;none&gt;           &lt;none&gt;
+</span></span><span class="line"><span class="cl">kube-proxy-xm2qq                                1/1     Running   <span class="m">0</span>          169m   192.168.1.5     ip-192-168-1-5.ap-northeast-2.compute.internal     &lt;none&gt;           &lt;none&gt;**
+</span></span></code></pre></td></tr></table>
+</div>
+</div><ul>
+<li>VPC CNI Mode로 <code>userspace</code> ,<code>iptables</code> , <code>ipvs</code> 모드가 존재하나, 보통 iptable 모드를 사용한다. 이유는 userspace 경우, 느리고 비효율적이여서 거의 사용되지 않은 상태이다. 반면 ipvs 의 경우, L4 기반의 로드밸런서로 매우 빠른 이점이 있지만 호환성 문제로 추가 설정이 필요하고 커뮤니티 규모가 적어 트러블슈팅이 동반되어 기본적으로 사용하지 않는다.</li>
+</ul>
+<p>이어서 각 노드에 접속하여 네트워크 정보를 확인해보겠다.</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span><span class="lnt">31
+</span><span class="lnt">32
+</span><span class="lnt">33
+</span><span class="lnt">34
+</span><span class="lnt">35
+</span><span class="lnt">36
+</span><span class="lnt">37
+</span><span class="lnt">38
+</span><span class="lnt">39
+</span><span class="lnt">40
+</span><span class="lnt">41
+</span><span class="lnt">42
+</span><span class="lnt">43
+</span><span class="lnt">44
+</span><span class="lnt">45
+</span><span class="lnt">46
+</span><span class="lnt">47
+</span><span class="lnt">48
+</span><span class="lnt">49
+</span><span class="lnt">50
+</span><span class="lnt">51
+</span><span class="lnt">52
+</span><span class="lnt">53
+</span><span class="lnt">54
+</span><span class="lnt">55
+</span><span class="lnt">56
+</span><span class="lnt">57
+</span><span class="lnt">58
+</span><span class="lnt">59
+</span><span class="lnt">60
+</span><span class="lnt">61
+</span><span class="lnt">62
+</span><span class="lnt">63
+</span><span class="lnt">64
+</span><span class="lnt">65
+</span><span class="lnt">66
+</span><span class="lnt">67
+</span><span class="lnt">68
+</span><span class="lnt">69
+</span><span class="lnt">70
+</span><span class="lnt">71
+</span><span class="lnt">72
+</span><span class="lnt">73
+</span><span class="lnt">74
+</span><span class="lnt">75
+</span><span class="lnt">76
+</span><span class="lnt">77
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl"><span class="c1"># 각 노드 IP 확인 및 변수 설정 </span>
+</span></span><span class="line"><span class="cl">kubectl get nodes -o wide 
+</span></span><span class="line"><span class="cl">---
+</span></span><span class="line"><span class="cl">NAME                                               STATUS   ROLES    AGE     VERSION                INTERNAL-IP     EXTERNAL-IP      OS-IMAGE         KERNEL-VERSION                  CONTAINER-RUNTIME
+</span></span><span class="line"><span class="cl">ip-192-168-1-5.ap-northeast-2.compute.internal     Ready    &lt;none&gt;   3h10m   v1.24.11-eks-a59e1f0   192.168.1.5     3.36.127.19      Amazon Linux <span class="m">2</span>   5.10.178-162.673.amzn2.x86_64   containerd://1.6.19
+</span></span><span class="line"><span class="cl">ip-192-168-2-16.ap-northeast-2.compute.internal    Ready    &lt;none&gt;   3h10m   v1.24.11-eks-a59e1f0   192.168.2.16    3.34.30.94       Amazon Linux <span class="m">2</span>   5.10.178-162.673.amzn2.x86_64   containerd://1.6.19
+</span></span><span class="line"><span class="cl">ip-192-168-3-162.ap-northeast-2.compute.internal   Ready    &lt;none&gt;   3h10m   v1.24.11-eks-a59e1f0   192.168.3.162   15.164.220.246   Amazon Linux <span class="m">2</span>   5.10.178-162.673.amzn2.x86_64   containerd://1.6.19
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1"># 위 External IP 확인하여 노드별 변수 설정</span>
+</span></span><span class="line"><span class="cl"><span class="nv">N1</span><span class="o">=</span>3.36.127.19
+</span></span><span class="line"><span class="cl"><span class="nv">N2</span><span class="o">=</span>3.34.30.94
+</span></span><span class="line"><span class="cl"><span class="nv">N3</span><span class="o">=</span>15.164.220.246
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1"># 각 노드에 툴 설치</span>
+</span></span><span class="line"><span class="cl">ssh ec2-user@<span class="nv">$N1</span> sudo yum install links tree jq tcpdump -y
+</span></span><span class="line"><span class="cl">ssh ec2-user@<span class="nv">$N2</span> sudo yum install links tree jq tcpdump -y
+</span></span><span class="line"><span class="cl">ssh ec2-user@<span class="nv">$N3</span> sudo yum install links tree jq tcpdump -y
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1"># 네트워크 CNI 로그 경로 확인</span>
+</span></span><span class="line"><span class="cl">ssh ec2-user@<span class="nv">$N1</span> tree /var/log/aws-routed-eni
+</span></span><span class="line"><span class="cl">---
+</span></span><span class="line"><span class="cl">/var/log/aws-routed-eni
+</span></span><span class="line"><span class="cl">├── egress-v4-plugin.log <span class="c1"># 이그래스 트래픽 관련 로그 파일 </span>
+</span></span><span class="line"><span class="cl">├── ipamd.log <span class="c1"># eni IP 주소 할당, 해제, 그리고 오류 등과 관련된 이벤트와 상태 변경 로그 파일 </span>
+</span></span><span class="line"><span class="cl">└── plugin.log <span class="c1"># 파드의 네트워크 인터페이스 설정, 트래픽 관리, 오류 처리 등과 관련된 이벤트와 상태 변경 로그 파일**</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1"># eni IP 주소 할당, 해제, 그리고 오류 등과 관련된 이벤트와 상태 변경 로그 파일</span>
+</span></span><span class="line"><span class="cl">ssh ec2-user@<span class="nv">$N1</span> cat /var/log/aws-routed-eni/ipamd.log <span class="p">|</span> jq
+</span></span><span class="line"><span class="cl">---
+</span></span><span class="line"><span class="cl"><span class="o">{</span>
+</span></span><span class="line"><span class="cl">  <span class="s2">&#34;level&#34;</span>: <span class="s2">&#34;info&#34;</span>,
+</span></span><span class="line"><span class="cl">  <span class="s2">&#34;ts&#34;</span>: <span class="s2">&#34;2023-05-08T07:16:00.757Z&#34;</span>,
+</span></span><span class="line"><span class="cl">  <span class="s2">&#34;caller&#34;</span>: <span class="s2">&#34;ipamd/ipamd.go:1599&#34;</span>,
+</span></span><span class="line"><span class="cl">  <span class="s2">&#34;msg&#34;</span>: <span class="s2">&#34;Adding 192.168.1.190/32 to DS for eni-0d79c0daf04234458&#34;</span>
+</span></span><span class="line"><span class="cl"><span class="o">}</span>
+</span></span><span class="line"><span class="cl"><span class="o">{</span>
+</span></span><span class="line"><span class="cl">  <span class="s2">&#34;level&#34;</span>: <span class="s2">&#34;info&#34;</span>,
+</span></span><span class="line"><span class="cl">  <span class="s2">&#34;ts&#34;</span>: <span class="s2">&#34;2023-05-08T07:16:00.757Z&#34;</span>,
+</span></span><span class="line"><span class="cl">  <span class="s2">&#34;caller&#34;</span>: <span class="s2">&#34;ipamd/ipamd.go:1599&#34;</span>,
+</span></span><span class="line"><span class="cl">  <span class="s2">&#34;msg&#34;</span>: <span class="s2">&#34;IP already in DS&#34;</span>
+</span></span><span class="line"><span class="cl"><span class="o">}</span>
+</span></span><span class="line"><span class="cl"><span class="o">{</span>
+</span></span><span class="line"><span class="cl">  <span class="s2">&#34;level&#34;</span>: <span class="s2">&#34;info&#34;</span>,
+</span></span><span class="line"><span class="cl">  <span class="s2">&#34;ts&#34;</span>: <span class="s2">&#34;2023-05-08T07:16:00.757Z&#34;</span>,
+</span></span><span class="line"><span class="cl">  <span class="s2">&#34;caller&#34;</span>: <span class="s2">&#34;ipamd/ipamd.go:1475&#34;</span>,
+</span></span><span class="line"><span class="cl">  <span class="s2">&#34;msg&#34;</span>: <span class="s2">&#34;Trying to add 192.168.1.145&#34;</span>
+</span></span><span class="line"><span class="cl"><span class="o">}</span>
+</span></span><span class="line"><span class="cl"><span class="o">{</span>
+</span></span><span class="line"><span class="cl">  <span class="s2">&#34;level&#34;</span>: <span class="s2">&#34;info&#34;</span>,
+</span></span><span class="line"><span class="cl">  <span class="s2">&#34;ts&#34;</span>: <span class="s2">&#34;2023-05-08T07:16:00.757Z&#34;</span>,
+</span></span><span class="line"><span class="cl">  <span class="s2">&#34;caller&#34;</span>: <span class="s2">&#34;ipamd/ipamd.go:1599&#34;</span>,
+</span></span><span class="line"><span class="cl">  <span class="s2">&#34;msg&#34;</span>: <span class="s2">&#34;Adding 192.168.1.145/32 to DS for eni-0d79c0daf04234458&#34;</span>
+</span></span><span class="line"><span class="cl"><span class="o">}</span>
+</span></span><span class="line"><span class="cl">...
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1"># 파드의 네트워크 인터페이스 설정, 트래픽 관리, 오류 처리 등과 관련된 이벤트와 상태 변경 로그 파일</span>
+</span></span><span class="line"><span class="cl">ssh ec2-user@<span class="nv">$N1</span> cat /var/log/aws-routed-eni/plugin.log <span class="p">|</span> jq
+</span></span><span class="line"><span class="cl">---
+</span></span><span class="line"><span class="cl"><span class="o">{</span>
+</span></span><span class="line"><span class="cl">  <span class="s2">&#34;level&#34;</span>: <span class="s2">&#34;debug&#34;</span>,
+</span></span><span class="line"><span class="cl">  <span class="s2">&#34;ts&#34;</span>: <span class="s2">&#34;2023-05-08T05:59:41.741Z&#34;</span>,
+</span></span><span class="line"><span class="cl">  <span class="s2">&#34;caller&#34;</span>: <span class="s2">&#34;driver/driver.go:281&#34;</span>,
+</span></span><span class="line"><span class="cl">  <span class="s2">&#34;msg&#34;</span>: <span class="s2">&#34;Successfully disabled IPv6 RA and ICMP redirects on hostVeth eni25c78048487&#34;</span>
+</span></span><span class="line"><span class="cl"><span class="o">}</span>
+</span></span><span class="line"><span class="cl"><span class="o">{</span>
+</span></span><span class="line"><span class="cl">  <span class="s2">&#34;level&#34;</span>: <span class="s2">&#34;debug&#34;</span>,
+</span></span><span class="line"><span class="cl">  <span class="s2">&#34;ts&#34;</span>: <span class="s2">&#34;2023-05-08T05:59:41.741Z&#34;</span>,
+</span></span><span class="line"><span class="cl">  <span class="s2">&#34;caller&#34;</span>: <span class="s2">&#34;driver/driver.go:297&#34;</span>,
+</span></span><span class="line"><span class="cl">  <span class="s2">&#34;msg&#34;</span>: <span class="s2">&#34;Successfully setup container route, containerAddr=192.168.1.190/32, hostVeth=eni25c78048487, rtTable=main&#34;</span>
+</span></span><span class="line"><span class="cl"><span class="o">}</span>
+</span></span><span class="line"><span class="cl"><span class="o">{</span>
+</span></span><span class="line"><span class="cl">  <span class="s2">&#34;level&#34;</span>: <span class="s2">&#34;debug&#34;</span>,
+</span></span><span class="line"><span class="cl">  <span class="s2">&#34;ts&#34;</span>: <span class="s2">&#34;2023-05-08T05:59:41.741Z&#34;</span>,
+</span></span><span class="line"><span class="cl">  <span class="s2">&#34;caller&#34;</span>: <span class="s2">&#34;driver/driver.go:297&#34;</span>,
+</span></span><span class="line"><span class="cl">  <span class="s2">&#34;msg&#34;</span>: <span class="s2">&#34;Successfully setup toContainer rule, containerAddr=192.168.1.190/32, rtTable=main&#34;</span>
+</span></span><span class="line"><span class="cl"><span class="o">}</span>
+</span></span><span class="line"><span class="cl">...
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>직접 라우터 및 네트워크 인터페이스를 확인하여 파드 IP정보를 확인할 수 있다.</p>
+<p><img loading="lazy" 
+    src="/./aews-eks-vpc-1/vpc5.png" 
+    alt="vpc5.png" 
+     
+    width=1868 
+    height="912"  /></p>
+<ul>
+<li>빨간 네모는 노드  IP로 프라이빗 IPv4 주소가 할당되어 있음을 확인할 수 있다. 또한 노란 네모 및 선이 파드 할당이 되면 생기는 IP로 보조 프라이빗 IPv4 주소가 할당됨을 알 수 있다.</li>
+<li>노드에 파드가 할당되면 네트워크인터페이스가 eniY@N 의 네트워크 인터페이스가 할당된다.</li>
+<li>라우터 정보를 확인했을 때 노드 1의 CIDR이 192.168.1.0/24 로 해당 IP 대역의 트래픽을 받으면 192.168.1.5 로 통신됨을 확인할 수 있다.</li>
+</ul>
+<h3 id="통신-흐름-확인하기">
+    <a href="#%ed%86%b5%ec%8b%a0-%ed%9d%90%eb%a6%84-%ed%99%95%ec%9d%b8%ed%95%98%ea%b8%b0" class="anchor">
+        <svg class="icon" aria-hidden="true" focusable="false" height="16" version="1.1" viewBox="0 0 16 16" width="16">
+            <path fill-rule="evenodd"
+                d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z">
+            </path>
+        </svg>
+    </a>
+    통신 흐름 확인하기
+</h3>
+<p>이렇게 할당된 파드의 IP가 어떻게 통신하는지 파드간 통신과 외부 통신을 나눠 통신 흐름을 확인해보자. 먼저 클러스터 내부 파드간 통신을 확인하겠다. 테스트 파드를 3개 배포하여 파드 1과 파드2의 IP 통신흐름을 확인할 것이다.</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span><span class="lnt">31
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl"><span class="c1"># 테스트 파드 배포 </span>
+</span></span><span class="line"><span class="cl">cat <span class="s">&lt;&lt;EOF | kubectl create -f -
+</span></span></span><span class="line"><span class="cl"><span class="s">apiVersion: apps/v1
+</span></span></span><span class="line"><span class="cl"><span class="s">kind: Deployment
+</span></span></span><span class="line"><span class="cl"><span class="s">metadata:
+</span></span></span><span class="line"><span class="cl"><span class="s">  name: netshoot-pod
+</span></span></span><span class="line"><span class="cl"><span class="s">spec:
+</span></span></span><span class="line"><span class="cl"><span class="s">  replicas: 3
+</span></span></span><span class="line"><span class="cl"><span class="s">  selector:
+</span></span></span><span class="line"><span class="cl"><span class="s">    matchLabels:
+</span></span></span><span class="line"><span class="cl"><span class="s">      app: netshoot-pod
+</span></span></span><span class="line"><span class="cl"><span class="s">  template:
+</span></span></span><span class="line"><span class="cl"><span class="s">    metadata:
+</span></span></span><span class="line"><span class="cl"><span class="s">      labels:
+</span></span></span><span class="line"><span class="cl"><span class="s">        app: netshoot-pod
+</span></span></span><span class="line"><span class="cl"><span class="s">    spec:
+</span></span></span><span class="line"><span class="cl"><span class="s">      containers:
+</span></span></span><span class="line"><span class="cl"><span class="s">      - name: netshoot-pod
+</span></span></span><span class="line"><span class="cl"><span class="s">        image: nicolaka/netshoot
+</span></span></span><span class="line"><span class="cl"><span class="s">        command: [&#34;tail&#34;]
+</span></span></span><span class="line"><span class="cl"><span class="s">        args: [&#34;-f&#34;, &#34;/dev/null&#34;]
+</span></span></span><span class="line"><span class="cl"><span class="s">      terminationGracePeriodSeconds: 0
+</span></span></span><span class="line"><span class="cl"><span class="s">EOF</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1"># 배포 확인 </span>
+</span></span><span class="line"><span class="cl">kubectl get pods -A 
+</span></span><span class="line"><span class="cl">----
+</span></span><span class="line"><span class="cl">NAMESPACE     NAME                                            READY   STATUS    RESTARTS   AGE
+</span></span><span class="line"><span class="cl">default       netshoot-pod-7757d5dd99-9dr8p                   1/1     Running   <span class="m">0</span>          90s
+</span></span><span class="line"><span class="cl">default       netshoot-pod-7757d5dd99-jw4z4                   1/1     Running   <span class="m">0</span>          90s
+</span></span><span class="line"><span class="cl">default       netshoot-pod-7757d5dd99-tgwj7                   1/1     Running   <span class="m">0</span>          90s
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>내부 통신은 tcpdump 의 패킷 덤프를 통해 통신 과정을 확인할 수 있다. 파드1에 접속하여 파드2에 직접 트래픽을 쏴서 통신 흐름을 확인하자</p>
+<p><img loading="lazy" 
+    src="/./aews-eks-vpc-1/vpc6.png" 
+    alt="vpc6.png" 
+     
+    width=1533 
+    height="778"  /></p>
+<ul>
+<li>패킷에서와 같이 오버레이없이 파드에 할당된 IP로 직접 통신함을 알 수 있다.</li>
+</ul>
+<p>이어서 외부 통신을 진행해보자. 외부 통신은 SNAT을 통해 진행하게 되는데 SNAT의 경우 iptable의 룰을 통해 확인할 수 있다.</p>
+<p><img loading="lazy" 
+    src="/./aews-eks-vpc-1/Vpc7.png" 
+    alt="Vpc7.png" 
+     
+    width=1033 
+    height="48"  /></p>
+<ul>
+<li>Iptable 룰에 따라 AWS-SNAT-CHAIN-0, AWS-SNAT-CHAIN-1 에 매칭되어, 목적지가 <strong>192.168.0.0/16</strong> 아니고 외부 빠져나갈때 SNAT <strong>192.168.1.5로</strong> 변경되어 나간다</li>
+</ul>
+<p>파드 안에서 외부 네트워크로 통신을 하여 통신 흐름을 확인하자</p>
+<p><img loading="lazy" 
+    src="/./aews-eks-vpc-1/vpc8.png" 
+    alt="vpc8.png" 
+     
+    width=1020 
+    height="816"  /></p>
+<ul>
+<li>통신 패킷을 통해 확인하면 iptable의 룰과 같이 192.168.1.5로 IP가 SNAT되어 통신됨을 알 수 있다.</li>
+</ul>
+<h2 id="네트워크-addon-설치alb-external-dns">
+    <a href="#%eb%84%a4%ed%8a%b8%ec%9b%8c%ed%81%ac-addon-%ec%84%a4%ec%b9%98alb-external-dns" class="anchor">
+        <svg class="icon" aria-hidden="true" focusable="false" height="16" version="1.1" viewBox="0 0 16 16" width="16">
+            <path fill-rule="evenodd"
+                d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z">
+            </path>
+        </svg>
+    </a>
+    네트워크 Addon 설치(ALB, External DNS)
+</h2>
+<p>이어서 EKS에서 제공하는 네트워크 애드온 중 ALB Controller와 External DNS를 살펴보고 배포하겠다. 각 addon을 간략하게 요약해서 표로 나타내면 다음과 같다.</p>
+<table>
+<thead>
+<tr>
+<th>Addon 서비스</th>
+<th>사용 AWS 서비스</th>
+<th>목적</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Load Balancer Controller</td>
+<td>AWS Elastic Load Balancer(ELB)</td>
+<td>네트워크 로드밸런서(L4, L7) 사용</td>
+</tr>
+<tr>
+<td>External DNS Controller</td>
+<td>AWS Route53</td>
+<td>DNS 도메인 연동 및 사용</td>
+</tr>
+</tbody>
+</table>
+<p>표로 확인할 수 있겠지만 네트워크 addon들은 AWS 네트워크 서비스(ELB, Route53)을 연동해서 사용한다. 그렇기 때문에 Addon 설치시 AWS 서비스를 사용하기 위한 보안 정책(IAM) 연동이 필요하다. 이번 글에서는 IAM 정책 연동 방법으로 IAM OIDC를 통해 EKS 서비스어카운트에 IAM 정책을 연동을 하겠다.</p>
+<h3 id="alb-controller-설치">
+    <a href="#alb-controller-%ec%84%a4%ec%b9%98" class="anchor">
+        <svg class="icon" aria-hidden="true" focusable="false" height="16" version="1.1" viewBox="0 0 16 16" width="16">
+            <path fill-rule="evenodd"
+                d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z">
+            </path>
+        </svg>
+    </a>
+    ALB Controller 설치
+</h3>
+<p>IAM 정책 생성 및 서비스 어카운트 연동하겠다. 다음의 스크립트를 통해 진행하자.</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl"><span class="c1"># ALB controller 정책 설치</span>
+</span></span><span class="line"><span class="cl">curl -o iam_policy.json https://raw.githubusercontent.com/kubernetes-sigs/aws-load-balancer-controller/v2.4.7/docs/install/iam_policy.json
+</span></span><span class="line"><span class="cl">aws iam create-policy --policy-name AWSLoadBalancerControllerIAMPolicy --policy-document file://iam_policy.json
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1"># 정책 arn 생성 확인 </span>
+</span></span><span class="line"><span class="cl"><span class="nv">ACCOUNT_ID</span><span class="o">={</span>AWS 계정 넘버<span class="o">}</span> 
+</span></span><span class="line"><span class="cl">aws iam get-policy --policy-arn arn:aws:iam::<span class="nv">$ACCOUNT_ID</span>:policy/AWSLoadBalancerControllerIAMPolicy --query <span class="s1">&#39;Policy.Arn&#39;</span>
+</span></span><span class="line"><span class="cl">---
+</span></span><span class="line"><span class="cl"><span class="s2">&#34;arn:aws:iam::955963799952:policy/AWSLoadBalancerControllerIAMPolicy&#34;</span> 
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1"># OIDC 서비스 어카운트 생성</span>
+</span></span><span class="line"><span class="cl"><span class="nv">CLUSTER_NAME</span><span class="o">={</span>EKS 클러스터 이름<span class="o">}</span> 
+</span></span><span class="line"><span class="cl">eksctl create iamserviceaccount --cluster<span class="o">=</span><span class="nv">$CLUSTER_NAME</span> --namespace<span class="o">=</span>kube-system --name<span class="o">=</span>aws-load-balancer-controller <span class="se">\
+</span></span></span><span class="line"><span class="cl"><span class="se"></span>--attach-policy-arn<span class="o">=</span>arn:aws:iam::<span class="nv">$ACCOUNT_ID</span>:policy/AWSLoadBalancerControllerIAMPolicy --override-existing-serviceaccounts --approve
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1"># OIDC 서비스 어카운트 확인 </span>
+</span></span><span class="line"><span class="cl">kubectl edit sa/aws-load-balancer-controller  -n kube-system
+</span></span><span class="line"><span class="cl">---
+</span></span><span class="line"><span class="cl">apiVersion: v1
+</span></span><span class="line"><span class="cl">kind: ServiceAccount
+</span></span><span class="line"><span class="cl">metadata:
+</span></span><span class="line"><span class="cl">  annotations: <span class="c1"># annoation 에 role-arn이 추가된 것을 확인! </span>
+</span></span><span class="line"><span class="cl">    eks.amazonaws.com/role-arn: arn:aws:iam::955963799952:role/eksctl-hanhorang-addon-iamserviceaccount-kub-Role1-1MPK8ATNJVXQH
+</span></span><span class="line"><span class="cl">  creationTimestamp: <span class="s2">&#34;2023-05-08T05:32:22Z&#34;</span>
+</span></span><span class="line"><span class="cl">  labels:
+</span></span><span class="line"><span class="cl">    app.kubernetes.io/managed-by: eksctl
+</span></span><span class="line"><span class="cl">  name: aws-load-balancer-controller
+</span></span><span class="line"><span class="cl">  namespace: kube-system
+</span></span><span class="line"><span class="cl">  resourceVersion: <span class="s2">&#34;1236&#34;</span>
+</span></span><span class="line"><span class="cl">  uid: 5fe3e69b-8cfc-426c-a16a-509e1f7c4a86
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>서비스 어카운트 연동이 확인이 되었으면 ALB 을 설치하겠다. 설치는 Helm을 통해 진행했다.</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl"><span class="c1"># ALB 설치 </span>
+</span></span><span class="line"><span class="cl">helm repo add eks https://aws.github.io/eks-charts
+</span></span><span class="line"><span class="cl">helm repo update
+</span></span><span class="line"><span class="cl">helm install aws-load-balancer-controller eks/aws-load-balancer-controller -n kube-system --set <span class="nv">clusterName</span><span class="o">=</span><span class="nv">$CLUSTER_NAME</span> <span class="se">\
+</span></span></span><span class="line"><span class="cl"><span class="se"></span>  --set serviceAccount.create<span class="o">=</span><span class="nb">false</span> --set serviceAccount.name<span class="o">=</span>aws-load-balancer-controller
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1"># ALB 파드 확인 </span>
+</span></span><span class="line"><span class="cl">kubectl get pods -A
+</span></span><span class="line"><span class="cl">---
+</span></span><span class="line"><span class="cl">NAMESPACE     NAME                                            READY   STATUS    RESTARTS   AGE
+</span></span><span class="line"><span class="cl">kube-system   aws-load-balancer-controller-7857849d69-qc9nr   1/1     Running   <span class="m">0</span>          24m
+</span></span><span class="line"><span class="cl">kube-system   aws-load-balancer-controller-7857849d69-qjvkk   1/1     Running   <span class="m">0</span>          24m
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1"># ALB 로그 확인</span>
+</span></span><span class="line"><span class="cl">kubectl logs pods/aws-load-balancer-controller-7857849d69-qc9nr -n kube-system
+</span></span><span class="line"><span class="cl">---
+</span></span><span class="line"><span class="cl"><span class="o">{</span><span class="s2">&#34;level&#34;</span>:<span class="s2">&#34;info&#34;</span>,<span class="s2">&#34;ts&#34;</span>:<span class="s2">&#34;2023-05-08T05:59:45Z&#34;</span>,<span class="s2">&#34;msg&#34;</span>:<span class="s2">&#34;version&#34;</span>,<span class="s2">&#34;GitVersion&#34;</span>:<span class="s2">&#34;v2.5.1&#34;</span>,<span class="s2">&#34;GitCommit&#34;</span>:<span class="s2">&#34;06abaed66e17a411ba064f34e6018b889780ac66&#34;</span>,<span class="s2">&#34;BuildDate&#34;</span>:<span class="s2">&#34;2023-04-17T22:36:53+0000&#34;</span><span class="o">}</span>
+</span></span><span class="line"><span class="cl"><span class="o">{</span><span class="s2">&#34;level&#34;</span>:<span class="s2">&#34;info&#34;</span>,<span class="s2">&#34;ts&#34;</span>:<span class="s2">&#34;2023-05-08T05:59:45Z&#34;</span>,<span class="s2">&#34;logger&#34;</span>:<span class="s2">&#34;controller-runtime.metrics&#34;</span>,<span class="s2">&#34;msg&#34;</span>:<span class="s2">&#34;Metrics server is starting to listen&#34;</span>,<span class="s2">&#34;addr&#34;</span>:<span class="s2">&#34;:8080&#34;</span><span class="o">}</span>
+</span></span><span class="line"><span class="cl"><span class="o">{</span><span class="s2">&#34;level&#34;</span>:<span class="s2">&#34;info&#34;</span>,<span class="s2">&#34;ts&#34;</span>:<span class="s2">&#34;2023-05-08T05:59:45Z&#34;</span>,<span class="s2">&#34;logger&#34;</span>:<span class="s2">&#34;setup&#34;</span>,<span class="s2">&#34;msg&#34;</span>:<span class="s2">&#34;adding health check for controller&#34;</span><span class="o">}</span>
+</span></span><span class="line"><span class="cl"><span class="o">{</span><span class="s2">&#34;level&#34;</span>:<span class="s2">&#34;info&#34;</span>,<span class="s2">&#34;ts&#34;</span>:<span class="s2">&#34;2023-05-08T05:59:45Z&#34;</span>,<span class="s2">&#34;logger&#34;</span>:<span class="s2">&#34;controller-runtime.webhook&#34;</span>,<span class="s2">&#34;msg&#34;</span>:<span class="s2">&#34;Registering webhook&#34;</span>,<span class="s2">&#34;path&#34;</span>:<span class="s2">&#34;/mutate-v1-pod&#34;</span><span class="o">}</span>
+</span></span><span class="line"><span class="cl"><span class="o">{</span><span class="s2">&#34;level&#34;</span>:<span class="s2">&#34;info&#34;</span>,<span class="s2">&#34;ts&#34;</span>:<span class="s2">&#34;2023-05-08T05:59:45Z&#34;</span>,<span class="s2">&#34;logger&#34;</span>:<span class="s2">&#34;controller-runtime.webhook&#34;</span>,<span class="s2">&#34;msg&#34;</span>:<span class="s2">&#34;Registering webhook&#34;</span>,<span class="s2">&#34;path&#34;</span>:<span class="s2">&#34;/mutate-v1-service&#34;</span><span class="o">}</span>
+</span></span><span class="line"><span class="cl"><span class="o">{</span><span class="s2">&#34;level&#34;</span>:<span class="s2">&#34;info&#34;</span>,<span class="s2">&#34;ts&#34;</span>:<span class="s2">&#34;2023-05-08T05:59:45Z&#34;</span>,<span class="s2">&#34;logger&#34;</span>:<span class="s2">&#34;controller-runtime.webhook&#34;</span>,<span class="s2">&#34;msg&#34;</span>:<span class="s2">&#34;Registering webhook&#34;</span>,<span class="s2">&#34;path&#34;</span>:<span class="s2">&#34;/validate-elbv2-k8s-aws-v1beta1-ingressclassparams&#34;</span><span class="o">}</span>
+</span></span><span class="line"><span class="cl"><span class="o">{</span><span class="s2">&#34;level&#34;</span>:<span class="s2">&#34;info&#34;</span>,<span class="s2">&#34;ts&#34;</span>:<span class="s2">&#34;2023-05-08T05:59:45Z&#34;</span>,<span class="s2">&#34;logger&#34;</span>:<span class="s2">&#34;controller-runtime.webhook&#34;</span>,<span class="s2">&#34;msg&#34;</span>:<span class="s2">&#34;Registering webhook&#34;</span>,<span class="s2">&#34;path&#34;</span>:<span class="s2">&#34;/mutate-elbv2-k8s-aws-v1beta1-targetgroupbinding&#34;</span><span class="o">}</span>
+</span></span><span class="line"><span class="cl"><span class="o">{</span><span class="s2">&#34;level&#34;</span>:<span class="s2">&#34;info&#34;</span>,<span class="s2">&#34;ts&#34;</span>:<span class="s2">&#34;2023-05-08T05:59:45Z&#34;</span>,<span class="s2">&#34;logger&#34;</span>:<span class="s2">&#34;controller-runtime.webhook&#34;</span>,<span class="s2">&#34;msg&#34;</span>:<span class="s2">&#34;Registering webhook&#34;</span>,<span class="s2">&#34;path&#34;</span>:<span class="s2">&#34;/validate-elbv2-k8s-aws-v1beta1-targetgroupbinding&#34;</span><span class="o">}</span>
+</span></span><span class="line"><span class="cl"><span class="o">{</span><span class="s2">&#34;level&#34;</span>:<span class="s2">&#34;info&#34;</span>,<span class="s2">&#34;ts&#34;</span>:<span class="s2">&#34;2023-05-08T05:59:45Z&#34;</span>,<span class="s2">&#34;logger&#34;</span>:<span class="s2">&#34;controller-runtime.webhook&#34;</span>,<span class="s2">&#34;msg&#34;</span>:<span class="s2">&#34;Registering webhook&#34;</span>,<span class="s2">&#34;path&#34;</span>:<span class="s2">&#34;/validate-networking-v1-ingress&#34;</span><span class="o">}</span>
+</span></span><span class="line"><span class="cl"><span class="o">{</span><span class="s2">&#34;level&#34;</span>:<span class="s2">&#34;info&#34;</span>,<span class="s2">&#34;ts&#34;</span>:<span class="s2">&#34;2023-05-08T05:59:45Z&#34;</span>,<span class="s2">&#34;logger&#34;</span>:<span class="s2">&#34;setup&#34;</span>,<span class="s2">&#34;msg&#34;</span>:<span class="s2">&#34;starting podInfo repo&#34;</span><span class="o">}</span>
+</span></span><span class="line"><span class="cl"><span class="o">{</span><span class="s2">&#34;level&#34;</span>:<span class="s2">&#34;info&#34;</span>,<span class="s2">&#34;ts&#34;</span>:<span class="s2">&#34;2023-05-08T05:59:47Z&#34;</span>,<span class="s2">&#34;logger&#34;</span>:<span class="s2">&#34;controller-runtime.webhook.webhooks&#34;</span>,<span class="s2">&#34;msg&#34;</span>:<span class="s2">&#34;Starting webhook server&#34;</span><span class="o">}</span>
+</span></span><span class="line"><span class="cl"><span class="o">{</span><span class="s2">&#34;level&#34;</span>:<span class="s2">&#34;info&#34;</span>,<span class="s2">&#34;ts&#34;</span>:<span class="s2">&#34;2023-05-08T05:59:47Z&#34;</span>,<span class="s2">&#34;msg&#34;</span>:<span class="s2">&#34;Starting server&#34;</span>,<span class="s2">&#34;kind&#34;</span>:<span class="s2">&#34;health probe&#34;</span>,<span class="s2">&#34;addr&#34;</span>:<span class="s2">&#34;[::]:61779&#34;</span><span class="o">}</span>
+</span></span><span class="line"><span class="cl">...
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h3 id="external-dns-설치">
+    <a href="#external-dns-%ec%84%a4%ec%b9%98" class="anchor">
+        <svg class="icon" aria-hidden="true" focusable="false" height="16" version="1.1" viewBox="0 0 16 16" width="16">
+            <path fill-rule="evenodd"
+                d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z">
+            </path>
+        </svg>
+    </a>
+    External DNS 설치
+</h3>
+<p>External DNS 설치 과정도 앞 ALB 설치 과정과 동일하다. IAM OIDC 연동을 진행하고, 배포를 진행하겠다.</p>
+<p>먼저, 스크립트를 기반으로  OIDC 정책 연동부터 진행하자.</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span><span class="lnt">31
+</span><span class="lnt">32
+</span><span class="lnt">33
+</span><span class="lnt">34
+</span><span class="lnt">35
+</span><span class="lnt">36
+</span><span class="lnt">37
+</span><span class="lnt">38
+</span><span class="lnt">39
+</span><span class="lnt">40
+</span><span class="lnt">41
+</span><span class="lnt">42
+</span><span class="lnt">43
+</span><span class="lnt">44
+</span><span class="lnt">45
+</span><span class="lnt">46
+</span><span class="lnt">47
+</span><span class="lnt">48
+</span><span class="lnt">49
+</span><span class="lnt">50
+</span><span class="lnt">51
+</span><span class="lnt">52
+</span><span class="lnt">53
+</span><span class="lnt">54
+</span><span class="lnt">55
+</span><span class="lnt">56
+</span><span class="lnt">57
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl"><span class="c1"># vi iam_external_policy.json 생성</span>
+</span></span><span class="line"><span class="cl">cat <span class="s">&lt;&lt;EOT &gt; iam_external_policy.json
+</span></span></span><span class="line"><span class="cl"><span class="s">{
+</span></span></span><span class="line"><span class="cl"><span class="s">  &#34;Version&#34;: &#34;2012-10-17&#34;,
+</span></span></span><span class="line"><span class="cl"><span class="s">  &#34;Statement&#34;: [
+</span></span></span><span class="line"><span class="cl"><span class="s">    {
+</span></span></span><span class="line"><span class="cl"><span class="s">      &#34;Effect&#34;: &#34;Allow&#34;,
+</span></span></span><span class="line"><span class="cl"><span class="s">      &#34;Action&#34;: [
+</span></span></span><span class="line"><span class="cl"><span class="s">        &#34;route53:ChangeResourceRecordSets&#34;
+</span></span></span><span class="line"><span class="cl"><span class="s">      ],
+</span></span></span><span class="line"><span class="cl"><span class="s">      &#34;Resource&#34;: [
+</span></span></span><span class="line"><span class="cl"><span class="s">        &#34;arn:aws:route53:::hostedzone/*&#34;
+</span></span></span><span class="line"><span class="cl"><span class="s">      ]
+</span></span></span><span class="line"><span class="cl"><span class="s">    },
+</span></span></span><span class="line"><span class="cl"><span class="s">    {
+</span></span></span><span class="line"><span class="cl"><span class="s">      &#34;Effect&#34;: &#34;Allow&#34;,
+</span></span></span><span class="line"><span class="cl"><span class="s">      &#34;Action&#34;: [
+</span></span></span><span class="line"><span class="cl"><span class="s">        &#34;route53:ListHostedZones&#34;,
+</span></span></span><span class="line"><span class="cl"><span class="s">        &#34;route53:ListResourceRecordSets&#34;
+</span></span></span><span class="line"><span class="cl"><span class="s">      ],
+</span></span></span><span class="line"><span class="cl"><span class="s">      &#34;Resource&#34;: [
+</span></span></span><span class="line"><span class="cl"><span class="s">        &#34;*&#34;
+</span></span></span><span class="line"><span class="cl"><span class="s">      ]
+</span></span></span><span class="line"><span class="cl"><span class="s">    }
+</span></span></span><span class="line"><span class="cl"><span class="s">  ]
+</span></span></span><span class="line"><span class="cl"><span class="s">}
+</span></span></span><span class="line"><span class="cl"><span class="s">EOT</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">aws iam create-policy --policy-name <span class="s2">&#34;AllowExternalDNSUpdates&#34;</span> --policy-document file://iam_external_policy.json.json
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1"># 정책 arn 생성 확인 </span>
+</span></span><span class="line"><span class="cl">aws iam get-policy --policy-arn arn:aws:iam::<span class="nv">$ACCOUNT_ID</span>:policy/AllowExternalDNSUpdates --query <span class="s1">&#39;Policy.Arn&#39;</span>
+</span></span><span class="line"><span class="cl">---
+</span></span><span class="line"><span class="cl"><span class="s2">&#34;arn:aws:iam::955963799952:policy/AllowExternalDNSUpdates&#34;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1"># OIDC 서비스 어카운트 생성 </span>
+</span></span><span class="line"><span class="cl">eksctl create iamserviceaccount --cluster<span class="o">=</span><span class="nv">$CLUSTER_NAME</span> --namespace<span class="o">=</span>kube-system --name<span class="o">=</span>external-dns <span class="se">\
+</span></span></span><span class="line"><span class="cl"><span class="se"></span>--attach-policy-arn<span class="o">=</span>arn:aws:iam::<span class="nv">$ACCOUNT_ID</span>:policy/AllowExternalDNSUpdates --override-existing-serviceaccounts --approve
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1"># OIDC 서비스 어카운트 확인 </span>
+</span></span><span class="line"><span class="cl">kubectl edit sa/external-dns -n kube-system
+</span></span><span class="line"><span class="cl">---
+</span></span><span class="line"><span class="cl">apiVersion: v1
+</span></span><span class="line"><span class="cl">kind: ServiceAccount
+</span></span><span class="line"><span class="cl">metadata: 
+</span></span><span class="line"><span class="cl">  annotations: <span class="c1"># 마찬가지로 연동 확인이 가능하다. </span>
+</span></span><span class="line"><span class="cl">    eks.amazonaws.com/role-arn: arn:aws:iam::955963799952:role/eksctl-hanhorang-addon-iamserviceaccount-kub-Role1-499RATDKJVJU
+</span></span><span class="line"><span class="cl">    kubectl.kubernetes.io/last-applied-configuration: <span class="p">|</span>
+</span></span><span class="line"><span class="cl">      <span class="o">{</span><span class="s2">&#34;apiVersion&#34;</span>:<span class="s2">&#34;v1&#34;</span>,<span class="s2">&#34;kind&#34;</span>:<span class="s2">&#34;ServiceAccount&#34;</span>,<span class="s2">&#34;metadata&#34;</span>:<span class="o">{</span><span class="s2">&#34;annotations&#34;</span>:<span class="o">{}</span>,<span class="s2">&#34;labels&#34;</span>:<span class="o">{</span><span class="s2">&#34;app.kubernetes.io/name&#34;</span>:<span class="s2">&#34;external-dns&#34;</span><span class="o">}</span>,<span class="s2">&#34;name&#34;</span>:<span class="s2">&#34;external-dns&#34;</span>,<span class="s2">&#34;namespace&#34;</span>:<span class="s2">&#34;kube-system&#34;</span><span class="o">}}</span>
+</span></span><span class="line"><span class="cl">  creationTimestamp: <span class="s2">&#34;2023-05-08T06:02:38Z&#34;</span>
+</span></span><span class="line"><span class="cl">  labels:
+</span></span><span class="line"><span class="cl">    app.kubernetes.io/managed-by: eksctl
+</span></span><span class="line"><span class="cl">    app.kubernetes.io/name: external-dns
+</span></span><span class="line"><span class="cl">  name: external-dns
+</span></span><span class="line"><span class="cl">  namespace: kube-system
+</span></span><span class="line"><span class="cl">  resourceVersion: <span class="s2">&#34;13937&#34;</span>
+</span></span><span class="line"><span class="cl">  uid: 67ce20cc-6545-486c-b525-450be6311d65
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>external DNS을 연동하기 위해서는 <strong>도메인</strong>이 필요하다. 필자는 Route53 도메인을 구입했다. 도메인 구매 후  도메인 HOST ID를 변수로 지정하여 external DNS 설치시 파라미터로 사용하자.</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl"><span class="c1"># MyDomain=&lt;자신의 도메인&gt;</span>
+</span></span><span class="line"><span class="cl"><span class="nv">MyDomain</span><span class="o">=</span>hanhorang.link 
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1"># 자신의 Route 53 도메인 ID 조회 및 변수 지정</span>
+</span></span><span class="line"><span class="cl"><span class="nv">MyDnzHostedZoneId</span><span class="o">=</span><span class="k">$(</span>aws route53 list-hosted-zones-by-name --dns-name <span class="s2">&#34;</span><span class="si">${</span><span class="nv">MyDomain</span><span class="si">}</span><span class="s2">.&#34;</span> --query <span class="s2">&#34;HostedZones[0].Id&#34;</span> --output text<span class="k">)</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1"># ExternalDNS 배포</span>
+</span></span><span class="line"><span class="cl">curl -s -O https://raw.githubusercontent.com/gasida/PKOS/main/aews/externaldns.yaml
+</span></span><span class="line"><span class="cl">cat externaldns.yaml <span class="p">|</span> yh
+</span></span><span class="line"><span class="cl"><span class="nv">MyDomain</span><span class="o">=</span><span class="nv">$MyDomain</span> <span class="nv">MyDnzHostedZoneId</span><span class="o">=</span><span class="nv">$MyDnzHostedZoneId</span> envsubst &lt; externaldns.yaml <span class="p">|</span> kubectl apply -
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1"># 로그 확인 </span>
+</span></span><span class="line"><span class="cl">kubectl get pods -A
+</span></span><span class="line"><span class="cl">---
+</span></span><span class="line"><span class="cl">kube-system   external-dns-6b5bbbf9d-l7ms2                    1/1     Running   <span class="m">0</span>          <span class="m">4</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">kubectl logs pods/external-dns-6b5bbbf9d-l7ms2 -n kube-system
+</span></span><span class="line"><span class="cl">---
+</span></span><span class="line"><span class="cl"><span class="nv">time</span><span class="o">=</span><span class="s2">&#34;2023-05-08T06:02:43Z&#34;</span> <span class="nv">level</span><span class="o">=</span>info <span class="nv">msg</span><span class="o">=</span><span class="s2">&#34;config: {APIServerURL: KubeConfig: RequestTimeout:30s DefaultTargets:[] ContourLoadBalancerService:heptio-contour/contour GlooNamespace:gloo-system SkipperRouteGroupVersion:zalando.org/v1 Sources:[service ingress] Namespace: AnnotationFilter: LabelFilter: FQDNTemplate: CombineFQDNAndAnnotation:false IgnoreHostnameAnnotation:false IgnoreIngressTLSSpec:false IgnoreIngressRulesSpec:false GatewayNamespace: GatewayLabelFilter: Compatibility: PublishInternal:false PublishHostIP:false AlwaysPublishNotReadyAddresses:false ConnectorSourceServer:localhost:8080 Provider:aws GoogleProject: GoogleBatchChangeSize:1000 GoogleBatchChangeInterval:1s GoogleZoneVisibility: DomainFilter:[hanhorang.link] ExcludeDomains:[] RegexDomainFilter: RegexDomainExclusion: ZoneNameFilter:[] ZoneIDFilter:[] TargetNetFilter:[] ExcludeTargetNets:[] AlibabaCloudConfigFile:/etc/kubernetes/alibaba-cloud.json AlibabaCloudZoneType: AWSZoneType:public AWSZoneTagFilter:[] AWSAssumeRole: AWSAssumeRoleExternalID: AWSBatchChangeSize:1000 AWSBatchChangeInterval:1s AWSEvaluateTargetHealth:true AWSAPIRetries:3 AWSPreferCNAME:false AWSZoneCacheDuration:0s AWSSDServiceCleanup:false AzureConfigFile:/etc/kubernetes/azure.json AzureResourceGroup: AzureSubscriptionID: AzureUserAssignedIdentityClientID: BluecatDNSConfiguration: BluecatConfigFile:/etc/kubernetes/bluecat.json BluecatDNSView: BluecatGatewayHost: BluecatRootZone: BluecatDNSServerName: BluecatDNSDeployType:no-deploy BluecatSkipTLSVerify:false CloudflareProxied:false CloudflareDNSRecordsPerPage:100 CoreDNSPrefix:/skydns/ RcodezeroTXTEncrypt:false AkamaiServiceConsumerDomain: AkamaiClientToken: AkamaiClientSecret: AkamaiAccessToken: AkamaiEdgercPath: AkamaiEdgercSection: InfobloxGridHost: InfobloxWapiPort:443 InfobloxWapiUsername:admin InfobloxWapiPassword: InfobloxWapiVersion:2.3.1 InfobloxSSLVerify:true InfobloxView: InfobloxMaxResults:0 InfobloxFQDNRegEx: InfobloxNameRegEx: InfobloxCreatePTR:false InfobloxCacheDuration:0 DynCustomerName: DynUsername: DynPassword: DynMinTTLSeconds:0 OCIConfigFile:/etc/kubernetes/oci.yaml InMemoryZones:[] OVHEndpoint:ovh-eu OVHApiRateLimit:20 PDNSServer:http://localhost:8081 PDNSAPIKey: PDNSTLSEnabled:false TLSCA: TLSClientCert: TLSClientCertKey: Policy:sync Registry:txt TXTOwnerID:/hostedzone/Z08463751O7YNWD79KKIX TXTPrefix: TXTSuffix: Interval:1m0s MinEventSyncInterval:5s Once:false DryRun:false UpdateEvents:false LogFormat:text MetricsAddress::7979 LogLevel:info TXTCacheInterval:0s TXTWildcardReplacement: ExoscaleEndpoint:https://api.exoscale.ch/dns ExoscaleAPIKey: ExoscaleAPISecret: CRDSourceAPIVersion:externaldns.k8s.io/v1alpha1 CRDSourceKind:DNSEndpoint ServiceTypeFilter:[] CFAPIEndpoint: CFUsername: CFPassword: RFC2136Host: RFC2136Port:0 RFC2136Zone: RFC2136Insecure:false RFC2136GSSTSIG:false RFC2136KerberosRealm: RFC2136KerberosUsername: RFC2136KerberosPassword: RFC2136TSIGKeyName: RFC2136TSIGSecret: RFC2136TSIGSecretAlg: RFC2136TAXFR:false RFC2136MinTTL:0s RFC2136BatchChangeSize:50 NS1Endpoint: NS1IgnoreSSL:false NS1MinTTLSeconds:0 TransIPAccountName: TransIPPrivateKeyFile: DigitalOceanAPIPageSize:50 ManagedDNSRecordTypes:[A CNAME] GoDaddyAPIKey: GoDaddySecretKey: GoDaddyTTL:0 GoDaddyOTE:false OCPRouterName: IBMCloudProxied:false IBMCloudConfigFile:/etc/kubernetes/ibmcloud.json TencentCloudConfigFile:/etc/kubernetes/tencent-cloud.json TencentCloudZoneType: PiholeServer: PiholePassword: PiholeTLSInsecureSkipVerify:false PluralCluster: PluralProvider:}&#34;</span>
+</span></span><span class="line"><span class="cl"><span class="nv">time</span><span class="o">=</span><span class="s2">&#34;2023-05-08T06:02:43Z&#34;</span> <span class="nv">level</span><span class="o">=</span>info <span class="nv">msg</span><span class="o">=</span><span class="s2">&#34;Instantiating new Kubernetes client&#34;</span>
+</span></span><span class="line"><span class="cl"><span class="nv">time</span><span class="o">=</span><span class="s2">&#34;2023-05-08T06:02:43Z&#34;</span> <span class="nv">level</span><span class="o">=</span>info <span class="nv">msg</span><span class="o">=</span><span class="s2">&#34;Using inCluster-config based on serviceaccount-token&#34;</span>
+</span></span><span class="line"><span class="cl"><span class="nv">time</span><span class="o">=</span><span class="s2">&#34;2023-05-08T06:02:43Z&#34;</span> <span class="nv">level</span><span class="o">=</span>info <span class="nv">msg</span><span class="o">=</span><span class="s2">&#34;Created Kubernetes client https://10.100.0.1:443&#34;</span>
+</span></span><span class="line"><span class="cl"><span class="nv">time</span><span class="o">=</span><span class="s2">&#34;2023-05-08T06:02:45Z&#34;</span> <span class="nv">level</span><span class="o">=</span>info <span class="nv">msg</span><span class="o">=</span><span class="s2">&#34;Applying provider record filter for domains: [hanhorang.link. .hanhorang.link.]&#34;</span>
+</span></span><span class="line"><span class="cl"><span class="nv">time</span><span class="o">=</span><span class="s2">&#34;2023-05-08T06:02:45Z&#34;</span> <span class="nv">level</span><span class="o">=</span>info <span class="nv">msg</span><span class="o">=</span><span class="s2">&#34;All records are already up to date&#34;</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>설치 이후 반드시 로그를 확인하는 것이 중요하다. 필자의 경험에서 도메인 연동이 잘못되었다던가, IAM 정책 미스로 addon 연동이 잘못되면 로그를 통해 상세 확인이 가능하기 떄문이다.</p>
+<h2 id="eks-vpc-운영">
+    <a href="#eks-vpc-%ec%9a%b4%ec%98%81" class="anchor">
+        <svg class="icon" aria-hidden="true" focusable="false" height="16" version="1.1" viewBox="0 0 16 16" width="16">
+            <path fill-rule="evenodd"
+                d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z">
+            </path>
+        </svg>
+    </a>
+    EKS VPC 운영
+</h2>
+<p><a href="https://www.eksworkshop.com/docs/networking/">EKS Workshop Networking</a> 를 토대로 필자가 실습한 내용들을 공유한다.</p>
+<h3 id="prefix-delegation을-통한-노드별-할당-ip-확장하기">
+    <a href="#prefix-delegation%ec%9d%84-%ed%86%b5%ed%95%9c-%eb%85%b8%eb%93%9c%eb%b3%84-%ed%95%a0%eb%8b%b9-ip-%ed%99%95%ec%9e%a5%ed%95%98%ea%b8%b0" class="anchor">
+        <svg class="icon" aria-hidden="true" focusable="false" height="16" version="1.1" viewBox="0 0 16 16" width="16">
+            <path fill-rule="evenodd"
+                d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z">
+            </path>
+        </svg>
+    </a>
+    Prefix Delegation을 통한 노드별 할당 IP 확장하기
+</h3>
+<p>EKS 노드는 EC2 인스턴스로 운영된다. 문제는 EC2 인스턴스 타입별로 할당되는 IP 개수의 제한이 존재한다. 이유는 인스턴스 타입당 할당가능한 네트워크 인터페이스의 제한이 있기 때문이다. 인스턴스별 IP 개수 제한 관련하여 다음의 명령어를 통해서도 확인할 수 있다.</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">kubectl get nodes -o <span class="nv">jsonpath</span><span class="o">=</span><span class="s2">&#34;{range .items[*]}{.metadata.labels[&#39;beta\.kubernetes\.io\/instance-type&#39;]}{&#39;\t&#39;}{.status.capacity.pods}{&#39;\n&#39;}{end}&#34;</span>
+</span></span><span class="line"><span class="cl">---
+</span></span><span class="line"><span class="cl">t3.medium       <span class="m">17</span>
+</span></span><span class="line"><span class="cl">t3.medium       <span class="m">17</span>
+</span></span><span class="line"><span class="cl">t3.medium       <span class="m">17</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>기존에는 IP 할당 개수를 늘리기 위해서 인스턴스 타입을 변경해야 했지만, Amazon VPC CNI 추가 기능 버전 1.9.0 이상부터 Prefix Delegation 를 통해 최대 파드 개수까지 IP 할당 개수를 확장할 수 있다.  Prefix Delegation  란 IPv6 기능으로 하위 IP에 접두사를 위임하여 최대 IP를 할당할 수 있게 만들어 주는 기능이다. 이를 VPC CNI에도 사용할 수 있다.  IP Mode와 Prefix Mode 를 비교하면 다음과 같이 나타낼 수 있다.</p>
+<p><img loading="lazy" 
+    src="/./aews-eks-vpc-1/prefix_subnets-cba22c2ff364463d6d2f8b42585004f1.png" 
+    alt="prefix_subnets-cba22c2ff364463d6d2f8b42585004f1.png" 
+     
+    width=5484 
+    height="2444"  /></p>
+<ul>
+<li>오른쪽이 Prefix Mode로 Secondary ENI에 접두사가 위임된 것을 확인할 수 있다. 비교하자면 개별 보조 IP 주소를 할당하는 대신 접두사를 할당하여 최대 IP 개수늘 늘릴 수 있다.</li>
+</ul>
+<p>좋은 기능이지만 사용하기에 몇 가지 제한이 존재한다. 기능 도입 전 제한 사항을 꼭 확인하자!</p>
+<ul>
+<li>VPC CNI version 1.9.0 이상</li>
+<li>Nitro 기반의 인스턴스에서만 가능</li>
+<li>/28 접두사를 생성할 수 있는 사용 가능한 IP 주소가 충분하지 않은 경우</li>
+</ul>
+<p>바로 VPC CNI 파드를 통해 설정해보겠다. 먼저, 버전 확인과 VPC CNI의 옵션을 살펴보겠다.</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span><span class="lnt">31
+</span><span class="lnt">32
+</span><span class="lnt">33
+</span><span class="lnt">34
+</span><span class="lnt">35
+</span><span class="lnt">36
+</span><span class="lnt">37
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl"><span class="c1"># VPC CNI 버전 확인 1.9.0 이상 </span>
+</span></span><span class="line"><span class="cl">kubectl describe daemonset aws-node --namespace kube-system <span class="p">|</span> grep Image <span class="p">|</span> cut -d <span class="s2">&#34;/&#34;</span> -f <span class="m">2</span>
+</span></span><span class="line"><span class="cl">---
+</span></span><span class="line"><span class="cl">amazon-k8s-cni-init:v1.12.6-eksbuild.1
+</span></span><span class="line"><span class="cl">amazon-k8s-cni:v1.12.6-eksbuild.1
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1"># Prefix 관련 옵션 확인 (주석 처리 파라미터 확인) </span>
+</span></span><span class="line"><span class="cl">kubectl describe daemonsets.apps aws-node -n kube-system <span class="p">|</span> grep ADDITIONAL_ENI_TAGS: -B1 -A26
+</span></span><span class="line"><span class="cl">    Environment:
+</span></span><span class="line"><span class="cl">      ADDITIONAL_ENI_TAGS:                    <span class="o">{}</span>
+</span></span><span class="line"><span class="cl">      ANNOTATE_POD_IP:                        <span class="nb">false</span>
+</span></span><span class="line"><span class="cl">      AWS_VPC_CNI_NODE_PORT_SUPPORT:          <span class="nb">true</span>
+</span></span><span class="line"><span class="cl">      AWS_VPC_ENI_MTU:                        <span class="m">9001</span>
+</span></span><span class="line"><span class="cl">      AWS_VPC_K8S_CNI_CONFIGURE_RPFILTER:     <span class="nb">false</span>
+</span></span><span class="line"><span class="cl">      AWS_VPC_K8S_CNI_CUSTOM_NETWORK_CFG:     <span class="nb">false</span>
+</span></span><span class="line"><span class="cl">      AWS_VPC_K8S_CNI_EXTERNALSNAT:           <span class="nb">false</span>
+</span></span><span class="line"><span class="cl">      AWS_VPC_K8S_CNI_LOGLEVEL:               DEBUG
+</span></span><span class="line"><span class="cl">      AWS_VPC_K8S_CNI_LOG_FILE:               /host/var/log/aws-routed-eni/ipamd.log
+</span></span><span class="line"><span class="cl">      AWS_VPC_K8S_CNI_RANDOMIZESNAT:          prng
+</span></span><span class="line"><span class="cl">      AWS_VPC_K8S_CNI_VETHPREFIX:             eni
+</span></span><span class="line"><span class="cl">      AWS_VPC_K8S_PLUGIN_LOG_FILE:            /var/log/aws-routed-eni/plugin.log
+</span></span><span class="line"><span class="cl">      AWS_VPC_K8S_PLUGIN_LOG_LEVEL:           DEBUG
+</span></span><span class="line"><span class="cl">      CLUSTER_ENDPOINT:                       https://65CBAF476ED2A8986CC4BAFE19F86C44.yl4.ap-northeast-2.eks.amazonaws.com
+</span></span><span class="line"><span class="cl">      CLUSTER_NAME:                           hanhorang
+</span></span><span class="line"><span class="cl">      DISABLE_INTROSPECTION:                  <span class="nb">false</span>
+</span></span><span class="line"><span class="cl">      DISABLE_METRICS:                        <span class="nb">false</span>
+</span></span><span class="line"><span class="cl">      DISABLE_NETWORK_RESOURCE_PROVISIONING:  <span class="nb">false</span>
+</span></span><span class="line"><span class="cl">      ENABLE_IPv4:                            <span class="nb">true</span>
+</span></span><span class="line"><span class="cl">      ENABLE_IPv6:                            <span class="nb">false</span>
+</span></span><span class="line"><span class="cl">      ENABLE_POD_ENI:                         <span class="nb">false</span>
+</span></span><span class="line"><span class="cl">      ENABLE_PREFIX_DELEGATION:               <span class="nb">false</span>   <span class="c1"># PREFIX 관련 옵션</span>
+</span></span><span class="line"><span class="cl">      VPC_ID:                                 vpc-0cc614fae36493a12
+</span></span><span class="line"><span class="cl">      WARM_ENI_TARGET:                        <span class="m">1</span>      <span class="c1"># PREFIX 관련 옵션</span>
+</span></span><span class="line"><span class="cl">      WARM_PREFIX_TARGET:                     <span class="m">1</span>      <span class="c1"># PREFIX 관련 옵션</span>
+</span></span><span class="line"><span class="cl">      MY_NODE_NAME:                            <span class="o">(</span>v1:spec.nodeName<span class="o">)</span>
+</span></span><span class="line"><span class="cl">      MY_POD_NAME:                             <span class="o">(</span>v1:metadata.name<span class="o">)</span>
+</span></span><span class="line"><span class="cl">     <span class="c1">#MINIMUM_IP_TARGET: # PREFIX 관련 옵션</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>Prefix  관련 파라미터의 옵션은 다음과 같다.</p>
+<ul>
+<li><code>ENABLE_PREFIX_DELEGATION</code> : Prefix Delegation 활성화 여부</li>
+<li><code>WARM_PREFIX_TARGET</code> :  현재 초과하여 할당할 접두사 수</li>
+<li><code>WARM_IP_TARGET, MINIMUM_IP_TARGET</code> : (WARM_PREFIX_TARGET를 설정하면 오버라이드 됨) 할당할 IP 수와 최소 IP 주소 수</li>
+</ul>
+<p>파라미터에서 WARM이라는 표현이 등장하는데, CNI 는 WARM Pool(웜풀) 이라고 하여 더 빠른 파드 시작을 위해 IP 및 접두사를 사전 할당하는 기능이다. 이 웜풀을 통해서 IP와 접두사를 파드에 할당받는다.</p>
+<p><img loading="lazy" 
+    src="/./aews-eks-vpc-1/prefix_flow-ba9b7334e3827a70a78c6b83acb03ef6.jpeg" 
+    alt="&lt;a href=&#34;https://aws.github.io/aws-eks-best-practices/networking/prefix-mode/&#34;&gt;https://aws.github.io/aws-eks-best-practices/networking/prefix-mode/&lt;/a&gt;" 
+     
+    width=1280 
+    height="708"  /></p>
+<p><a href="https://aws.github.io/aws-eks-best-practices/networking/prefix-mode/">https://aws.github.io/aws-eks-best-practices/networking/prefix-mode/</a></p>
+<ul>
+<li>더 많은 파드가 예약되면 ENI에 프리픽스를 요청하고, 만약에 ENI가 사용량에 도달하면 새 ENI를 할당하려고 시도하여 연결한다. 새 ENI는 최대 ENI 제한에 도달할 때까지 연결된다.</li>
+</ul>
+<p>살펴본 파라미터를 통해 접두사 모드를 활성해보자.</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span><span class="lnt">31
+</span><span class="lnt">32
+</span><span class="lnt">33
+</span><span class="lnt">34
+</span><span class="lnt">35
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">kubectl <span class="nb">set</span> env daemonset aws-node -n kube-system <span class="nv">ENABLE_PREFIX_DELEGATION</span><span class="o">=</span><span class="nb">true</span>
+</span></span><span class="line"><span class="cl">---
+</span></span><span class="line"><span class="cl">daemonset.apps/aws-node env updated
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">kubectl describe daemonsets.apps aws-node -n kube-system <span class="p">|</span> grep ADDITIONAL_ENI_TAGS: -B1 -A26
+</span></span><span class="line"><span class="cl">---
+</span></span><span class="line"><span class="cl">    Environment:
+</span></span><span class="line"><span class="cl">      ADDITIONAL_ENI_TAGS:                    <span class="o">{}</span>
+</span></span><span class="line"><span class="cl">      ANNOTATE_POD_IP:                        <span class="nb">false</span>
+</span></span><span class="line"><span class="cl">      AWS_VPC_CNI_NODE_PORT_SUPPORT:          <span class="nb">true</span>
+</span></span><span class="line"><span class="cl">      AWS_VPC_ENI_MTU:                        <span class="m">9001</span>
+</span></span><span class="line"><span class="cl">      AWS_VPC_K8S_CNI_CONFIGURE_RPFILTER:     <span class="nb">false</span>
+</span></span><span class="line"><span class="cl">      AWS_VPC_K8S_CNI_CUSTOM_NETWORK_CFG:     <span class="nb">false</span>
+</span></span><span class="line"><span class="cl">      AWS_VPC_K8S_CNI_EXTERNALSNAT:           <span class="nb">false</span>
+</span></span><span class="line"><span class="cl">      AWS_VPC_K8S_CNI_LOGLEVEL:               DEBUG
+</span></span><span class="line"><span class="cl">      AWS_VPC_K8S_CNI_LOG_FILE:               /host/var/log/aws-routed-eni/ipamd.log
+</span></span><span class="line"><span class="cl">      AWS_VPC_K8S_CNI_RANDOMIZESNAT:          prng
+</span></span><span class="line"><span class="cl">      AWS_VPC_K8S_CNI_VETHPREFIX:             eni
+</span></span><span class="line"><span class="cl">      AWS_VPC_K8S_PLUGIN_LOG_FILE:            /var/log/aws-routed-eni/plugin.log
+</span></span><span class="line"><span class="cl">      AWS_VPC_K8S_PLUGIN_LOG_LEVEL:           DEBUG
+</span></span><span class="line"><span class="cl">      CLUSTER_ENDPOINT:                       https://65CBAF476ED2A8986CC4BAFE19F86C44.yl4.ap-northeast-2.eks.amazonaws.com
+</span></span><span class="line"><span class="cl">      CLUSTER_NAME:                           hanhorang
+</span></span><span class="line"><span class="cl">      DISABLE_INTROSPECTION:                  <span class="nb">false</span>
+</span></span><span class="line"><span class="cl">      DISABLE_METRICS:                        <span class="nb">false</span>
+</span></span><span class="line"><span class="cl">      DISABLE_NETWORK_RESOURCE_PROVISIONING:  <span class="nb">false</span>
+</span></span><span class="line"><span class="cl">      ENABLE_IPv4:                            <span class="nb">true</span>
+</span></span><span class="line"><span class="cl">      ENABLE_IPv6:                            <span class="nb">false</span>
+</span></span><span class="line"><span class="cl">      ENABLE_POD_ENI:                         <span class="nb">false</span>
+</span></span><span class="line"><span class="cl">      ENABLE_PREFIX_DELEGATION:               <span class="nb">true</span>  <span class="c1"># 변경되었다! </span>
+</span></span><span class="line"><span class="cl">      VPC_ID:                                 vpc-0cc614fae36493a12
+</span></span><span class="line"><span class="cl">      WARM_ENI_TARGET:                        <span class="m">1</span>
+</span></span><span class="line"><span class="cl">      WARM_PREFIX_TARGET:                     <span class="m">1</span>
+</span></span><span class="line"><span class="cl">      MY_NODE_NAME:                            <span class="o">(</span>v1:spec.nodeName<span class="o">)</span>
+</span></span><span class="line"><span class="cl">      MY_POD_NAME:                             <span class="o">(</span>v1:metadata.name<span class="o">)</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>설정이 확인되면, 테스트용 파드를 150개 배포해보자.</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">cat <span class="s">&lt;&lt;EOF | kubectl create -f -
+</span></span></span><span class="line"><span class="cl"><span class="s">apiVersion: apps/v1
+</span></span></span><span class="line"><span class="cl"><span class="s">kind: Deployment
+</span></span></span><span class="line"><span class="cl"><span class="s">metadata:
+</span></span></span><span class="line"><span class="cl"><span class="s">  name: netshoot-pod
+</span></span></span><span class="line"><span class="cl"><span class="s">spec:
+</span></span></span><span class="line"><span class="cl"><span class="s">  replicas: 150
+</span></span></span><span class="line"><span class="cl"><span class="s">  selector:
+</span></span></span><span class="line"><span class="cl"><span class="s">    matchLabels:
+</span></span></span><span class="line"><span class="cl"><span class="s">      app: netshoot-pod
+</span></span></span><span class="line"><span class="cl"><span class="s">  template:
+</span></span></span><span class="line"><span class="cl"><span class="s">    metadata:
+</span></span></span><span class="line"><span class="cl"><span class="s">      labels:
+</span></span></span><span class="line"><span class="cl"><span class="s">        app: netshoot-pod
+</span></span></span><span class="line"><span class="cl"><span class="s">    spec:
+</span></span></span><span class="line"><span class="cl"><span class="s">      containers:
+</span></span></span><span class="line"><span class="cl"><span class="s">      - name: netshoot-pod
+</span></span></span><span class="line"><span class="cl"><span class="s">        image: nicolaka/netshoot
+</span></span></span><span class="line"><span class="cl"><span class="s">        command: [&#34;tail&#34;]
+</span></span></span><span class="line"><span class="cl"><span class="s">        args: [&#34;-f&#34;, &#34;/dev/null&#34;]
+</span></span></span><span class="line"><span class="cl"><span class="s">      terminationGracePeriodSeconds: 0
+</span></span></span><span class="line"><span class="cl"><span class="s">EOF</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1"># 이상하다 파드가 43개밖에 할당되지 않았다. </span>
+</span></span><span class="line"><span class="cl">kubectl get deploy 
+</span></span><span class="line"><span class="cl">---
+</span></span><span class="line"><span class="cl">NAME           READY    UP-TO-DATE   AVAILABLE   AGE
+</span></span><span class="line"><span class="cl">netshoot-pod   43/150   <span class="m">150</span>          <span class="m">43</span>          19s
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>Pending 된 파드의 이벤트를 확인하니 노드 제한으로 파드 할당이 되지 않았다.</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">Events:
+</span></span><span class="line"><span class="cl">  Type     Reason            Age   From               Message
+</span></span><span class="line"><span class="cl">  ----     ------            ----  ----               -------
+</span></span><span class="line"><span class="cl">  Warning  FailedScheduling  88s   default-scheduler  0/3 nodes are available: <span class="m">3</span> Too many pods. preemption: 0/3 nodes are available: <span class="m">3</span> No preemption victims found <span class="k">for</span> incoming pod.
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>확인해보니 노드에서 MaX 파드 수치가 존재하기 때문이였다. 앞서 본 17개가 해당 인스턴스의 <code>맥스 파드 수</code>였다. 이 MAX 파드 제한을 늘리기 위해서는 워커 노드의 kubelet의 옵션을 수정해야 한다. 방법은 두 가지로 1. EKS 구축시 MAX POD 설정 및 2. 실행 중인 노드 kubelet을 수정하여 MAX POD를 설정할 수 있다.</p>
+<ol>
+<li>Eksctl 파라미터를 통한 MAX POD 설정</li>
+</ol>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">eksctl create nodegroup <span class="se">\
+</span></span></span><span class="line"><span class="cl"><span class="se"></span> --cluster hanhorang <span class="se">\
+</span></span></span><span class="line"><span class="cl"><span class="se"></span> --region ap-northeast-2 <span class="se">\
+</span></span></span><span class="line"><span class="cl"><span class="se"></span> --name ng-1 <span class="se">\
+</span></span></span><span class="line"><span class="cl"><span class="se"></span> --node-type t3.medium <span class="se">\
+</span></span></span><span class="line"><span class="cl"><span class="se"></span> --managed <span class="se">\
+</span></span></span><span class="line"><span class="cl"><span class="se"></span> --max-pods-per-node <span class="m">100</span> <span class="c1"># 해당 파라미터 </span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><ol>
+<li>실행중인 노드 kubelet 수정  ( <a href="https://kimalarm.tistory.com/51">kimalram 님 블로그 글</a>을 참고하였습니다! )</li>
+</ol>
+<p>실행 중인 노드에 접속하여 kubelet 옵션의 MAX 파드를 수정할 것이다.</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span><span class="lnt">31
+</span><span class="lnt">32
+</span><span class="lnt">33
+</span><span class="lnt">34
+</span><span class="lnt">35
+</span><span class="lnt">36
+</span><span class="lnt">37
+</span><span class="lnt">38
+</span><span class="lnt">39
+</span><span class="lnt">40
+</span><span class="lnt">41
+</span><span class="lnt">42
+</span><span class="lnt">43
+</span><span class="lnt">44
+</span><span class="lnt">45
+</span><span class="lnt">46
+</span><span class="lnt">47
+</span><span class="lnt">48
+</span><span class="lnt">49
+</span><span class="lnt">50
+</span><span class="lnt">51
+</span><span class="lnt">52
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl"><span class="c1"># 노드 IP 확인 </span>
+</span></span><span class="line"><span class="cl">kubectl get nodes -o wide 
+</span></span><span class="line"><span class="cl">---
+</span></span><span class="line"><span class="cl">ssNAME                                               STATUS   ROLES    AGE     VERSION                INTERNAL-IP     EXTERNAL-IP     OS-IMAGE         KERNEL-VERSION                  CONTAINER-RUNTIME
+</span></span><span class="line"><span class="cl">ip-192-168-1-209.ap-northeast-2.compute.internal   Ready    &lt;none&gt;   3h16m   v1.24.11-eks-a59e1f0   192.168.1.209   52.78.121.165   Amazon Linux <span class="m">2</span>   5.10.178-162.673.amzn2.x86_64   containerd://1.6.19
+</span></span><span class="line"><span class="cl">ip-192-168-2-134.ap-northeast-2.compute.internal   Ready    &lt;none&gt;   3h17m   v1.24.11-eks-a59e1f0   192.168.2.134   3.36.17.42      Amazon Linux <span class="m">2</span>   5.10.178-162.673.amzn2.x86_64   containerd://1.6.19
+</span></span><span class="line"><span class="cl">ip-192-168-3-250.ap-northeast-2.compute.internal   Ready    &lt;none&gt;   3h17m   v1.24.11-eks-a59e1f0   192.168.3.250   54.180.101.37   Amazon Linux <span class="m">2</span>   5.10.178-162.673.amzn2.x86_64   containerd://1.6.19
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1"># 노드 접속 </span>
+</span></span><span class="line"><span class="cl">ssh ec2-user@52.78.121.165
+</span></span><span class="line"><span class="cl">---
+</span></span><span class="line"><span class="cl">The authenticity of host <span class="s1">&#39;52.78.121.165 (52.78.121.165)&#39;</span> can<span class="s1">&#39;t be established.
+</span></span></span><span class="line"><span class="cl"><span class="s1">ECDSA key fingerprint is SHA256:gr23rumKlP2+B0Dn0wYN+UPxaCgoyrL/uyhjBZxPCug.
+</span></span></span><span class="line"><span class="cl"><span class="s1">ECDSA key fingerprint is MD5:7c:d8:29:c9:5c:09:66:b6:7c:64:62:e6:85:1d:46:ac.
+</span></span></span><span class="line"><span class="cl"><span class="s1">Are you sure you want to continue connecting (yes/no)? yes
+</span></span></span><span class="line"><span class="cl"><span class="s1">Warning: Permanently added &#39;</span>52.78.121.165<span class="s1">&#39; (ECDSA) to the list of known hosts.
+</span></span></span><span class="line"><span class="cl"><span class="s1">Last login: Mon May  1 20:27:30 2023 from 205.251.233.237
+</span></span></span><span class="line"><span class="cl"><span class="s1">
+</span></span></span><span class="line"><span class="cl"><span class="s1">       __|  __|_  )
+</span></span></span><span class="line"><span class="cl"><span class="s1">       _|  (     /   Amazon Linux 2 AMI
+</span></span></span><span class="line"><span class="cl"><span class="s1">      ___|\___|___|
+</span></span></span><span class="line"><span class="cl"><span class="s1">
+</span></span></span><span class="line"><span class="cl"><span class="s1">https://aws.amazon.com/amazon-linux-2/
+</span></span></span><span class="line"><span class="cl"><span class="s1">3 package(s) needed for security, out of 12 available
+</span></span></span><span class="line"><span class="cl"><span class="s1">Run &#34;sudo yum update&#34; to apply all updates.
+</span></span></span><span class="line"><span class="cl"><span class="s1">
+</span></span></span><span class="line"><span class="cl"><span class="s1"># 노드 eks 설정 부분 경로 접속 
+</span></span></span><span class="line"><span class="cl"><span class="s1">cd /etc/eks 
+</span></span></span><span class="line"><span class="cl"><span class="s1">
+</span></span></span><span class="line"><span class="cl"><span class="s1"># kubelet 재실행 
+</span></span></span><span class="line"><span class="cl"><span class="s1">sudo /etc/eks/bootstrap.sh hanhorang --use-max-pods false --kubelet-extra-args &#39;</span>--max-pods<span class="o">=</span>110<span class="s1">&#39;
+</span></span></span><span class="line"><span class="cl"><span class="s1">---
+</span></span></span><span class="line"><span class="cl"><span class="s1">2023-05-09T11:31:57+0000 [eks-bootstrap] INFO: starting...
+</span></span></span><span class="line"><span class="cl"><span class="s1">2023-05-09T11:31:57+0000 [eks-bootstrap] INFO: --use-max-pods=&#39;</span>false<span class="s1">&#39;
+</span></span></span><span class="line"><span class="cl"><span class="s1">2023-05-09T11:31:57+0000 [eks-bootstrap] INFO: --kubelet-extra-args=&#39;</span>--max-pods<span class="o">=</span>110<span class="err">&#39;</span>
+</span></span><span class="line"><span class="cl">2023-05-09T11:31:57+0000 <span class="o">[</span>eks-bootstrap<span class="o">]</span> INFO: Using kubelet version 1.24.11
+</span></span><span class="line"><span class="cl">2023-05-09T11:31:57+0000 <span class="o">[</span>eks-bootstrap<span class="o">]</span> INFO: Using containerd as the container runtime
+</span></span><span class="line"><span class="cl">2023-05-09T11:31:58+0000 <span class="o">[</span>eks-bootstrap<span class="o">]</span> INFO: --cluster-ca or --api-server-endpoint is not defined, describing cluster...
+</span></span><span class="line"><span class="cl">2023-05-09T11:31:59+0000 <span class="o">[</span>eks-bootstrap<span class="o">]</span> INFO: Using IP family: ipv4
+</span></span><span class="line"><span class="cl"><span class="o">[</span>Service<span class="o">]</span>
+</span></span><span class="line"><span class="cl"><span class="nv">Slice</span><span class="o">=</span>runtime.slice
+</span></span><span class="line"><span class="cl">‘/etc/eks/containerd/kubelet-containerd.service’ -&gt; ‘/etc/systemd/system/kubelet.service’
+</span></span><span class="line"><span class="cl">2023-05-09T11:32:01+0000 <span class="o">[</span>eks-bootstrap<span class="o">]</span> INFO: complete!
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1"># kubelet 로그 확인 ( 수정이 안됨) </span>
+</span></span><span class="line"><span class="cl">sudo ps -ef <span class="p">|</span> grep kubelet 
+</span></span><span class="line"><span class="cl">--
+</span></span><span class="line"><span class="cl">root      <span class="m">2860</span>     <span class="m">1</span>  <span class="m">1</span> 08:11 ?        00:02:29 /usr/bin/kubelet --config /etc/kubernetes/kubelet/kubelet-config.json --kubeconfig /var/lib/kubelet/kubeconfig --container-runtime-endpoint unix:///run/containerd/containerd.sock --image-credential-provider-config /etc/eks/image-credential-provider/config.json --image-credential-provider-bin-dir /etc/eks/image-credential-provider --node-ip<span class="o">=</span>192.168.1.209 --pod-infra-container-image<span class="o">=</span>602401143452.dkr.ecr.ap-northeast-2.amazonaws.com/eks/pause:3.5 --v<span class="o">=</span><span class="m">2</span> --cloud-provider<span class="o">=</span>aws --container-runtime<span class="o">=</span>remote --node-labels<span class="o">=</span>eks.amazonaws.com/sourceLaunchTemplateVersion<span class="o">=</span>1,alpha.eksctl.io/cluster-name<span class="o">=</span>hanhorang,alpha.eksctl.io/nodegroup-name<span class="o">=</span>ng1,eks.amazonaws.com/nodegroup-image<span class="o">=</span>ami-0da378ed846e950a4,eks.amazonaws.com/capacityType<span class="o">=</span>ON_DEMAND,eks.amazonaws.com/nodegroup<span class="o">=</span>ng1,eks.amazonaws.com/sourceLaunchTemplateId<span class="o">=</span>lt-0a84643ab8f551110 --max-pods<span class="o">=</span><span class="m">17</span> 
+</span></span><span class="line"><span class="cl">ec2-user  <span class="m">6100</span>  <span class="m">4064</span>  <span class="m">0</span> 11:34 pts/0    00:00:00 grep --color<span class="o">=</span>auto kubelet
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1"># kubelet 재시작 </span>
+</span></span><span class="line"><span class="cl">sudo systemctl restart kubelet
+</span></span></code></pre></td></tr></table>
+</div>
+</div><ul>
+<li>kubelet 은 Static 파드로 동작하므로 수동으로 재시작을 해줘야 기능이 적용된다.</li>
+</ul>
+<p><img loading="lazy" 
+    src="/./aews-eks-vpc-1/kubelet1.png" 
+    alt="kubelet1.png" 
+     
+    width=2262 
+    height="428"  /></p>
+<p>맥스 파드가 적용되었으면 전에 배포한 150개 파드 동작을 확인할 수 있다.</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">kubectl get deploy 
+</span></span><span class="line"><span class="cl">---
+</span></span><span class="line"><span class="cl">NAME           READY     UP-TO-DATE   AVAILABLE   AGE
+</span></span><span class="line"><span class="cl">netshoot-pod   150/150   <span class="m">150</span>          <span class="m">150</span>         38m
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h3 id="custom-network를-통한-ip-확장하기">
+    <a href="#custom-network%eb%a5%bc-%ed%86%b5%ed%95%9c-ip-%ed%99%95%ec%9e%a5%ed%95%98%ea%b8%b0" class="anchor">
+        <svg class="icon" aria-hidden="true" focusable="false" height="16" version="1.1" viewBox="0 0 16 16" width="16">
+            <path fill-rule="evenodd"
+                d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z">
+            </path>
+        </svg>
+    </a>
+    CUSTOM Network를 통한 IP 확장하기
+</h3>
+<p>서브넷 대역에 IP가 부족했을 때 추가 서브넷 CIDR을 부여하여 IP 할당 개수를 추가로 확장할 수 있다.</p>
+<p><img loading="lazy" 
+    src="/./aews-eks-vpc-1/custom-networking-intro-995b094f310d9d4d93fc9139a5dfc106.png" 
+    alt="custom-networking-intro-995b094f310d9d4d93fc9139a5dfc106.png" 
+     
+    width=1370 
+    height="590"  /></p>
+<p>공식 문서에 따르면 Custom CIDR 제약 사항도 존재한다. 적용시 반드시 참고하자</p>
+<ul>
+<li>사용자 지정 네트워킹을 사용 설정하면 기본 네트워크 인터페이스에 할당된 IP 주소가 pods에 할당되지 않는다. 보조 네트워크 인터페이스의 IP 주소만 pods에 할당된다.</li>
+<li>클러스터에서 IPv6 패밀리를 사용하는 경우 사용자 지정 네트워킹을 사용할 수 없다.</li>
+<li>사용자 지정 네트워킹을 사용하여 IPv4 주소 소모를 완화하려는 경우 대신 IPv6 패밀리를 사용하여 클러스터를 생성할 수 있다.</li>
+</ul>
+<p>그러면 서브넷 CIDR 을 추가하겠다. 추가 과정은 다음의 4가지로 진행된다.</p>
+<ul>
+<li>VPC 서브넷 생성</li>
+<li>aws-node 파드 파라미터 수정(VPC CNI)</li>
+<li>ENIConfig (CRD) 배포 생성 및 EKS 노드에 연결</li>
+<li>노드 그룹 재배포</li>
+</ul>
+<p>VPC 할당 및 서브넷 생성은 AWS 콘솔에서 진행하였다. AWS 콘솔 [VPC] 에서 CIDR 및 서브넷 조작이 가능하다. 다음과 같이 10.64.0.0/16 의 VPC CIDR 과 대역에 맞는 서브넷을 생성하였다.</p>
+<p><img loading="lazy" 
+    src="/./aews-eks-vpc-1/vpc11.png" 
+    alt="vpc11.png" 
+     
+    width=697 
+    height="541"  /></p>
+<p><img loading="lazy" 
+    src="/./aews-eks-vpc-1/vpc12.png" 
+    alt="vpc12.png" 
+     
+    width=788 
+    height="860"  /></p>
+<p>생성한 서브넷 ID는 다음의 명령어로 조회가 가능하다.</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl"><span class="c1">#aws ec2 describe-subnets --filters &#34;Name=vpc-id,Values=$vpc_id&#34; --query &#39;Subnets[*].{SubnetId: SubnetId, AvailabilityZone: AvailabilityZone, CidrBlock: CidrBlock}&#39; --output table</span>
+</span></span><span class="line"><span class="cl">aws ec2 describe-subnets --filters <span class="s2">&#34;Name=vpc-id,Values=vpc-0fc5c162640e67e66&#34;</span> --query <span class="s1">&#39;Subnets[*].{SubnetId: SubnetId, AvailabilityZone: AvailabilityZone, CidrBlock: CidrBlock}&#39;</span> --output table
+</span></span><span class="line"><span class="cl">---------------------------------------------------------------------
+</span></span><span class="line"><span class="cl"><span class="p">|</span>                          DescribeSubnets                          <span class="p">|</span>
+</span></span><span class="line"><span class="cl">+------------------+-------------------+----------------------------+
+</span></span><span class="line"><span class="cl"><span class="p">|</span> AvailabilityZone <span class="p">|</span>     CidrBlock     <span class="p">|</span>         SubnetId           <span class="p">|</span>
+</span></span><span class="line"><span class="cl">+------------------+-------------------+----------------------------+
+</span></span><span class="line"><span class="cl"><span class="p">|</span>  ap-northeast-2a <span class="p">|</span>  100.64.1.0/24    <span class="p">|</span>  subnet-06daaaa9fa3990545  <span class="p">|</span>
+</span></span><span class="line"><span class="cl"><span class="p">|</span>  ap-northeast-2c <span class="p">|</span>  192.168.3.0/24   <span class="p">|</span>  subnet-0020334582f221a4e  <span class="p">|</span>
+</span></span><span class="line"><span class="cl"><span class="p">|</span>  ap-northeast-2b <span class="p">|</span>  100.64.2.0/24    <span class="p">|</span>  subnet-0a498cbb63e30d085  <span class="p">|</span>
+</span></span><span class="line"><span class="cl"><span class="p">|</span>  ap-northeast-2c <span class="p">|</span>  100.64.3.0/24    <span class="p">|</span>  subnet-03de86c554113fec7  <span class="p">|</span>
+</span></span><span class="line"><span class="cl"><span class="p">|</span>  ap-northeast-2b <span class="p">|</span>  192.168.2.0/24   <span class="p">|</span>  subnet-0808f8970f303632f  <span class="p">|</span>
+</span></span><span class="line"><span class="cl"><span class="p">|</span>  ap-northeast-2a <span class="p">|</span>  192.168.11.0/24  <span class="p">|</span>  subnet-0bc63c89a9965b672  <span class="p">|</span>
+</span></span><span class="line"><span class="cl"><span class="p">|</span>  ap-northeast-2c <span class="p">|</span>  192.168.13.0/24  <span class="p">|</span>  subnet-0f229c12c2c595c5b  <span class="p">|</span>
+</span></span><span class="line"><span class="cl"><span class="p">|</span>  ap-northeast-2b <span class="p">|</span>  192.168.12.0/24  <span class="p">|</span>  subnet-06229a20d32b499de  <span class="p">|</span>
+</span></span><span class="line"><span class="cl"><span class="p">|</span>  ap-northeast-2a <span class="p">|</span>  192.168.1.0/24   <span class="p">|</span>  subnet-0de74f64866c7a8e5  <span class="p">|</span>
+</span></span><span class="line"><span class="cl">+------------------+-------------------+----------------------------+
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>이어서 VPC CNI 파드(aws-node)에 custom network 를 사용하겠다는 파라미터를 추가하자.</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">kubectl <span class="nb">set</span> env daemonset aws-node -n kube-system <span class="nv">AWS_VPC_K8S_CNI_CUSTOM_NETWORK_CFG</span><span class="o">=</span><span class="nb">true</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">kubectl describe daemonsets.apps aws-node -n kube-system <span class="p">|</span> grep CUSTOM
+</span></span><span class="line"><span class="cl">----
+</span></span><span class="line"><span class="cl">      AWS_VPC_K8S_CNI_CUSTOM_NETWORK_CFG:  <span class="nb">true</span> <span class="c1"># 설정 확인 </span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>추가 작업으로 서브넷 배포 설정에 대한 eniconfig 파일을 작성하여 배포하도록 하자.</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-yaml" data-lang="yaml"><span class="line"><span class="cl"><span class="c"># eniconfigs.yaml</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="nt">apiVersion</span><span class="p">:</span><span class="w"> </span><span class="l">crd.k8s.amazonaws.com/v1alpha1</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="nt">kind</span><span class="p">:</span><span class="w"> </span><span class="l">ENIConfig</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="nt">metadata</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l">ap-noratheast-2a</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="nt">spec</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="nt">securityGroups</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span>- <span class="l">sg-0db212244a3e72ae1</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="nt">subnet</span><span class="p">:</span><span class="w"> </span><span class="l">subnet-06daaaa9fa3990545</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="nn">---</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="nt">apiVersion</span><span class="p">:</span><span class="w"> </span><span class="l">crd.k8s.amazonaws.com/v1alpha1</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="nt">kind</span><span class="p">:</span><span class="w"> </span><span class="l">ENIConfig</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="nt">metadata</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l">ap-noratheast-2b</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="nt">spec</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="nt">securityGroups</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span>- <span class="l">sg-0db212244a3e72ae1</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="nt">subnet</span><span class="p">:</span><span class="w"> </span><span class="l">subnet-0a498cbb63e30d085 </span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="nn">---</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="nt">apiVersion</span><span class="p">:</span><span class="w"> </span><span class="l">crd.k8s.amazonaws.com/v1alpha1</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="nt">kind</span><span class="p">:</span><span class="w"> </span><span class="l">ENIConfig</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="nt">metadata</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l">ap-noratheast-2c</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="nt">spec</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="nt">securityGroups</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span>- <span class="l">sg-0db212244a3e72ae1</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="nt">subnet</span><span class="p">:</span><span class="w"> </span><span class="l">subnet-03de86c554113fec7</span><span class="w">
+</span></span></span></code></pre></td></tr></table>
+</div>
+</div><ul>
+<li>
+<p>추가할 서브넷만 작성하도록 하자. 밑의 노드에 annotation을 추가할 것이기 때문에 AND 로 서브넷이 추가된다.</p>
+</li>
+<li>
+<p>보안 그룹은 배포된 워크 노드의 보안 그룹으로 작성하였다.</p>
+</li>
+<li>
+<p><a href="http://metadata.name">metadata.name</a> 에 되도록 AZ 이름을 입력하도록 하자, AZ 이름이 아니면 노드에 적용시키기 위해서는 아래와 같이 추가 주석이 필요하다.</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">kubectl annotate node ip-192-168-1-84.ap-northeast-2.compute.internal k8s.amazonaws.com/eniConfig<span class="o">=</span>ap-noratheast-2a-custom 
+</span></span><span class="line"><span class="cl">kubectl annotate node ip-192-168-2-219.ap-northeast-2.compute.internal k8s.amazonaws.com/eniConfig<span class="o">=</span>ap-noratheast-2b-custom
+</span></span><span class="line"><span class="cl">kubectl annotate node ip-192-168-3-140.ap-northeast-2.compute.internal k8s.amazonaws.com/eniConfig<span class="o">=</span>ap-noratheast-2c-custom
+</span></span></code></pre></td></tr></table>
+</div>
+</div></li>
+</ul>
+<p>배포 및 노드에 연결하자.</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">kubectl apply -f eniconfigs.yaml 
+</span></span><span class="line"><span class="cl">---
+</span></span><span class="line"><span class="cl">eniconfig.crd.k8s.amazonaws.com/ap-northeast-2a created
+</span></span><span class="line"><span class="cl">eniconfig.crd.k8s.amazonaws.com/ap-northeast-2b created
+</span></span><span class="line"><span class="cl">eniconfig.crd.k8s.amazonaws.com/ap-northeast-2c created
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">kubectl get eniconfig
+</span></span><span class="line"><span class="cl">---
+</span></span><span class="line"><span class="cl">NAME               AGE
+</span></span><span class="line"><span class="cl">ap-northeast-2a   16s
+</span></span><span class="line"><span class="cl">ap-northeast-2b   16s
+</span></span><span class="line"><span class="cl">ap-northeast-2c   16s
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1"># VPC 서브넷 업데이트</span>
+</span></span><span class="line"><span class="cl">kubectl <span class="nb">set</span> env daemonset aws-node -n kube-system <span class="nv">ENI_CONFIG_LABEL_DEF</span><span class="o">=</span>topology.kubernetes.io/zone
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>업데이트된 내용이 노드에는 바로 적용되지 않는다. 새로 추가된 노드에만 적용된다.  새로 노드 그룹을 추가하고 확인하도록 하자.</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">eksctl create nodegroup <span class="se">\
+</span></span></span><span class="line"><span class="cl"><span class="se"></span> --cluster hanhorang <span class="se">\
+</span></span></span><span class="line"><span class="cl"><span class="se"></span> --region ap-northeast-2 <span class="se">\
+</span></span></span><span class="line"><span class="cl"><span class="se"></span> --name ng-2 <span class="se">\
+</span></span></span><span class="line"><span class="cl"><span class="se"></span> --node-type t3.medium <span class="se">\
+</span></span></span><span class="line"><span class="cl"><span class="se"></span> --managed
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>AWS 콘솔을 통해 확인이 가능하다.</p>
+<p><img loading="lazy" 
+    src="/./aews-eks-vpc-1/vpc15.png" 
+    alt="vpc15.png" 
+     
+    width=1616 
+    height="388"  /></p>
+<h3 id="sg-for-pod-설정">
+    <a href="#sg-for-pod-%ec%84%a4%ec%a0%95" class="anchor">
+        <svg class="icon" aria-hidden="true" focusable="false" height="16" version="1.1" viewBox="0 0 16 16" width="16">
+            <path fill-rule="evenodd"
+                d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z">
+            </path>
+        </svg>
+    </a>
+    SG for Pod 설정
+</h3>
+<p>VPC 보안 그룹을 파드에도 설정할 수 있는 기능이다. 파드에 보안 그룹을 적용하면 파드 접근에 세부적인 보안 관리가 가능해진다.</p>
+<p><img loading="lazy" 
+    src="/./aews-eks-vpc-1/overview-73e7178bcd0c18bff238143b87d6937a.png" 
+    alt="&lt;a href=&#34;https://www.eksworkshop.com/docs/networking/security-groups-for-pods/&#34;&gt;https://www.eksworkshop.com/docs/networking/security-groups-for-pods/&lt;/a&gt;" 
+     
+    width=2764 
+    height="2444"  /></p>
+<p><a href="https://www.eksworkshop.com/docs/networking/security-groups-for-pods/">https://www.eksworkshop.com/docs/networking/security-groups-for-pods/</a></p>
+<p>SG for Pod를 설정하기 전 몇가지 제한 사항이 존재한다.</p>
+<ul>
+<li>
+<p>윈도우 노드에서 사용할 수 없다.</p>
+</li>
+<li>
+<p>인스턴스 유형 중 t 타입의 인스턴스에서 사용할 수 없다.</p>
+</li>
+<li>
+<p>IPv6 패밀리용으로 구성된 클러스터에서 사용할 수 없지만 fargate에서는 사용이 가능하다.</p>
+</li>
+<li>
+<p>정책 제한이 있을시 사용자에 SG for Pod를 위한 섹션을 추가 해야 한다.</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-yaml" data-lang="yaml"><span class="line"><span class="cl"><span class="nn">...</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="nt">subjects</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span>- <span class="nt">kind</span><span class="p">:</span><span class="w"> </span><span class="l">Group</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="nt">apiGroup</span><span class="p">:</span><span class="w"> </span><span class="l">rbac.authorization.k8s.io</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l">system:authenticated</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span>- <span class="nt">apiGroup</span><span class="p">:</span><span class="w"> </span><span class="l">rbac.authorization.k8s.io</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="nt">kind</span><span class="p">:</span><span class="w"> </span><span class="l">User</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l">eks:vpc-resource-controller</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span>- <span class="nt">kind</span><span class="p">:</span><span class="w"> </span><span class="l">ServiceAccount</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l">eks-vpc-resource-controller</span><span class="w">
+</span></span></span></code></pre></td></tr></table>
+</div>
+</div></li>
+<li>
+<p>VPC CNI 버전이 1.7.7 이상이여야 한다.</p>
+</li>
+</ul>
+<p>이외에도 VPC CNI 버전 별 플래그 마다 제한사항이 존재한다. 세부 내용은 <a href="https://docs.aws.amazon.com/ko_kr/eks/latest/userguide/security-groups-for-pods.html">공식 문서</a>를 참고하자.</p>
+<p><a href="https://docs.aws.amazon.com/ko_kr/eks/latest/userguide/security-groups-for-pods.html">공식 문서</a>를 참고하여  SG for Pod 설정을 진행하자.</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span><span class="lnt">31
+</span><span class="lnt">32
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl"><span class="c1"># 버전 확인 </span>
+</span></span><span class="line"><span class="cl">kubectl describe daemonset aws-node --namespace kube-system <span class="p">|</span> grep amazon-k8s-cni: <span class="p">|</span> cut -d : -f <span class="m">3</span> 
+</span></span><span class="line"><span class="cl">---
+</span></span><span class="line"><span class="cl">v1.12.6-eksbuild.1
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1"># EKS VPC ResourceController Role 추가 </span>
+</span></span><span class="line"><span class="cl"><span class="nv">cluster_role</span><span class="o">=</span><span class="k">$(</span>aws eks describe-cluster --name hanhorang --query cluster.roleArn --output text <span class="p">|</span> cut -d / -f 2<span class="k">)</span>
+</span></span><span class="line"><span class="cl"><span class="c1"># 클러스터에 정책 연결 </span>
+</span></span><span class="line"><span class="cl">aws iam attach-role-policy --policy-arn arn:aws:iam::aws:policy/AmazonEKSVPCResourceController --role-name <span class="nv">$cluster_role</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1"># VPC CNI 파라미터 수정(Pod eni 관리 파라미터 허용)</span>
+</span></span><span class="line"><span class="cl">kubectl <span class="nb">set</span> env daemonset aws-node -n kube-system <span class="nv">ENABLE_POD_ENI</span><span class="o">=</span><span class="nb">true</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1"># 파드 eni 가능 노드 확인</span>
+</span></span><span class="line"><span class="cl"><span class="c1"># 위 명령어로 업데이트에 몇 초의 시간이 소요됩니다.</span>
+</span></span><span class="line"><span class="cl">kubectl get nodes -o wide -l vpc.amazonaws.com/has-trunk-attached<span class="o">=</span><span class="nb">true</span>
+</span></span><span class="line"><span class="cl">---
+</span></span><span class="line"><span class="cl">NAME                                               STATUS   ROLES    AGE   VERSION                INTERNAL-IP     EXTERNAL-IP     OS-IMAGE         KERNEL-VERSION                   CONTAINER-RUNTIME
+</span></span><span class="line"><span class="cl">ip-192-168-1-108.ap-northeast-2.compute.internal   Ready    &lt;none&gt;   20m   v1.24.11-eks-a59e1f0   192.168.1.108   3.38.214.241    Amazon Linux <span class="m">2</span>   5.10.178-162.673.amzn2.aarch64   containerd://1.6.19
+</span></span><span class="line"><span class="cl">ip-192-168-2-45.ap-northeast-2.compute.internal    Ready    &lt;none&gt;   20m   v1.24.11-eks-a59e1f0   192.168.2.45    3.38.188.199    Amazon Linux <span class="m">2</span>   5.10.178-162.673.amzn2.aarch64   containerd://1.6.19
+</span></span><span class="line"><span class="cl">ip-192-168-3-18.ap-northeast-2.compute.internal    Ready    &lt;none&gt;   20m   v1.24.11-eks-a59e1f0   192.168.3.18    13.125.254.20   Amazon Linux <span class="m">2</span>   5.10.178-162.673.amzn2.aarch64   containerd://1.6.19
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1"># 파드에서 VPC 외부 주소로 아웃바운드되는 트래픽은 기본 ENI로 가며, 노드 보안 그룹에 대한 규칙이 적용된다, 파드의 eni만 적용시키고 싶다면 아래 파라미터를 추가하자.</span>
+</span></span><span class="line"><span class="cl">kubectl <span class="nb">set</span> env daemonset aws-node -n kube-system  <span class="nv">AWS_VPC_K8S_CNI_EXTERNALSNAT</span><span class="o">=</span><span class="nb">true</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1"># 옵션 1. liveness &amp; readyprobe 사용 경우, kubelet이 TCP를 사용하여 파드 eni 와 연결할 수 있도록 TCP 초기 demux 중지</span>
+</span></span><span class="line"><span class="cl">kubectl patch daemonset aws-node -n kube-system <span class="se">\
+</span></span></span><span class="line"><span class="cl"><span class="se"></span>  -p <span class="s1">&#39;{&#34;spec&#34;: {&#34;template&#34;: {&#34;spec&#34;: {&#34;initContainers&#34;: [{&#34;env&#34;:[{&#34;name&#34;:&#34;DISABLE_TCP_EARLY_DEMUX&#34;,&#34;value&#34;:&#34;true&#34;}],&#34;name&#34;:&#34;aws-vpc-cni-init&#34;}]}}}}&#39;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1"># 옵션 2. externalTrafficPolicy: local, NodeLocal DNSCache, 자체 보안 그룹이 있는 네트워크 정책이 있는 경우 아래 명령어 추가 </span>
+</span></span><span class="line"><span class="cl"><span class="c1"># 해당 설정을 기존 Pods에 적용하려면, 노드를 재시작해야함 </span>
+</span></span><span class="line"><span class="cl">kubectl <span class="nb">set</span> env daemonset aws-node -n kube-system <span class="nv">POD_SECURITY_GROUP_ENFORCING_MODE</span><span class="o">=</span>standard
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>SG for Pod 설정 이후 파드에 직접 보안 그룹을 설정하도록 하겠다. <a href="https://www.eksworkshop.com/docs/networking/security-groups-for-pods/">활용 예제</a>는 EKS Workshop 을 참고하였다.</p>
+<p><img loading="lazy" 
+    src="/./aews-eks-vpc-1/home-2ef623b5837cd647adaf7e938d3ff9ee.png" 
+    alt="home-2ef623b5837cd647adaf7e938d3ff9ee.png" 
+     
+    width=1313 
+    height="702"  /></p>
+<p><img loading="lazy" 
+    src="/./aews-eks-vpc-1/architecture-0cae9bbdb8ccba1c0883e713cd76f72b.png" 
+    alt="&lt;a href=&#34;https://www.eksworkshop.com/docs/introduction/getting-started/about&#34;&gt;https://www.eksworkshop.com/docs/introduction/getting-started/about&lt;/a&gt;" 
+     
+    width=603 
+    height="503"  /></p>
+<p><a href="https://www.eksworkshop.com/docs/introduction/getting-started/about">https://www.eksworkshop.com/docs/introduction/getting-started/about</a></p>
+<table>
+<thead>
+<tr>
+<th>Component</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>UI</td>
+<td>프론트엔드로 사용자 인터페이스를 제공하며 다른 서비스에 대한 API을 연결한다.</td>
+</tr>
+<tr>
+<td>Catalog</td>
+<td>상품 목록과 상세 정보에 대한 API</td>
+</tr>
+<tr>
+<td>Cart</td>
+<td>고객 쇼핑카트에 대한 API</td>
+</tr>
+<tr>
+<td>Checkout</td>
+<td>체크아웃 프로세스를 조정하는 API</td>
+</tr>
+<tr>
+<td>Orders</td>
+<td>고객 주문을 받고 처리하는 API</td>
+</tr>
+<tr>
+<td>Static assets</td>
+<td>상품 카탈로그와 관련된 이미지와 같은 정적 파일</td>
+</tr>
+</tbody>
+</table>
+<p>활용 예제는 마이크로서비스 아키텍처의 웹 스토어 어플리케이션으로 아래 Catalog의 DB를 RDS로 변경하고 Catalog Pod에 보안 그룹을 적용하여 RDS 접근 권한을 부여한다. 이렇게 하면 Catalog에서만 RDS에 접근이 가능해진다.</p>
+<p><img loading="lazy" 
+    src="/./aews-eks-vpc-1/sg9.png" 
+    alt="sg9.png" 
+     
+    width=820 
+    height="431"  /></p>
+<p>파일 배포는 다음과 같이 진행하자.</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span><span class="lnt">8
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">git clone https://github.com/aws-samples/eks-workshop-v2.git
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="nb">cd</span> eks-workshop-v2/environment/workspace/manifests
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1"># public ecr 로그인 </span>
+</span></span><span class="line"><span class="cl">aws ecr-public get-login-password --region us-east-1 <span class="p">|</span> docker login --username AWS --password-stdin public.ecr.aws
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">kubectl apply -k . 
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>🧐 <strong>배포 트러블슈팅</strong></p>
+<p>EKS 노드에서 이미지 pull 이 안되어 파드 실행이 안되는 문제가 발생했다.</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">kubectl describe pods/catalog-mysql-0 -n catalog
+</span></span><span class="line"><span class="cl">---
+</span></span><span class="line"><span class="cl">...
+</span></span><span class="line"><span class="cl">Events:
+</span></span><span class="line"><span class="cl">  Type     Reason     Age                  From               Message
+</span></span><span class="line"><span class="cl">  ----     ------     ----                 ----               -------
+</span></span><span class="line"><span class="cl">  Normal   Scheduled  10m                  default-scheduler  Successfully assigned catalog/catalog-mysql-0 to ip-192-168-2-197.ap-northeast-2.compute.internal
+</span></span><span class="line"><span class="cl">  Normal   Pulling    9m19s <span class="o">(</span>x4 over 10m<span class="o">)</span>  kubelet            Pulling image <span class="s2">&#34;public.ecr.aws/docker/library/mysql:5.7&#34;</span>
+</span></span><span class="line"><span class="cl">  Warning  Failed     9m18s <span class="o">(</span>x4 over 10m<span class="o">)</span>  kubelet            Failed to pull image <span class="s2">&#34;public.ecr.aws/docker/library/mysql:5.7&#34;</span>: rpc error: <span class="nv">code</span> <span class="o">=</span> NotFound <span class="nv">desc</span> <span class="o">=</span> failed to pull and unpack image <span class="s2">&#34;public.ecr.aws/docker/library/mysql:5.7&#34;</span>: no match <span class="k">for</span> platform in manifest: not found
+</span></span><span class="line"><span class="cl">  Warning  Failed     9m18s <span class="o">(</span>x4 over 10m<span class="o">)</span>  kubelet            Error: ErrImagePull
+</span></span><span class="line"><span class="cl">  Warning  Failed     9m5s <span class="o">(</span>x6 over 10m<span class="o">)</span>   kubelet            Error: ImagePullBackOff
+</span></span><span class="line"><span class="cl">  Normal   BackOff    56s <span class="o">(</span>x42 over 10m<span class="o">)</span>   kubelet            Back-off pulling image <span class="s2">&#34;public.ecr.aws/docker/library/mysql:5.7&#34;</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>이상한 점은 베스천 서버에서는 이미지 풀이 되는 반면, EKS 노드에서는 이미지 풀에 대해 not found가 발생한다.</p>
+<p><img loading="lazy" 
+    src="/./aews-eks-vpc-1/vpc17.png" 
+    alt="vpc17.png" 
+     
+    width=2296 
+    height="1374"  /></p>
+<p>확인해보니 해당 이미지의 경우(ECR) 에서 linux/arm64/v8 에 대한 이미지 레이어 대한 정보가 없어서 발생한 문제였다. linux/arm64/v8 레이어는 AWS 인스턴스 유형 (A1, M6g,C6g,R6g)에서 사용되는 반면 linux/amd64 는 (x86-64) 아키텍처로 AWS 인스턴스 유형(t2,t3 m4, m5) 기반의 프로세서에서 동작한다.</p>
+<p>해결 방법으로 이미지를 직접 빌드 및 Push 할 수 있지만, 인스턴스 유형을 m5.large 로 변경했다.</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">kubectl get pods -A 
+</span></span><span class="line"><span class="cl">---
+</span></span><span class="line"><span class="cl">NAMESPACE     NAME                              READY   STATUS    RESTARTS       AGE
+</span></span><span class="line"><span class="cl">assets        assets-97576f445-fbf8m            1/1     Running   <span class="m">0</span>              2m5s
+</span></span><span class="line"><span class="cl">carts         carts-75d5cc858f-xh474            1/1     Running   <span class="m">0</span>              2m5s
+</span></span><span class="line"><span class="cl">carts         carts-dynamodb-69b57dddc9-5qcmb   1/1     Running   <span class="m">0</span>              2m5s
+</span></span><span class="line"><span class="cl">catalog       catalog-6d688b9f9c-9f8sg          1/1     Running   <span class="m">2</span> <span class="o">(</span>103s ago<span class="o">)</span>   2m5s
+</span></span><span class="line"><span class="cl">catalog       catalog-mysql-0                   1/1     Running   <span class="m">0</span>              2m4s
+</span></span><span class="line"><span class="cl">checkout      checkout-79d67d6765-r442r         1/1     Running   <span class="m">0</span>              2m5s
+</span></span><span class="line"><span class="cl">checkout      checkout-redis-cb98f6ff7-qmsk5    1/1     Running   <span class="m">0</span>              2m5s
+</span></span><span class="line"><span class="cl">kube-system   aws-node-h8rnr                    1/1     Running   <span class="m">0</span>              7m15s
+</span></span><span class="line"><span class="cl">kube-system   aws-node-k7nzq                    1/1     Running   <span class="m">0</span>              7m47s
+</span></span><span class="line"><span class="cl">kube-system   aws-node-mbc76                    1/1     Running   <span class="m">0</span>              7m31s
+</span></span><span class="line"><span class="cl">kube-system   coredns-dc4979556-hfztx           1/1     Running   <span class="m">0</span>              14m
+</span></span><span class="line"><span class="cl">kube-system   coredns-dc4979556-s8qj7           1/1     Running   <span class="m">0</span>              14m
+</span></span><span class="line"><span class="cl">kube-system   kube-proxy-h2r6m                  1/1     Running   <span class="m">0</span>              9m8s
+</span></span><span class="line"><span class="cl">kube-system   kube-proxy-jjjmx                  1/1     Running   <span class="m">0</span>              9m8s
+</span></span><span class="line"><span class="cl">kube-system   kube-proxy-np7fj                  1/1     Running   <span class="m">0</span>              9m8s
+</span></span><span class="line"><span class="cl">orders        orders-7fcc4fb7d8-kvb2b           1/1     Running   <span class="m">1</span> <span class="o">(</span>91s ago<span class="o">)</span>    2m5s
+</span></span><span class="line"><span class="cl">orders        orders-mysql-5d99464c58-mp6xm     1/1     Running   <span class="m">0</span>              2m5s
+</span></span><span class="line"><span class="cl">rabbitmq      rabbitmq-0                        1/1     Running   <span class="m">0</span>              2m4s
+</span></span><span class="line"><span class="cl">ui            ui-5b9cf4db94-54v8g               1/1     Running   <span class="m">0</span>              2m4s
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>이어서 Catalog 의 DB를 mysql에서 AWS RDS 로 변경하기 위한 작업을 진행하겠다. 이를 위해 보안 그룹 생성 및 RDS 생성을 다음과 같이 진행하자.</p>
+<ul>
+<li>
+<p>보안 그룹 생성(VPC는 EKS VPC로 설정)</p>
+<p><img loading="lazy" 
+    src="/./aews-eks-vpc-1/sg13.png" 
+    alt="sg13.png" 
+     
+    width=1771 
+    height="827"  /></p>
+<p><img loading="lazy" 
+    src="/./aews-eks-vpc-1/sg14.png" 
+    alt="sg14.png" 
+     
+    width=1771 
+    height="853"  /></p>
+</li>
+<li>
+<p>RDS 생성 과정 중 보안 그룹 설정을 앞서 생성한 보안 그룹으로 만들고, VPC를 EKS 가 배포된 VPC로 설정하자. 추가로 필자는 비용 문제로 프리티어로 설정했고 비밀번호를 12341234 로 설정했다.</p>
+<p><img loading="lazy" 
+    src="/./aews-eks-vpc-1/rds10.png" 
+    alt="rds10.png" 
+     
+    width=746 
+    height="810"  /></p>
+</li>
+</ul>
+<p><img loading="lazy" 
+    src="/./aews-eks-vpc-1/rds2.png" 
+    alt="rds2.png" 
+     
+    width=1527 
+    height="670"  /></p>
+<p>생성한 DB 인스턴스의 엔드포인트를 환경 변수로 입력하여 catalog를 재배포 하자.</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span><span class="lnt">31
+</span><span class="lnt">32
+</span><span class="lnt">33
+</span><span class="lnt">34
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl"><span class="nb">export</span> <span class="nv">CATALOG_RDS_PASSWORD</span><span class="o">=</span><span class="m">12341234</span>
+</span></span><span class="line"><span class="cl"><span class="nb">export</span> <span class="nv">CATALOG_RDS_ENDPOINT</span><span class="o">=</span>catalog-db2.cnrosybtsnww.ap-northeast-2.rds.amazonaws.com:3306
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">kubectl apply -k /workspace/modules/networking/securitygroups-for-pods/rds
+</span></span><span class="line"><span class="cl">--
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1"># 생성 이후 DB endpoint 확인 </span>
+</span></span><span class="line"><span class="cl">kubectl get -n catalog cm catalog -o yaml
+</span></span><span class="line"><span class="cl">---
+</span></span><span class="line"><span class="cl">apiVersion: v1
+</span></span><span class="line"><span class="cl">data:
+</span></span><span class="line"><span class="cl">  DB_ENDPOINT: database-2.cnrosybtsnww.ap-northeast-2.rds.amazonaws.com:3306
+</span></span><span class="line"><span class="cl">  DB_NAME: catalog
+</span></span><span class="line"><span class="cl">  DB_READ_ENDPOINT: database-2.cnrosybtsnww.ap-northeast-2.rds.amazonaws.com:3306
+</span></span><span class="line"><span class="cl">kind: ConfigMap
+</span></span><span class="line"><span class="cl">metadata:
+</span></span><span class="line"><span class="cl">  annotations:
+</span></span><span class="line"><span class="cl">    kubectl.kubernetes.io/last-applied-configuration: <span class="p">|</span>
+</span></span><span class="line"><span class="cl">      <span class="o">{</span><span class="s2">&#34;apiVersion&#34;</span>:<span class="s2">&#34;v1&#34;</span>,<span class="s2">&#34;data&#34;</span>:<span class="o">{</span><span class="s2">&#34;DB_ENDPOINT&#34;</span>:<span class="s2">&#34;database-2.cnrosybtsnww.ap-northeast-2.rds.amazonaws.com:3306&#34;</span>,<span class="s2">&#34;DB_NAME&#34;</span>:<span class="s2">&#34;catalog&#34;</span>,<span class="s2">&#34;DB_READ_ENDPOINT&#34;</span>:<span class="s2">&#34;database-2.cnrosybtsnww.ap-northeast-2.rds.amazonaws.com:3306&#34;</span><span class="o">}</span>,<span class="s2">&#34;kind&#34;</span>:<span class="s2">&#34;ConfigMap&#34;</span>,<span class="s2">&#34;metadata&#34;</span>:<span class="o">{</span><span class="s2">&#34;annotations&#34;</span>:<span class="o">{}</span>,<span class="s2">&#34;name&#34;</span>:<span class="s2">&#34;catalog&#34;</span>,<span class="s2">&#34;namespace&#34;</span>:<span class="s2">&#34;catalog&#34;</span><span class="o">}}</span>
+</span></span><span class="line"><span class="cl">  creationTimestamp: <span class="s2">&#34;2023-05-10T19:48:42Z&#34;</span>
+</span></span><span class="line"><span class="cl">  name: catalog
+</span></span><span class="line"><span class="cl">  namespace: catalog
+</span></span><span class="line"><span class="cl">  resourceVersion: <span class="s2">&#34;6645&#34;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1"># 기존 catalog 파드 삭제</span>
+</span></span><span class="line"><span class="cl">kubectl delete pod -n catalog -l app.kubernetes.io/component<span class="o">=</span>service
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1"># catalog 로그 확인</span>
+</span></span><span class="line"><span class="cl">kubectl -n catalog logs deployment/catalog
+</span></span><span class="line"><span class="cl">---
+</span></span><span class="line"><span class="cl">2023/05/10 20:13:25 Running database migration...
+</span></span><span class="line"><span class="cl">2023/05/10 20:13:30 Error: Failed to prep migration dial tcp 192.168.12.123:3306: i/o timeout
+</span></span><span class="line"><span class="cl">2023/05/10 20:13:30 Error: Failed to run migration dial tcp 192.168.12.123:3306: i/o timeout
+</span></span><span class="line"><span class="cl">2023/05/10 20:13:30 dial tcp 192.168.12.123:3306: i/o timeout
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>결과 처럼 i/o timeout 이 발생하는데 보안 그룹을 설정하지 않았기 때문이다.</p>
+<p>보안 정책 생성을 통해 앞서 생성한 보안 그룹(pods-connect-rds)을 catalog 파드에 적용시키자.</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-yaml" data-lang="yaml"><span class="line"><span class="cl"><span class="nt">apiVersion</span><span class="p">:</span><span class="w"> </span><span class="l">vpcresources.k8s.aws/v1beta1</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="nt">kind</span><span class="p">:</span><span class="w"> </span><span class="l">SecurityGroupPolicy</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="nt">metadata</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l">catalog-rds-access</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="nt">namespace</span><span class="p">:</span><span class="w"> </span><span class="l">catalog</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="nt">spec</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="nt">podSelector</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="nt">matchLabels</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">      </span><span class="nt">app.kubernetes.io/component</span><span class="p">:</span><span class="w"> </span><span class="l">mysql</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="nt">securityGroups</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="nt">groupIds</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span>- <span class="l">sg-07739bd847069f56e</span><span class="w"> </span><span class="c"># catalog-sg</span><span class="w">
+</span></span></span></code></pre></td></tr></table>
+</div>
+</div><p>보안 그룹 적용 후 파드를 재배포하자.</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl"><span class="nb">export</span> <span class="nv">CATALOG_SG_ID</span><span class="o">=</span>sg-08bb6f8b77a20e693
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">kubectl apply -k .
+</span></span><span class="line"><span class="cl">---
+</span></span><span class="line"><span class="cl">WARNING: This Kustomization is relying on a bug that loads values from the environment when they are omitted from an env file. This behaviour will be removed in the next major release of Kustomize.
+</span></span><span class="line"><span class="cl">WARNING: This Kustomization is relying on a bug that loads values from the environment when they are omitted from an env file. This behaviour will be removed in the next major release of Kustomize.
+</span></span><span class="line"><span class="cl">WARNING: This Kustomization is relying on a bug that loads values from the environment when they are omitted from an env file. This behaviour will be removed in the next major release of Kustomize.
+</span></span><span class="line"><span class="cl">namespace/catalog unchanged
+</span></span><span class="line"><span class="cl">serviceaccount/catalog unchanged
+</span></span><span class="line"><span class="cl">configmap/catalog unchanged
+</span></span><span class="line"><span class="cl">configmap/catalog-env-7gtc4hbmd2 unchanged
+</span></span><span class="line"><span class="cl">configmap/catalog-sg-env-5969b7c958 created
+</span></span><span class="line"><span class="cl">secret/catalog-db unchanged
+</span></span><span class="line"><span class="cl">service/catalog unchanged
+</span></span><span class="line"><span class="cl">service/catalog-mysql unchanged
+</span></span><span class="line"><span class="cl">service/ui-nlb unchanged
+</span></span><span class="line"><span class="cl">deployment.apps/catalog unchanged
+</span></span><span class="line"><span class="cl">statefulset.apps/catalog-mysql unchanged
+</span></span><span class="line"><span class="cl">securitygrouppolicy.vpcresources.k8s.aws/catalog-rds-access created
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1"># 기존 catalog 파드 삭제</span>
+</span></span><span class="line"><span class="cl">kubectl delete pod -n catalog -l app.kubernetes.io/component<span class="o">=</span>service
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1"># 보안 그룹 변경 확인 </span>
+</span></span><span class="line"><span class="cl">kubectl get events -n catalog <span class="p">|</span> grep SecurityGroupRequested
+</span></span><span class="line"><span class="cl">--
+</span></span><span class="line"><span class="cl">5m22s       Normal    SecurityGroupRequested   pod/catalog-6d688b9f9c-gjhvt    Pod will get the following Security Groups <span class="o">[</span>sg-08bb6f8b77a20e693<span class="o">]</span>
+</span></span><span class="line"><span class="cl">20s         Normal    SecurityGroupRequested   pod/catalog-6d688b9f9c-vnlgb    Pod will get the following Security Groups <span class="o">[</span>sg-08bb6f8b77a20e693<span class="o">]</span>
+</span></span><span class="line"><span class="cl">10s         Normal    SecurityGroupRequested   pod/catalog-mysql-0             Pod will get the following Security Groups <span class="o">[</span>sg-08bb6f8b77a20e693<span class="o">]</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>이후 파드에 접속하여 rds에 접속하면 정상적으로 접근이 된다.(밑 사진의 빨간네모) 반면에 노드에서 rds 접근 시도시 timeout이 발생한다. (밑 사진의 파란네모)</p>
+<p><img loading="lazy" 
+    src="/./aews-eks-vpc-1/Sg10.png" 
+    alt="Sg10.png" 
+     
+    width=2276 
+    height="1290"  /></p>
+<p>워크샵에 있는 내용을 따라했지만, catalog 파드에서 연결이 안되어 catalog-mysal 에서 RDS 연결 테스트를 진행하였다. 실습 진행에 참고하자!</p>
+<h2 id="마치며">
+    <a href="#%eb%a7%88%ec%b9%98%eb%a9%b0" class="anchor">
+        <svg class="icon" aria-hidden="true" focusable="false" height="16" version="1.1" viewBox="0 0 16 16" width="16">
+            <path fill-rule="evenodd"
+                d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z">
+            </path>
+        </svg>
+    </a>
+    마치며
+</h2>
+<p>이번 글에서는 못 다뤘지만, VPC 관련하여 다룰 주제가 많다!  틈틈히 정리하여 VPC Deep Dive 2탄에서 해당 내용들을 다룰 수 있도록 하겠다.</p>
+
+    </div>
+</div>
+
+<div class="container">
+    
+    <nav class="flex container suggested">
+        
+        <a rel="prev" href="/post/kubeflow-on-aws/" title="Previous post (older)">
+            <span>Previous</span>
+            [AEWS] Kubeflow on AWS
+            </a>
+        
+        
+        
+    </nav>
+    
+</div>
+ 
+<div class="container">
+    
+    <script src="https://giscus.app/client.js" 
+        data-repo="WingLim/hugo-tania"
+        data-repo-id="MDEwOlJlcG9zaXRvcnkzMTYyNjQzMDc="
+        
+        data-category="Comments"
+        data-category-id="DIC_kwDOEtnPc84B_WKP"
+        
+        data-mapping="pathname"
+        data-reactions-enabled="1"
+        data-emit-metadata="0"
+        data-theme="light"
+        crossorigin="anonymous"
+        async
+        >
+</script>
+
+<script>
+    function setGiscusTeheme(theme) {
+        let giscus = document.querySelector('.giscus iframe');
+        if (giscus) {
+            giscus.contentWindow.postMessage(
+                {
+                    giscus: {
+                        setConfig: {
+                            theme: theme
+                        }
+                    }
+                },
+                'https://giscus.app'
+            )
+        }
+    }
+
+    addEventListener('message', event => {
+        if (event.origin !== 'https://giscus.app') return;
+        setGiscusTeheme(document.documentElement.dataset.userColorScheme)
+    });
+
+    window.addEventListener('onColorSchemeChange', (e) => {
+        setGiscusTeheme(e.detail)
+    })
+</script>
+
+</div>
+
+</main>
+
+
+        </main>
+        <footer class="footer flex">
+    <section class="container">
+        <nav class="footer-links">
+            
+            <a href="/index.xml">RSS</a>
+            
+        </nav>
+
+        
+    </section>
+    <script defer src="/ts/features.706a523ba43e6d0427c7fdf2b9d05dbd0920d3f12942b453690b495cb2522743.js" 
+    data-enable-footnotes="true"
+    ></script>
+</footer>
+
+    </body>
+</html>
