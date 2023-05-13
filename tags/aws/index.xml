@@ -6,11 +6,11 @@
     <description>Recent content in AWS on HanHoRang Tech Blog</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <lastBuildDate>Fri, 12 May 2023 07:35:40 +0900</lastBuildDate><atom:link href="https://HanHoRang31.github.io/tags/aws/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Fri, 12 May 2023 00:00:00 +0000</lastBuildDate><atom:link href="https://HanHoRang31.github.io/tags/aws/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>[AEWS] EKS VPC CNI Deep Dive</title>
       <link>https://HanHoRang31.github.io/post/aews-eks-vpc-1/</link>
-      <pubDate>Fri, 12 May 2023 07:35:40 +0900</pubDate>
+      <pubDate>Fri, 12 May 2023 00:00:00 +0000</pubDate>
       
       <guid>https://HanHoRang31.github.io/post/aews-eks-vpc-1/</guid>
       <description>1 2 AWS EKS Workshop Study (=AEWS)는 EKS Workshop 실습 스터디입니다. CloudNet@ Gasida(가시다)이 진행하며,공개된 AWS EKS Workshop을 기반으로 진행하고 있습니다. EKS VPC CNI CNI(Container Network Interface) 란 네트워크 플러그인 인터페이스로 k8s 네트워크 환경을 구성해준다. EKS 에서는 기본 CNI로 VPC를 사용한다. 여기서 VPC는 AWS 네트워크 서비스인 AWS VPC로 VPC CIDR을 이용하여 파드 IP 할당 및 통신을 지원한다.
@@ -21,7 +21,7 @@ EKS 에서 CNI를 VPC로 사용하면 대표적으로 얻을 수 있는 이점�
     <item>
       <title>[AEWS] Kubeflow on AWS</title>
       <link>https://HanHoRang31.github.io/post/kubeflow-on-aws/</link>
-      <pubDate>Fri, 12 May 2023 07:35:40 +0900</pubDate>
+      <pubDate>Thu, 11 May 2023 00:00:00 +0000</pubDate>
       
       <guid>https://HanHoRang31.github.io/post/kubeflow-on-aws/</guid>
       <description>1 2 AWS EKS Workshop Study (=AEWS)는 EKS Workshop 실습 스터디입니다. CloudNet@ Gasida(가시다)이 진행하며,공개된 AWS EKS Workshop을 기반으로 진행하고 있습니다. 지난 블로그 글에 이어서 kubeflow 를 스터디한 내용을 공유하고자 한다. 오늘 주제는 kubeflow 의 인프라 요소로 왜 쿠버네티스에서 머신러닝을 쓰는 것이 좋은 가와 kubeflow 가 AWS 클라우드(EKS)에 올라갔을 때 어떤 이점이 있는 지 확인하겠다.

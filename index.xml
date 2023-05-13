@@ -5,11 +5,11 @@
     <description>Recent content on HanHoRang Tech Blog</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <lastBuildDate>Fri, 12 May 2023 07:35:40 +0900</lastBuildDate><atom:link href="https://HanHoRang31.github.io/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Fri, 12 May 2023 00:00:00 +0000</lastBuildDate><atom:link href="https://HanHoRang31.github.io/index.xml" rel="self" type="application/rss+xml" />
     <item>
     <title>[AEWS] EKS VPC CNI Deep Dive</title>
     <link>https://HanHoRang31.github.io/post/aews-eks-vpc-1/</link>
-    <pubDate>Fri, 12 May 2023 07:35:40 +0900</pubDate>
+    <pubDate>Fri, 12 May 2023 00:00:00 +0000</pubDate>
     <author>HanHoRnag</author>
     <guid>https://HanHoRang31.github.io/post/aews-eks-vpc-1/</guid>
     <description>
@@ -2052,7 +2052,7 @@
     <item>
     <title>[AEWS] Kubeflow on AWS</title>
     <link>https://HanHoRang31.github.io/post/kubeflow-on-aws/</link>
-    <pubDate>Fri, 12 May 2023 07:35:40 +0900</pubDate>
+    <pubDate>Thu, 11 May 2023 00:00:00 +0000</pubDate>
     <author>HanHoRnag</author>
     <guid>https://HanHoRang31.github.io/post/kubeflow-on-aws/</guid>
     <description>
