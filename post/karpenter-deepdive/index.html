@@ -48,7 +48,7 @@
     },
     "datePublished": "2023-05-26",
     "description": "karpenter 이해와 활용(오버프로비저닝과 kubeflow 워크플로 통합)",
-    "wordCount":  0 ,
+    "wordCount":  3853 ,
     "mainEntityOfPage": "True",
     "dateModified": "2023-05-26",
     "publisher": {
@@ -135,7 +135,7 @@
                             
                             
                             By HanHoRnag | <time>May 26, 2023</time>
-                            | 0 minutes
+                            | 19 minutes
                         </div>
                         <div class="tags">
                             
@@ -163,7 +163,1658 @@
     </article>
 
     <div class="article-post">
-    
+    <div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-markdown" data-lang="markdown"><span class="line"><span class="cl">AWS EKS Workshop Study (=AEWS)는 EKS Workshop 실습 스터디입니다.
+</span></span><span class="line"><span class="cl">CloudNet@ Gasida(가시다)님이 진행하시며,공개된 AWS EKS Workshop을 기반으로 진행하고 있습니다.
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>스터디 5주차 시간에는 최근 핫한 노드 수명 주기 관리 솔루션인 Karpenter를 공부하였다. 타 기업 사례에서 자주 보는 주제로서 볼 때마다 시간나면 해야지 해야지.. 생각만 했었는데 이번 스터디로 계기가 되어 정리한다. 이번 블로그 글에서는 Karpenter 에 대해 중점적으로 정리하여 공유할 예정이다. 먼저 Karpenter에 대한 개념과 원리를 살펴볼 것이고, 실습으로 오버프로비저닝과 Kubeflow와 통합하여 테스트를 진행할 것이다.</p>
+<h1 id="karpenter-">
+    <a href="#karpenter-" class="anchor">
+        <svg class="icon" aria-hidden="true" focusable="false" height="16" version="1.1" viewBox="0 0 16 16" width="16">
+            <path fill-rule="evenodd"
+                d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z">
+            </path>
+        </svg>
+    </a>
+    Karpenter ?
+</h1>
+<p>쿠버네티스에서 동작하는 오픈소스 노드 오토스케일러이다. 기존 노드 오토스케일러인 Cluster Autoscaler(CA) 의 진화 기술이라고 생각하면 생각하기 쉽겠다. CA에 비해 Karpenter 가 최근 노드 오토스케일러 기술로 각광받고 있는데 g이유를 정리하면 다음과 같다.</p>
+<p><img loading="lazy" 
+    src="/./karpenter-deepdive/karpenter1.png" 
+    alt="karpenter1.png" 
+     
+    width=627 
+    height="327"  /></p>
+<ul>
+<li>실시간 노드 프로비저닝(Just in time) : 기존 CA 가 5~10분 정도의 프로비저닝 시간이 걸리는 반면, Karpenter 는 5~30초 단위의 시간으로 노드가 빠르게 프로비저닝된다. 이로 인해 운영 워크로드에서 예상하지 못한 트래픽에 발 빠른 대처가 가능하다.</li>
+<li>기능 기반 프로비저닝(Optimized) : Karpenter는 인스턴스 가드레일 방식,PV 서브넷 인식을 지원한다. 가드레일 방식이란 사용자가 지정한 인스턴스 타입의 범위에서 노드가 프로비저닝된다는 것을 의미하며 여기에서 가장 저렴한 노드를 자동으로 선택하여 프로비저닝된다. 또한, 자동으로 PV를 인식하여 PV가 존재하는 서브넷에 노드를 프로비저닝 시켜준다.</li>
+<li>노드 자동 조정 (Optimized) : 여유 컴퓨팅 자원이 있을 시 자동으로 노드를 정리해주며, 큰 노드 하나가 작은 노드 여러개 보다 비용이 저렴하면 자동으로 합쳐줘 비용 효율적으로 노드를 운영시킬 수 있다.</li>
+<li>타 운영 관리 솔루션과 합쳐 다양한 노드 스케쥴링 가능 : 대표적으로 이벤트 기반의 파드 수를 조절하는 KEDA와 같이 사용하여 오버 프로비저닝이 가능하다.</li>
+</ul>
+<p>기존의 EKS EC2 노드 관리를 생각하면 정말 강력한 기능이 아닐 수 없다! 기존 EKS 의 노드같은 경우 하나의 인스턴스 타입으로 노드 그룹을 구성하고 변경할 수 없었으며, 노드 프로비저닝에 기본 5분이 걸렸다.</p>
+<p>Karpenter가 이러한 기능을 제공할 수 있는 원리를 찾아보니 EKS의 노드를 노드 그룹이 아닌 <strong>EC2 Fleet</strong>으로 노드를 관리하기 때문이였다.</p>
+<p><img loading="lazy" 
+    src="/./karpenter-deepdive/karpenter2.png" 
+    alt="karpenter2.png" 
+     
+    width=559 
+    height="253"  /></p>
+<p>EC2 Fleet은 EC2 인스턴스 유형과 가용 영역을 최대한 활용하여, 비용을 최적화하는 데 유용한 도구이다. 기능적으로는 Karpenter에서 확인한 기능 요소인 다양한 인스턴스 유형 프로비저닝, Spot 인스턴스 &amp; 온디맨드 혼합, 자동 조정을 제공한다.</p>
+<h2 id="karpenter--배포">
+    <a href="#karpenter--%eb%b0%b0%ed%8f%ac" class="anchor">
+        <svg class="icon" aria-hidden="true" focusable="false" height="16" version="1.1" viewBox="0 0 16 16" width="16">
+            <path fill-rule="evenodd"
+                d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z">
+            </path>
+        </svg>
+    </a>
+    Karpenter  배포
+</h2>
+<p>이어서 Karpenter 를 배포하고 실습해보겠다. 실습 내용은 <a href="https://karpenter.sh/v0.27.5/getting-started/getting-started-with-karpenter/">공식문서</a>와 스터디에서 모임장님이 공유해주신 내용을 참고하였다. 먼저 Cloudformation을 통해 베스천 서버를 구축하고 Karpenter을 활성화시키기 위해 EKS 클러스터 생성을 진행하겠다. EKS 생성이 끝나면 Karpenter을 설치하고, 예제를 통해 노드의 상태를 확인하겠다.</p>
+<h3 id="환경-구성">
+    <a href="#%ed%99%98%ea%b2%bd-%ea%b5%ac%ec%84%b1" class="anchor">
+        <svg class="icon" aria-hidden="true" focusable="false" height="16" version="1.1" viewBox="0 0 16 16" width="16">
+            <path fill-rule="evenodd"
+                d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z">
+            </path>
+        </svg>
+    </a>
+    환경 구성
+</h3>
+<p><strong>베스천 서버 생성</strong></p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl"><span class="c1"># 베스천 서버 YAML 파일 다운로드</span>
+</span></span><span class="line"><span class="cl">curl -O https://s3.ap-northeast-2.amazonaws.com/cloudformation.cloudneta.net/K8S/karpenter-preconfig.yaml
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1"># CloudFormation 스택 배포 파라미터 작성 </span>
+</span></span><span class="line"><span class="cl"><span class="c1"># aws cloudformation deploy --template-file karpenter-preconfig.yaml --stack-name myeks2 --parameter-overrides KeyName=kp-gasida SgIngressSshCidr=$(curl -s ipinfo.io/ip)/32  MyIamUserAccessKeyID=AKIA5... MyIamUserSecretAccessKey=&#39;CVNa2...&#39; ClusterBaseName=myeks2 --region ap-northeast-2</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1"># CloudFormation 스택 배포 완료 후 작업용 EC2 IP 출력</span>
+</span></span><span class="line"><span class="cl">aws cloudformation describe-stacks --stack-name myeks2 --query <span class="s1">&#39;Stacks[*].Outputs[0].OutputValue&#39;</span> --output text
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1"># 작업용 EC2 SSH 접속</span>
+</span></span><span class="line"><span class="cl">ssh -i key.pem ec2-user@<span class="k">$(</span>aws cloudformation describe-stacks --stack-name myeks2 --query <span class="s1">&#39;Stacks[*].Outputs[0].OutputValue&#39;</span> --output text<span class="k">)</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p><strong>EKS 클러스터 생성</strong></p>
+<p>Karpenter 로 노드 수명을 관리하기 위해서는 IRSA 허용, 클러스터 태그 설정 , IAM 정책 설정 그리고 aws-auth 에 역할 연결이 필요하다. 필자는 위에서 구성한 베스천 서버에 접속하여 다음의 명령어를 통해 설치를 진행하였다.</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span><span class="lnt">31
+</span><span class="lnt">32
+</span><span class="lnt">33
+</span><span class="lnt">34
+</span><span class="lnt">35
+</span><span class="lnt">36
+</span><span class="lnt">37
+</span><span class="lnt">38
+</span><span class="lnt">39
+</span><span class="lnt">40
+</span><span class="lnt">41
+</span><span class="lnt">42
+</span><span class="lnt">43
+</span><span class="lnt">44
+</span><span class="lnt">45
+</span><span class="lnt">46
+</span><span class="lnt">47
+</span><span class="lnt">48
+</span><span class="lnt">49
+</span><span class="lnt">50
+</span><span class="lnt">51
+</span><span class="lnt">52
+</span><span class="lnt">53
+</span><span class="lnt">54
+</span><span class="lnt">55
+</span><span class="lnt">56
+</span><span class="lnt">57
+</span><span class="lnt">58
+</span><span class="lnt">59
+</span><span class="lnt">60
+</span><span class="lnt">61
+</span><span class="lnt">62
+</span><span class="lnt">63
+</span><span class="lnt">64
+</span><span class="lnt">65
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl"><span class="c1"># Karpenter 버전 및 임시 파일 생성 </span>
+</span></span><span class="line"><span class="cl"><span class="nb">export</span> <span class="nv">KARPENTER_VERSION</span><span class="o">=</span>v0.27.5
+</span></span><span class="line"><span class="cl"><span class="nb">export</span> <span class="nv">TEMPOUT</span><span class="o">=</span><span class="k">$(</span>mktemp<span class="k">)</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1"># Karpenter 설치를 위한 환경변수 확인</span>
+</span></span><span class="line"><span class="cl"><span class="c1"># 다 나와야 설치가 진행된다. </span>
+</span></span><span class="line"><span class="cl"><span class="nb">echo</span> <span class="nv">$KARPENTER_VERSION</span> <span class="nv">$CLUSTER_NAME</span> <span class="nv">$AWS_DEFAULT_REGION</span> <span class="nv">$AWS_ACCOUNT_ID</span> <span class="nv">$TEMPOUT</span>
+</span></span><span class="line"><span class="cl">---
+</span></span><span class="line"><span class="cl">v0.27.5 hanhorang ap-northeast-2 <span class="m">0000000000</span> /tmp/tmp.ckgtAn0r5x
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1"># Karpenter IAM 정책 및 role, EC2 Instance Profile 생성 </span>
+</span></span><span class="line"><span class="cl">curl -fsSL https://karpenter.sh/<span class="s2">&#34;</span><span class="si">${</span><span class="nv">KARPENTER_VERSION</span><span class="si">}</span><span class="s2">&#34;</span>/getting-started/getting-started-with-karpenter/cloudformation.yaml  &gt; <span class="nv">$TEMPOUT</span> <span class="se">\
+</span></span></span><span class="line"><span class="cl"><span class="se"></span><span class="o">&amp;&amp;</span> aws cloudformation deploy <span class="se">\
+</span></span></span><span class="line"><span class="cl"><span class="se"></span>  --stack-name <span class="s2">&#34;Karpenter-</span><span class="si">${</span><span class="nv">CLUSTER_NAME</span><span class="si">}</span><span class="s2">&#34;</span> <span class="se">\
+</span></span></span><span class="line"><span class="cl"><span class="se"></span>  --template-file <span class="s2">&#34;</span><span class="si">${</span><span class="nv">TEMPOUT</span><span class="si">}</span><span class="s2">&#34;</span> <span class="se">\
+</span></span></span><span class="line"><span class="cl"><span class="se"></span>  --capabilities CAPABILITY_NAMED_IAM <span class="se">\
+</span></span></span><span class="line"><span class="cl"><span class="se"></span>  --parameter-overrides <span class="s2">&#34;ClusterName=</span><span class="si">${</span><span class="nv">CLUSTER_NAME</span><span class="si">}</span><span class="s2">&#34;</span> 
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1"># EKS 클러스터 구성</span>
+</span></span><span class="line"><span class="cl">eksctl create cluster -f - <span class="s">&lt;&lt;EOF
+</span></span></span><span class="line"><span class="cl"><span class="s">---
+</span></span></span><span class="line"><span class="cl"><span class="s">apiVersion: eksctl.io/v1alpha5
+</span></span></span><span class="line"><span class="cl"><span class="s">kind: ClusterConfig
+</span></span></span><span class="line"><span class="cl"><span class="s">metadata:
+</span></span></span><span class="line"><span class="cl"><span class="s">  name: ${CLUSTER_NAME}
+</span></span></span><span class="line"><span class="cl"><span class="s">  region: ${AWS_DEFAULT_REGION}
+</span></span></span><span class="line"><span class="cl"><span class="s">  version: &#34;1.24&#34;
+</span></span></span><span class="line"><span class="cl"><span class="s">  tags:
+</span></span></span><span class="line"><span class="cl"><span class="s">    karpenter.sh/discovery: ${CLUSTER_NAME}
+</span></span></span><span class="line"><span class="cl"><span class="s">
+</span></span></span><span class="line"><span class="cl"><span class="s">iam:
+</span></span></span><span class="line"><span class="cl"><span class="s">  withOIDC: true
+</span></span></span><span class="line"><span class="cl"><span class="s">  serviceAccounts:
+</span></span></span><span class="line"><span class="cl"><span class="s">  - metadata:
+</span></span></span><span class="line"><span class="cl"><span class="s">      name: karpenter
+</span></span></span><span class="line"><span class="cl"><span class="s">      namespace: karpenter
+</span></span></span><span class="line"><span class="cl"><span class="s">    roleName: ${CLUSTER_NAME}-karpenter
+</span></span></span><span class="line"><span class="cl"><span class="s">    attachPolicyARNs:
+</span></span></span><span class="line"><span class="cl"><span class="s">    - arn:aws:iam::${AWS_ACCOUNT_ID}:policy/KarpenterControllerPolicy-${CLUSTER_NAME}
+</span></span></span><span class="line"><span class="cl"><span class="s">    roleOnly: true
+</span></span></span><span class="line"><span class="cl"><span class="s">
+</span></span></span><span class="line"><span class="cl"><span class="s">iamIdentityMappings:
+</span></span></span><span class="line"><span class="cl"><span class="s">- arn: &#34;arn:aws:iam::${AWS_ACCOUNT_ID}:role/KarpenterNodeRole-${CLUSTER_NAME}&#34;
+</span></span></span><span class="line"><span class="cl"><span class="s">  username: system:node:{{EC2PrivateDNSName}}
+</span></span></span><span class="line"><span class="cl"><span class="s">  groups:
+</span></span></span><span class="line"><span class="cl"><span class="s">  - system:bootstrappers
+</span></span></span><span class="line"><span class="cl"><span class="s">  - system:nodes
+</span></span></span><span class="line"><span class="cl"><span class="s">
+</span></span></span><span class="line"><span class="cl"><span class="s">managedNodeGroups:
+</span></span></span><span class="line"><span class="cl"><span class="s">- instanceType: m5.large
+</span></span></span><span class="line"><span class="cl"><span class="s">  amiFamily: AmazonLinux2
+</span></span></span><span class="line"><span class="cl"><span class="s">  name: ${CLUSTER_NAME}-ng
+</span></span></span><span class="line"><span class="cl"><span class="s">  desiredCapacity: 2
+</span></span></span><span class="line"><span class="cl"><span class="s">  minSize: 1
+</span></span></span><span class="line"><span class="cl"><span class="s">  maxSize: 10
+</span></span></span><span class="line"><span class="cl"><span class="s">  iam:
+</span></span></span><span class="line"><span class="cl"><span class="s">    withAddonPolicies:
+</span></span></span><span class="line"><span class="cl"><span class="s">      externalDNS: true
+</span></span></span><span class="line"><span class="cl"><span class="s">
+</span></span></span><span class="line"><span class="cl"><span class="s">*## Optionally run on fargate
+</span></span></span><span class="line"><span class="cl"><span class="s"># fargateProfiles:
+</span></span></span><span class="line"><span class="cl"><span class="s"># - name: karpenter
+</span></span></span><span class="line"><span class="cl"><span class="s">#  selectors:
+</span></span></span><span class="line"><span class="cl"><span class="s">#  - namespace: karpenter*
+</span></span></span><span class="line"><span class="cl"><span class="s">EOF</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>eksctl 코드에서 karpenter를 배포하기 위해 몇 가지 설정을 진행하였다.</p>
+<ul>
+<li>
+<p>tags : 카펜터를 사용할 곳에 태그를 지정시킨다. 해당 예제에서는 클러스터 전체에서 카펜터를 사용하도록 지정하였지만, 필요에 따라 서브넷, 보안 그룹에 태그를 지정하여 해당 태그에 있는 곳에만 카펜터를 사용할 수 있다.</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span><span class="lnt">31
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl"><span class="c1"># 노드 그룹 서브넷 태그 추가</span>
+</span></span><span class="line"><span class="cl"><span class="k">for</span> NODEGROUP in <span class="k">$(</span>aws eks list-nodegroups --cluster-name <span class="si">${</span><span class="nv">CLUSTER_NAME</span><span class="si">}</span> <span class="se">\
+</span></span></span><span class="line"><span class="cl"><span class="se"></span>    --query <span class="s1">&#39;nodegroups&#39;</span> --output text<span class="k">)</span><span class="p">;</span> <span class="k">do</span> aws ec2 create-tags <span class="se">\
+</span></span></span><span class="line"><span class="cl"><span class="se"></span>        --tags <span class="s2">&#34;Key=karpenter.sh/discovery,Value=</span><span class="si">${</span><span class="nv">CLUSTER_NAME</span><span class="si">}</span><span class="s2">&#34;</span> <span class="se">\
+</span></span></span><span class="line"><span class="cl"><span class="se"></span>        --resources <span class="k">$(</span>aws eks describe-nodegroup --cluster-name <span class="si">${</span><span class="nv">CLUSTER_NAME</span><span class="si">}</span> <span class="se">\
+</span></span></span><span class="line"><span class="cl"><span class="se"></span>        --nodegroup-name <span class="nv">$NODEGROUP</span> --query <span class="s1">&#39;nodegroup.subnets&#39;</span> --output text <span class="k">)</span>
+</span></span><span class="line"><span class="cl"><span class="k">done</span> 
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1"># 보안 그룹 태그 추가 </span>
+</span></span><span class="line"><span class="cl"><span class="nv">NODEGROUP</span><span class="o">=</span><span class="k">$(</span>aws eks list-nodegroups --cluster-name <span class="si">${</span><span class="nv">CLUSTER_NAME</span><span class="si">}</span> <span class="se">\
+</span></span></span><span class="line"><span class="cl"><span class="se"></span>    --query <span class="s1">&#39;nodegroups[0]&#39;</span> --output text<span class="k">)</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="nv">LAUNCH_TEMPLATE</span><span class="o">=</span><span class="k">$(</span>aws eks describe-nodegroup --cluster-name <span class="si">${</span><span class="nv">CLUSTER_NAME</span><span class="si">}</span> <span class="se">\
+</span></span></span><span class="line"><span class="cl"><span class="se"></span>    --nodegroup-name <span class="si">${</span><span class="nv">NODEGROUP</span><span class="si">}</span> --query <span class="s1">&#39;nodegroup.launchTemplate.{id:id,version:version}&#39;</span> <span class="se">\
+</span></span></span><span class="line"><span class="cl"><span class="se"></span>    --output text <span class="p">|</span> tr -s <span class="s2">&#34;\t&#34;</span> <span class="s2">&#34;,&#34;</span><span class="k">)</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1"># If your EKS setup is configured to use only Cluster security group, then please execute -</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="nv">SECURITY_GROUPS</span><span class="o">=</span><span class="k">$(</span>aws eks describe-cluster <span class="se">\
+</span></span></span><span class="line"><span class="cl"><span class="se"></span>    --name <span class="si">${</span><span class="nv">CLUSTER_NAME</span><span class="si">}</span> --query <span class="s2">&#34;cluster.resourcesVpcConfig.clusterSecurityGroupId&#34;</span> --output text<span class="k">)</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1"># If your setup uses the security groups in the Launch template of a managed node group, then :</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="nv">SECURITY_GROUPS</span><span class="o">=</span><span class="k">$(</span>aws ec2 describe-launch-template-versions <span class="se">\
+</span></span></span><span class="line"><span class="cl"><span class="se"></span>    --launch-template-id <span class="si">${</span><span class="nv">LAUNCH_TEMPLATE</span><span class="p">%,*</span><span class="si">}</span> --versions <span class="si">${</span><span class="nv">LAUNCH_TEMPLATE</span><span class="p">#*,</span><span class="si">}</span> <span class="se">\
+</span></span></span><span class="line"><span class="cl"><span class="se"></span>    --query <span class="s1">&#39;LaunchTemplateVersions[0].LaunchTemplateData.[NetworkInterfaces[0].Groups||SecurityGroupIds]&#39;</span> <span class="se">\
+</span></span></span><span class="line"><span class="cl"><span class="se"></span>    --output text<span class="k">)</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">aws ec2 create-tags <span class="se">\
+</span></span></span><span class="line"><span class="cl"><span class="se"></span>    --tags <span class="s2">&#34;Key=karpenter.sh/discovery,Value=</span><span class="si">${</span><span class="nv">CLUSTER_NAME</span><span class="si">}</span><span class="s2">&#34;</span> <span class="se">\
+</span></span></span><span class="line"><span class="cl"><span class="se"></span>    --resources <span class="si">${</span><span class="nv">SECURITY_GROUPS</span><span class="si">}</span> 
+</span></span></code></pre></td></tr></table>
+</div>
+</div></li>
+<li>
+<p>iam : OIDC 를 True로 설정함과 동시에 karpenter라는 쿠버네티스 서비스 어카운터에 앞 서 생성한 정책을 연결하였다. 이렇게 하면 생성한 정책에 따라 karpenter 사용자가 AWS 서비스를 관리할 수 있게 된다.</p>
+</li>
+<li>
+<p>iamIdentityMappings: aws-auth configmap 업데이트 작업으로 노드 IAM 역할을 사용하는 노드가 클러스터에 가입하도록 허용시켜주는 작업이다. 예상이지만 노드를 ASG로 관리하는 것이 아닌 EC2 Fleet으로 관리하기에 추가로 필요한 작업인 것 같다.</p>
+</li>
+</ul>
+<p><strong>Karpenter 배포</strong></p>
+<p>EKS 클러스터 생성 후, Karpenter 를 배포하겠다.</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl"><span class="c1"># 카펜터 설치를 위한 환경 변수 확인</span>
+</span></span><span class="line"><span class="cl"><span class="nb">export</span> <span class="nv">CLUSTER_ENDPOINT</span><span class="o">=</span><span class="s2">&#34;</span><span class="k">$(</span>aws eks describe-cluster --name <span class="si">${</span><span class="nv">CLUSTER_NAME</span><span class="si">}</span> --query <span class="s2">&#34;cluster.endpoint&#34;</span> --output text<span class="k">)</span><span class="s2">&#34;</span>
+</span></span><span class="line"><span class="cl"><span class="nb">export</span> <span class="nv">KARPENTER_IAM_ROLE_ARN</span><span class="o">=</span><span class="s2">&#34;arn:aws:iam::</span><span class="si">${</span><span class="nv">AWS_ACCOUNT_ID</span><span class="si">}</span><span class="s2">:role/</span><span class="si">${</span><span class="nv">CLUSTER_NAME</span><span class="si">}</span><span class="s2">-karpenter&#34;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="nb">echo</span> <span class="nv">$CLUSTER_ENDPOINT</span> <span class="nv">$KARPENTER_IAM_ROLE_ARN</span> 
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1"># EC2 Spot Fleet 사용을 위한 정책 확인 : 이미 생성한 정책으로 결과와 같이 에러가 떠야 정상이다. </span>
+</span></span><span class="line"><span class="cl">aws iam create-service-linked-role --aws-service-name spot.amazonaws.com <span class="o">||</span> <span class="nb">true</span>
+</span></span><span class="line"><span class="cl">-- 
+</span></span><span class="line"><span class="cl">An error occurred <span class="o">(</span>InvalidInput<span class="o">)</span> when calling the CreateServiceLinkedRole operation: Service role name AWSServiceRoleForEC2Spot has been taken in this account, please try a different suffix.
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1"># public ECR 로그아웃, 익명의 상태로 이미지 다운로드하기 위함</span>
+</span></span><span class="line"><span class="cl">docker <span class="nb">logout</span> public.ecr.aws
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1"># Karpenter 설치 </span>
+</span></span><span class="line"><span class="cl">helm upgrade --install karpenter oci://public.ecr.aws/karpenter/karpenter --version <span class="si">${</span><span class="nv">KARPENTER_VERSION</span><span class="si">}</span> --namespace karpenter --create-namespace <span class="se">\
+</span></span></span><span class="line"><span class="cl"><span class="se"></span>  --set serviceAccount.annotations.<span class="s2">&#34;eks\.amazonaws\.com/role-arn&#34;</span><span class="o">=</span><span class="si">${</span><span class="nv">KARPENTER_IAM_ROLE_ARN</span><span class="si">}</span> <span class="se">\
+</span></span></span><span class="line"><span class="cl"><span class="se"></span>  --set settings.aws.clusterName<span class="o">=</span><span class="si">${</span><span class="nv">CLUSTER_NAME</span><span class="si">}</span> <span class="se">\
+</span></span></span><span class="line"><span class="cl"><span class="se"></span>  --set settings.aws.defaultInstanceProfile<span class="o">=</span>KarpenterNodeInstanceProfile-<span class="si">${</span><span class="nv">CLUSTER_NAME</span><span class="si">}</span> <span class="se">\
+</span></span></span><span class="line"><span class="cl"><span class="se"></span>  --set settings.aws.interruptionQueueName<span class="o">=</span><span class="si">${</span><span class="nv">CLUSTER_NAME</span><span class="si">}</span> <span class="se">\
+</span></span></span><span class="line"><span class="cl"><span class="se"></span>  --set controller.resources.requests.cpu<span class="o">=</span><span class="m">1</span> <span class="se">\
+</span></span></span><span class="line"><span class="cl"><span class="se"></span>  --set controller.resources.requests.memory<span class="o">=</span>1Gi <span class="se">\
+</span></span></span><span class="line"><span class="cl"><span class="se"></span>  --set controller.resources.limits.cpu<span class="o">=</span><span class="m">1</span> <span class="se">\
+</span></span></span><span class="line"><span class="cl"><span class="se"></span>  --set controller.resources.limits.memory<span class="o">=</span>1Gi <span class="se">\
+</span></span></span><span class="line"><span class="cl"><span class="se"></span>  --wait
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1"># 설치 확인 </span>
+</span></span><span class="line"><span class="cl">kubectl get all -n karpenter
+</span></span><span class="line"><span class="cl">kubectl get cm -n karpenter karpenter-global-settings -o <span class="nv">jsonpath</span><span class="o">={</span>.data<span class="o">}</span> <span class="p">|</span> jq
+</span></span><span class="line"><span class="cl">kubectl get crd <span class="p">|</span> grep karpenter
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p><strong>Karpenter 모니터링 설정</strong></p>
+<p>Karpenter 설치가 완료되었으면 예제를 통해 노드 프로비저닝을 직접 테스트해보겠다.  먼저  노드 프로비저닝을 확인하기 위해 그라파나와 노드 모니터링 도구인 eks-node-viewer를 설치하겠다.</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span><span class="lnt">31
+</span><span class="lnt">32
+</span><span class="lnt">33
+</span><span class="lnt">34
+</span><span class="lnt">35
+</span><span class="lnt">36
+</span><span class="lnt">37
+</span><span class="lnt">38
+</span><span class="lnt">39
+</span><span class="lnt">40
+</span><span class="lnt">41
+</span><span class="lnt">42
+</span><span class="lnt">43
+</span><span class="lnt">44
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl"><span class="c1"># External DNS 추가</span>
+</span></span><span class="line"><span class="cl"><span class="nv">MyDomain</span><span class="o">=</span>hanhorang.link <span class="c1"># 각자 도메인 입력</span>
+</span></span><span class="line"><span class="cl"><span class="nb">echo</span> <span class="s2">&#34;export MyDomain=&lt;자신의 도메인&gt;&#34;</span> &gt;&gt; /etc/profile
+</span></span><span class="line"><span class="cl">*MyDomain<span class="o">=</span>*hanhorang.link 
+</span></span><span class="line"><span class="cl">*echo <span class="s2">&#34;export MyDomain=gasida.link&#34;</span> &gt;&gt; /etc/profile*
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="nv">MyDnzHostedZoneId</span><span class="o">=</span><span class="k">$(</span>aws route53 list-hosted-zones-by-name --dns-name <span class="s2">&#34;</span><span class="si">${</span><span class="nv">MyDomain</span><span class="si">}</span><span class="s2">.&#34;</span> --query <span class="s2">&#34;HostedZones[0].Id&#34;</span> --output text<span class="k">)</span>
+</span></span><span class="line"><span class="cl"><span class="nb">echo</span> <span class="nv">$MyDomain</span>, <span class="nv">$MyDnzHostedZoneId</span>
+</span></span><span class="line"><span class="cl">curl -s -O https://raw.githubusercontent.com/gasida/PKOS/main/aews/externaldns.yaml
+</span></span><span class="line"><span class="cl"><span class="nv">MyDomain</span><span class="o">=</span><span class="nv">$MyDomain</span> <span class="nv">MyDnzHostedZoneId</span><span class="o">=</span><span class="nv">$MyDnzHostedZoneId</span> envsubst &lt; externaldns.yaml <span class="p">|</span> kubectl apply -f -
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1"># IP 주소 확인 : 172.30.0.0/16 VPC 대역에서 172.30.1.0/24 대역을 사용 중</span>
+</span></span><span class="line"><span class="cl">ip -br -c addr
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1"># EKS Node Viewer 설치 : 현재 ec2 spec에서는설치에 다소 시간이 소요됨 = 2분 이상</span>
+</span></span><span class="line"><span class="cl">go install github.com/awslabs/eks-node-viewer/cmd/eks-node-viewer@latest
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1"># [터미널1] bin 확인 및 사용</span>
+</span></span><span class="line"><span class="cl">tree ~/go/bin
+</span></span><span class="line"><span class="cl"><span class="nb">cd</span> ~/go/bin
+</span></span><span class="line"><span class="cl">./eks-node-viewer -h
+</span></span><span class="line"><span class="cl">./eks-node-viewer 
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1"># 그라파나 배포 </span>
+</span></span><span class="line"><span class="cl">helm repo add grafana-charts https://grafana.github.io/helm-charts
+</span></span><span class="line"><span class="cl">helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
+</span></span><span class="line"><span class="cl">helm repo update
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">kubectl create namespace monitoring
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1"># 프로메테우스 설치</span>
+</span></span><span class="line"><span class="cl">curl -fsSL https://karpenter.sh/<span class="s2">&#34;</span><span class="si">${</span><span class="nv">KARPENTER_VERSION</span><span class="si">}</span><span class="s2">&#34;</span>/getting-started/getting-started-with-karpenter/prometheus-values.yaml <span class="p">|</span> tee prometheus-values.yaml
+</span></span><span class="line"><span class="cl">helm install --namespace monitoring prometheus prometheus-community/prometheus --values prometheus-values.yaml --set alertmanager.enabled<span class="o">=</span><span class="nb">false</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1"># 그라파나 설치</span>
+</span></span><span class="line"><span class="cl">curl -fsSL https://karpenter.sh/<span class="s2">&#34;</span><span class="si">${</span><span class="nv">KARPENTER_VERSION</span><span class="si">}</span><span class="s2">&#34;</span>/getting-started/getting-started-with-karpenter/grafana-values.yaml <span class="p">|</span> tee grafana-values.yaml
+</span></span><span class="line"><span class="cl">helm install --namespace monitoring grafana grafana-charts/grafana --values grafana-values.yaml --set service.type<span class="o">=</span>LoadBalancer
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1"># admin 암호</span>
+</span></span><span class="line"><span class="cl">kubectl get secret --namespace monitoring grafana -o <span class="nv">jsonpath</span><span class="o">=</span><span class="s2">&#34;{.data.admin-password}&#34;</span> <span class="p">|</span> base64 --decode <span class="p">;</span> <span class="nb">echo</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1"># 그라파나 접속</span>
+</span></span><span class="line"><span class="cl">kubectl annotate service grafana -n monitoring <span class="s2">&#34;external-dns.alpha.kubernetes.io/hostname=grafana.</span><span class="nv">$MyDomain</span><span class="s2">&#34;</span>
+</span></span><span class="line"><span class="cl"><span class="nb">echo</span> -e <span class="s2">&#34;grafana URL = http://grafana.</span><span class="nv">$MyDomain</span><span class="s2">&#34;</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><ul>
+<li>
+<p>모니터링 설치를 위한 추가 헬름 차트 구성은 다음과 같다. 설치한 메트릭 스택이 있다면 아래 부분을 추가하자.</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl"><span class="c1"># 프로메테우스 헬름 차트 </span>
+</span></span><span class="line"><span class="cl">alertmanager:
+</span></span><span class="line"><span class="cl">  persistentVolume:
+</span></span><span class="line"><span class="cl">    enabled: <span class="nb">false</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">server:
+</span></span><span class="line"><span class="cl">  fullnameOverride: prometheus-server
+</span></span><span class="line"><span class="cl">  persistentVolume:
+</span></span><span class="line"><span class="cl">    enabled: <span class="nb">false</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1"># karpenter 메트릭 수집 추가 </span>
+</span></span><span class="line"><span class="cl">extraScrapeConfigs: <span class="p">|</span>
+</span></span><span class="line"><span class="cl">    - job_name: karpenter
+</span></span><span class="line"><span class="cl">      kubernetes_sd_configs:
+</span></span><span class="line"><span class="cl">      - role: endpoints
+</span></span><span class="line"><span class="cl">        namespaces:
+</span></span><span class="line"><span class="cl">          names:
+</span></span><span class="line"><span class="cl">          - karpenter
+</span></span><span class="line"><span class="cl">      relabel_configs:
+</span></span><span class="line"><span class="cl">      - source_labels: <span class="o">[</span>__meta_kubernetes_endpoint_port_name<span class="o">]</span>
+</span></span><span class="line"><span class="cl">        regex: http-metrics
+</span></span><span class="line"><span class="cl">        action: keep
+</span></span></code></pre></td></tr></table>
+</div>
+</div><div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl"><span class="c1"># 그라파나 헬름 차트 </span>
+</span></span><span class="line"><span class="cl">datasources: <span class="c1"># 메트릭 소스 설정</span>
+</span></span><span class="line"><span class="cl">  datasources.yaml:
+</span></span><span class="line"><span class="cl">    apiVersion: <span class="m">1</span>
+</span></span><span class="line"><span class="cl">    datasources:
+</span></span><span class="line"><span class="cl">    - name: Prometheus
+</span></span><span class="line"><span class="cl">      type: prometheus
+</span></span><span class="line"><span class="cl">      version: <span class="m">1</span>
+</span></span><span class="line"><span class="cl">      url: http://prometheus-server:80
+</span></span><span class="line"><span class="cl">      access: proxy
+</span></span><span class="line"><span class="cl">dashboardProviders:
+</span></span><span class="line"><span class="cl">  dashboardproviders.yaml:
+</span></span><span class="line"><span class="cl">    apiVersion: <span class="m">1</span>
+</span></span><span class="line"><span class="cl">    providers:
+</span></span><span class="line"><span class="cl">    - name: <span class="s1">&#39;default&#39;</span>
+</span></span><span class="line"><span class="cl">      orgId: <span class="m">1</span>
+</span></span><span class="line"><span class="cl">      folder: <span class="s1">&#39;&#39;</span>
+</span></span><span class="line"><span class="cl">      type: file
+</span></span><span class="line"><span class="cl">      disableDeletion: <span class="nb">false</span>
+</span></span><span class="line"><span class="cl">      editable: <span class="nb">true</span>
+</span></span><span class="line"><span class="cl">      options:
+</span></span><span class="line"><span class="cl">        path: /var/lib/grafana/dashboards/default
+</span></span><span class="line"><span class="cl">dashboards: <span class="c1"># 대시보드 추가 </span>
+</span></span><span class="line"><span class="cl">  default:
+</span></span><span class="line"><span class="cl">    capacity-dashboard:
+</span></span><span class="line"><span class="cl">      url: https://karpenter.sh/v0.27.5/getting-started/getting-started-with-karpenter/karpenter-capacity-dashboard.json
+</span></span><span class="line"><span class="cl">    performance-dashboard:
+</span></span><span class="line"><span class="cl">      url: https://karpenter.sh/v0.27.5/getting-started/getting-started-with-karpenter/karpenter-performance-dashboard.json
+</span></span></code></pre></td></tr></table>
+</div>
+</div></li>
+</ul>
+<p>그라파나 대시보드 화면</p>
+<p><img loading="lazy" 
+    src="/./karpenter-deepdive/karpenter4.png" 
+    alt="karpenter4.png" 
+     
+    width=1849 
+    height="966"  /></p>
+<p>eks-node-viewer 모니터링 화면</p>
+<p><img loading="lazy" 
+    src="/./karpenter-deepdive/Karpenter3.png" 
+    alt="Karpenter3.png" 
+     
+    width=2102 
+    height="220"  /></p>
+<h3 id="karpenter-테스트">
+    <a href="#karpenter-%ed%85%8c%ec%8a%a4%ed%8a%b8" class="anchor">
+        <svg class="icon" aria-hidden="true" focusable="false" height="16" version="1.1" viewBox="0 0 16 16" width="16">
+            <path fill-rule="evenodd"
+                d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z">
+            </path>
+        </svg>
+    </a>
+    Karpenter 테스트
+</h3>
+<p>모니터링 설정이 끝났으면 실제로 노드가 빠르게 프로비저닝되는 지 테스트해보겠다. 노드 관리에 따른 설정 옵션으로 Karpenter 에서는 Provisioner 라는 CRD 형태의 관리 형태를 제공한다. 제공하는 옵션이 많으므로 <a href="https://karpenter.sh/v0.26.1/concepts/provisioners/">공식문서</a>를 통해 옵션을 참고하자.</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">cat <span class="s">&lt;&lt;EOF | kubectl apply -f -
+</span></span></span><span class="line"><span class="cl"><span class="s">apiVersion: karpenter.sh/v1alpha5
+</span></span></span><span class="line"><span class="cl"><span class="s">kind: Provisioner
+</span></span></span><span class="line"><span class="cl"><span class="s">metadata:
+</span></span></span><span class="line"><span class="cl"><span class="s">  name: default
+</span></span></span><span class="line"><span class="cl"><span class="s">spec:
+</span></span></span><span class="line"><span class="cl"><span class="s">  requirements:
+</span></span></span><span class="line"><span class="cl"><span class="s">    - key: karpenter.sh/capacity-type
+</span></span></span><span class="line"><span class="cl"><span class="s">      operator: In
+</span></span></span><span class="line"><span class="cl"><span class="s">      values: [&#34;spot&#34;]
+</span></span></span><span class="line"><span class="cl"><span class="s">  limits:
+</span></span></span><span class="line"><span class="cl"><span class="s">    resources:
+</span></span></span><span class="line"><span class="cl"><span class="s">      cpu: 1000
+</span></span></span><span class="line"><span class="cl"><span class="s">  providerRef:
+</span></span></span><span class="line"><span class="cl"><span class="s">    name: default
+</span></span></span><span class="line"><span class="cl"><span class="s">  ttlSecondsAfterEmpty: 30
+</span></span></span><span class="line"><span class="cl"><span class="s">---
+</span></span></span><span class="line"><span class="cl"><span class="s">apiVersion: karpenter.k8s.aws/v1alpha1
+</span></span></span><span class="line"><span class="cl"><span class="s">kind: AWSNodeTemplate
+</span></span></span><span class="line"><span class="cl"><span class="s">metadata:
+</span></span></span><span class="line"><span class="cl"><span class="s">  name: default
+</span></span></span><span class="line"><span class="cl"><span class="s">spec:
+</span></span></span><span class="line"><span class="cl"><span class="s">  subnetSelector:
+</span></span></span><span class="line"><span class="cl"><span class="s">    karpenter.sh/discovery: ${CLUSTER_NAME}
+</span></span></span><span class="line"><span class="cl"><span class="s">  securityGroupSelector:
+</span></span></span><span class="line"><span class="cl"><span class="s">    karpenter.sh/discovery: ${CLUSTER_NAME}
+</span></span></span><span class="line"><span class="cl"><span class="s">EOF</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><ul>
+<li>spec : Spot 인스턴스를 추가하도록 설정하고 최대 CPU 제한을 1000개로 설정한다.</li>
+<li>ttlSecondsAfterEmpty : 노드가 비어 있을 때 해당 노드를 종료하기 전에 대기하는 시간이다. 본 예제에서는 30초로 설정하였다.</li>
+</ul>
+<p>이제 예제 파드를 배포하고, 파드 수를 늘려 노드 프로비저닝을 확인하겠다.</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl"><span class="c1"># pause 파드 1개에 CPU 1개 최소 보장 할당</span>
+</span></span><span class="line"><span class="cl">cat <span class="s">&lt;&lt;EOF | kubectl apply -f -
+</span></span></span><span class="line"><span class="cl"><span class="s">apiVersion: apps/v1
+</span></span></span><span class="line"><span class="cl"><span class="s">kind: Deployment
+</span></span></span><span class="line"><span class="cl"><span class="s">metadata:
+</span></span></span><span class="line"><span class="cl"><span class="s">  name: inflate
+</span></span></span><span class="line"><span class="cl"><span class="s">spec:
+</span></span></span><span class="line"><span class="cl"><span class="s">  replicas: 0
+</span></span></span><span class="line"><span class="cl"><span class="s">  selector:
+</span></span></span><span class="line"><span class="cl"><span class="s">    matchLabels:
+</span></span></span><span class="line"><span class="cl"><span class="s">      app: inflate
+</span></span></span><span class="line"><span class="cl"><span class="s">  template:
+</span></span></span><span class="line"><span class="cl"><span class="s">    metadata:
+</span></span></span><span class="line"><span class="cl"><span class="s">      labels:
+</span></span></span><span class="line"><span class="cl"><span class="s">        app: inflate
+</span></span></span><span class="line"><span class="cl"><span class="s">    spec:
+</span></span></span><span class="line"><span class="cl"><span class="s">      terminationGracePeriodSeconds: 0
+</span></span></span><span class="line"><span class="cl"><span class="s">      containers:
+</span></span></span><span class="line"><span class="cl"><span class="s">        - name: inflate
+</span></span></span><span class="line"><span class="cl"><span class="s">          image: public.ecr.aws/eks-distro/kubernetes/pause:3.7
+</span></span></span><span class="line"><span class="cl"><span class="s">          resources:
+</span></span></span><span class="line"><span class="cl"><span class="s">            requests:
+</span></span></span><span class="line"><span class="cl"><span class="s">              cpu: 1
+</span></span></span><span class="line"><span class="cl"><span class="s">EOF</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">kubectl scale deployment inflate --replicas <span class="m">5</span> 
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>파드를 5개로 늘리니 실시간으로 Spot 인스턴스가 프로비저닝된다. 파드가 배치되기까지 약 1분정도 소요되며 그라파나에서 생성한 노드 수를 확인할 수 있다.</p>
+<p><img loading="lazy" 
+    src="/./karpenter-deepdive/karpenter7.png" 
+    alt="karpenter7.png" 
+     
+    width=2152 
+    height="270"  /></p>
+<p><img loading="lazy" 
+    src="/./karpenter-deepdive/karpenter10.png" 
+    alt="karpenter10.png" 
+     
+    width=1852 
+    height="617"  /></p>
+<h1 id="karpenter--활용">
+    <a href="#karpenter--%ed%99%9c%ec%9a%a9" class="anchor">
+        <svg class="icon" aria-hidden="true" focusable="false" height="16" version="1.1" viewBox="0 0 16 16" width="16">
+            <path fill-rule="evenodd"
+                d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z">
+            </path>
+        </svg>
+    </a>
+    Karpenter  활용
+</h1>
+<p>Karpenter와 타 쿠버네티스 플랫폼과 합쳐 노드 관리해보는 시나리오를 구성하여 활용해보겠다. 활용 시나리오는 다음과 같다.</p>
+<ul>
+<li>Karpenter + KEDA로 노드 오버프로비저닝</li>
+<li>Karpenter + Kubeflow 로 필요시 GPU 기반의 SPOT 인스턴스 제공하기</li>
+</ul>
+<h2 id="karpenter--keda로-노드-오버-프로비저닝">
+    <a href="#karpenter--keda%eb%a1%9c-%eb%85%b8%eb%93%9c-%ec%98%a4%eb%b2%84-%ed%94%84%eb%a1%9c%eb%b9%84%ec%a0%80%eb%8b%9d" class="anchor">
+        <svg class="icon" aria-hidden="true" focusable="false" height="16" version="1.1" viewBox="0 0 16 16" width="16">
+            <path fill-rule="evenodd"
+                d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z">
+            </path>
+        </svg>
+    </a>
+    Karpenter + KEDA로 노드 오버 프로비저닝
+</h2>
+<p><a href="https://www.youtube.com/@awskrug">AWS 한국사용자모임 - AWSKRUG</a> 에서 발표해주신 내용으로 직접 테스트해보겠다. 영상 PPT에서 확인할 수 있듯이, 노드 오버프로비저닝의 목적은 카펜터가 프로비저닝 하는 시간(1~2분)을 없애기 위한 목적이다.</p>
+<p>Karpenter 는 ASG를 사용하지 않기 때문에 CA 처럼 일정 시간에 노드를 증설하고 감소 시킬 수 없다. 이를 위한 해결 방법으로 이벤트 기반의 툴인 KEDA를 통해 파드를 특정 시간에 배치하여 깡통 노드를 증설시켜 해결할 수 있다.</p>
+<p><img loading="lazy" 
+    src="/./karpenter-deepdive/karpenter11.png" 
+    alt="&lt;a href=&#34;https://www.youtube.com/watch?v=FPlCVVrCD64&#34;&gt;https://www.youtube.com/watch?v=FPlCVVrCD64&lt;/a&gt;" 
+     
+    width=1316 
+    height="735"  /></p>
+<p><a href="https://www.youtube.com/watch?v=FPlCVVrCD64">https://www.youtube.com/watch?v=FPlCVVrCD64</a></p>
+<h3 id="keda-">
+    <a href="#keda-" class="anchor">
+        <svg class="icon" aria-hidden="true" focusable="false" height="16" version="1.1" viewBox="0 0 16 16" width="16">
+            <path fill-rule="evenodd"
+                d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z">
+            </path>
+        </svg>
+    </a>
+    KEDA ?
+</h3>
+<p>특정 이벤트를 기반으로 파드 수를 스케쥴링시켜주는 Autoscaler이다. Kubernetes의 cron 처럼 파드 수를 일정 시간에 수를 늘릴 수 도 있고, 특정 이벤트(task 수, kafka topic)에 의해 파드를 스케쥴링할 수 있다.</p>
+<p><img loading="lazy" 
+    src="/./karpenter-deepdive/Untitled.png" 
+    alt="&lt;a href=&#34;https://keda.sh/docs/2.10/concepts/&#34;&gt;https://keda.sh/docs/2.10/concepts/&lt;/a&gt;" 
+     
+    width=1296 
+    height="1003"  /></p>
+<p><a href="https://keda.sh/docs/2.10/concepts/">https://keda.sh/docs/2.10/concepts/</a></p>
+<p>선수 작업으로 prom-operator 설치가 필요하다. 아래의 과정으로 설치를 진행하자.</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
+</span></span><span class="line"><span class="cl">kubectl create ns monitoring
+</span></span><span class="line"><span class="cl">helm install kube-prometheus-stack prometheus-community/kube-prometheus-stack --version 45.27.2 <span class="se">\
+</span></span></span><span class="line"><span class="cl"><span class="se"></span>--set prometheus.prometheusSpec.scrapeInterval<span class="o">=</span><span class="s1">&#39;15s&#39;</span> --set prometheus.prometheusSpec.evaluationInterval<span class="o">=</span><span class="s1">&#39;15s&#39;</span> <span class="se">\
+</span></span></span><span class="line"><span class="cl"><span class="se"></span>--namespace monitoring
+</span></span></code></pre></td></tr></table>
+</div>
+</div><div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span><span class="lnt">31
+</span><span class="lnt">32
+</span><span class="lnt">33
+</span><span class="lnt">34
+</span><span class="lnt">35
+</span><span class="lnt">36
+</span><span class="lnt">37
+</span><span class="lnt">38
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl"><span class="c1"># KEDA 설치</span>
+</span></span><span class="line"><span class="cl">cat <span class="s">&lt;&lt;EOT &gt; keda-values.yaml
+</span></span></span><span class="line"><span class="cl"><span class="s">metricsServer:
+</span></span></span><span class="line"><span class="cl"><span class="s">  useHostNetwork: true
+</span></span></span><span class="line"><span class="cl"><span class="s">
+</span></span></span><span class="line"><span class="cl"><span class="s">prometheus:
+</span></span></span><span class="line"><span class="cl"><span class="s">  metricServer:
+</span></span></span><span class="line"><span class="cl"><span class="s">    enabled: true
+</span></span></span><span class="line"><span class="cl"><span class="s">    port: 9022
+</span></span></span><span class="line"><span class="cl"><span class="s">    portName: metrics
+</span></span></span><span class="line"><span class="cl"><span class="s">    path: /metrics
+</span></span></span><span class="line"><span class="cl"><span class="s">    serviceMonitor:
+</span></span></span><span class="line"><span class="cl"><span class="s">      # Enables ServiceMonitor creation for the Prometheus Operator
+</span></span></span><span class="line"><span class="cl"><span class="s">      enabled: true
+</span></span></span><span class="line"><span class="cl"><span class="s">    podMonitor:
+</span></span></span><span class="line"><span class="cl"><span class="s">      # Enables PodMonitor creation for the Prometheus Operator
+</span></span></span><span class="line"><span class="cl"><span class="s">      enabled: true
+</span></span></span><span class="line"><span class="cl"><span class="s">  operator:
+</span></span></span><span class="line"><span class="cl"><span class="s">    enabled: true
+</span></span></span><span class="line"><span class="cl"><span class="s">    port: 8080
+</span></span></span><span class="line"><span class="cl"><span class="s">    serviceMonitor:
+</span></span></span><span class="line"><span class="cl"><span class="s">      # Enables ServiceMonitor creation for the Prometheus Operator
+</span></span></span><span class="line"><span class="cl"><span class="s">      enabled: true
+</span></span></span><span class="line"><span class="cl"><span class="s">    podMonitor:
+</span></span></span><span class="line"><span class="cl"><span class="s">      # Enables PodMonitor creation for the Prometheus Operator
+</span></span></span><span class="line"><span class="cl"><span class="s">      enabled: true
+</span></span></span><span class="line"><span class="cl"><span class="s">
+</span></span></span><span class="line"><span class="cl"><span class="s">  webhooks:
+</span></span></span><span class="line"><span class="cl"><span class="s">    enabled: true
+</span></span></span><span class="line"><span class="cl"><span class="s">    port: 8080
+</span></span></span><span class="line"><span class="cl"><span class="s">    serviceMonitor:
+</span></span></span><span class="line"><span class="cl"><span class="s">      # Enables ServiceMonitor creation for the Prometheus webhooks
+</span></span></span><span class="line"><span class="cl"><span class="s">      enabled: true
+</span></span></span><span class="line"><span class="cl"><span class="s">EOT</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">kubectl create namespace keda
+</span></span><span class="line"><span class="cl">helm repo add kedacore https://kedacore.github.io/charts
+</span></span><span class="line"><span class="cl">helm install keda kedacore/keda --version 2.10.2 --namespace keda -f keda-values.yaml
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h3 id="오버-프로비저닝-테스트">
+    <a href="#%ec%98%a4%eb%b2%84-%ed%94%84%eb%a1%9c%eb%b9%84%ec%a0%80%eb%8b%9d-%ed%85%8c%ec%8a%a4%ed%8a%b8" class="anchor">
+        <svg class="icon" aria-hidden="true" focusable="false" height="16" version="1.1" viewBox="0 0 16 16" width="16">
+            <path fill-rule="evenodd"
+                d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z">
+            </path>
+        </svg>
+    </a>
+    오버 프로비저닝 테스트
+</h3>
+<p>Karpenter 설치와 프로비저닝은 테스트에서 진행한 프로비저닝과 inflate 파드을 그대로 사용하겠다. 아래의 KEDA 이벤트를 정의하여 특정 시간에 파드를 늘리는 정책을 생성하고 노드 수를 모니터링하겠다.</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl"><span class="c1"># ScaledObject 정책 생성 : cron</span>
+</span></span><span class="line"><span class="cl">cat <span class="s">&lt;&lt;EOT &gt; keda-cron.yaml
+</span></span></span><span class="line"><span class="cl"><span class="s">apiVersion: keda.sh/v1alpha1
+</span></span></span><span class="line"><span class="cl"><span class="s">kind: ScaledObject
+</span></span></span><span class="line"><span class="cl"><span class="s">metadata:
+</span></span></span><span class="line"><span class="cl"><span class="s">  name: inflate-cron-scaled
+</span></span></span><span class="line"><span class="cl"><span class="s">spec: 
+</span></span></span><span class="line"><span class="cl"><span class="s">  # 파드 수 확인 
+</span></span></span><span class="line"><span class="cl"><span class="s">  minReplicaCount: 0
+</span></span></span><span class="line"><span class="cl"><span class="s">  maxReplicaCount: 10
+</span></span></span><span class="line"><span class="cl"><span class="s">  # 파드 대상 
+</span></span></span><span class="line"><span class="cl"><span class="s">  scaleTargetRef:
+</span></span></span><span class="line"><span class="cl"><span class="s">    apiVersion: apps/v1
+</span></span></span><span class="line"><span class="cl"><span class="s">    kind: Deployment
+</span></span></span><span class="line"><span class="cl"><span class="s">    name: inflate
+</span></span></span><span class="line"><span class="cl"><span class="s">  # 트리거 설정
+</span></span></span><span class="line"><span class="cl"><span class="s">  triggers:
+</span></span></span><span class="line"><span class="cl"><span class="s">  - type: cron
+</span></span></span><span class="line"><span class="cl"><span class="s">    metadata:
+</span></span></span><span class="line"><span class="cl"><span class="s">      timezone: Asia/Seoul
+</span></span></span><span class="line"><span class="cl"><span class="s">      start: 00,15,30,45 * * * *
+</span></span></span><span class="line"><span class="cl"><span class="s">      end: 05,20,35,50 * * * *
+</span></span></span><span class="line"><span class="cl"><span class="s">      desiredReplicas: &#34;5&#34;
+</span></span></span><span class="line"><span class="cl"><span class="s">EOT</span>
+</span></span><span class="line"><span class="cl">kubectl apply -f keda-cron.yaml
+</span></span></code></pre></td></tr></table>
+</div>
+</div><ul>
+<li>확장 트리거를 cron으로 설정하여 특정 시간에 확장이 발생하도록 설정하였다. 매 시간 00, 15, 30, 45분에 5개의 파드으로 확장하고, 05, 20, 35, 50분에 확장을 종료하도록 설정하였다.</li>
+</ul>
+<p>🧐 <strong>ScaledObject 트러블슈팅</strong></p>
+<p>필자의 경우 ScaledObject 배포시 다음과 같은 스키마 에러가 발생하였다.</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">kubectl logs ScaledObject/inflate-cron-scaled -n keda
+</span></span><span class="line"><span class="cl">---
+</span></span><span class="line"><span class="cl">error: no kind <span class="s2">&#34;ScaledObject&#34;</span> is registered <span class="k">for</span> version <span class="s2">&#34;keda.sh/v1alpha1&#34;</span> in scheme <span class="s2">&#34;pkg/scheme/scheme.go:28&#34;</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>구글링하니 CRD문제라 해서 차트를 재설치하였는데 문제가 계속 되어 트러블슈팅에 시간이 걸렸다. 결론적으로 CRD문제는 아니고, ScaledObject 속한 네임스페이스(keda) 와 deployment 네임스페이스(default) 달라 생긴 문제였다. 네임스페이스를 올바르게 설정하고 배포하면 문제 없이 진행된다.</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">kubectl get ScaledObject -A 
+</span></span><span class="line"><span class="cl">---
+</span></span><span class="line"><span class="cl">NAMESPACE   NAME                  SCALETARGETKIND      SCALETARGETNAME   MIN   MAX   TRIGGERS   AUTHENTICATION   READY   ACTIVE   FALLBACK   AGE
+</span></span><span class="line"><span class="cl">default     inflate-cron-scaled   apps/v1.Deployment   inflate           <span class="m">0</span>     <span class="m">10</span>    cron                        True    False    Unknown    9s
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>15분에 확인하니 노드가 아래와 같이 정상적으로 프로비저닝된 것을 확인할 수 있다.</p>
+<p><img loading="lazy" 
+    src="/./karpenter-deepdive/karpenter13.png" 
+    alt="karpenter13.png" 
+     
+    width=2140 
+    height="258"  /></p>
+<p><img loading="lazy" 
+    src="/./karpenter-deepdive/karpenter14.png" 
+    alt="karpenter14.png" 
+     
+    width=921 
+    height="611"  /></p>
+<h2 id="karpenter--kubeflow-로-필요시-gpu-기반의-spot-인스턴스-제공하기">
+    <a href="#karpenter--kubeflow-%eb%a1%9c-%ed%95%84%ec%9a%94%ec%8b%9c-gpu-%ea%b8%b0%eb%b0%98%ec%9d%98-spot-%ec%9d%b8%ec%8a%a4%ed%84%b4%ec%8a%a4-%ec%a0%9c%ea%b3%b5%ed%95%98%ea%b8%b0" class="anchor">
+        <svg class="icon" aria-hidden="true" focusable="false" height="16" version="1.1" viewBox="0 0 16 16" width="16">
+            <path fill-rule="evenodd"
+                d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z">
+            </path>
+        </svg>
+    </a>
+    Karpenter + Kubeflow 로 필요시 GPU 기반의 SPOT 인스턴스 제공하기
+</h2>
+<p>다음은 karpenter 를 kubeflow와 연계하여 GPU 기반의 SPOT 노드를 프로비저닝하겠다. 목적은 비용 최적화로 kubeflow 머신러닝 워크로드에서 GPU 자원이 필요할 때 SPOT 인스턴스를 노드에 프로비저닝하여 사용하고자 한다. 결론부터 말하면, 현재 karpenter 메모리 limit 이상 문제로 동작하지 않는다. 깃 이슈에서 문제를 확인 중이며 해결시 업데이트하겠다.</p>
+<p>kubeflow 설치와 구성은 필자의 블로그 글을 기반으로 진행한다. karpenter를 설치하고 프로비저닝 파일은 다음과 같이 정의하여 배포한다.</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">  1
+</span><span class="lnt">  2
+</span><span class="lnt">  3
+</span><span class="lnt">  4
+</span><span class="lnt">  5
+</span><span class="lnt">  6
+</span><span class="lnt">  7
+</span><span class="lnt">  8
+</span><span class="lnt">  9
+</span><span class="lnt"> 10
+</span><span class="lnt"> 11
+</span><span class="lnt"> 12
+</span><span class="lnt"> 13
+</span><span class="lnt"> 14
+</span><span class="lnt"> 15
+</span><span class="lnt"> 16
+</span><span class="lnt"> 17
+</span><span class="lnt"> 18
+</span><span class="lnt"> 19
+</span><span class="lnt"> 20
+</span><span class="lnt"> 21
+</span><span class="lnt"> 22
+</span><span class="lnt"> 23
+</span><span class="lnt"> 24
+</span><span class="lnt"> 25
+</span><span class="lnt"> 26
+</span><span class="lnt"> 27
+</span><span class="lnt"> 28
+</span><span class="lnt"> 29
+</span><span class="lnt"> 30
+</span><span class="lnt"> 31
+</span><span class="lnt"> 32
+</span><span class="lnt"> 33
+</span><span class="lnt"> 34
+</span><span class="lnt"> 35
+</span><span class="lnt"> 36
+</span><span class="lnt"> 37
+</span><span class="lnt"> 38
+</span><span class="lnt"> 39
+</span><span class="lnt"> 40
+</span><span class="lnt"> 41
+</span><span class="lnt"> 42
+</span><span class="lnt"> 43
+</span><span class="lnt"> 44
+</span><span class="lnt"> 45
+</span><span class="lnt"> 46
+</span><span class="lnt"> 47
+</span><span class="lnt"> 48
+</span><span class="lnt"> 49
+</span><span class="lnt"> 50
+</span><span class="lnt"> 51
+</span><span class="lnt"> 52
+</span><span class="lnt"> 53
+</span><span class="lnt"> 54
+</span><span class="lnt"> 55
+</span><span class="lnt"> 56
+</span><span class="lnt"> 57
+</span><span class="lnt"> 58
+</span><span class="lnt"> 59
+</span><span class="lnt"> 60
+</span><span class="lnt"> 61
+</span><span class="lnt"> 62
+</span><span class="lnt"> 63
+</span><span class="lnt"> 64
+</span><span class="lnt"> 65
+</span><span class="lnt"> 66
+</span><span class="lnt"> 67
+</span><span class="lnt"> 68
+</span><span class="lnt"> 69
+</span><span class="lnt"> 70
+</span><span class="lnt"> 71
+</span><span class="lnt"> 72
+</span><span class="lnt"> 73
+</span><span class="lnt"> 74
+</span><span class="lnt"> 75
+</span><span class="lnt"> 76
+</span><span class="lnt"> 77
+</span><span class="lnt"> 78
+</span><span class="lnt"> 79
+</span><span class="lnt"> 80
+</span><span class="lnt"> 81
+</span><span class="lnt"> 82
+</span><span class="lnt"> 83
+</span><span class="lnt"> 84
+</span><span class="lnt"> 85
+</span><span class="lnt"> 86
+</span><span class="lnt"> 87
+</span><span class="lnt"> 88
+</span><span class="lnt"> 89
+</span><span class="lnt"> 90
+</span><span class="lnt"> 91
+</span><span class="lnt"> 92
+</span><span class="lnt"> 93
+</span><span class="lnt"> 94
+</span><span class="lnt"> 95
+</span><span class="lnt"> 96
+</span><span class="lnt"> 97
+</span><span class="lnt"> 98
+</span><span class="lnt"> 99
+</span><span class="lnt">100
+</span><span class="lnt">101
+</span><span class="lnt">102
+</span><span class="lnt">103
+</span><span class="lnt">104
+</span><span class="lnt">105
+</span><span class="lnt">106
+</span><span class="lnt">107
+</span><span class="lnt">108
+</span><span class="lnt">109
+</span><span class="lnt">110
+</span><span class="lnt">111
+</span><span class="lnt">112
+</span><span class="lnt">113
+</span><span class="lnt">114
+</span><span class="lnt">115
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl"><span class="c1"># Cost-Optimized EKS cluster for Kubeflow with spot GPU instances and node scale down to zero</span>
+</span></span><span class="line"><span class="cl"><span class="c1"># Built in efforts to reducing training costs of ML workloads.</span>
+</span></span><span class="line"><span class="cl"><span class="c1"># Supporting tutorial can be found at the following link: </span>
+</span></span><span class="line"><span class="cl"><span class="c1"># https://blog.gofynd.com/how-we-reduced-our-ml-training-costs-by-78-a33805cb00cf</span>
+</span></span><span class="line"><span class="cl"><span class="c1"># This spec creates a cluster on EKS with the following active nodes </span>
+</span></span><span class="line"><span class="cl"><span class="c1"># - 2x m5a.2xlarge - Accomodates all pods of Kubeflow</span>
+</span></span><span class="line"><span class="cl"><span class="c1"># It also creates the following nodegroups with 0 nodes running unless a pod comes along and requests for the node to get spun up</span>
+</span></span><span class="line"><span class="cl"><span class="c1"># - m5a.2xlarge   -- Max Allowed 10 worker nodes</span>
+</span></span><span class="line"><span class="cl"><span class="c1"># - p2.xlarge     -- Max Allowed 10 worker nodes</span>
+</span></span><span class="line"><span class="cl"><span class="c1"># - p3.2xlarge    -- Max Allowed 10 worker nodes</span>
+</span></span><span class="line"><span class="cl"><span class="c1"># - p3.8xlarge    -- Max Allowed 04 worker nodes</span>
+</span></span><span class="line"><span class="cl"><span class="c1"># - p3dn.24xlarge -- Max Allowed 01 worker nodes</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">apiVersion: eksctl.io/v1alpha5
+</span></span><span class="line"><span class="cl">kind: ClusterConfig
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">metadata:
+</span></span><span class="line"><span class="cl">  <span class="c1"># Name of your cluster, change to whatever you find fit.</span>
+</span></span><span class="line"><span class="cl">  <span class="c1"># If changed, make sure to change all nodegroup tags from </span>
+</span></span><span class="line"><span class="cl">  <span class="c1"># &#39;k8s.io/cluster-autoscaler/my-eks-kubeflow: &#34;owned&#34;&#39; --&gt; &#39;k8s.io/cluster-autoscaler/your-new-name: &#34;owned&#34;&#39;</span>
+</span></span><span class="line"><span class="cl">  name: hanhorang 
+</span></span><span class="line"><span class="cl">  <span class="c1"># choose your region wisely, this will significantly impact the cost incurred</span>
+</span></span><span class="line"><span class="cl">  region: ap-northeast-2
+</span></span><span class="line"><span class="cl">  <span class="c1"># 1.14 Kubernetes version since Kubeflow 1.0 officially supports the same</span>
+</span></span><span class="line"><span class="cl">  version: <span class="s1">&#39;1.25&#39;</span>
+</span></span><span class="line"><span class="cl">  tags:
+</span></span><span class="line"><span class="cl">    <span class="c1"># Add more cloud tags if needed for billing</span>
+</span></span><span class="line"><span class="cl">    karpenter.sh/discovery: hanhorang 
+</span></span><span class="line"><span class="cl">  
+</span></span><span class="line"><span class="cl"><span class="c1"># Add all possible AZs to ensure nodes can be spun up in any AZ later on. </span>
+</span></span><span class="line"><span class="cl"><span class="c1"># THIS CAN&#39;T BE CHANGED LATER. YOU WILL HAVE TO CREATE A NEW CLUSTER TO ADD NEW AZ SUPPORT.</span>
+</span></span><span class="line"><span class="cl"><span class="c1"># This list applies to the whole cluster and isn&#39;t specific to nodegroups</span>
+</span></span><span class="line"><span class="cl">vpc:
+</span></span><span class="line"><span class="cl">  id: vpc-032c30fdebbb69fd6
+</span></span><span class="line"><span class="cl">  cidr: 192.168.0.0/16
+</span></span><span class="line"><span class="cl">  securityGroup: sg-093be0632becd746b
+</span></span><span class="line"><span class="cl">  nat:
+</span></span><span class="line"><span class="cl">    gateway: HighlyAvailable
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">  subnets:
+</span></span><span class="line"><span class="cl">    public: 
+</span></span><span class="line"><span class="cl">      public-2a:
+</span></span><span class="line"><span class="cl">        id: subnet-03bfdfe3c7d5aa2a4
+</span></span><span class="line"><span class="cl">        cidr: 192.168.1.0/24
+</span></span><span class="line"><span class="cl">      public-2c:
+</span></span><span class="line"><span class="cl">        id: subnet-078ee0d964d71e1f2
+</span></span><span class="line"><span class="cl">        cidr: 192.168.2.0/24
+</span></span><span class="line"><span class="cl">    private:
+</span></span><span class="line"><span class="cl">      private-2a:
+</span></span><span class="line"><span class="cl">        id: subnet-0958e380d34c306e3
+</span></span><span class="line"><span class="cl">        cidr: 192.168.3.0/24
+</span></span><span class="line"><span class="cl">      private-2c:
+</span></span><span class="line"><span class="cl">        id: subnet-0bd38833c317d5e2b
+</span></span><span class="line"><span class="cl">        cidr: 192.168.4.0/24
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">iam: 
+</span></span><span class="line"><span class="cl">  withOIDC: <span class="nb">true</span>
+</span></span><span class="line"><span class="cl">  serviceAccounts:
+</span></span><span class="line"><span class="cl">  - metadata:
+</span></span><span class="line"><span class="cl">      name: karpenter
+</span></span><span class="line"><span class="cl">      namespace: karpenter
+</span></span><span class="line"><span class="cl">    roleName: hanhorang-karpenter
+</span></span><span class="line"><span class="cl">    attachPolicyARNs:
+</span></span><span class="line"><span class="cl">    - arn:aws:iam::955963799952:policy/KarpenterControllerPolicy-hanhorang
+</span></span><span class="line"><span class="cl">    roleOnly: <span class="nb">true</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">iamIdentityMappings:
+</span></span><span class="line"><span class="cl">- arn: <span class="s2">&#34;arn:aws:iam::955963799952:role/KarpenterNodeRole-hanhorang&#34;</span>
+</span></span><span class="line"><span class="cl">  username: system:node:<span class="o">{{</span>EC2PrivateDNSName<span class="o">}}</span>
+</span></span><span class="line"><span class="cl">  groups:
+</span></span><span class="line"><span class="cl">  - system:bootstrappers
+</span></span><span class="line"><span class="cl">  - system:nodes
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">nodeGroups:
+</span></span><span class="line"><span class="cl">  - name: ng-1
+</span></span><span class="line"><span class="cl">    desiredCapacity: <span class="m">4</span>
+</span></span><span class="line"><span class="cl">    minSize: <span class="m">0</span>
+</span></span><span class="line"><span class="cl">    maxSize: <span class="m">10</span>
+</span></span><span class="line"><span class="cl">    <span class="c1"># Set one nodegroup with 100GB volumes for Kubeflow to get deployed. </span>
+</span></span><span class="line"><span class="cl">    <span class="c1"># Kubeflow requirement states 1-2 Nodes with 100GB volume attached to the node. </span>
+</span></span><span class="line"><span class="cl">    volumeSize: <span class="m">100</span>
+</span></span><span class="line"><span class="cl">    volumeType: gp2
+</span></span><span class="line"><span class="cl">    instanceType: c5n.xlarge
+</span></span><span class="line"><span class="cl">    privateNetworking: <span class="nb">true</span> 
+</span></span><span class="line"><span class="cl">    ssh:
+</span></span><span class="line"><span class="cl">      publicKeyName: eks-terraform-key
+</span></span><span class="line"><span class="cl">    availabilityZones:
+</span></span><span class="line"><span class="cl">      - ap-northeast-2a
+</span></span><span class="line"><span class="cl">    labels:
+</span></span><span class="line"><span class="cl">      node-class: <span class="s2">&#34;worker-node&#34;</span>
+</span></span><span class="line"><span class="cl">    tags:
+</span></span><span class="line"><span class="cl">      <span class="c1"># EC2 tags required for cluster-autoscaler auto-discovery</span>
+</span></span><span class="line"><span class="cl">      k8s.io/cluster-autoscaler/node-template/label/lifecycle: OnDemand
+</span></span><span class="line"><span class="cl">      k8s.io/cluster-autoscaler/node-template/label/aws.amazon.com/spot: <span class="s2">&#34;false&#34;</span>
+</span></span><span class="line"><span class="cl">      k8s.io/cluster-autoscaler/node-template/label/gpu-count: <span class="s2">&#34;0&#34;</span>
+</span></span><span class="line"><span class="cl">      k8s.io/cluster-autoscaler/enabled: <span class="s2">&#34;true&#34;</span>
+</span></span><span class="line"><span class="cl">      k8s.io/cluster-autoscaler/my-eks-kubeflow: <span class="s2">&#34;owned&#34;</span>
+</span></span><span class="line"><span class="cl">    iam:
+</span></span><span class="line"><span class="cl">      withAddonPolicies:
+</span></span><span class="line"><span class="cl">        awsLoadBalancerController: <span class="nb">true</span>
+</span></span><span class="line"><span class="cl">        autoScaler: <span class="nb">true</span>
+</span></span><span class="line"><span class="cl">        cloudWatch: <span class="nb">true</span>
+</span></span><span class="line"><span class="cl">        efs: <span class="nb">true</span>
+</span></span><span class="line"><span class="cl">        ebs: <span class="nb">true</span> 
+</span></span><span class="line"><span class="cl">        externalDNS: <span class="nb">true</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">addons:
+</span></span><span class="line"><span class="cl">- name: vpc-cni <span class="c1"># no version is specified so it deploys the default version</span>
+</span></span><span class="line"><span class="cl">  version: v1.12.6-eksbuild.1
+</span></span><span class="line"><span class="cl">  attachPolicyARNs:
+</span></span><span class="line"><span class="cl">    - arn:aws:iam::aws:policy/AmazonEKS_CNI_Policy
+</span></span><span class="line"><span class="cl">- name: kube-proxy
+</span></span><span class="line"><span class="cl">  version: latest <span class="c1"># auto discovers the latest available</span>
+</span></span><span class="line"><span class="cl">- name: coredns
+</span></span><span class="line"><span class="cl">  version: latest <span class="c1"># v1.9.3-eksbuild.2</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><ul>
+<li>
+<p>서브넷에 태그 추가</p>
+<p>베스천 서버 구성에서 eks 클러스터를 배포함으로 서브넷과 보안 그룹에 카펜터 사용을 위한 태그가 필요하다. 다음과 같이 입력하다.</p>
+<p><img loading="lazy" 
+    src="/./karpenter-deepdive/kar1.png" 
+    alt="kar1.png" 
+     
+    width=837 
+    height="477"  /></p>
+<p><img loading="lazy" 
+    src="/./karpenter-deepdive/subnet1.png" 
+    alt="subnet1.png" 
+     
+    width=821 
+    height="463"  /></p>
+</li>
+<li>
+<p>EBS CSI Driver 배포</p>
+<p>앞 블로그 글에서의 트러블슈팅에서 다룬 내용이다. kubeflow 설치를 위해 EBS CSI driver를 배포하고 기본 스토리지 클래스를 변경하자</p>
+</li>
+<li>
+<p>베스천서버 보안그룹 인그래스 규칙 추가</p>
+<p>본 글에서는 베스천서버에서 포트포워딩을 해서 테스트한다. 이를 위해 필자는 베스천 서버의 보안 그룹 인그래스 포트 설정을 모두 허용(0.0.0.0/0)으로 바꿨다.</p>
+</li>
+<li>
+<p>notebook 생성 트러블슈팅</p>
+<p>포트포워딩으로 jupyter notebook 생성시 추가 작업이 필요하다. 아래 작업을 통해 APP_SECURE_COOKIES 옵션을 false 로 변경하자.</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span><span class="lnt">31
+</span><span class="lnt">32
+</span><span class="lnt">33
+</span><span class="lnt">34
+</span><span class="lnt">35
+</span><span class="lnt">36
+</span><span class="lnt">37
+</span><span class="lnt">38
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="cl"><span class="n">kubectl</span> <span class="n">edit</span> <span class="n">deploy</span><span class="o">/</span><span class="n">jupyter</span><span class="o">-</span><span class="n">web</span><span class="o">-</span><span class="n">app</span><span class="o">-</span><span class="n">deployment</span> <span class="o">-</span><span class="n">n</span> <span class="n">kubeflow</span>
+</span></span><span class="line"><span class="cl"><span class="o">---</span>
+</span></span><span class="line"><span class="cl"><span class="o">...</span>
+</span></span><span class="line"><span class="cl"><span class="n">maxUnavailable</span><span class="p">:</span> <span class="mi">25</span><span class="o">%</span>
+</span></span><span class="line"><span class="cl">    <span class="nb">type</span><span class="p">:</span> <span class="n">RollingUpdate</span>
+</span></span><span class="line"><span class="cl">  <span class="n">template</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">    <span class="n">metadata</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">      <span class="n">creationTimestamp</span><span class="p">:</span> <span class="n">null</span>
+</span></span><span class="line"><span class="cl">      <span class="n">labels</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">        <span class="n">app</span><span class="p">:</span> <span class="n">jupyter</span><span class="o">-</span><span class="n">web</span><span class="o">-</span><span class="n">app</span>
+</span></span><span class="line"><span class="cl">        <span class="n">kustomize</span><span class="o">.</span><span class="n">component</span><span class="p">:</span> <span class="n">jupyter</span><span class="o">-</span><span class="n">web</span><span class="o">-</span><span class="n">app</span>
+</span></span><span class="line"><span class="cl">    <span class="n">spec</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">      <span class="n">containers</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">      <span class="o">-</span> <span class="n">env</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">        <span class="o">-</span> <span class="n">name</span><span class="p">:</span> <span class="n">APP_PREFIX</span>
+</span></span><span class="line"><span class="cl">          <span class="n">value</span><span class="p">:</span> <span class="o">/</span><span class="n">jupyter</span>
+</span></span><span class="line"><span class="cl">        <span class="o">-</span> <span class="n">name</span><span class="p">:</span> <span class="n">UI</span>
+</span></span><span class="line"><span class="cl">          <span class="n">value</span><span class="p">:</span> <span class="n">default</span>
+</span></span><span class="line"><span class="cl">        <span class="o">-</span> <span class="n">name</span><span class="p">:</span> <span class="n">USERID_HEADER</span>
+</span></span><span class="line"><span class="cl">          <span class="n">value</span><span class="p">:</span> <span class="n">kubeflow</span><span class="o">-</span><span class="n">userid</span>
+</span></span><span class="line"><span class="cl">        <span class="o">-</span> <span class="n">name</span><span class="p">:</span> <span class="n">USERID_PREFIX</span>
+</span></span><span class="line"><span class="cl">        <span class="o">-</span> <span class="n">name</span><span class="p">:</span> <span class="n">APP_SECURE_COOKIES</span>
+</span></span><span class="line"><span class="cl">          <span class="n">value</span><span class="p">:</span> <span class="s2">&#34;false&#34;</span> <span class="c1"># ture 에서 false 로 수정 ! </span>
+</span></span><span class="line"><span class="cl">        <span class="n">image</span><span class="p">:</span> <span class="n">docker</span><span class="o">.</span><span class="n">io</span><span class="o">/</span><span class="n">kubeflownotebookswg</span><span class="o">/</span><span class="n">jupyter</span><span class="o">-</span><span class="n">web</span><span class="o">-</span><span class="n">app</span><span class="p">:</span><span class="n">v1</span><span class="mf">.7.0</span>
+</span></span><span class="line"><span class="cl">        <span class="n">imagePullPolicy</span><span class="p">:</span> <span class="n">IfNotPresent</span>
+</span></span><span class="line"><span class="cl">        <span class="n">name</span><span class="p">:</span> <span class="n">jupyter</span><span class="o">-</span><span class="n">web</span><span class="o">-</span><span class="n">app</span>
+</span></span><span class="line"><span class="cl">        <span class="n">ports</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">        <span class="o">-</span> <span class="n">containerPort</span><span class="p">:</span> <span class="mi">5000</span>
+</span></span><span class="line"><span class="cl">          <span class="n">protocol</span><span class="p">:</span> <span class="n">TCP</span>
+</span></span><span class="line"><span class="cl">        <span class="n">resources</span><span class="p">:</span> <span class="p">{}</span>
+</span></span><span class="line"><span class="cl">        <span class="n">terminationMessagePath</span><span class="p">:</span> <span class="o">/</span><span class="n">dev</span><span class="o">/</span><span class="n">termination</span><span class="o">-</span><span class="n">log</span>
+</span></span><span class="line"><span class="cl">        <span class="n">terminationMessagePolicy</span><span class="p">:</span> <span class="n">File</span>
+</span></span><span class="line"><span class="cl">        <span class="n">volumeMounts</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">        <span class="o">-</span> <span class="n">mountPath</span><span class="p">:</span> <span class="o">/</span><span class="n">etc</span><span class="o">/</span><span class="n">config</span>
+</span></span><span class="line"><span class="cl">          <span class="n">name</span><span class="p">:</span> <span class="n">config</span><span class="o">-</span><span class="n">volume</span>
+</span></span><span class="line"><span class="cl">        <span class="o">-</span> <span class="n">mountPath</span><span class="p">:</span> <span class="o">/</span><span class="n">src</span><span class="o">/</span><span class="n">apps</span><span class="o">/</span><span class="n">default</span><span class="o">/</span><span class="n">static</span><span class="o">/</span><span class="n">assets</span><span class="o">/</span><span class="n">logos</span>
+</span></span><span class="line"><span class="cl">          <span class="n">name</span><span class="p">:</span> <span class="n">logos</span><span class="o">-</span><span class="n">volume</span>
+</span></span><span class="line"><span class="cl"><span class="o">...</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div></li>
+</ul>
+<p>EKS 클러스터 구성 후 카펜터 프로비저너를 다음과 같이 정의하여 배포하였다.</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span><span class="lnt">31
+</span><span class="lnt">32
+</span><span class="lnt">33
+</span><span class="lnt">34
+</span><span class="lnt">35
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">cat <span class="s">&lt;&lt;EOF | kubectl apply -f -
+</span></span></span><span class="line"><span class="cl"><span class="s">apiVersion: karpenter.sh/v1alpha5
+</span></span></span><span class="line"><span class="cl"><span class="s">kind: Provisioner
+</span></span></span><span class="line"><span class="cl"><span class="s">metadata:
+</span></span></span><span class="line"><span class="cl"><span class="s">  name: default
+</span></span></span><span class="line"><span class="cl"><span class="s">spec:
+</span></span></span><span class="line"><span class="cl"><span class="s">  requirements:
+</span></span></span><span class="line"><span class="cl"><span class="s">    - key: karpenter.sh/capacity-type
+</span></span></span><span class="line"><span class="cl"><span class="s">      operator: In
+</span></span></span><span class="line"><span class="cl"><span class="s">      values: [&#34;spot&#34;]
+</span></span></span><span class="line"><span class="cl"><span class="s">    - key: node.kubernetes.io/instance-type
+</span></span></span><span class="line"><span class="cl"><span class="s">      operator: In
+</span></span></span><span class="line"><span class="cl"><span class="s">      values: [&#34;p2.xlarge&#34;, &#34;p3.2xlarge&#34;, &#34;p3.8xlarge&#34;, &#34;p3.16xlarge&#34;] # Add your desired GPU instance types here
+</span></span></span><span class="line"><span class="cl"><span class="s">    - key: kubernetes.io/arch
+</span></span></span><span class="line"><span class="cl"><span class="s">      operator: In
+</span></span></span><span class="line"><span class="cl"><span class="s">      values: [&#34;nvidia&#34;, &#34;amd64&#34;]
+</span></span></span><span class="line"><span class="cl"><span class="s">  limits:
+</span></span></span><span class="line"><span class="cl"><span class="s">    resources:
+</span></span></span><span class="line"><span class="cl"><span class="s">      cpu: 1000
+</span></span></span><span class="line"><span class="cl"><span class="s">      memory: 1000Gi
+</span></span></span><span class="line"><span class="cl"><span class="s">      nvidia.com/gpu: 10
+</span></span></span><span class="line"><span class="cl"><span class="s">  providerRef:
+</span></span></span><span class="line"><span class="cl"><span class="s">    name: default
+</span></span></span><span class="line"><span class="cl"><span class="s">  ttlSecondsAfterEmpty: 30
+</span></span></span><span class="line"><span class="cl"><span class="s">---
+</span></span></span><span class="line"><span class="cl"><span class="s">apiVersion: karpenter.k8s.aws/v1alpha1
+</span></span></span><span class="line"><span class="cl"><span class="s">kind: AWSNodeTemplate
+</span></span></span><span class="line"><span class="cl"><span class="s">metadata:
+</span></span></span><span class="line"><span class="cl"><span class="s">  name: default
+</span></span></span><span class="line"><span class="cl"><span class="s">spec:
+</span></span></span><span class="line"><span class="cl"><span class="s">  subnetSelector:
+</span></span></span><span class="line"><span class="cl"><span class="s">    karpenter.sh/discovery: ${CLUSTER_NAME}
+</span></span></span><span class="line"><span class="cl"><span class="s">  securityGroupSelector:
+</span></span></span><span class="line"><span class="cl"><span class="s">    karpenter.sh/discovery: ${CLUSTER_NAME}
+</span></span></span><span class="line"><span class="cl"><span class="s">EOF</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><ul>
+<li>GPU 기반의 인스턴스를 설정하고 spot 인스턴스만 설정하도록 프로비저닝하였다.</li>
+</ul>
+<h3 id="테스트">
+    <a href="#%ed%85%8c%ec%8a%a4%ed%8a%b8" class="anchor">
+        <svg class="icon" aria-hidden="true" focusable="false" height="16" version="1.1" viewBox="0 0 16 16" width="16">
+            <path fill-rule="evenodd"
+                d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z">
+            </path>
+        </svg>
+    </a>
+    테스트
+</h3>
+<p>kubeflow 에서 GPU 1개를 사용하는 jupyter notebook을 생성하여 잘 동작되는 지 확인하겠다.</p>
+<p><img loading="lazy" 
+    src="/./karpenter-deepdive/karpenter19.png" 
+    alt="karpenter19.png" 
+     
+    width=1624 
+    height="960"  /></p>
+<p><img loading="lazy" 
+    src="/./karpenter-deepdive/karpenter18.png" 
+    alt="karpenter18.png" 
+     
+    width=914 
+    height="379"  /></p>
+<p><img loading="lazy" 
+    src="/./karpenter-deepdive/Karpenter15.png" 
+    alt="Karpenter15.png" 
+     
+    width=1886 
+    height="72"  /></p>
+<p>GPU 자원을 사용하는 jupyer notebook 생성시 파드가 pending 상태로 있다가, karpenter에 의해 GPU 노드가 새로 프로비저닝되고 파드가 배치되는 것을 확인할 수 있다.</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl"><span class="c1"># ubuntu golang install (go &gt;1.16)</span>
+</span></span><span class="line"><span class="cl">wget  https://go.dev/dl/go1.20.2.linux-amd64.tar.gz
+</span></span><span class="line"><span class="cl">sudo tar -xvf go1.20.2.linux-amd64.tar.gz
+</span></span><span class="line"><span class="cl">sudo mv go /usr/local
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="nb">export</span> <span class="nv">GOROOT</span><span class="o">=</span>/usr/local/go
+</span></span><span class="line"><span class="cl"><span class="nb">export</span> <span class="nv">PATH</span><span class="o">=</span><span class="nv">$GOPATH</span>/bin:<span class="nv">$GOROOT</span>/bin:<span class="nv">$PATH</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">go version 
+</span></span><span class="line"><span class="cl">-- 
+</span></span><span class="line"><span class="cl">go version go1.20.2 linux/amd64 
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">go install github.com/awslabs/eks-node-viewer/cmd/eks-node-viewer@latest
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">tree ~/go/bin
+</span></span><span class="line"><span class="cl"><span class="nb">cd</span> ~/go/bin
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">./eks-node-viewer -resources cpu,memory
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p><img loading="lazy" 
+    src="/./karpenter-deepdive/kar5.png" 
+    alt="kar5.png" 
+     
+    width=1904 
+    height="512"  /></p>
+<p>🧐 <strong>워크로드 트러블슈팅</strong></p>
+<p>그러나, 노드의 임시 저장 공간이 부족하여 파드가 배치되었다가 추방되는 과정이 반복된다. 이벤트 로그를 확인하면 노드 ephemeral-storage 가 부족하다는데..</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">Events:
+</span></span><span class="line"><span class="cl">  Type     Reason                  Age    From                     Message
+</span></span><span class="line"><span class="cl">  ----     ------                  ----   ----                     -------
+</span></span><span class="line"><span class="cl">  Warning  FailedScheduling        3m16s  default-scheduler        0/5 nodes are available: <span class="m">1</span> node<span class="o">(</span>s<span class="o">)</span> had untolerated taint <span class="o">{</span>node.kubernetes.io/disk-pressure: <span class="o">}</span>, <span class="m">4</span> Insufficient nvidia.com/gpu. preemption: 0/5 nodes are available: <span class="m">1</span> Preemption is not helpful <span class="k">for</span> scheduling, <span class="m">4</span> No preemption victims found <span class="k">for</span> incoming pod.
+</span></span><span class="line"><span class="cl">  Normal   Nominated               3m12s  karpenter                Pod should schedule on node: ip-192-168-3-68.ap-northeast-2.compute.internal
+</span></span><span class="line"><span class="cl">  Normal   Scheduled               117s   default-scheduler        Successfully assigned kubeflow-user-example-com/test-0 to ip-192-168-3-68.ap-northeast-2.compute.internal
+</span></span><span class="line"><span class="cl">  Normal   SuccessfulAttachVolume  113s   attachdetach-controller  AttachVolume.Attach succeeded <span class="k">for</span> volume <span class="s2">&#34;pvc-e503cf70-748c-4a9c-aef8-c94172aa2324&#34;</span>
+</span></span><span class="line"><span class="cl">  Normal   Pulling                 106s   kubelet                  Pulling image <span class="s2">&#34;docker.io/istio/proxyv2:1.16.0&#34;</span>
+</span></span><span class="line"><span class="cl">  Normal   Pulled                  99s    kubelet                  Successfully pulled image <span class="s2">&#34;docker.io/istio/proxyv2:1.16.0&#34;</span> in 7.047356094s <span class="o">(</span>7.047411717s including waiting<span class="o">)</span>
+</span></span><span class="line"><span class="cl">  Normal   Created                 99s    kubelet                  Created container istio-init
+</span></span><span class="line"><span class="cl">  Normal   Started                 99s    kubelet                  Started container istio-init
+</span></span><span class="line"><span class="cl">  Normal   Pulling                 92s    kubelet                  Pulling image <span class="s2">&#34;public.ecr.aws/kubeflow-on-aws/notebook-servers/jupyter-tensorflow:2.12.0-cpu-py310-ubuntu20.04-ec2-v1.0&#34;</span>
+</span></span><span class="line"><span class="cl">  Warning  Evicted                 17s    kubelet                  The node was low on resource: ephemeral-storage.
+</span></span><span class="line"><span class="cl">  Warning  ExceededGracePeriod     7s     kubelet                  Container runtime did not <span class="nb">kill</span> the pod within specified grace period.
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>노드 리소스를 확인하면 jupyter notebook 파드의 memory limit 값이 비이상적으로 설정되어 생기는 원인임을 확인할 수 있다.</p>
+<p><img loading="lazy" 
+    src="/./karpenter-deepdive/kar6.png" 
+    alt="kar6.png" 
+     
+    width=2006 
+    height="298"  /></p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="cl"><span class="n">Allocated</span> <span class="n">resources</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">  <span class="p">(</span><span class="n">Total</span> <span class="n">limits</span> <span class="n">may</span> <span class="n">be</span> <span class="n">over</span> <span class="mi">100</span> <span class="n">percent</span><span class="p">,</span> <span class="n">i</span><span class="o">.</span><span class="n">e</span><span class="o">.</span><span class="p">,</span> <span class="n">overcommitted</span><span class="o">.</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">  <span class="n">Resource</span>                    <span class="n">Requests</span>     <span class="n">Limits</span>
+</span></span><span class="line"><span class="cl">  <span class="o">--------</span>                    <span class="o">--------</span>     <span class="o">------</span>
+</span></span><span class="line"><span class="cl">  <span class="n">cpu</span>                         <span class="mi">665</span><span class="n">m</span> <span class="p">(</span><span class="mi">16</span><span class="o">%</span><span class="p">)</span>   <span class="mi">2600</span><span class="n">m</span> <span class="p">(</span><span class="mi">66</span><span class="o">%</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">  <span class="n">memory</span>                      <span class="mi">1184</span><span class="n">Mi</span> <span class="p">(</span><span class="mi">1</span><span class="o">%</span><span class="p">)</span>  <span class="mi">3167538380800</span><span class="n">m</span> <span class="p">(</span><span class="mi">5</span><span class="o">%</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">  <span class="n">ephemeral</span><span class="o">-</span><span class="n">storage</span>           <span class="mi">0</span> <span class="p">(</span><span class="mi">0</span><span class="o">%</span><span class="p">)</span>       <span class="mi">0</span> <span class="p">(</span><span class="mi">0</span><span class="o">%</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">  <span class="n">hugepages</span><span class="o">-</span><span class="mi">1</span><span class="n">Gi</span>               <span class="mi">0</span> <span class="p">(</span><span class="mi">0</span><span class="o">%</span><span class="p">)</span>       <span class="mi">0</span> <span class="p">(</span><span class="mi">0</span><span class="o">%</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">  <span class="n">hugepages</span><span class="o">-</span><span class="mi">2</span><span class="n">Mi</span>               <span class="mi">0</span> <span class="p">(</span><span class="mi">0</span><span class="o">%</span><span class="p">)</span>       <span class="mi">0</span> <span class="p">(</span><span class="mi">0</span><span class="o">%</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">  <span class="n">attachable</span><span class="o">-</span><span class="n">volumes</span><span class="o">-</span><span class="n">aws</span><span class="o">-</span><span class="n">ebs</span>  <span class="mi">0</span>            <span class="mi">0</span>
+</span></span><span class="line"><span class="cl">  <span class="n">nvidia</span><span class="o">.</span><span class="n">com</span><span class="o">/</span><span class="n">gpu</span>              <span class="mi">1</span>            <span class="mi">1</span>
+</span></span><span class="line"><span class="cl"><span class="n">Events</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">  <span class="n">Type</span>     <span class="n">Reason</span>                   <span class="n">Age</span>                  <span class="n">From</span>             <span class="n">Message</span>
+</span></span><span class="line"><span class="cl">  <span class="o">----</span>     <span class="o">------</span>                   <span class="o">----</span>                 <span class="o">----</span>             <span class="o">-------</span>
+</span></span><span class="line"><span class="cl">  <span class="n">Normal</span>   <span class="n">Starting</span>                 <span class="mi">109</span><span class="n">s</span>                 <span class="n">kube</span><span class="o">-</span><span class="n">proxy</span>       
+</span></span><span class="line"><span class="cl">  <span class="n">Normal</span>   <span class="n">RegisteredNode</span>           <span class="mi">2</span><span class="n">m44s</span>                <span class="n">node</span><span class="o">-</span><span class="n">controller</span>  <span class="n">Node</span> <span class="n">ip</span><span class="o">-</span><span class="mi">192</span><span class="o">-</span><span class="mi">168</span><span class="o">-</span><span class="mi">1</span><span class="o">-</span><span class="mf">190.</span><span class="n">ap</span><span class="o">-</span><span class="n">northeast</span><span class="o">-</span><span class="mf">2.</span><span class="n">compute</span><span class="o">.</span><span class="n">internal</span> <span class="n">event</span><span class="p">:</span> <span class="n">Registered</span> <span class="n">Node</span> <span class="n">ip</span><span class="o">-</span><span class="mi">192</span><span class="o">-</span><span class="mi">168</span><span class="o">-</span><span class="mi">1</span><span class="o">-</span><span class="mf">190.</span><span class="n">ap</span><span class="o">-</span><span class="n">northeast</span><span class="o">-</span><span class="mf">2.</span><span class="n">compute</span><span class="o">.</span><span class="n">internal</span> <span class="ow">in</span> <span class="n">Controller</span>
+</span></span><span class="line"><span class="cl">  <span class="n">Normal</span>   <span class="n">Starting</span>                 <span class="mi">2</span><span class="n">m3s</span>                 <span class="n">kubelet</span>          <span class="n">Starting</span> <span class="n">kubelet</span><span class="o">.</span>
+</span></span><span class="line"><span class="cl">  <span class="ne">Warning</span>  <span class="n">InvalidDiskCapacity</span>      <span class="mi">2</span><span class="n">m3s</span>                 <span class="n">kubelet</span>          <span class="n">invalid</span> <span class="n">capacity</span> <span class="mi">0</span> <span class="n">on</span> <span class="n">image</span> <span class="n">filesystem</span>
+</span></span><span class="line"><span class="cl">  <span class="n">Normal</span>   <span class="n">NodeHasSufficientMemory</span>  <span class="mi">2</span><span class="n">m3s</span> <span class="p">(</span><span class="n">x3</span> <span class="n">over</span> <span class="mi">2</span><span class="n">m3s</span><span class="p">)</span>  <span class="n">kubelet</span>          <span class="n">Node</span> <span class="n">ip</span><span class="o">-</span><span class="mi">192</span><span class="o">-</span><span class="mi">168</span><span class="o">-</span><span class="mi">1</span><span class="o">-</span><span class="mf">190.</span><span class="n">ap</span><span class="o">-</span><span class="n">northeast</span><span class="o">-</span><span class="mf">2.</span><span class="n">compute</span><span class="o">.</span><span class="n">internal</span> <span class="n">status</span> <span class="ow">is</span> <span class="n">now</span><span class="p">:</span> <span class="n">NodeHasSufficientMemory</span>
+</span></span><span class="line"><span class="cl">  <span class="n">Normal</span>   <span class="n">NodeHasNoDiskPressure</span>    <span class="mi">2</span><span class="n">m3s</span> <span class="p">(</span><span class="n">x3</span> <span class="n">over</span> <span class="mi">2</span><span class="n">m3s</span><span class="p">)</span>  <span class="n">kubelet</span>          <span class="n">Node</span> <span class="n">ip</span><span class="o">-</span><span class="mi">192</span><span class="o">-</span><span class="mi">168</span><span class="o">-</span><span class="mi">1</span><span class="o">-</span><span class="mf">190.</span><span class="n">ap</span><span class="o">-</span><span class="n">northeast</span><span class="o">-</span><span class="mf">2.</span><span class="n">compute</span><span class="o">.</span><span class="n">internal</span> <span class="n">status</span> <span class="ow">is</span> <span class="n">now</span><span class="p">:</span> <span class="n">NodeHasNoDiskPressure</span>
+</span></span><span class="line"><span class="cl">  <span class="n">Normal</span>   <span class="n">NodeHasSufficientPID</span>     <span class="mi">2</span><span class="n">m3s</span> <span class="p">(</span><span class="n">x3</span> <span class="n">over</span> <span class="mi">2</span><span class="n">m3s</span><span class="p">)</span>  <span class="n">kubelet</span>          <span class="n">Node</span> <span class="n">ip</span><span class="o">-</span><span class="mi">192</span><span class="o">-</span><span class="mi">168</span><span class="o">-</span><span class="mi">1</span><span class="o">-</span><span class="mf">190.</span><span class="n">ap</span><span class="o">-</span><span class="n">northeast</span><span class="o">-</span><span class="mf">2.</span><span class="n">compute</span><span class="o">.</span><span class="n">internal</span> <span class="n">status</span> <span class="ow">is</span> <span class="n">now</span><span class="p">:</span> <span class="n">NodeHasSufficientPID</span>
+</span></span><span class="line"><span class="cl">  <span class="n">Normal</span>   <span class="n">NodeAllocatableEnforced</span>  <span class="mi">2</span><span class="n">m3s</span>                 <span class="n">kubelet</span>          <span class="n">Updated</span> <span class="n">Node</span> <span class="n">Allocatable</span> <span class="n">limit</span> <span class="n">across</span> <span class="n">pods</span>
+</span></span><span class="line"><span class="cl">  <span class="n">Normal</span>   <span class="n">NodeReady</span>                <span class="mi">107</span><span class="n">s</span>                 <span class="n">kubelet</span>          <span class="n">Node</span> <span class="n">ip</span><span class="o">-</span><span class="mi">192</span><span class="o">-</span><span class="mi">168</span><span class="o">-</span><span class="mi">1</span><span class="o">-</span><span class="mf">190.</span><span class="n">ap</span><span class="o">-</span><span class="n">northeast</span><span class="o">-</span><span class="mf">2.</span><span class="n">compute</span><span class="o">.</span><span class="n">internal</span> <span class="n">status</span> <span class="ow">is</span> <span class="n">now</span><span class="p">:</span> <span class="n">NodeReady</span>
+</span></span><span class="line"><span class="cl">  <span class="n">Normal</span>   <span class="n">Unconsolidatable</span>         <span class="mi">66</span><span class="n">s</span>                  <span class="n">karpenter</span>        <span class="n">provisioner</span> <span class="n">default</span> <span class="n">has</span> <span class="n">consolidation</span> <span class="n">disabled</span> <span class="c1"># 모으는 설정 비활성화 </span>
+</span></span><span class="line"><span class="cl">  <span class="ne">Warning</span>  <span class="n">EvictionThresholdMet</span>     <span class="mi">25</span><span class="n">s</span>                  <span class="n">kubelet</span>          <span class="n">Attempting</span> <span class="n">to</span> <span class="n">reclaim</span> <span class="n">ephemeral</span><span class="o">-</span><span class="n">storage</span>
+</span></span><span class="line"><span class="cl">  <span class="n">Normal</span>   <span class="n">NodeHasDiskPressure</span>      <span class="mi">20</span><span class="n">s</span>                  <span class="n">kubelet</span>          <span class="n">Node</span> <span class="n">ip</span><span class="o">-</span><span class="mi">192</span><span class="o">-</span><span class="mi">168</span><span class="o">-</span><span class="mi">1</span><span class="o">-</span><span class="mf">190.</span><span class="n">ap</span><span class="o">-</span><span class="n">northeast</span><span class="o">-</span><span class="mf">2.</span><span class="n">compute</span><span class="o">.</span><span class="n">internal</span> <span class="n">status</span> <span class="ow">is</span> <span class="n">now</span><span class="p">:</span> <span class="n">NodeHasDiskPressure</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>파드 limit 값을 수정하면 해결되지만,, kubeflow 플랫폼을 사용할 때마다 limit 값을 수정할 수 는 없기에 깃 이슈를 생성해둔 상태이다. 이슈가 해결되면 업데이트하겠다.</p>
+<p><img loading="lazy" 
+    src="/./karpenter-deepdive/issue10.png" 
+    alt="&lt;a href=&#34;https://github.com/awslabs/kubeflow-manifests/issues/748&#34;&gt;https://github.com/awslabs/kubeflow-manifests/issues/748&lt;/a&gt;" 
+     
+    width=1051 
+    height="798"  /></p>
+<p><a href="https://github.com/awslabs/kubeflow-manifests/issues/748">https://github.com/awslabs/kubeflow-manifests/issues/748</a></p>
+<p>이슈를 뒤져보니,, 비슷한 이슈가 있었다. 개발자 측에서 인지하고 있는 문제로 다음 버전 업데이트에 해결될 것 같다.</p>
+<p><img loading="lazy" 
+    src="/./karpenter-deepdive/kubeflow11.png" 
+    alt="&lt;a href=&#34;https://github.com/awslabs/kubeflow-manifests/issues/540&#34;&gt;https://github.com/awslabs/kubeflow-manifests/issues/748&lt;/a&gt;" 
+     
+    width=955 
+    height="926"  /></p>
+<p><a href="https://github.com/awslabs/kubeflow-manifests/issues/540">https://github.com/awslabs/kubeflow-manifests/issues/748</a></p>
+
     </div>
 </div>
 
