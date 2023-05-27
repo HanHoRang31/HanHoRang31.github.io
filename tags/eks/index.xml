@@ -6,7 +6,27 @@
     <description>Recent content in eks on HanHoRang Tech Blog</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <lastBuildDate>Fri, 12 May 2023 00:00:00 +0000</lastBuildDate><atom:link href="https://HanHoRang31.github.io/tags/eks/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Fri, 26 May 2023 00:00:00 +0000</lastBuildDate><atom:link href="https://HanHoRang31.github.io/tags/eks/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>[AEWS] EKS Observability 워크샵 학습과 트레이싱 기능 확인하기</title>
+      <link>https://HanHoRang31.github.io/post/eks-observability-tracing/</link>
+      <pubDate>Fri, 26 May 2023 00:00:00 +0000</pubDate>
+      
+      <guid>https://HanHoRang31.github.io/post/eks-observability-tracing/</guid>
+      <description>1 2 AWS EKS Workshop Study (=AEWS)는 EKS Workshop 실습 스터디입니다. CloudNet@ Gasida(가시다)님이 진행하시며,공개된 AWS EKS Workshop을 기반으로 진행하고 있습니다. EKS workshop 아키텍처 이해와 트레이싱 기능 확인하기 스터디에서 관측시스템 관련 좋은 워크샵 링크를 공유해주셨다. 이번 시간에는 해당 워크샵 자료를 토대로 실습 아키텍처 이해와 워크샵 기능 중 트레이싱을 살펴볼 예정이다.
+EKS One Observability Workshop 워크샵 링크 : https://catalog.workshops.aws/observability/en-US
+관측시스템 아키텍처 워크샵에서 제공하는 아키텍처가 AWS 기반의 실 애플리케이션을 운영하는 예제로 좋은 것 같아 정리한다.</description>
+    </item>
+    
+    <item>
+      <title>[AEWS] karpenter DeeP Dive (Feat. 오버프로비저닝, kubeflow)</title>
+      <link>https://HanHoRang31.github.io/post/karpenter-deepdive/</link>
+      <pubDate>Fri, 26 May 2023 00:00:00 +0000</pubDate>
+      
+      <guid>https://HanHoRang31.github.io/post/karpenter-deepdive/</guid>
+      <description>1 2 AWS EKS Workshop Study (=AEWS)는 EKS Workshop 실습 스터디입니다. CloudNet@ Gasida(가시다)님이 진행하시며,공개된 AWS EKS Workshop을 기반으로 진행하고 있습니다. 스터디 5주차 시간에는 최근 핫한 노드 수명 주기 관리 솔루션인 Karpenter를 공부하였다. 타 기업 사례에서 자주 보는 주제로서 볼 때마다 시간나면 해야지 해야지.. 생각만 했었는데 이번 스터디로 계기가 되어 정리한다. 이번 블로그 글에서는 Karpenter 에 대해 중점적으로 정리하여 공유할 예정이다. 먼저 Karpenter에 대한 개념과 원리를 살펴볼 것이고, 실습으로 오버프로비저닝과 Kubeflow와 통합하여 테스트를 진행할 것이다.</description>
+    </item>
+    
     <item>
       <title>[AEWS] EKS VPC CNI Deep Dive</title>
       <link>https://HanHoRang31.github.io/post/aews-eks-vpc-1/</link>

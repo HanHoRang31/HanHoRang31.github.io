@@ -6,11 +6,20 @@
     <description>Recent content in Tags on HanHoRang Tech Blog</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <lastBuildDate>Fri, 12 May 2023 00:00:00 +0000</lastBuildDate><atom:link href="https://HanHoRang31.github.io/tags/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Fri, 26 May 2023 00:00:00 +0000</lastBuildDate><atom:link href="https://HanHoRang31.github.io/tags/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>AEWS</title>
+      <link>https://HanHoRang31.github.io/tags/aews/</link>
+      <pubDate>Fri, 26 May 2023 00:00:00 +0000</pubDate>
+      
+      <guid>https://HanHoRang31.github.io/tags/aews/</guid>
+      <description></description>
+    </item>
+    
     <item>
       <title>AWS</title>
       <link>https://HanHoRang31.github.io/tags/aws/</link>
-      <pubDate>Fri, 12 May 2023 00:00:00 +0000</pubDate>
+      <pubDate>Fri, 26 May 2023 00:00:00 +0000</pubDate>
       
       <guid>https://HanHoRang31.github.io/tags/aws/</guid>
       <description></description>
@@ -19,7 +28,7 @@
     <item>
       <title>cloud</title>
       <link>https://HanHoRang31.github.io/tags/cloud/</link>
-      <pubDate>Fri, 12 May 2023 00:00:00 +0000</pubDate>
+      <pubDate>Fri, 26 May 2023 00:00:00 +0000</pubDate>
       
       <guid>https://HanHoRang31.github.io/tags/cloud/</guid>
       <description></description>
@@ -28,9 +37,72 @@
     <item>
       <title>eks</title>
       <link>https://HanHoRang31.github.io/tags/eks/</link>
-      <pubDate>Fri, 12 May 2023 00:00:00 +0000</pubDate>
+      <pubDate>Fri, 26 May 2023 00:00:00 +0000</pubDate>
       
       <guid>https://HanHoRang31.github.io/tags/eks/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>eksctl</title>
+      <link>https://HanHoRang31.github.io/tags/eksctl/</link>
+      <pubDate>Fri, 26 May 2023 00:00:00 +0000</pubDate>
+      
+      <guid>https://HanHoRang31.github.io/tags/eksctl/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>karpenter</title>
+      <link>https://HanHoRang31.github.io/tags/karpenter/</link>
+      <pubDate>Fri, 26 May 2023 00:00:00 +0000</pubDate>
+      
+      <guid>https://HanHoRang31.github.io/tags/karpenter/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>keda</title>
+      <link>https://HanHoRang31.github.io/tags/keda/</link>
+      <pubDate>Fri, 26 May 2023 00:00:00 +0000</pubDate>
+      
+      <guid>https://HanHoRang31.github.io/tags/keda/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>kubeflow</title>
+      <link>https://HanHoRang31.github.io/tags/kubeflow/</link>
+      <pubDate>Fri, 26 May 2023 00:00:00 +0000</pubDate>
+      
+      <guid>https://HanHoRang31.github.io/tags/kubeflow/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>Observability</title>
+      <link>https://HanHoRang31.github.io/tags/observability/</link>
+      <pubDate>Fri, 26 May 2023 00:00:00 +0000</pubDate>
+      
+      <guid>https://HanHoRang31.github.io/tags/observability/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>trace</title>
+      <link>https://HanHoRang31.github.io/tags/trace/</link>
+      <pubDate>Fri, 26 May 2023 00:00:00 +0000</pubDate>
+      
+      <guid>https://HanHoRang31.github.io/tags/trace/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>x-ray</title>
+      <link>https://HanHoRang31.github.io/tags/x-ray/</link>
+      <pubDate>Fri, 26 May 2023 00:00:00 +0000</pubDate>
+      
+      <guid>https://HanHoRang31.github.io/tags/x-ray/</guid>
       <description></description>
     </item>
     
@@ -58,24 +130,6 @@
       <pubDate>Fri, 12 May 2023 00:00:00 +0000</pubDate>
       
       <guid>https://HanHoRang31.github.io/tags/vpc/</guid>
-      <description></description>
-    </item>
-    
-    <item>
-      <title>eksctl</title>
-      <link>https://HanHoRang31.github.io/tags/eksctl/</link>
-      <pubDate>Thu, 11 May 2023 00:00:00 +0000</pubDate>
-      
-      <guid>https://HanHoRang31.github.io/tags/eksctl/</guid>
-      <description></description>
-    </item>
-    
-    <item>
-      <title>kubeflow</title>
-      <link>https://HanHoRang31.github.io/tags/kubeflow/</link>
-      <pubDate>Thu, 11 May 2023 00:00:00 +0000</pubDate>
-      
-      <guid>https://HanHoRang31.github.io/tags/kubeflow/</guid>
       <description></description>
     </item>
     
