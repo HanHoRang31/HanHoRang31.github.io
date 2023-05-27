@@ -9,7 +9,13 @@
     <lastmod>2023-05-26T00:00:00+00:00</lastmod>
     <priority>0</priority>
   </url><url>
+    <loc>https://HanHoRang31.github.io/post/eks-observability-tracing/</loc>
+    <lastmod>2023-05-26T00:00:00+00:00</lastmod>
+  </url><url>
     <loc>https://HanHoRang31.github.io/post/karpenter-deepdive/</loc>
+    <lastmod>2023-05-26T00:00:00+00:00</lastmod>
+  </url><url>
+    <loc>https://HanHoRang31.github.io/tags/aews/</loc>
     <lastmod>2023-05-26T00:00:00+00:00</lastmod>
   </url><url>
     <loc>https://HanHoRang31.github.io/tags/aws/</loc>
@@ -24,9 +30,6 @@
     <loc>https://HanHoRang31.github.io/tags/eksctl/</loc>
     <lastmod>2023-05-26T00:00:00+00:00</lastmod>
   </url><url>
-    <loc>https://HanHoRang31.github.io/tags/kans/</loc>
-    <lastmod>2023-05-26T00:00:00+00:00</lastmod>
-  </url><url>
     <loc>https://HanHoRang31.github.io/tags/karpenter/</loc>
     <lastmod>2023-05-26T00:00:00+00:00</lastmod>
   </url><url>
@@ -36,13 +39,25 @@
     <loc>https://HanHoRang31.github.io/tags/kubeflow/</loc>
     <lastmod>2023-05-26T00:00:00+00:00</lastmod>
   </url><url>
+    <loc>https://HanHoRang31.github.io/tags/observability/</loc>
+    <lastmod>2023-05-26T00:00:00+00:00</lastmod>
+  </url><url>
     <loc>https://HanHoRang31.github.io/post/</loc>
     <lastmod>2023-05-26T00:00:00+00:00</lastmod>
   </url><url>
     <loc>https://HanHoRang31.github.io/tags/</loc>
     <lastmod>2023-05-26T00:00:00+00:00</lastmod>
   </url><url>
+    <loc>https://HanHoRang31.github.io/tags/trace/</loc>
+    <lastmod>2023-05-26T00:00:00+00:00</lastmod>
+  </url><url>
+    <loc>https://HanHoRang31.github.io/tags/x-ray/</loc>
+    <lastmod>2023-05-26T00:00:00+00:00</lastmod>
+  </url><url>
     <loc>https://HanHoRang31.github.io/post/aews-eks-vpc-1/</loc>
+    <lastmod>2023-05-12T00:00:00+00:00</lastmod>
+  </url><url>
+    <loc>https://HanHoRang31.github.io/tags/kans/</loc>
     <lastmod>2023-05-12T00:00:00+00:00</lastmod>
   </url><url>
     <loc>https://HanHoRang31.github.io/tags/kubernetes/</loc>
