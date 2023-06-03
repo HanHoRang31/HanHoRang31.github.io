@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>SealedSecrets on HanHoRang Tech Blog</title>
+    <link>https://HanHoRang31.github.io/tags/sealedsecrets/</link>
+    <description>Recent content in SealedSecrets on HanHoRang Tech Blog</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-us</language>
+    <lastBuildDate>Fri, 02 Jun 2023 00:00:00 +0000</lastBuildDate><atom:link href="https://HanHoRang31.github.io/tags/sealedsecrets/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>[AEWS] AWS 서비스를 통한 EKS 보안 구성</title>
+      <link>https://HanHoRang31.github.io/post/eks-security-allinone/</link>
+      <pubDate>Fri, 02 Jun 2023 00:00:00 +0000</pubDate>
+      
+      <guid>https://HanHoRang31.github.io/post/eks-security-allinone/</guid>
+      <description>1 2 AWS EKS Workshop Study (=AEWS)는 EKS Workshop 실습 스터디입니다. CloudNet@ Gasida(가시다)님이 진행하시며,공개된 AWS EKS Workshop을 기반으로 진행하고 있습니다. 지난 글에 이어서 AWS 서비스를 통해서 EKS 보안 구성을 한 내용들을 공유한다. 보안 구성 내용은 EKS 워크샵 내용을 참고하여 정리하였다. 보안 구성 내용은 다음과 같다.
+EKS Secret 시크릿 키 관리 : Sealed Secrets + AWS KMS EKS 이상 탐지 모니터링 : Amazon GuardDuty + 사고 대응 EKS 애플리케이션 트래픽 보호 : AWS WAF EKS Secret Key 관리 참고 : EKS 워크샵, AWS 블로그</description>
+    </item>
+    
+  </channel>
+</rss>

@@ -1,0 +1,1189 @@
+<!DOCTYPE html>
+<html lang="en-us">
+    
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="theme-color" content="dark">
+    <title>[AEWS] EKS Security 이해 | HanHoRang Tech Blog</title>
+
+    
+    
+    
+    <meta property="og:site_name" content="HanHoRang Tech Blog by Tania in Hugo" />
+    <meta property="og:title" content="[AEWS] EKS Security 이해 | HanHoRang Tech Blog"/>
+    <meta itemprop="name" content="[AEWS] EKS Security 이해 | HanHoRang Tech Blog" />
+    <meta name="twitter:title" content="[AEWS] EKS Security 이해 | HanHoRang Tech Blog" />
+    <meta name="application-name" content="[AEWS] EKS Security 이해 | HanHoRang Tech Blog" /><meta name="twitter:card" content="summary"/>
+
+    <meta name="description" content="EKS 인증/인가와 IRSA 이해하기" />
+    <meta name="twitter:description" content="EKS 인증/인가와 IRSA 이해하기 "/>
+    <meta itemprop="description" content=" EKS 인증/인가와 IRSA 이해하기 "/>
+    <meta property="og:description" content=" EKS 인증/인가와 IRSA 이해하기 " />
+
+    
+
+<meta property="og:type" content="article" />
+<meta property="article:publisher" content="Hugo Tania" />
+<meta property="og:article:published_time" content=2023-06-02T00:00:00Z />
+<meta property="article:published_time" content=2023-06-02T00:00:00Z />
+
+
+  <meta property="og:article:author" content="Han ho rnag" />
+  <meta property="article:author" content="Han ho rnag" />
+  <meta name="author" content="Han ho rnag" />
+
+
+
+
+<script defer type="application/ld+json">
+  {
+    "@context": "http://schema.org",
+    "@type": "Article",
+    "headline": "[AEWS] EKS Security 이해",
+    "author": {
+      "@type": "Person",
+      "name": "Hugo Tania"
+    },
+    "datePublished": "2023-06-02",
+    "description": "EKS 인증/인가와 IRSA 이해하기",
+    "wordCount":  2269 ,
+    "mainEntityOfPage": "True",
+    "dateModified": "2023-06-02",
+    "publisher": {
+      "@type": "Organization",
+      "name": "Hugo Tania",
+      "logo": {
+        "@type": "imageObject",
+        "url": "https:\/\/HanHoRang31.github.io\/favicon.ico"
+      }
+    }
+  }
+</script>
+
+
+
+    <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico" />
+    
+    <link rel="stylesheet" href="/sass/main.min.ab99ff095f832511e24ffb2fba2b51ad473b2f7e9301d674eba2c6c3a6e8bd81.css">
+    
+</head>
+    
+    <script>
+        (function() {
+            const colorSchemeKey = 'ThemeColorScheme';
+            if(!localStorage.getItem(colorSchemeKey)){
+                localStorage.setItem(colorSchemeKey, "auto");
+            }
+        })();
+    </script><script>
+    (function() {
+        const colorSchemeKey = 'ThemeColorScheme';
+        const colorSchemeItem = localStorage.getItem(colorSchemeKey);
+        const supportDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches === true;
+
+        if (colorSchemeItem == 'dark' || colorSchemeItem === 'auto' && supportDarkMode) {
+            
+
+            document.documentElement.dataset.userColorScheme = 'dark';
+        } else {
+            document.documentElement.dataset.userColorScheme = 'light';
+        }
+    })();
+</script>
+
+
+    <body class="dark">
+        <nav class="navbar">
+    <div class="container">
+        <div class="flex">
+            <div>
+                <a class="brand" href="/">
+                    
+                    
+                        <img src="/favicon.ico" />
+                    
+                    HanHoRang Tech Blog
+                    </a>
+            </div>
+            <div class="flex">
+                
+                <a href="/articles/">Articles</a>
+                
+                
+                    <button id="dark-mode-button">
+                    <svg class="light" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" aria-hidden="true" focusable="false" width="1em" height="1em" style="-ms-transform: rotate(360deg); -webkit-transform: rotate(360deg); transform: rotate(360deg);" preserveAspectRatio="xMidYMid meet" viewBox="0 0 36 36"><path fill="#FFD983" d="M30.312.776C32 19 20 32 .776 30.312c8.199 7.717 21.091 7.588 29.107-.429C37.9 21.867 38.03 8.975 30.312.776z"/><path d="M30.705 15.915a1.163 1.163 0 1 0 1.643 1.641a1.163 1.163 0 0 0-1.643-1.641zm-16.022 14.38a1.74 1.74 0 0 0 0 2.465a1.742 1.742 0 1 0 0-2.465zm13.968-2.147a2.904 2.904 0 0 1-4.108 0a2.902 2.902 0 0 1 0-4.107a2.902 2.902 0 0 1 4.108 0a2.902 2.902 0 0 1 0 4.107z" fill="#FFCC4D"/><rect x="0" y="0" width="36" height="36" fill="rgba(0, 0, 0, 0)" /></svg>
+                    <svg class="dark" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" aria-hidden="true" focusable="false" width="1em" height="1em" style="-ms-transform: rotate(360deg); -webkit-transform: rotate(360deg); transform: rotate(360deg);" preserveAspectRatio="xMidYMid meet" viewBox="0 0 36 36"><path fill="#FFD983" d="M16 2s0-2 2-2s2 2 2 2v2s0 2-2 2s-2-2-2-2V2zm18 14s2 0 2 2s-2 2-2 2h-2s-2 0-2-2s2-2 2-2h2zM4 16s2 0 2 2s-2 2-2 2H2s-2 0-2-2s2-2 2-2h2zm5.121-8.707s1.414 1.414 0 2.828s-2.828 0-2.828 0L4.878 8.708s-1.414-1.414 0-2.829c1.415-1.414 2.829 0 2.829 0l1.414 1.414zm21 21s1.414 1.414 0 2.828s-2.828 0-2.828 0l-1.414-1.414s-1.414-1.414 0-2.828s2.828 0 2.828 0l1.414 1.414zm-.413-18.172s-1.414 1.414-2.828 0s0-2.828 0-2.828l1.414-1.414s1.414-1.414 2.828 0s0 2.828 0 2.828l-1.414 1.414zm-21 21s-1.414 1.414-2.828 0s0-2.828 0-2.828l1.414-1.414s1.414-1.414 2.828 0s0 2.828 0 2.828l-1.414 1.414zM16 32s0-2 2-2s2 2 2 2v2s0 2-2 2s-2-2-2-2v-2z"/><circle fill="#FFD983" cx="18" cy="18" r="10"/><rect x="0" y="0" width="36" height="36" fill="rgba(0, 0, 0, 0)" /></svg>
+                    </button>
+                
+            </div>
+            </div>
+    </div>
+</nav>
+
+        <main>
+            
+<div class="container">
+    <article>
+        <header class="article-header">
+            <div class="thumb">
+                <div>
+                    <h1>[AEWS] EKS Security 이해</h1>
+                    <div class="post-meta">
+                        <div>
+                            
+                            
+                            By HanHoRnag | <time>June 02, 2023</time>
+                            | 11 minutes
+                        </div>
+                        <div class="tags">
+                            
+                            <a href="/tags/kans/">KANS</a>
+                            
+                            <a href="/tags/kubeflow/">kubeflow</a>
+                            
+                            <a href="/tags/cloud/">cloud</a>
+                            
+                            <a href="/tags/aws/">AWS</a>
+                            
+                            <a href="/tags/eksctl/">eksctl</a>
+                            
+                            <a href="/tags/eks/">eks</a>
+                            
+                            <a href="/tags/security/">security</a>
+                            
+                            <a href="/tags/irsa/">IRSA</a>
+                            
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </header>
+    </article>
+
+    <div class="article-post">
+    <div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-markdown" data-lang="markdown"><span class="line"><span class="cl">AWS EKS Workshop Study (=AEWS)는 EKS Workshop 실습 스터디입니다.
+</span></span><span class="line"><span class="cl">CloudNet@ Gasida(가시다)님이 진행하시며,공개된 AWS EKS Workshop을 기반으로 진행하고 있습니다.
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>스터디도 어느덧 6주차다. 6주차에는 EKS 보안을 주제로 모임장님이 스터디를 진행해주셨다. 스터디 내용으로 EKS 인증 / 인가와 IRSA의 원리를 소개해주셨는데.. 개인적으로 여러 번 돌려볼 정도로 내용이 많이 어려웠다.</p>
+<p>필자 스스로 보안이 다른 분야에 비해 미숙한 부분도 있고,, 아는 내용도 별로 없기 떄문이라 본다. 아마 필자에게 EKS 보안에 대해 소개해달라고 요청받으면 인증 → 인가 → RBAC 수준으로 밖에 답을 못할 것이라 예상한다. 이번 기회에 EKS 보안 원리를 손 쉽게 학습할 수 있는 기회가 생겨 운이 좋았다고 생각한다. 이번 블로그 글에서는 EKS 보안에 대해 필자가 학습 내용을 공유할 것이다.  스터디에서 학습한 EKS 인증/인가, IRSA 에 대한 내용과 워크샵에서 학습한 AWS 서비스를 통한 EKS 보안 구성이 주가 될 예정이다.</p>
+<h2 id="쿠버네티스-보안-체계">
+    <a href="#%ec%bf%a0%eb%b2%84%eb%84%a4%ed%8b%b0%ec%8a%a4-%eb%b3%b4%ec%95%88-%ec%b2%b4%ea%b3%84" class="anchor">
+        <svg class="icon" aria-hidden="true" focusable="false" height="16" version="1.1" viewBox="0 0 16 16" width="16">
+            <path fill-rule="evenodd"
+                d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z">
+            </path>
+        </svg>
+    </a>
+    쿠버네티스 보안 체계
+</h2>
+<p><img loading="lazy" 
+    src="/./EKS-Security-concept/Access_API_with_Authenticaiton_for_Kubernetes.jpeg" 
+    alt="&lt;a href=&#34;https://kubetm.github.io/k8s/07-intermediate-basic-resource/authentication/&#34;&gt;https://kubetm.github.io/k8s/07-intermediate-basic-resource/authentication/&lt;/a&gt;" 
+     
+    width=886 
+    height="232"  /></p>
+<p><a href="https://kubetm.github.io/k8s/07-intermediate-basic-resource/authentication/">https://kubetm.github.io/k8s/07-intermediate-basic-resource/authentication/</a></p>
+<p>쿠버네티스에서는 API 서버가 인증→ 인가→ Admission Control을 통해 클러스터 접근에 대한 보안을 관리 및 제어한다.</p>
+<ol>
+<li>인증(Authentication): 사용자의 신원을 확인하는 단계이다.  쿠버네티스에서는 X.509 Client Cert 를 쿠버네티스 접근 파일(kubeconfig)에 저장시키거나 서비스 어카운트를 통해 인증 작업을 수행한다.</li>
+<li>인가(Authorization): 사용자가 시스템의 특정 리소스에 접근하거나 특정 작업을 수행할 권한이 있는지확인하는 단계이다. 쿠버네티스에서는 Role-Based Access Control (RBAC), Attribute-Based Access Control (ABAC), Webhook, Node Auththorization 등의 메커니즘을 통해 인가 작업을 수행한다.</li>
+<li>Admission Control: 인증, 인가 요청을 처리하기 전에 요청을 검사하고 수정하거나 거부하는 일련의 플러그인 단계이다. Mutating Admission Webhooks, Validating Admission Webhooks 을 통해 요청된 오브젝트를 수정하여 추가 보안 플러그인(IRSA)에 확장 연결시켜주는 작업을 수행한다.</li>
+</ol>
+<h2 id="eks-인증인가">
+    <a href="#eks-%ec%9d%b8%ec%a6%9d%ec%9d%b8%ea%b0%80" class="anchor">
+        <svg class="icon" aria-hidden="true" focusable="false" height="16" version="1.1" viewBox="0 0 16 16" width="16">
+            <path fill-rule="evenodd"
+                d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z">
+            </path>
+        </svg>
+    </a>
+    EKS 인증/인가
+</h2>
+<p>EKS에서 인증/인가 작업은 나눠서 진행된다. 인증은 AWS IAM, 인가는 k8s RBAC이 수행한다. 각 작업의 대한 세부 동작은 다음 그림과 같이 진행된다.</p>
+<p><img loading="lazy" 
+    src="/./EKS-Security-concept/Untitled.png" 
+    alt="&lt;a href=&#34;https://awskoreamarketingasset.s3.amazonaws.com/2022%20Summit/pdf/T10S1_EKS%20%ED%99%98%EA%B2%BD%EC%9D%84%20%EB%8D%94%20%ED%9A%A8%EC%9C%A8%EC%A0%81%EC%9C%BC%EB%A1%9C%20%EB%8D%94%20%EC%95%88%EC%A0%84%ED%95%98%EA%B2%8C.pdf&#34;&gt;https://awskoreamarketingasset.s3.amazonaws.com/2022 Summit/pdf/T10S1_EKS 환경을 더 효율적으로 더 안전하게.pdf&lt;/a&gt;" 
+     
+    width=1280 
+    height="721"  /></p>
+<p><a href="https://awskoreamarketingasset.s3.amazonaws.com/2022%20Summit/pdf/T10S1_EKS%20%ED%99%98%EA%B2%BD%EC%9D%84%20%EB%8D%94%20%ED%9A%A8%EC%9C%A8%EC%A0%81%EC%9C%BC%EB%A1%9C%20%EB%8D%94%20%EC%95%88%EC%A0%84%ED%95%98%EA%B2%8C.pdf">https://awskoreamarketingasset.s3.amazonaws.com/2022 Summit/pdf/T10S1_EKS 환경을 더 효율적으로 더 안전하게.pdf</a></p>
+<p>이해하기 쉽지 않다! 필자 또한 여러번 영상을 돌려보고 실습을 통해 겨우 이해했다. 쉬운 이해를 위해 직접 해당 과정을 실습해보도록 하겠다. 그림에 순서도가 나와있지 않지만 왼쪽 Authentication(인증) →  아래 Authorization(인가) 작업을 통해 진행된다. 여기서 봐야할 점은 인증 작업에서의 AWS IAM 와 연계 작업이다.</p>
+<p><img loading="lazy" 
+    src="/./EKS-Security-concept/auth-iam.png" 
+    alt="&lt;a href=&#34;https://awskoreamarketingasset.s3.amazonaws.com/2022%20Summit/pdf/T10S1_EKS%20%ED%99%98%EA%B2%BD%EC%9D%84%20%EB%8D%94%20%ED%9A%A8%EC%9C%A8%EC%A0%81%EC%9C%BC%EB%A1%9C%20%EB%8D%94%20%EC%95%88%EC%A0%84%ED%95%98%EA%B2%8C.pdf&#34;&gt;https://awskoreamarketingasset.s3.amazonaws.com/2022 Summit/pdf/T10S1_EKS 환경을 더 효율적으로 더 안전하게.pdf&lt;/a&gt;" 
+     
+    width=1260 
+    height="695"  /></p>
+<p><a href="https://awskoreamarketingasset.s3.amazonaws.com/2022%20Summit/pdf/T10S1_EKS%20%ED%99%98%EA%B2%BD%EC%9D%84%20%EB%8D%94%20%ED%9A%A8%EC%9C%A8%EC%A0%81%EC%9C%BC%EB%A1%9C%20%EB%8D%94%20%EC%95%88%EC%A0%84%ED%95%98%EA%B2%8C.pdf">https://awskoreamarketingasset.s3.amazonaws.com/2022 Summit/pdf/T10S1_EKS 환경을 더 효율적으로 더 안전하게.pdf</a></p>
+<p>인증 과정을 IAM 와 연계해서 확인해보자면 다음과 같이 요약할 수 있다.</p>
+<p>IAM Authenticator Client 에서 토큰을 발급받고 → 발급받은 토큰을 IAM Authenticator Server에 요청하여 인증 작업을 수행한다.</p>
+<ol>
+<li>
+<p>토큰 발급</p>
+<p>앞 서 과정에서 IAM Authenticator Client가 토큰을 발급해주는 객체인 것을 확인하였다. 그렇다면 토큰 발급은 누가 요청하는 것일까? eks 접근 파일인 kubeconfig를 확인하면 이를 확인할 수 있다 .</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">cat ~/.kube/config <span class="p">|</span> yh
+</span></span><span class="line"><span class="cl">---
+</span></span><span class="line"><span class="cl">...
+</span></span><span class="line"><span class="cl">- name: terraform-eks@hanhorang.ap-northeast-2.eksctl.io
+</span></span><span class="line"><span class="cl">  user:
+</span></span><span class="line"><span class="cl">    exec:
+</span></span><span class="line"><span class="cl">      apiVersion: client.authentication.k8s.io/v1beta1
+</span></span><span class="line"><span class="cl">      args:
+</span></span><span class="line"><span class="cl">      - eks
+</span></span><span class="line"><span class="cl">      - get-token
+</span></span><span class="line"><span class="cl">      - --output
+</span></span><span class="line"><span class="cl">      - json
+</span></span><span class="line"><span class="cl">      - --cluster-name
+</span></span><span class="line"><span class="cl">      - hanhorang
+</span></span><span class="line"><span class="cl">      - --region
+</span></span><span class="line"><span class="cl">      - ap-northeast-2
+</span></span><span class="line"><span class="cl">      command: aws
+</span></span><span class="line"><span class="cl">      env:
+</span></span><span class="line"><span class="cl">      - name: AWS_STS_REGIONAL_ENDPOINTS
+</span></span><span class="line"><span class="cl">        value: regional
+</span></span><span class="line"><span class="cl">      provideClusterInfo: <span class="nb">false</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>위의 커맨드를 입력하면 그대로 입력하면 아래와 같이 토큰을 확인할 수 있다.</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">aws eks get-token --cluster-name <span class="nv">$CLUSTER_NAME</span> <span class="p">|</span> jq
+</span></span><span class="line"><span class="cl">---
+</span></span><span class="line"><span class="cl"><span class="o">{</span>
+</span></span><span class="line"><span class="cl">  <span class="s2">&#34;kind&#34;</span>: <span class="s2">&#34;ExecCredential&#34;</span>,
+</span></span><span class="line"><span class="cl">  <span class="s2">&#34;apiVersion&#34;</span>: <span class="s2">&#34;client.authentication.k8s.io/v1beta1&#34;</span>,
+</span></span><span class="line"><span class="cl">  <span class="s2">&#34;spec&#34;</span>: <span class="o">{}</span>,
+</span></span><span class="line"><span class="cl">  <span class="s2">&#34;status&#34;</span>: <span class="o">{</span>
+</span></span><span class="line"><span class="cl">    <span class="s2">&#34;expirationTimestamp&#34;</span>: <span class="s2">&#34;2023-06-03T07:17:27Z&#34;</span>,
+</span></span><span class="line"><span class="cl">    <span class="s2">&#34;token&#34;</span>: <span class="s2">&#34;k8s...&#34;</span>
+</span></span><span class="line"><span class="cl">  <span class="o">}</span>
+</span></span><span class="line"><span class="cl"><span class="o">}</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><ul>
+<li>발급 정보를 확인하면 expirationTimestamp 필드를 확인할 수 있는데 해당 토큰의 수명이다. 이는 발급받은 토큰이 임시 보안 자격 증명으로 활용되는 것을 확인할 수 있다.</li>
+</ul>
+<p>발급받은 토큰을 jwt에서 확인하면 토큰 정보가 다음과 같이 구성됨을 확인할 수 있다.</p>
+<p><img loading="lazy" 
+    src="/./EKS-Security-concept/jwt1.png" 
+    alt="&lt;a href=&#34;https://jwt.io/&#34;&gt;https://jwt.io/&lt;/a&gt;" 
+     
+    width=918 
+    height="782"  /></p>
+<p><a href="https://jwt.io/">https://jwt.io/</a></p>
+<p>PAYLOAD 정보를 확인하면 해당 정보가 AWS API 호출시의 필드와 유사한 것을 확인할 수 있다. 자세히보면, AWS sts(임시자격증명 제공자)에 getcallerIdentity(토큰발급)을 요청(Action)한 것을 확인할 수 있다.</p>
+</li>
+<li>
+<p>토큰 리뷰</p>
+<p>발급받은 토큰을 IAM Authenticator Server에 요청하면 인증 작업이 완료된다. 토큰 리뷰 요청은 API 서버에서 진행되어 과정에 대해 세부 확인을 못하지만 AWS CloudTrail 콘솔에서 리뷰 작업을 확인할 수 있다.</p>
+<p><img loading="lazy" 
+    src="/./EKS-Security-concept/eks-iam2.png" 
+    alt="eks-iam2.png" 
+     
+    width=1542 
+    height="765"  /></p>
+</li>
+<li>
+<p>인가</p>
+<p>인증 작업이 완료되면 User/Role에 대한 ARN을 반환하게 되고 해당 ARN에 대한  RBAC 작업을 수행한다. 인가 작업에 대한 설정은 aws-auth 컨피그 맵에서 확인할 수 있다.</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">kubectl get cm -n kube-system aws-auth -o yaml <span class="p">|</span> kubectl neat <span class="p">|</span> yh
+</span></span><span class="line"><span class="cl">--
+</span></span><span class="line"><span class="cl">apiVersion: v1
+</span></span><span class="line"><span class="cl">data: 
+</span></span><span class="line"><span class="cl">  mapRoles: <span class="p">|</span>
+</span></span><span class="line"><span class="cl">    - groups:
+</span></span><span class="line"><span class="cl">      - system:bootstrappers
+</span></span><span class="line"><span class="cl">      - system:nodes
+</span></span><span class="line"><span class="cl">      rolearn: arn:aws:iam::-:role/eksctl-hanhorang-nodegroup-ng1-NodeInstanceRole-1BT7EJGDT32FR
+</span></span><span class="line"><span class="cl">      username: system:node:<span class="o">{{</span>EC2PrivateDNSName<span class="o">}}</span>
+</span></span><span class="line"><span class="cl">kind: ConfigMap
+</span></span><span class="line"><span class="cl">metadata: 
+</span></span><span class="line"><span class="cl">  name: aws-auth
+</span></span><span class="line"><span class="cl">  namespace: kube-system
+</span></span></code></pre></td></tr></table>
+</div>
+</div><ul>
+<li>mapRoles에서 rolearn이 인증작업에서 반환된 arn이 입력되며 groups에서 설정한 역할에 바인딩되어 RBAC처리가 진행된다.</li>
+</ul>
+<p>RBAC 확인은 krew 플러그인 설치를 통해 자세히 확인할 수 있다.</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span><span class="lnt">31
+</span><span class="lnt">32
+</span><span class="lnt">33
+</span><span class="lnt">34
+</span><span class="lnt">35
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl"><span class="c1"># 플러그인 설치</span>
+</span></span><span class="line"><span class="cl">kubectl krew install access-matrix rbac-tool rbac-view rolesum
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1"># EKS 설치한 IAM user 정보 </span>
+</span></span><span class="line"><span class="cl">kubectl rbac-tool whoami 
+</span></span><span class="line"><span class="cl">--
+</span></span><span class="line"><span class="cl"><span class="o">{</span>Username: <span class="s2">&#34;kubernetes-admin&#34;</span>,
+</span></span><span class="line"><span class="cl"> UID:      <span class="s2">&#34;aws-iam-authenticator:955963799952:AIDA55E7B7GIFCJDANOIO&#34;</span>,
+</span></span><span class="line"><span class="cl"> Groups:   <span class="o">[</span><span class="s2">&#34;system:masters&#34;</span>,
+</span></span><span class="line"><span class="cl">            <span class="s2">&#34;system:authenticated&#34;</span><span class="o">]</span>,
+</span></span><span class="line"><span class="cl"> Extra:    <span class="o">{</span>accessKeyId:  <span class="o">[</span><span class="s2">&#34;AKIA55E7B7GIPMN3X7NP&#34;</span><span class="o">]</span>,
+</span></span><span class="line"><span class="cl">            arn:          <span class="o">[</span><span class="s2">&#34;arn:aws:iam::955963799952:user/terraform-eks&#34;</span><span class="o">]</span>,
+</span></span><span class="line"><span class="cl">            canonicalArn: <span class="o">[</span><span class="s2">&#34;arn:aws:iam::955963799952:user/terraform-eks&#34;</span><span class="o">]</span>,
+</span></span><span class="line"><span class="cl">            principalId:  <span class="o">[</span><span class="s2">&#34;AIDA55E7B7GIFC
+</span></span></span><span class="line"><span class="cl"><span class="s2">
+</span></span></span><span class="line"><span class="cl"><span class="s2"># system:master RBAC 확인
+</span></span></span><span class="line"><span class="cl"><span class="s2">kubectl rbac-tool lookup system:masters
+</span></span></span><span class="line"><span class="cl"><span class="s2">---
+</span></span></span><span class="line"><span class="cl"><span class="s2">W0603 16:28:17.218380    9877 warnings.go:67] policy/v1beta1 PodSecurityPolicy is deprecated in v1.21+, unavailable in v1.25+
+</span></span></span><span class="line"><span class="cl"><span class="s2">  SUBJECT        | SUBJECT TYPE | SCOPE       | NAMESPACE | ROLE           
+</span></span></span><span class="line"><span class="cl"><span class="s2">+----------------+--------------+-------------+-----------+---------------+
+</span></span></span><span class="line"><span class="cl"><span class="s2">  system:masters | Group        | ClusterRole |           | cluster-admin
+</span></span></span><span class="line"><span class="cl"><span class="s2">
+</span></span></span><span class="line"><span class="cl"><span class="s2"># role에 할당된 cluster-admin 확인
+</span></span></span><span class="line"><span class="cl"><span class="s2">kubectl describe clusterrole cluster-admin
+</span></span></span><span class="line"><span class="cl"><span class="s2">---
+</span></span></span><span class="line"><span class="cl"><span class="s2">Name:         cluster-admin
+</span></span></span><span class="line"><span class="cl"><span class="s2">Labels:       kubernetes.io/bootstrapping=rbac-defaults
+</span></span></span><span class="line"><span class="cl"><span class="s2">Annotations:  rbac.authorization.kubernetes.io/autoupdate: true
+</span></span></span><span class="line"><span class="cl"><span class="s2">PolicyRule:
+</span></span></span><span class="line"><span class="cl"><span class="s2">  Resources  Non-Resource URLs  Resource Names  Verbs
+</span></span></span><span class="line"><span class="cl"><span class="s2">  ---------  -----------------  --------------  -----
+</span></span></span><span class="line"><span class="cl"><span class="s2">  *.*        []                 []              [*]
+</span></span></span><span class="line"><span class="cl"><span class="s2">             [*]                []              [*] 
+</span></span></span></code></pre></td></tr></table>
+</div>
+</div><ul>
+<li>aws-auth 컨피그맵에는 클러스터 생성 IAM 사용자(kubernetes-admin) 의 정보가 없는 것을 확인할 수 있는데 보안 이슈(탈취 및 삭제) 로 AWS 가 자체적으로 숨겨둔 것 같다.</li>
+</ul>
+</li>
+</ol>
+<h3 id="eks-에-사용자-추가하기">
+    <a href="#eks-%ec%97%90-%ec%82%ac%ec%9a%a9%ec%9e%90-%ec%b6%94%ea%b0%80%ed%95%98%ea%b8%b0" class="anchor">
+        <svg class="icon" aria-hidden="true" focusable="false" height="16" version="1.1" viewBox="0 0 16 16" width="16">
+            <path fill-rule="evenodd"
+                d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z">
+            </path>
+        </svg>
+    </a>
+    EKS 에 사용자 추가하기
+</h3>
+<p>스터디에서 공유해주신 실습 예제로 EKS 클러스터 관리(모든 리소스 읽기 권한 부여)를 위한 사용자를 추가하고 새 베스천 서버에서 접근이 가능한 지 확인해보겠다.</p>
+<ul>
+<li>
+<p>[베스천 서버-1] IAM 사용자 추가 및 클러스터 접근 권한 부여</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl"><span class="c1"># testuser 사용자 생성 </span>
+</span></span><span class="line"><span class="cl">aws iam create-user --user-name testuser 
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1"># 사용자에게 프로그래밍 방식 액세스 권한 부여</span>
+</span></span><span class="line"><span class="cl">aws iam create-access-key --user-name testuser
+</span></span><span class="line"><span class="cl">--
+</span></span><span class="line"><span class="cl"><span class="o">{</span>
+</span></span><span class="line"><span class="cl">    <span class="s2">&#34;AccessKey&#34;</span>: <span class="o">{</span>
+</span></span><span class="line"><span class="cl">        <span class="s2">&#34;UserName&#34;</span>: <span class="s2">&#34;testuser&#34;</span>,
+</span></span><span class="line"><span class="cl">        <span class="s2">&#34;AccessKeyId&#34;</span>: <span class="s2">&#34;AKIA55E7B7GIOXM4OAVI&#34;</span>,
+</span></span><span class="line"><span class="cl">        <span class="s2">&#34;Status&#34;</span>: <span class="s2">&#34;Active&#34;</span>,
+</span></span><span class="line"><span class="cl">        <span class="s2">&#34;SecretAccessKey&#34;</span>: <span class="s2">&#34;bjQvsqoETo1rHeFXyye7yzsh13Utd4SXRrOeejjq&#34;</span>,
+</span></span><span class="line"><span class="cl">        <span class="s2">&#34;CreateDate&#34;</span>: <span class="s2">&#34;2023-06-03T07:38:08+00:00&#34;</span>
+</span></span><span class="line"><span class="cl">    <span class="o">}</span>
+</span></span><span class="line"><span class="cl"><span class="o">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1"># testuser 사용자에 IAM 정책을 추가</span>
+</span></span><span class="line"><span class="cl">aws iam attach-user-policy --policy-arn arn:aws:iam::aws:policy/AdministratorAccess --user-name testuser
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1"># 구별을 위해 베스천 서버 1의 arn 확인 </span>
+</span></span><span class="line"><span class="cl"><span class="s2">&#34;arn:aws:iam::0000000000:user/hanohnrag-eks&#34;</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>다음은 클러스터 RBAC 권한(모든 리소스 읽기 권한) 을 생성하여 group:user 에 바인딩하자.</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-yaml" data-lang="yaml"><span class="line"><span class="cl"><span class="nt">apiVersion</span><span class="p">:</span><span class="w"> </span><span class="l">rbac.authorization.k8s.io/v1</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="nt">kind</span><span class="p">:</span><span class="w"> </span><span class="l">ClusterRole</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="nt">metadata</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l">readonly</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="nt">rules</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span>- <span class="nt">apiGroups</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">&#34;*&#34;</span><span class="p">]</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="nt">resources</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">&#34;*&#34;</span><span class="p">]</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="nt">verbs</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">&#34;get&#34;</span><span class="p">,</span><span class="w"> </span><span class="s2">&#34;watch&#34;</span><span class="p">,</span><span class="w"> </span><span class="s2">&#34;list&#34;</span><span class="p">]</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="nn">---</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="nt">apiVersion</span><span class="p">:</span><span class="w"> </span><span class="l">rbac.authorization.k8s.io/v1</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="nt">kind</span><span class="p">:</span><span class="w"> </span><span class="l">ClusterRoleBinding</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="nt">metadata</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l">readonly-binding</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="nt">roleRef</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="nt">apiGroup</span><span class="p">:</span><span class="w"> </span><span class="l">rbac.authorization.k8s.io</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="nt">kind</span><span class="p">:</span><span class="w"> </span><span class="l">ClusterRole</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l">readonly</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="nt">subjects</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span>- <span class="nt">kind</span><span class="p">:</span><span class="w"> </span><span class="l">Group</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l">user</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="nt">apiGroup</span><span class="p">:</span><span class="w"> </span><span class="l">rbac.authorization.k8s.io</span><span class="w">
+</span></span></span></code></pre></td></tr></table>
+</div>
+</div><p>생성한 Group에 IAM 유저(testuser)를 매핑하자.</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">eksctl create iamidentitymapping --cluster <span class="nv">$CLUSTER_NAME</span> --username testuser --group user --arn arn:aws:iam::<span class="nv">$ACCOUNT_ID</span>:user/testuser
+</span></span><span class="line"><span class="cl">--
+</span></span><span class="line"><span class="cl">2023-06-03 16:59:25 <span class="o">[</span>ℹ<span class="o">]</span>  checking arn arn:aws:iam::0000000000:user/testuser against entries in the auth ConfigMap
+</span></span><span class="line"><span class="cl">2023-06-03 16:59:25 <span class="o">[</span>ℹ<span class="o">]</span>  adding identity <span class="s2">&#34;arn:aws:iam::0000000000:user/testuser&#34;</span> to auth ConfigMap
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1"># 매핑 확인</span>
+</span></span><span class="line"><span class="cl">kubectl get cm -n kube-system aws-auth -o yaml <span class="p">|</span> kubectl neat <span class="p">|</span> yh
+</span></span><span class="line"><span class="cl">--
+</span></span><span class="line"><span class="cl">apiVersion: v1
+</span></span><span class="line"><span class="cl">data: 
+</span></span><span class="line"><span class="cl">  mapRoles: <span class="p">|</span>
+</span></span><span class="line"><span class="cl">    - groups:
+</span></span><span class="line"><span class="cl">      - system:bootstrappers
+</span></span><span class="line"><span class="cl">      - system:nodes
+</span></span><span class="line"><span class="cl">      rolearn: arn:aws:iam::0000000000:role/eksctl-hanhorang-nodegroup-ng1-NodeInstanceRole-1BT7EJGDT32FR
+</span></span><span class="line"><span class="cl">      username: system:node:<span class="o">{{</span>EC2PrivateDNSName<span class="o">}}</span>
+</span></span><span class="line"><span class="cl">  mapUsers: <span class="p">|</span>
+</span></span><span class="line"><span class="cl">    - groups:
+</span></span><span class="line"><span class="cl">      - user
+</span></span><span class="line"><span class="cl">      userarn: arn:aws:iam::0000000000:user/testuser
+</span></span><span class="line"><span class="cl">      username: testuser
+</span></span></code></pre></td></tr></table>
+</div>
+</div></li>
+<li>
+<p>[베스천 서버-2]  test-user 권한 부여 확인</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span><span class="lnt">31
+</span><span class="lnt">32
+</span><span class="lnt">33
+</span><span class="lnt">34
+</span><span class="lnt">35
+</span><span class="lnt">36
+</span><span class="lnt">37
+</span><span class="lnt">38
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl"><span class="c1"># IAM ARN 확인 </span>
+</span></span><span class="line"><span class="cl">aws sts get-caller-identity --query Arn
+</span></span><span class="line"><span class="cl">---
+</span></span><span class="line"><span class="cl">Unable to locate credentials. You can configure credentials by running <span class="s2">&#34;aws configure&#34;</span>.
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1"># testuser 액세스 키 입력 </span>
+</span></span><span class="line"><span class="cl">aws configure 
+</span></span><span class="line"><span class="cl">--
+</span></span><span class="line"><span class="cl">AWS Access Key ID <span class="o">[</span>None<span class="o">]</span>: AKIA55E7B7GIOXM4OAVI
+</span></span><span class="line"><span class="cl">AWS Secret Access Key <span class="o">[</span>None<span class="o">]</span>: bjQvsqoETo1rHeFXyye7yzsh13Utd4SXRrOeejjq
+</span></span><span class="line"><span class="cl">Default region name <span class="o">[</span>None<span class="o">]</span>: ap-northeast-2
+</span></span><span class="line"><span class="cl">Default output format <span class="o">[</span>None<span class="o">]</span>: json
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1"># 확인 </span>
+</span></span><span class="line"><span class="cl">aws sts get-caller-identity --query Arn
+</span></span><span class="line"><span class="cl">---
+</span></span><span class="line"><span class="cl"><span class="s2">&#34;arn:aws:iam::955963799952:user/testuser&#34;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1"># 접근 파일 업데이트</span>
+</span></span><span class="line"><span class="cl">aws eks --region ap-northeast-2 update-kubeconfig --name hanhorang
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1"># 확인 </span>
+</span></span><span class="line"><span class="cl">kubectl get pods -A 
+</span></span><span class="line"><span class="cl">---
+</span></span><span class="line"><span class="cl">NAMESPACE     NAME                                        READY   STATUS    RESTARTS   AGE
+</span></span><span class="line"><span class="cl">default       mysql-9fd5797cc-d7r2g                       1/1     Running   <span class="m">0</span>          4h47m
+</span></span><span class="line"><span class="cl">default       sealed-secrets-855f5fbf78-d2j4b             1/1     Running   <span class="m">0</span>          5h26m
+</span></span><span class="line"><span class="cl">kube-system   aws-node-j6nq2                              1/1     Running   <span class="m">0</span>          8h
+</span></span><span class="line"><span class="cl">kube-system   aws-node-lg25d                              1/1     Running   <span class="m">0</span>          8h
+</span></span><span class="line"><span class="cl">kube-system   coredns-6777fcd775-68cql                    1/1     Running   <span class="m">0</span>          8h
+</span></span><span class="line"><span class="cl">kube-system   coredns-6777fcd775-jzxr2                    1/1     Running   <span class="m">0</span>          8h
+</span></span><span class="line"><span class="cl">kube-system   ebs-csi-controller-67dccdf78f-65hr5         6/6     Running   <span class="m">0</span>          8h
+</span></span><span class="line"><span class="cl">kube-system   ebs-csi-controller-67dccdf78f-hjgjm         6/6     Running   <span class="m">0</span>          8h
+</span></span><span class="line"><span class="cl">kube-system   ebs-csi-node-4jzmh                          3/3     Running   <span class="m">0</span>          8h
+</span></span><span class="line"><span class="cl">kube-system   ebs-csi-node-68n58                          3/3     Running   <span class="m">0</span>          8h
+</span></span><span class="line"><span class="cl">kube-system   kube-proxy-8bgrm                            1/1     Running   <span class="m">0</span>          8h
+</span></span><span class="line"><span class="cl">kube-system   kube-proxy-wvnfs                            1/1     Running   <span class="m">0</span>          8h
+</span></span><span class="line"><span class="cl">kube-system   sealed-secrets-controller-b97869575-d7prq   1/1     Running   <span class="m">0</span>          5h17m
+</span></span></code></pre></td></tr></table>
+</div>
+</div></li>
+<li>
+<p>IAM User로 할당했지만 role로 할당도 가능하다. role로 할당하면 다수의 사용자에게 권한 부여 관리가 간편해지므로 추가로 작성한다.</p>
+<ul>
+<li>
+<p>test-role 생성</p>
+<p><img loading="lazy" 
+    src="/./EKS-Security-concept/iam-role2.png" 
+    alt="iam-role2.png" 
+     
+    width=569 
+    height="741"  /></p>
+</li>
+<li>
+<p>role과 쿠버네티스 RBAC 매핑</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl"><span class="c1"># 매핑 </span>
+</span></span><span class="line"><span class="cl">eksctl create iamidentitymapping <span class="se">\
+</span></span></span><span class="line"><span class="cl"><span class="se"></span>--cluster <span class="nv">$CLUSTER_NAME</span> <span class="se">\
+</span></span></span><span class="line"><span class="cl"><span class="se"></span>--username testuser <span class="se">\
+</span></span></span><span class="line"><span class="cl"><span class="se"></span>--group user <span class="se">\
+</span></span></span><span class="line"><span class="cl"><span class="se"></span>--arn arn:aws:iam::<span class="nv">$ACCOUNT_ID</span>:role/test-role
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1"># 매핑 확인 </span>
+</span></span><span class="line"><span class="cl">kubectl get cm aws-auth -o yaml -n kube-system
+</span></span><span class="line"><span class="cl">--
+</span></span><span class="line"><span class="cl">...
+</span></span><span class="line"><span class="cl">- groups:
+</span></span><span class="line"><span class="cl">      - user
+</span></span><span class="line"><span class="cl">      rolearn: arn:aws:iam::00000000000:role/test-role
+</span></span><span class="line"><span class="cl">      username: testuser
+</span></span></code></pre></td></tr></table>
+</div>
+</div></li>
+<li>
+<p>접근파일 업데이트 후 kubectl 사용</p>
+<p>접근 파일 업데이트 후 kubectl 사용 시 아래 와 같은 문제로 쿠버네티스에 접근이 안된다.</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">aws eks --region ap-northeast-2 update-kubeconfig --name hanhorang --role-arn arn:aws:iam::955963799952:role/test-role
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">kubectl get pods -A 
+</span></span><span class="line"><span class="cl">--
+</span></span><span class="line"><span class="cl">An error occurred <span class="o">(</span>AccessDenied<span class="o">)</span> when calling the AssumeRole operation: User: arn:aws:iam::955963799952:user/testuser is not authorized to perform: sts:AssumeRole on resource: arn:aws:iam::955963799952:role/test-role
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>이유는 role의 신뢰 관계를 업데이트하지 않았기 때문인데 iam role에서 신뢰관계에 유저를 추가하면 정상적으로 작동한다.</p>
+<p><img loading="lazy" 
+    src="/./EKS-Security-concept/iam-role3.png" 
+    alt="iam-role3.png" 
+     
+    width=1500 
+    height="511"  /></p>
+<p><img loading="lazy" 
+    src="/./EKS-Security-concept/bestion3.png" 
+    alt="bestion3.png" 
+     
+    width=1664 
+    height="422"  /></p>
+<p>이번 예제에서는 사용자에게 role를 부여하여 클러스터에 접근했으나, role 을 베스천서버에 위임하여 사용할 수 있다.</p>
+</li>
+</ul>
+</li>
+</ul>
+<h3 id="eks-인증인가-한계">
+    <a href="#eks-%ec%9d%b8%ec%a6%9d%ec%9d%b8%ea%b0%80-%ed%95%9c%ea%b3%84" class="anchor">
+        <svg class="icon" aria-hidden="true" focusable="false" height="16" version="1.1" viewBox="0 0 16 16" width="16">
+            <path fill-rule="evenodd"
+                d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z">
+            </path>
+        </svg>
+    </a>
+    EKS 인증/인가 한계
+</h3>
+<p>사용하기 편하지만, 최소 권한 부여 원칙에 위배되어 보안상 권고하지 않는다. 이유는 파드가 뚫리면 메타데이터를 활용하여 노드에 부여된 IAM 정책을 이용할 수 있기 때문이다.</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl"><span class="c1"># 메타데이터를 통해 토큰 발급 후 조회 </span>
+</span></span><span class="line"><span class="cl"><span class="nv">TOKEN</span><span class="o">=</span><span class="k">$(</span>curl -s -X PUT <span class="s2">&#34;http://169.254.169.254/latest/api/token&#34;</span> -H <span class="s2">&#34;X-aws-ec2-metadata-token-ttl-seconds: 21600&#34;</span><span class="k">)</span>
+</span></span><span class="line"><span class="cl"><span class="nb">echo</span> <span class="nv">$TOKEN</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1"># 메타 정보를 통해 임시 접근 키 부여 </span>
+</span></span><span class="line"><span class="cl">curl -s -H <span class="s2">&#34;X-aws-ec2-metadata-token: </span><span class="nv">$TOKEN</span><span class="s2">&#34;</span> –v http://169.254.169.254/latest/meta-data/iam/security-credentials/eksctl-myeks-nodegroup-ng1-NodeInstanceRole-1DC6Y2GRDAJHK
+</span></span><span class="line"><span class="cl">--
+</span></span><span class="line"><span class="cl"><span class="o">{</span>
+</span></span><span class="line"><span class="cl">    <span class="s2">&#34;AccessKey&#34;</span>: <span class="o">{</span>
+</span></span><span class="line"><span class="cl">        <span class="s2">&#34;UserName&#34;</span>: <span class="s2">&#34;testuser&#34;</span>,
+</span></span><span class="line"><span class="cl">        <span class="s2">&#34;AccessKeyId&#34;</span>: <span class="s2">&#34;AKIA55E7B7GIOXM4OAVI&#34;</span>,
+</span></span><span class="line"><span class="cl">        <span class="s2">&#34;Status&#34;</span>: <span class="s2">&#34;Active&#34;</span>,
+</span></span><span class="line"><span class="cl">        <span class="s2">&#34;SecretAccessKey&#34;</span>: <span class="s2">&#34;bjQvsqoETo1rHeFXyye7yzsh13Utd4SXRrOeejjq&#34;</span>,
+</span></span><span class="line"><span class="cl">        <span class="s2">&#34;CreateDate&#34;</span>: <span class="s2">&#34;2023-06-03T07:38:08+00:00&#34;</span>
+</span></span><span class="line"><span class="cl">    <span class="o">}</span>
+</span></span><span class="line"><span class="cl"><span class="o">}</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>파드가 뚫리면 노드에 등록된 IAM 정책의 권한이 다 뚫리므로 치명적이다.  이에 대해 새로운 인증/인가의 접근 방법(IRSA)이 필요하다.</p>
+<h2 id="irsa">
+    <a href="#irsa" class="anchor">
+        <svg class="icon" aria-hidden="true" focusable="false" height="16" version="1.1" viewBox="0 0 16 16" width="16">
+            <path fill-rule="evenodd"
+                d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z">
+            </path>
+        </svg>
+    </a>
+    IRSA
+</h2>
+<p>IRSA(Iam Role for Service Account)는 쿠버네티스 서비스 어카운트에 IAM role을 부여하여 AWS 서비스에 대한 사용을 제어하는 방법이다. 기존의 EKS 인증/인가 체계와는 반대로로 서비스 어카운트(RBAC) 단계에서 IAM role을 부여하여 IAM OIDC를 통해 인증/인가가 진행되는 방식이다.</p>
+<p>IRSA에 대한 원리는 다음의 그림을 통해 확인할 수 있다. 핵심은Admisstion Control 이다. Admisstion Control 의 Webhook으로 확장 API를 연결해서 IAM 에서 인증/인가를 대신 진행시켜준다라고 보면 된다.</p>
+<p><img loading="lazy" 
+    src="/./EKS-Security-concept/irsa1.png" 
+    alt="&lt;a href=&#34;https://awskoreamarketingasset.s3.amazonaws.com/2022%20Summit/pdf/T10S1_EKS%20%ED%99%98%EA%B2%BD%EC%9D%84%20%EB%8D%94%20%ED%9A%A8%EC%9C%A8%EC%A0%81%EC%9C%BC%EB%A1%9C%20%EB%8D%94%20%EC%95%88%EC%A0%84%ED%95%98%EA%B2%8C.pdf&#34;&gt;https://awskoreamarketingasset.s3.amazonaws.com/2022 Summit/pdf/T10S1_EKS 환경을 더 효율적으로 더 안전하게.pdf&lt;/a&gt;" 
+     
+    width=1789 
+    height="905"  /></p>
+<p><a href="https://awskoreamarketingasset.s3.amazonaws.com/2022%20Summit/pdf/T10S1_EKS%20%ED%99%98%EA%B2%BD%EC%9D%84%20%EB%8D%94%20%ED%9A%A8%EC%9C%A8%EC%A0%81%EC%9C%BC%EB%A1%9C%20%EB%8D%94%20%EC%95%88%EC%A0%84%ED%95%98%EA%B2%8C.pdf">https://awskoreamarketingasset.s3.amazonaws.com/2022 Summit/pdf/T10S1_EKS 환경을 더 효율적으로 더 안전하게.pdf</a></p>
+<p>위 MutatingWebhook 이 Admisstion Control 의 구성 중 하나로 사용자가 요청한 request에 대해 관리가 임의로 값을 변경하는 해준다. 그림에 따라서 요청에 대해 환경 변수(AWS_ROLE_ARN, AWS_WEB_IDENTITY_TOKEN_FILE)와 토큰 데이터(볼륨) 을 추가하여 STS에서 인증과 인가 작업을 수행하는 것을 확인할 수 있다.</p>
+<p><img loading="lazy" 
+    src="/./EKS-Security-concept/irsa3.png" 
+    alt="&lt;a href=&#34;https://tech.devsisters.com/posts/pod-iam-role/&#34;&gt;https://tech.devsisters.com/posts/pod-iam-role/&lt;/a&gt;" 
+     
+    width=864 
+    height="283"  /></p>
+<p><a href="https://tech.devsisters.com/posts/pod-iam-role/">https://tech.devsisters.com/posts/pod-iam-role/</a></p>
+<p>위 과정에서 OIDC IdP 란 OIDC Identity Provider (IdP)는 사용자를 대신 인증하는 서비스이다. 예를 들어, 구글과 페이스북에서 로그인을 하면 여러 앱이나 사이트에 접근할 수 있는 과정이라고 이해하면 된다. 여기서는 EKS 가 OIDC Identity Provider를 사용하여 쿠버네티스 서비스 어카운트에 IAM 역할을 부여하는 역할을 담당한다. 이를 통해 쿠버네티스 내부에서 실행되는 워크로드에서 AWS 리소스에 대한 접근 권한을 부여할 수 있게 된다.</p>
+<blockquote>
+<p>이 말은 MutatingWebhook 를 다른 보안 툴과 확장하여 사용할 수 있다는 말이다. 다른 보안 툴(dex, teleport, kube-oidc-prxo) 인증 및 액세스 관리 대체 할 수 있으므로 멀티 클러스터 구성시 활용해볼 수 있다.</p>
+<ul>
+<li>dex 를 인증 툴로 사용하기 <a href="https://aws.amazon.com/ko/blogs/containers/using-dex-dex-k8s-authenticator-to-authenticate-to-amazon-eks/">https://aws.amazon.com/ko/blogs/containers/using-dex-dex-k8s-authenticator-to-authenticate-to-amazon-eks/</a></li>
+</ul>
+</blockquote>
+<p>이에 대한 실습은 이미 진행해왔다. 블로그 글에서 여러 번 다룬 ALB 컨트롤러 설치나 externalDNS설치시 IRSA를 활용했기 때문이다. 예제를 다시 확인하면 다음과 같다.</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl"><span class="c1"># ALB controller 정책 설치</span>
+</span></span><span class="line"><span class="cl">curl -o iam_policy.json https://raw.githubusercontent.com/kubernetes-sigs/aws-load-balancer-controller/v2.4.7/docs/install/iam_policy.json
+</span></span><span class="line"><span class="cl">aws iam create-policy --policy-name AWSLoadBalancerControllerIAMPolicy --policy-document file://iam_policy.json
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1"># 정책 arn 생성 확인 </span>
+</span></span><span class="line"><span class="cl"><span class="nv">ACCOUNT_ID</span><span class="o">=</span><span class="m">000000000000</span>
+</span></span><span class="line"><span class="cl">aws iam get-policy --policy-arn arn:aws:iam::<span class="nv">$ACCOUNT_ID</span>:policy/AWSLoadBalancerControllerIAMPolicy --query <span class="s1">&#39;Policy.Arn&#39;</span>
+</span></span><span class="line"><span class="cl">---
+</span></span><span class="line"><span class="cl"><span class="s2">&#34;arn:aws:iam::000000000000:policy/AWSLoadBalancerControllerIAMPolicy&#34;</span> 
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1"># OIDC 서비스 어카운트 생성</span>
+</span></span><span class="line"><span class="cl"><span class="nv">CLUSTER_NAME</span><span class="o">=</span>hanhorang 
+</span></span><span class="line"><span class="cl">eksctl create iamserviceaccount --cluster<span class="o">=</span><span class="nv">$CLUSTER_NAME</span> --namespace<span class="o">=</span>kube-system --name<span class="o">=</span>aws-load-balancer-controller <span class="se">\
+</span></span></span><span class="line"><span class="cl"><span class="se"></span>--attach-policy-arn<span class="o">=</span>arn:aws:iam::<span class="nv">$ACCOUNT_ID</span>:policy/AWSLoadBalancerControllerIAMPolicy --override-existing-serviceaccounts --approve
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1"># OIDC 서비스 어카운트 확인 </span>
+</span></span><span class="line"><span class="cl">kubectl edit sa/aws-load-balancer-controller  -n kube-system
+</span></span><span class="line"><span class="cl">---
+</span></span><span class="line"><span class="cl">apiVersion: v1
+</span></span><span class="line"><span class="cl">kind: ServiceAccount
+</span></span><span class="line"><span class="cl">metadata:
+</span></span><span class="line"><span class="cl">  annotations: <span class="c1"># annoation 에 role-arn이 추가된 것을 확인! </span>
+</span></span><span class="line"><span class="cl">    eks.amazonaws.com/role-arn: arn:aws:iam::000000000000:role/eksctl-hanhorang-addon-iamserviceaccount-kub-Role1-1MPK8ATNJVXQH
+</span></span><span class="line"><span class="cl">  creationTimestamp: <span class="s2">&#34;2023-05-08T05:32:22Z&#34;</span>
+</span></span><span class="line"><span class="cl">  labels:
+</span></span><span class="line"><span class="cl">    app.kubernetes.io/managed-by: eksctl
+</span></span><span class="line"><span class="cl">  name: aws-load-balancer-controller
+</span></span><span class="line"><span class="cl">  namespace: kube-system
+</span></span><span class="line"><span class="cl">  resourceVersion: <span class="s2">&#34;1236&#34;</span>
+</span></span><span class="line"><span class="cl">  uid: 5fe3e69b-8cfc-426c-a16a-509e1f7c4a86
+</span></span></code></pre></td></tr></table>
+</div>
+</div><ul>
+<li><code>eksctl create iamserviceaccount</code> : 해당 명령어를 통해서 서비스 어카운트를 생성하고, IAM role에 정책을 부여하고 신뢰 관계를 설정시켜준다.</li>
+<li>OIDC Idp 에 등록된 과정은 서비스 어카운트에 annotations를 확인하면 된다. 해당 필드에 role-arn이 정상적으로 부여된 것을 확인할 수 있고 sts를 통해서 해당 role을 확인하여 서비스에 접근/제어를 해준다고 보면 된다.</li>
+</ul>
+<h2 id="irsa-도-잘-써야-한다">
+    <a href="#irsa-%eb%8f%84-%ec%9e%98-%ec%8d%a8%ec%95%bc-%ed%95%9c%eb%8b%a4" class="anchor">
+        <svg class="icon" aria-hidden="true" focusable="false" height="16" version="1.1" viewBox="0 0 16 16" width="16">
+            <path fill-rule="evenodd"
+                d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z">
+            </path>
+        </svg>
+    </a>
+    IRSA 도 잘 써야 한다
+</h2>
+<p>IRSA도 사용에 주의가 필요하다. 마찬가지로 정보 탈취(토큰과 role Arn)가 되면 임시 자격 증명이 되기 때문이다.  role arn은 서비스 어카운트에서 쉽게 확인이 가능하며, 토큰은 IRSA 과정에서 환경 변수로 마운트되기 때문에 다음의 경로에서 확인이 가능하다. (아래 내용은 <a href="https://medium.com/@7424069/aws-how-to-use-eks-irsa-in-the-most-vulnerable-way-5d8f4c8d6d20">블로그 글</a>을 참고하여 작성한다. )</p>
+<p><img loading="lazy" 
+    src="/./EKS-Security-concept/irsa4.png" 
+    alt="irsa4.png" 
+     
+    width=720 
+    height="283"  /></p>
+<p>해당 토큰을 jwt 사이트에서 토큰을 분석하면 서비스 계정과 OIDC엔드 포인트를 확인할 수 있다.</p>
+<p><img loading="lazy" 
+    src="/./EKS-Security-concept/1_TgycdRiNndnhFE57CTYozA.png" 
+    alt="1_TgycdRiNndnhFE57CTYozA.png" 
+     
+    width=720 
+    height="701"  /></p>
+<p>여기서 문제가 발생한다. AWS는 JWT 토큰의 유효성만 확인하지, 토큰 파일이나 서비스 계정에 지정된 IAM role에 대해 일관성을 보장하지 않기 때문에 아래와 같이 외부나 새로운 환경에서 AWS에 대한 자격 증명 발급이 가능하다!</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">aws sts assume-role-with-web-identity <span class="se">\ </span>
+</span></span><span class="line"><span class="cl">--role-arn arn:aws:iam::ACCOUNT_ID:role/eks-workshop-carts-dynamo <span class="se">\ </span>
+</span></span><span class="line"><span class="cl">--role-session-name <span class="nb">test</span> --web-identity-token eyJhbGciOiJSUzI1&lt;SNIP&gt; 
+</span></span><span class="line"><span class="cl"><span class="o">{</span> 
+</span></span><span class="line"><span class="cl">    <span class="s2">&#34;Credentials&#34;</span> : <span class="o">{</span> 
+</span></span><span class="line"><span class="cl">        <span class="s2">&#34;AccessKeyId&#34;</span> : <span class="s2">&#34;ASIA&lt;SNIP&gt;&#34;</span> , 
+</span></span><span class="line"><span class="cl">        <span class="s2">&#34;SecretAccessKey&#34;</span> : <span class="s2">&#34;KZ9V&lt;SNIP&gt;&#34;</span> , 
+</span></span><span class="line"><span class="cl">        <span class="s2">&#34;SessionToken&#34;</span> : <span class="s2">&#34;IQoJb&lt;SNIP&gt;&#34;</span> , 
+</span></span><span class="line"><span class="cl">        <span class="s2">&#34;만료&#34;</span> : <span class="s2">&#34;2023-06-03T01:00:43+00:00&#34;</span>
+</span></span><span class="line"><span class="cl">     <span class="o">}</span>, 
+</span></span><span class="line"><span class="cl">    <span class="s2">&#34;SubjectFromWebIdentityToken&#34;</span> : <span class="s2">&#34;system:serviceaccount:carts:carts&#34;</span>, 
+</span></span><span class="line"><span class="cl">    <span class="s2">&#34;AssumedRoleUser&#34;</span> : <span class="o">{</span> 
+</span></span><span class="line"><span class="cl">        <span class="s2">&#34;AssumedRoleId&#34;</span>: <span class="s2">&#34;AROAWU22AXDEAGQGMY3XZ:test&#34;</span> , 
+</span></span><span class="line"><span class="cl">        <span class="s2">&#34;Arn&#34;</span> : <span class="s2">&#34;arn:aws:sts::ACCOUNT_ID:assumed-role/eks-workshop-carts-dynamo/test&#34;</span>
+</span></span><span class="line"><span class="cl">     <span class="o">}</span>, 
+</span></span><span class="line"><span class="cl">    <span class="s2">&#34;제공자&#34;</span> : <span class="s2">&#34;arn:aws:iam::ACCOUNT_ID :oidc-provider/oidc.eks.us-east-2.amazonaws.com/id/9278920BDA929A8A54E92E18A4DECB2A&#34;</span> , 
+</span></span><span class="line"><span class="cl">    <span class="s2">&#34;대상&#34;</span> : <span class="s2">&#34;sts.amazonaws.com&#34;</span>
+</span></span><span class="line"><span class="cl"> <span class="o">}</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>이를 방지하기 위한 방법으로는 role 의 신뢰 정책에서 반드시 네임스페이스와 서비스 계정을 지정해야 한다. 서비스 계정을 지정하면 해당 서비스 계정에서만 해당 IAM 역할을 위임하여 사용할 수 있기 때문이다.</p>
+<h3 id="irsa-사용하다면">
+    <a href="#irsa-%ec%82%ac%ec%9a%a9%ed%95%98%eb%8b%a4%eb%a9%b4" class="anchor">
+        <svg class="icon" aria-hidden="true" focusable="false" height="16" version="1.1" viewBox="0 0 16 16" width="16">
+            <path fill-rule="evenodd"
+                d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z">
+            </path>
+        </svg>
+    </a>
+    IRSA 사용하다면?
+</h3>
+<p>파드에서 메타데이터 접근을 허용하지 않도록 네트워크 정책을 통해 차단이 가능하다.</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">apiVersion: networking.k8s.io/v1
+</span></span><span class="line"><span class="cl">kind: NetworkPolicy
+</span></span><span class="line"><span class="cl">metadata:
+</span></span><span class="line"><span class="cl">  name: deny-metadata-access
+</span></span><span class="line"><span class="cl">  namespace: example
+</span></span><span class="line"><span class="cl">spec:
+</span></span><span class="line"><span class="cl">  podSelector: <span class="o">{}</span>
+</span></span><span class="line"><span class="cl">  policyTypes:
+</span></span><span class="line"><span class="cl">  - Egress
+</span></span><span class="line"><span class="cl">  egress:
+</span></span><span class="line"><span class="cl">  - to:
+</span></span><span class="line"><span class="cl">    - ipBlock:
+</span></span><span class="line"><span class="cl">        cidr: 0.0.0.0/0
+</span></span><span class="line"><span class="cl">        except:
+</span></span><span class="line"><span class="cl">        - 169.254.169.254/32
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>특정 케이스가 생기면 다음과 같이 podselector를 통해서 해당 파드에서만 메타데이터 접근을 허용할 수 있다.</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">apiVersion: networking.k8s.io/v1
+</span></span><span class="line"><span class="cl">kind: NetworkPolicy
+</span></span><span class="line"><span class="cl">metadata:
+</span></span><span class="line"><span class="cl">  name: allow-metadata-access
+</span></span><span class="line"><span class="cl">  namespace: example
+</span></span><span class="line"><span class="cl">spec:
+</span></span><span class="line"><span class="cl">  podSelector:
+</span></span><span class="line"><span class="cl">    matchLabels:
+</span></span><span class="line"><span class="cl">      app: myapp  
+</span></span><span class="line"><span class="cl">  policyTypes:
+</span></span><span class="line"><span class="cl">  - Egress
+</span></span><span class="line"><span class="cl">  egress:
+</span></span><span class="line"><span class="cl">  - to:
+</span></span><span class="line"><span class="cl">    - ipBlock:
+</span></span><span class="line"><span class="cl">        cidr: 169.254.169.254/32
+</span></span></code></pre></td></tr></table>
+</div>
+</div>
+    </div>
+</div>
+
+<div class="container">
+    
+    <nav class="flex container suggested">
+        
+        <a rel="prev" href="/post/eks-observability-tracing/" title="Previous post (older)">
+            <span>Previous</span>
+            [AEWS] EKS Observability 워크샵 학습과 트레이싱 기능 확인하기
+            </a>
+        
+        
+        
+        <a rel="next" href="/post/eks-security-allinone/" title="Next post (newer)">
+            <span>Next</span>
+            [AEWS] AWS 서비스를 통한 EKS 보안 구성
+            </a> 
+        
+    </nav>
+    
+</div>
+ 
+<div class="container">
+    
+    <script src="https://giscus.app/client.js" 
+        data-repo="WingLim/hugo-tania"
+        data-repo-id="MDEwOlJlcG9zaXRvcnkzMTYyNjQzMDc="
+        
+        data-category="Comments"
+        data-category-id="DIC_kwDOEtnPc84B_WKP"
+        
+        data-mapping="pathname"
+        data-reactions-enabled="1"
+        data-emit-metadata="0"
+        data-theme="light"
+        crossorigin="anonymous"
+        async
+        >
+</script>
+
+<script>
+    function setGiscusTeheme(theme) {
+        let giscus = document.querySelector('.giscus iframe');
+        if (giscus) {
+            giscus.contentWindow.postMessage(
+                {
+                    giscus: {
+                        setConfig: {
+                            theme: theme
+                        }
+                    }
+                },
+                'https://giscus.app'
+            )
+        }
+    }
+
+    addEventListener('message', event => {
+        if (event.origin !== 'https://giscus.app') return;
+        setGiscusTeheme(document.documentElement.dataset.userColorScheme)
+    });
+
+    window.addEventListener('onColorSchemeChange', (e) => {
+        setGiscusTeheme(e.detail)
+    })
+</script>
+
+</div>
+
+</main>
+
+
+        </main>
+        <footer class="footer flex">
+    <section class="container">
+        <nav class="footer-links">
+            
+            <a href="/index.xml">RSS</a>
+            
+        </nav>
+
+        
+    </section>
+    <script defer src="/ts/features.706a523ba43e6d0427c7fdf2b9d05dbd0920d3f12942b453690b495cb2522743.js" 
+    data-enable-footnotes="true"
+    ></script>
+</footer>
+
+    </body>
+</html>

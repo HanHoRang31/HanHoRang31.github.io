@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>IRSA on HanHoRang Tech Blog</title>
+    <link>https://HanHoRang31.github.io/tags/irsa/</link>
+    <description>Recent content in IRSA on HanHoRang Tech Blog</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-us</language>
+    <lastBuildDate>Fri, 02 Jun 2023 00:00:00 +0000</lastBuildDate><atom:link href="https://HanHoRang31.github.io/tags/irsa/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>[AEWS] EKS Security 이해</title>
+      <link>https://HanHoRang31.github.io/post/eks-security-concept/</link>
+      <pubDate>Fri, 02 Jun 2023 00:00:00 +0000</pubDate>
+      
+      <guid>https://HanHoRang31.github.io/post/eks-security-concept/</guid>
+      <description>1 2 AWS EKS Workshop Study (=AEWS)는 EKS Workshop 실습 스터디입니다. CloudNet@ Gasida(가시다)님이 진행하시며,공개된 AWS EKS Workshop을 기반으로 진행하고 있습니다. 스터디도 어느덧 6주차다. 6주차에는 EKS 보안을 주제로 모임장님이 스터디를 진행해주셨다. 스터디 내용으로 EKS 인증 / 인가와 IRSA의 원리를 소개해주셨는데.. 개인적으로 여러 번 돌려볼 정도로 내용이 많이 어려웠다.
+필자 스스로 보안이 다른 분야에 비해 미숙한 부분도 있고,, 아는 내용도 별로 없기 떄문이라 본다. 아마 필자에게 EKS 보안에 대해 소개해달라고 요청받으면 인증 → 인가 → RBAC 수준으로 밖에 답을 못할 것이라 예상한다.</description>
+    </item>
+    
+  </channel>
+</rss>
