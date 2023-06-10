@@ -5,7 +5,960 @@
     <description>Recent content on HanHoRang Tech Blog</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <lastBuildDate>Fri, 02 Jun 2023 00:00:00 +0000</lastBuildDate><atom:link href="https://HanHoRang31.github.io/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Fri, 09 Jun 2023 00:00:00 +0000</lastBuildDate><atom:link href="https://HanHoRang31.github.io/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+    <title>[AEWS] Gitops CI &amp; CD 구성</title>
+    <link>https://HanHoRang31.github.io/post/aews-gitops/</link>
+    <pubDate>Fri, 09 Jun 2023 00:00:00 +0000</pubDate>
+    <author>HanHoRnag</author>
+    <guid>https://HanHoRang31.github.io/post/aews-gitops/</guid>
+    <description>
+        &lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
+&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code&gt;&lt;span class=&#34;lnt&#34;&gt;1
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;2
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-markdown&#34; data-lang=&#34;markdown&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;AWS EKS Workshop Study (=AEWS)는 EKS Workshop 실습 스터디입니다.
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;CloudNet@ Gasida(가시다)님이 진행하시며,공개된 AWS EKS Workshop을 기반으로 진행하고 있습니다.
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;p&gt;스터디 마지막 시간에는 EKS Automation 을 주제로 진행하였다. 여기서 Automation 단어는 인프라 프로비저닝 및 코드 배포를 포함하여 소프트웨어 제공 수명 주기의 일부를 자동화를 의미한다. 스터디에서는 모임장님께서 AWS 서비스 기반의 Automation(ACK)를 소개해주셨는데 실무에 도입하기에는 아직 보완할 서비스라 느껴, 다른 주제(gitops ci / cd 파이프라인 구성)를 선정하여 블로그를 작성한다.&lt;/p&gt;
+&lt;p&gt;&lt;a href=&#34;https://hanhorang31.github.io/post/pkos2-3-gitops/&#34;&gt;사실 지난 스터디에서 다룬 주제&lt;/a&gt;였지만, 내부 트러블슈팅으로 절반(CD 파이프라인 구성) 정도 밖에 구성하지 못하였다. 다시 스터디를 통해 계기가 생긴 만큼 이번 글에서는 CI 파이프라인 구성 확장 및 CD 연결까지 다룰 예정이다. 사용한 코드들은 &lt;a href=&#34;https://github.com/HanHoRang31/blog-share/tree/main/pkos-gitops&#34;&gt;필자의 레파지토리&lt;/a&gt;에서 확인이 가능하다.&lt;/p&gt;
+&lt;h3 id=&#34;ci--cd&#34;&gt;
+    &lt;a href=&#34;#ci--cd&#34; class=&#34;anchor&#34;&gt;
+        &lt;svg class=&#34;icon&#34; aria-hidden=&#34;true&#34; focusable=&#34;false&#34; height=&#34;16&#34; version=&#34;1.1&#34; viewBox=&#34;0 0 16 16&#34; width=&#34;16&#34;&gt;
+            &lt;path fill-rule=&#34;evenodd&#34;
+                d=&#34;M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z&#34;&gt;
+            &lt;/path&gt;
+        &lt;/svg&gt;
+    &lt;/a&gt;
+    CI / CD
+&lt;/h3&gt;
+&lt;p&gt;코드가 변경될 때마다 자동적으로 코드 통합(CI)와 배포(CD)를 수행하는 소프트웨어 개발 방식이다. 이를 통해 애플리케이션을 보다 짧은 주기로 서비스를 제공할 수 있어 비즈니스 이점이 큰 기술로 최근 devops 핵심 기술이라 할 수 있다.&lt;/p&gt;
+&lt;p&gt;&lt;img loading=&#34;lazy&#34; 
+    src=&#34;https://HanHoRang31.github.io/aews-gitops/cicd1.png&#34; 
+    alt=&#34;&amp;lt;a href=&amp;#34;https://server-engineer.tistory.com/800&amp;#34;&amp;gt;https://server-engineer.tistory.com/800&amp;lt;/a&amp;gt;&#34; 
+     
+    width=717 
+    height=&#34;170&#34;  /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;a href=&#34;https://server-engineer.tistory.com/800&#34;&gt;https://server-engineer.tistory.com/800&lt;/a&gt;&lt;/p&gt;
+&lt;h3 id=&#34;gitops는-ci--cd일까&#34;&gt;
+    &lt;a href=&#34;#gitops%eb%8a%94-ci--cd%ec%9d%bc%ea%b9%8c&#34; class=&#34;anchor&#34;&gt;
+        &lt;svg class=&#34;icon&#34; aria-hidden=&#34;true&#34; focusable=&#34;false&#34; height=&#34;16&#34; version=&#34;1.1&#34; viewBox=&#34;0 0 16 16&#34; width=&#34;16&#34;&gt;
+            &lt;path fill-rule=&#34;evenodd&#34;
+                d=&#34;M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z&#34;&gt;
+            &lt;/path&gt;
+        &lt;/svg&gt;
+    &lt;/a&gt;
+    Gitops는 CI / CD일까?
+&lt;/h3&gt;
+&lt;p&gt;엄밀히 말하면 다르다. GitOps는 이런 CI/CD 프로세스에 git를 사용하여 인프라와 애플리케이션의 설정을 관리하는 방법이다. 달리 말하면, CI/CD는 코드 변경을 효과적으로 관리하고 배포하는 프로세스이며, GitOps는 이런 프로세스를 git을 통해 조정하고 관리하는 방식이라고 할 수 있다. 이 둘은 상호 보완적인 개념으로, GitOps는 CI/CD 파이프라인을 통해 애플리케이션을 배포하고 관리하는 데 사용될 수 있다.&lt;/p&gt;
+&lt;p&gt;&lt;img loading=&#34;lazy&#34; 
+    src=&#34;https://HanHoRang31.github.io/aews-gitops/gitops1.png&#34; 
+    alt=&#34;&amp;lt;a href=&amp;#34;https://blogs.vmware.com/cloud/2021/02/24/gitops-cloud-operating-model/&amp;#34;&amp;gt;https://blogs.vmware.com/cloud/2021/02/24/gitops-cloud-operating-model/&amp;lt;/a&amp;gt;&#34; 
+     
+    width=622 
+    height=&#34;244&#34;  /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;a href=&#34;https://blogs.vmware.com/cloud/2021/02/24/gitops-cloud-operating-model/&#34;&gt;https://blogs.vmware.com/cloud/2021/02/24/gitops-cloud-operating-model/&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;이번 시간에는 EKS 환경에서 CI / CD 구성을 목표로 애플리케이션을 코드에서 배포까지 자동화하는 작업을 진행하고자 한다. CD 구성 같은 경우 &lt;a href=&#34;https://hanhorang31.github.io/post/pkos2-3-gitops/&#34;&gt;지난 블로그 글&lt;/a&gt;을 통해 진행하였고, 이어서 CI 구성과 gitops ci/cd 까지 확장하여 다룰 것이다. CI 구성에 사용한 도구는 보편적으로 가장 많이 사용하는 젠킨스(jenkins)를 사용핬고 gitops ci cd 구성을 위해 CD(Argocd), container registry(harbor), gitops(gitlab) 을 이용하였다.  구성 아키텍처는 다음과 같다.&lt;/p&gt;
+&lt;p&gt;&lt;img loading=&#34;lazy&#34; 
+    src=&#34;https://HanHoRang31.github.io/aews-gitops/gitlab-archi.png&#34; 
+    alt=&#34;gitlab-archi.png&#34; 
+     
+    width=1296 
+    height=&#34;465&#34;  /&gt;&lt;/p&gt;
+&lt;p&gt;복잡해보이지만, 각 도구들을 나눠서 확인하고 도구별 연동 방법에 대해 소개하겠다.&lt;/p&gt;
+&lt;h2 id=&#34;젠킨스jenkins&#34;&gt;
+    &lt;a href=&#34;#%ec%a0%a0%ed%82%a8%ec%8a%a4jenkins&#34; class=&#34;anchor&#34;&gt;
+        &lt;svg class=&#34;icon&#34; aria-hidden=&#34;true&#34; focusable=&#34;false&#34; height=&#34;16&#34; version=&#34;1.1&#34; viewBox=&#34;0 0 16 16&#34; width=&#34;16&#34;&gt;
+            &lt;path fill-rule=&#34;evenodd&#34;
+                d=&#34;M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z&#34;&gt;
+            &lt;/path&gt;
+        &lt;/svg&gt;
+    &lt;/a&gt;
+    젠킨스(Jenkins)
+&lt;/h2&gt;
+&lt;p&gt;CI 빌드 도구가 많지만, 젠킨스를 선택한 이유는 확장성과 커뮤니티 활성도가 압도적으로 높아서다. 젠킨스는 지속적 통합을 위한 오픈 소스 자동화 도구이다. 파이프라인 중 도커 이미지빌드 및 테스트, git에 업데이트(통합)까지의 과정을 구성해주는 도구이다. 젠킨스는 다양한 플러그인이 제공되어 기능 확장이 쉽게 가능하다. 대표적으로 쿠버네티스 플러그인을 통해서 쿠버네티스 APi 서버와 통신하여 코드 테스트(unit test)을 담당하는 Slave 파드를 동적으로 생성하고 관리할 수 있다. 이를 통해서 얻을 수 있는 이점은 다음과 같다.&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;&lt;strong&gt;동적 스케일링:&lt;/strong&gt; 쿠버네티스는 Jenkins 내 유닛 테스트(Jenkins Slaves)를 파드로 실행할 수 있다. 이렇게 하면 빌드/테스트 워크로드에 따라 파드를 동적으로 스케일링 할 수 있다. 즉, 추가적인 빌드 요구 사항이 있을 때마다 쿠버네티스는 새로운 유닛 테스트 파드를 생성하고, 작업이 완료되면 이를 제거할 수 있고 요청량에 따라 파드를 조절할 수 있다. 이를 통해 리소스를 효율적으로 사용할 수 있다.&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;고가용성:&lt;/strong&gt; 쿠버네티스의 내장된 고가용성 기능 덕분에, Jenkins 마스터의 다운타임을 크게 줄일 수 있다. 이는 Jenkins 마스터가 다운되더라도 쿠버네티스가 자동으로 새 인스턴스를 시작하여 서비스 중단 시간을 최소화할 수 있다는 것을 의미한다.&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;&lt;img loading=&#34;lazy&#34; 
+    src=&#34;https://HanHoRang31.github.io/aews-gitops/jenkins-architecture-1024x657.png.webp&#34; 
+    alt=&#34;&amp;lt;a href=&amp;#34;https://devopscube.com/jenkins-architecture-explained/&amp;#34;&amp;gt;https://devopscube.com/jenkins-architecture-explained/&amp;lt;/a&amp;gt;&#34; 
+     
+    width=1024 
+    height=&#34;657&#34;  /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;a href=&#34;https://devopscube.com/jenkins-architecture-explained/&#34;&gt;https://devopscube.com/jenkins-architecture-explained/&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;아키텍처도 간단하다. jekins 배포시 마스터 파드가 배포되며 해당 파드에서 jenkins https 서버(UI) 실행 및 빌드 스케쥴러, 유저, 플러그인, 보안 정보들을 관리한다.&lt;/p&gt;
+&lt;h3 id=&#34;jenkins-배포&#34;&gt;
+    &lt;a href=&#34;#jenkins-%eb%b0%b0%ed%8f%ac&#34; class=&#34;anchor&#34;&gt;
+        &lt;svg class=&#34;icon&#34; aria-hidden=&#34;true&#34; focusable=&#34;false&#34; height=&#34;16&#34; version=&#34;1.1&#34; viewBox=&#34;0 0 16 16&#34; width=&#34;16&#34;&gt;
+            &lt;path fill-rule=&#34;evenodd&#34;
+                d=&#34;M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z&#34;&gt;
+            &lt;/path&gt;
+        &lt;/svg&gt;
+    &lt;/a&gt;
+    Jenkins 배포
+&lt;/h3&gt;
+&lt;p&gt;헬름으로 젠킨스를 배포하면서 구성 아키텍처를 확인하겠다. 먼저, 차트를 가져오자.&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
+&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code&gt;&lt;span class=&#34;lnt&#34;&gt;1
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;2
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;3
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;helm repo add jenkins https://charts.jenkins.io
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;helm repo update
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;helm fetch jenkins/jenkins --untar --version 4.3.9
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;p&gt;차트에는 마스터(컨트롤러), Agent(노드), 플러그인 설정, PV 및 백업 설정, 보안적 요소가 들어가있다. 또한, 젠킨스 차트에는 VALUES_SUMMERY.md 이 포함되는데 전체 파라미터에 대한 설명이 알기 쉽게 들어가있다.&lt;/p&gt;
+&lt;p&gt;구성 차트는 다음과 같이 수정했다.&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
+&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code&gt;&lt;span class=&#34;lnt&#34;&gt; 1
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 2
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 3
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 4
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 5
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 6
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 7
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 8
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 9
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;10
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;11
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;12
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;13
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;14
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;15
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;16
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;17
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;18
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;19
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;20
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;21
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;22
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;23
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;24
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;25
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;c1&#34;&gt;# values-jenkins.yaml&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;controller:
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;  adminUser: &lt;span class=&#34;s2&#34;&gt;&amp;#34;admin&amp;#34;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;  adminPassword: &lt;span class=&#34;s2&#34;&gt;&amp;#34;admin1234&amp;#34;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;  jenkinsUriPrefix: &lt;span class=&#34;s2&#34;&gt;&amp;#34;/jenkins&amp;#34;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;  installPlugins:
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;  - kubernetes
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;  - workflow-aggregator
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;  - git
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;  - configuration-as-code
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;  - pipeline-stage-view
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;  - gitlab
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;  ingress: 
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;    enabled: &lt;span class=&#34;nb&#34;&gt;true&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;    apiVersion: &lt;span class=&#34;s2&#34;&gt;&amp;#34;networking.k8s.io/v1&amp;#34;&lt;/span&gt; 
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;    annotations: 
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;      alb.ingress.kubernetes.io/scheme: internet-facing
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;      alb.ingress.kubernetes.io/target-type: ip
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;      alb.ingress.kubernetes.io/listen-ports: &lt;span class=&#34;s1&#34;&gt;&amp;#39;[{&amp;#34;HTTPS&amp;#34;:443}, {&amp;#34;HTTP&amp;#34;:80}]&amp;#39;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;      alb.ingress.kubernetes.io/certificate-arn: &amp;lt;cert ARN 입력&amp;gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;      alb.ingress.kubernetes.io/healthcheck-path: /login
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;      kubernetes.io/ingress.class: alb
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;      ingressClassName: alb
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;    hostName: &amp;lt;host domain 입력&amp;gt; 
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
+&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code&gt;&lt;span class=&#34;lnt&#34;&gt;1
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;2
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;kubectl create ns jenkins
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;helm install jenkins jenkins/jenkins -f values-jenkins.yaml --namespace jenkins --version 4.3.9
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;p&gt;배포 후 jekins 페이지에 접속이 잘되는 지 확인해보자. 위 차트에서 확인했듯이 admin 아이디와 비밀번호는 admin / admin1234 이다.&lt;/p&gt;
+&lt;p&gt;&lt;img loading=&#34;lazy&#34; 
+    src=&#34;https://HanHoRang31.github.io/aews-gitops/jenkins1.png&#34; 
+    alt=&#34;jenkins1.png&#34; 
+     
+    width=717 
+    height=&#34;725&#34;  /&gt;&lt;/p&gt;
+&lt;h3 id=&#34;jenkins--쿠버네티스-연동&#34;&gt;
+    &lt;a href=&#34;#jenkins--%ec%bf%a0%eb%b2%84%eb%84%a4%ed%8b%b0%ec%8a%a4-%ec%97%b0%eb%8f%99&#34; class=&#34;anchor&#34;&gt;
+        &lt;svg class=&#34;icon&#34; aria-hidden=&#34;true&#34; focusable=&#34;false&#34; height=&#34;16&#34; version=&#34;1.1&#34; viewBox=&#34;0 0 16 16&#34; width=&#34;16&#34;&gt;
+            &lt;path fill-rule=&#34;evenodd&#34;
+                d=&#34;M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z&#34;&gt;
+            &lt;/path&gt;
+        &lt;/svg&gt;
+    &lt;/a&gt;
+    Jenkins &amp;amp; 쿠버네티스 연동
+&lt;/h3&gt;
+&lt;p&gt;젠킨스 파이프라인 작업을 쿠버네티스에서 작업시키려면 쿠버네티스와 연동이 필요하다. 다음 그림과 같이 젠킨스에서 쿠버네티스 주소를 입력하고, 쿠버네티스 접근 정보를 입력하자.&lt;/p&gt;
+&lt;p&gt;jenkins 관리 → 노드 관리 → Configure Clouds 접근 후 쿠버네티스 연동을 진행하자, 연동을 위해 kubernetes URL과 접근 정보가 필요하다. kubernetes URL과 접근 정보는 베스천 서버에 접근 파일에서 확인할 수 있다. 이를 복사해서 젠킨스 마스터 서버에 등록하자.&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
+&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code&gt;&lt;span class=&#34;lnt&#34;&gt; 1
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 2
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 3
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 4
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 5
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 6
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 7
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 8
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 9
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;10
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;c1&#34;&gt;# 베스천 서버 &lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;vi ~/.kube/config 
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;---
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;apiVersion: v1
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;clusters:
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;- cluster:
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;    certificate-authority-data: &amp;lt;auth-data&amp;gt; 
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;    server: https://api.hanhorang.link 
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;  name: hanhorang.link
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;contexts:
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;p&gt;&lt;img loading=&#34;lazy&#34; 
+    src=&#34;https://HanHoRang31.github.io/aews-gitops/add-auth.png&#34; 
+    alt=&#34;add-auth.png&#34; 
+     
+    width=625 
+    height=&#34;840&#34;  /&gt;&lt;/p&gt;
+&lt;p&gt;쿠버네티스 URL 입력 후 접근 파일(config)을 등록하자.&lt;/p&gt;
+&lt;p&gt;&lt;img loading=&#34;lazy&#34; 
+    src=&#34;https://HanHoRang31.github.io/aews-gitops/kube-auth.png&#34; 
+    alt=&#34;kube-auth.png&#34; 
+     
+    width=703 
+    height=&#34;741&#34;  /&gt;&lt;/p&gt;
+&lt;p&gt;Test Connection 버튼을 통해 연동 테스트를 진행하자.&lt;/p&gt;
+&lt;p&gt;&lt;img loading=&#34;lazy&#34; 
+    src=&#34;https://HanHoRang31.github.io/aews-gitops/test.png&#34; 
+    alt=&#34;test.png&#34; 
+     
+    width=596 
+    height=&#34;227&#34;  /&gt;&lt;/p&gt;
+&lt;p&gt;그림과 같이 Connected to kubernetes가 나오면 연동이 완료된 것이다. Save를 통해 Configure Clouds 정보를 저장시키자.&lt;/p&gt;
+&lt;h2 id=&#34;ci----cd-구성-전-사전-작업&#34;&gt;
+    &lt;a href=&#34;#ci----cd-%ea%b5%ac%ec%84%b1-%ec%a0%84-%ec%82%ac%ec%a0%84-%ec%9e%91%ec%97%85&#34; class=&#34;anchor&#34;&gt;
+        &lt;svg class=&#34;icon&#34; aria-hidden=&#34;true&#34; focusable=&#34;false&#34; height=&#34;16&#34; version=&#34;1.1&#34; viewBox=&#34;0 0 16 16&#34; width=&#34;16&#34;&gt;
+            &lt;path fill-rule=&#34;evenodd&#34;
+                d=&#34;M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z&#34;&gt;
+            &lt;/path&gt;
+        &lt;/svg&gt;
+    &lt;/a&gt;
+    CI  &amp;amp;  CD 구성 전 사전 작업
+&lt;/h2&gt;
+&lt;blockquote&gt;
+&lt;p&gt;사전 작업으로 추가 구성이 필요합니다. 아래 블로그 글을 참고하여 필요 툴을 설치해주세요.
+컨테이너 이미지 레지스트리(harbor) : &lt;a href=&#34;https://hanhorang31.github.io/post/tech-private-docker/&#34;&gt;https://hanhorang31.github.io/post/tech-private-docker/&lt;/a&gt;
+gitlab &amp;amp; argocd : &lt;a href=&#34;https://hanhorang31.github.io/post/pkos2-3-gitops/&#34;&gt;https://hanhorang31.github.io/post/pkos2-3-gitops/&lt;/a&gt;&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;구성전 도구 연동 &lt;strong&gt;[Gitlab-Jenkins-Harbor]&lt;/strong&gt; 을 위해 사전 작업이 필요하다.&lt;/p&gt;
+&lt;h3 id=&#34;gitlab-설정&#34;&gt;
+    &lt;a href=&#34;#gitlab-%ec%84%a4%ec%a0%95&#34; class=&#34;anchor&#34;&gt;
+        &lt;svg class=&#34;icon&#34; aria-hidden=&#34;true&#34; focusable=&#34;false&#34; height=&#34;16&#34; version=&#34;1.1&#34; viewBox=&#34;0 0 16 16&#34; width=&#34;16&#34;&gt;
+            &lt;path fill-rule=&#34;evenodd&#34;
+                d=&#34;M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z&#34;&gt;
+            &lt;/path&gt;
+        &lt;/svg&gt;
+    &lt;/a&gt;
+    GItlab 설정
+&lt;/h3&gt;
+&lt;ol&gt;
+&lt;li&gt;
+&lt;p&gt;사용자, 그룹 생성 &amp;amp; 접근 토큰 발급 (사용자 : han  /  토큰 glpat-yznZ6zHSNN7UaoSHZ-rr)&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;
+&lt;p&gt;admin→ users→ 계정생성
+비밀번호는 user 생성 후 edit 에서 설정할 수 있다.&lt;/p&gt;
+&lt;p&gt;&lt;img loading=&#34;lazy&#34; 
+    src=&#34;https://HanHoRang31.github.io/aews-gitops/gitlab-user-token.png&#34; 
+    alt=&#34;gitlab-user-token.png&#34; 
+     
+    width=931 
+    height=&#34;548&#34;  /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img loading=&#34;lazy&#34; 
+    src=&#34;https://HanHoRang31.github.io/aews-gitops/gitlab-admin-user.png&#34; 
+    alt=&#34;gitlab-admin-user.png&#34; 
+     
+    width=1756 
+    height=&#34;860&#34;  /&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;users→ 사용자 → Impersonation Token을 통해 토큰 발급&lt;/p&gt;
+&lt;p&gt;&lt;img loading=&#34;lazy&#34; 
+    src=&#34;https://HanHoRang31.github.io/aews-gitops/gitops-token.png&#34; 
+    alt=&#34;gitops-token.png&#34; 
+     
+    width=1269 
+    height=&#34;878&#34;  /&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;프로젝트 생성 (test) 및 옵션 설정&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;
+&lt;p&gt;프로젝트 → Setting → CI / CD → Devops 파이프라인 설정&lt;/p&gt;
+&lt;p&gt;&lt;img loading=&#34;lazy&#34; 
+    src=&#34;https://HanHoRang31.github.io/aews-gitops/gitlab1.png&#34; 
+    alt=&#34;gitlab1.png&#34; 
+     
+    width=917 
+    height=&#34;868&#34;  /&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Repository 접근 제어 설정&lt;/p&gt;
+&lt;p&gt;프로젝트 → Setting → Repository 접근 아래와 같이 설정&lt;/p&gt;
+&lt;p&gt;&lt;img loading=&#34;lazy&#34; 
+    src=&#34;https://HanHoRang31.github.io/aews-gitops/gitops2.png&#34; 
+    alt=&#34;gitops2.png&#34; 
+     
+    width=864 
+    height=&#34;814&#34;  /&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;빌드 코드 작성(예제 코드) 및 Repo에 Push&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
+&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code&gt;&lt;span class=&#34;lnt&#34;&gt; 1
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 2
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 3
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 4
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 5
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 6
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 7
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 8
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 9
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;10
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;11
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;12
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;13
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;14
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;15
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;16
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;17
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;18
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;19
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;20
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;21
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;git config --global user.email han@gmail.com
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;git config --global user.name han
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;git add . 
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;git commit -m &lt;span class=&#34;s2&#34;&gt;&amp;#34;update code&amp;#34;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;o&#34;&gt;[&lt;/span&gt;main 01f9418&lt;span class=&#34;o&#34;&gt;]&lt;/span&gt; update code
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt; &lt;span class=&#34;m&#34;&gt;3&lt;/span&gt; files changed, &lt;span class=&#34;m&#34;&gt;29&lt;/span&gt; insertions&lt;span class=&#34;o&#34;&gt;(&lt;/span&gt;+&lt;span class=&#34;o&#34;&gt;)&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt; create mode &lt;span class=&#34;m&#34;&gt;100644&lt;/span&gt; Dockerfile
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt; create mode &lt;span class=&#34;m&#34;&gt;100644&lt;/span&gt; app.py
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt; create mode &lt;span class=&#34;m&#34;&gt;100644&lt;/span&gt; requirements.txt
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;git push origin main
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;Username &lt;span class=&#34;k&#34;&gt;for&lt;/span&gt; &lt;span class=&#34;s1&#34;&gt;&amp;#39;https://gitlab.hanhorang.link&amp;#39;&lt;/span&gt;: han  
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;Password &lt;span class=&#34;k&#34;&gt;for&lt;/span&gt; &lt;span class=&#34;s1&#34;&gt;&amp;#39;https://han@gitlab.hanhorang.link&amp;#39;&lt;/span&gt;: 
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;Enumerating objects: 6, &lt;span class=&#34;k&#34;&gt;done&lt;/span&gt;.
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;Counting objects: 100% &lt;span class=&#34;o&#34;&gt;(&lt;/span&gt;6/6&lt;span class=&#34;o&#34;&gt;)&lt;/span&gt;, &lt;span class=&#34;k&#34;&gt;done&lt;/span&gt;.
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;Delta compression using up to &lt;span class=&#34;m&#34;&gt;2&lt;/span&gt; threads
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;Compressing objects: 100% &lt;span class=&#34;o&#34;&gt;(&lt;/span&gt;4/4&lt;span class=&#34;o&#34;&gt;)&lt;/span&gt;, &lt;span class=&#34;k&#34;&gt;done&lt;/span&gt;.
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;Writing objects: 100% &lt;span class=&#34;o&#34;&gt;(&lt;/span&gt;5/5&lt;span class=&#34;o&#34;&gt;)&lt;/span&gt;, &lt;span class=&#34;m&#34;&gt;824&lt;/span&gt; bytes &lt;span class=&#34;p&#34;&gt;|&lt;/span&gt; 824.00 KiB/s, &lt;span class=&#34;k&#34;&gt;done&lt;/span&gt;.
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;Total &lt;span class=&#34;m&#34;&gt;5&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;(&lt;/span&gt;delta 0&lt;span class=&#34;o&#34;&gt;)&lt;/span&gt;, reused &lt;span class=&#34;m&#34;&gt;0&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;(&lt;/span&gt;delta 0&lt;span class=&#34;o&#34;&gt;)&lt;/span&gt;, pack-reused &lt;span class=&#34;m&#34;&gt;0&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;To https://gitlab.hanhorang.link/gitlab-instance-0d144142/test.git
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;   347dcae..01f9418  main -&amp;gt; main
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;p&gt;&lt;img loading=&#34;lazy&#34; 
+    src=&#34;https://HanHoRang31.github.io/aews-gitops/giops4.png&#34; 
+    alt=&#34;giops4.png&#34; 
+     
+    width=874 
+    height=&#34;608&#34;  /&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h3 id=&#34;harbor-설정&#34;&gt;
+    &lt;a href=&#34;#harbor-%ec%84%a4%ec%a0%95&#34; class=&#34;anchor&#34;&gt;
+        &lt;svg class=&#34;icon&#34; aria-hidden=&#34;true&#34; focusable=&#34;false&#34; height=&#34;16&#34; version=&#34;1.1&#34; viewBox=&#34;0 0 16 16&#34; width=&#34;16&#34;&gt;
+            &lt;path fill-rule=&#34;evenodd&#34;
+                d=&#34;M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z&#34;&gt;
+            &lt;/path&gt;
+        &lt;/svg&gt;
+    &lt;/a&gt;
+    Harbor 설정
+&lt;/h3&gt;
+&lt;ol&gt;
+&lt;li&gt;
+&lt;p&gt;사용자 생성 (ID : han / PW)&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;버킷 생성 (bucket name : aews) 및 버킷 접근 제어 설정(han에 권한 부여)&lt;/p&gt;
+&lt;p&gt;&lt;img loading=&#34;lazy&#34; 
+    src=&#34;https://HanHoRang31.github.io/aews-gitops/automation1.png&#34; 
+    alt=&#34;automation1.png&#34; 
+     
+    width=1863 
+    height=&#34;890&#34;  /&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h3 id=&#34;jenkins-설정&#34;&gt;
+    &lt;a href=&#34;#jenkins-%ec%84%a4%ec%a0%95&#34; class=&#34;anchor&#34;&gt;
+        &lt;svg class=&#34;icon&#34; aria-hidden=&#34;true&#34; focusable=&#34;false&#34; height=&#34;16&#34; version=&#34;1.1&#34; viewBox=&#34;0 0 16 16&#34; width=&#34;16&#34;&gt;
+            &lt;path fill-rule=&#34;evenodd&#34;
+                d=&#34;M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z&#34;&gt;
+            &lt;/path&gt;
+        &lt;/svg&gt;
+    &lt;/a&gt;
+    Jenkins 설정
+&lt;/h3&gt;
+&lt;p&gt;&lt;strong&gt;Credentials 추가 ( Gitlab, Harbor ID &amp;amp; PWD)&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img loading=&#34;lazy&#34; 
+    src=&#34;https://HanHoRang31.github.io/aews-gitops/auto2.png&#34; 
+    alt=&#34;auto2.png&#34; 
+     
+    width=1752 
+    height=&#34;911&#34;  /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img loading=&#34;lazy&#34; 
+    src=&#34;https://HanHoRang31.github.io/aews-gitops/auto3.png&#34; 
+    alt=&#34;auto3.png&#34; 
+     
+    width=1596 
+    height=&#34;801&#34;  /&gt;&lt;/p&gt;
+&lt;h3 id=&#34;jenkins--gitlab-webhook-연동&#34;&gt;
+    &lt;a href=&#34;#jenkins--gitlab-webhook-%ec%97%b0%eb%8f%99&#34; class=&#34;anchor&#34;&gt;
+        &lt;svg class=&#34;icon&#34; aria-hidden=&#34;true&#34; focusable=&#34;false&#34; height=&#34;16&#34; version=&#34;1.1&#34; viewBox=&#34;0 0 16 16&#34; width=&#34;16&#34;&gt;
+            &lt;path fill-rule=&#34;evenodd&#34;
+                d=&#34;M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z&#34;&gt;
+            &lt;/path&gt;
+        &lt;/svg&gt;
+    &lt;/a&gt;
+    Jenkins &amp;amp; gitlab webhook 연동
+&lt;/h3&gt;
+&lt;p&gt;&lt;img loading=&#34;lazy&#34; 
+    src=&#34;https://HanHoRang31.github.io/aews-gitops/webhook.png&#34; 
+    alt=&#34;webhook.png&#34; 
+     
+    width=1138 
+    height=&#34;484&#34;  /&gt;&lt;/p&gt;
+&lt;p&gt;gitlab 에서 이벤트 발생(코드 변경)시 jenkins에 알려 코드 파이프라인이 바로 실행 될 수 있도록 webhook 을 구성하겠다. 다음과 같이 configure system → gitalb 에서 gitlab 연결을 테스트하여 등록한다.&lt;/p&gt;
+&lt;p&gt;&lt;img loading=&#34;lazy&#34; 
+    src=&#34;https://HanHoRang31.github.io/aews-gitops/webhook1.png&#34; 
+    alt=&#34;webhook1.png&#34; 
+     
+    width=1726 
+    height=&#34;895&#34;  /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img loading=&#34;lazy&#34; 
+    src=&#34;https://HanHoRang31.github.io/aews-gitops/webhook2.png&#34; 
+    alt=&#34;webhook2.png&#34; 
+     
+    width=1393 
+    height=&#34;723&#34;  /&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;해당 메뉴가 보이지 않을 경우 플러그인 &lt;code&gt;gitlab&lt;/code&gt; 을 설치하자&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;이어서 gitlab 과 jenkins 파이프라인을 연결하자. 우선 아래 메뉴에서 파이프라인을 생성하자.&lt;/p&gt;
+&lt;p&gt;&lt;img loading=&#34;lazy&#34; 
+    src=&#34;https://HanHoRang31.github.io/aews-gitops/webhook10.png&#34; 
+    alt=&#34;webhook10.png&#34; 
+     
+    width=1774 
+    height=&#34;966&#34;  /&gt;&lt;/p&gt;
+&lt;p&gt;그 다음 general에서 아래와 같이 설정한 후, [빌드 유발]에서 Secret token 토큰을 발급받고 webhook URL을 복사하자, 복사한 정보는 gitlab webhook 등록에 사용할 것이다.&lt;/p&gt;
+&lt;p&gt;&lt;img loading=&#34;lazy&#34; 
+    src=&#34;https://HanHoRang31.github.io/aews-gitops/webhook3.png&#34; 
+    alt=&#34;webhook3.png&#34; 
+     
+    width=1270 
+    height=&#34;799&#34;  /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img loading=&#34;lazy&#34; 
+    src=&#34;https://HanHoRang31.github.io/aews-gitops/webhook6.png&#34; 
+    alt=&#34;webhook6.png&#34; 
+     
+    width=1253 
+    height=&#34;688&#34;  /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img loading=&#34;lazy&#34; 
+    src=&#34;https://HanHoRang31.github.io/aews-gitops/webhook7.png&#34; 
+    alt=&#34;webhook7.png&#34; 
+     
+    width=1252 
+    height=&#34;842&#34;  /&gt;&lt;/p&gt;
+&lt;p&gt;확인한 정보값을 gitlab project → setting → webhook 에 입력하여 연동을 진행하자.&lt;/p&gt;
+&lt;p&gt;&lt;img loading=&#34;lazy&#34; 
+    src=&#34;https://HanHoRang31.github.io/aews-gitops/webhook8.png&#34; 
+    alt=&#34;webhook8.png&#34; 
+     
+    width=1733 
+    height=&#34;921&#34;  /&gt;&lt;/p&gt;
+&lt;h2 id=&#34;ci----cd-구성&#34;&gt;
+    &lt;a href=&#34;#ci----cd-%ea%b5%ac%ec%84%b1&#34; class=&#34;anchor&#34;&gt;
+        &lt;svg class=&#34;icon&#34; aria-hidden=&#34;true&#34; focusable=&#34;false&#34; height=&#34;16&#34; version=&#34;1.1&#34; viewBox=&#34;0 0 16 16&#34; width=&#34;16&#34;&gt;
+            &lt;path fill-rule=&#34;evenodd&#34;
+                d=&#34;M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z&#34;&gt;
+            &lt;/path&gt;
+        &lt;/svg&gt;
+    &lt;/a&gt;
+    CI  &amp;amp;  CD 구성
+&lt;/h2&gt;
+&lt;h3 id=&#34;1--ci-파이프라인-구성&#34;&gt;
+    &lt;a href=&#34;#1--ci-%ed%8c%8c%ec%9d%b4%ed%94%84%eb%9d%bc%ec%9d%b8-%ea%b5%ac%ec%84%b1&#34; class=&#34;anchor&#34;&gt;
+        &lt;svg class=&#34;icon&#34; aria-hidden=&#34;true&#34; focusable=&#34;false&#34; height=&#34;16&#34; version=&#34;1.1&#34; viewBox=&#34;0 0 16 16&#34; width=&#34;16&#34;&gt;
+            &lt;path fill-rule=&#34;evenodd&#34;
+                d=&#34;M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z&#34;&gt;
+            &lt;/path&gt;
+        &lt;/svg&gt;
+    &lt;/a&gt;
+    1.  CI 파이프라인 구성
+&lt;/h3&gt;
+&lt;p&gt;&lt;img loading=&#34;lazy&#34; 
+    src=&#34;https://HanHoRang31.github.io/aews-gitops/ci11.png&#34; 
+    alt=&#34;ci11.png&#34; 
+     
+    width=1199 
+    height=&#34;485&#34;  /&gt;&lt;/p&gt;
+&lt;p&gt;위 단계에서 생성한 파이프라인에서 스크립트를 다음과 같이 작성하자.&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
+&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code&gt;&lt;span class=&#34;lnt&#34;&gt; 1
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 2
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 3
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 4
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 5
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 6
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 7
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 8
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 9
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;10
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;11
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;12
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;13
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;14
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;15
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;16
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;17
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;18
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;19
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;20
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;21
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;22
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;23
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;24
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;25
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;26
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;27
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;28
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;29
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;30
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;31
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;32
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;33
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;34
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;35
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;36
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;37
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;38
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;39
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;40
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;41
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;42
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;43
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;44
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;45
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;46
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;47
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;48
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;49
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;50
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;51
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;52
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;53
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;54
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;55
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;56
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;57
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;58
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;59
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;60
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;61
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;62
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;podTemplate&lt;span class=&#34;o&#34;&gt;(&lt;/span&gt;yaml: &lt;span class=&#34;s1&#34;&gt;&amp;#39;&amp;#39;&amp;#39;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;s1&#34;&gt;              kind: Pod
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;s1&#34;&gt;              metadata:
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;s1&#34;&gt;                name: kaniko-image-build-pod
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;s1&#34;&gt;              spec:
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;s1&#34;&gt;                containers:
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;s1&#34;&gt;                - name: yq
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;s1&#34;&gt;                  image: linuxserver/yq:amd64-latest
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;s1&#34;&gt;                  imagePullPolicy: Always
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;s1&#34;&gt;                  tty : true
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;s1&#34;&gt;                  command:
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;s1&#34;&gt;                  - sleep
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;s1&#34;&gt;                  args:
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;s1&#34;&gt;                  - 99d
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;s1&#34;&gt;                - name: kaniko
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;s1&#34;&gt;                  image: gcr.io/kaniko-project/executor:v1.6.0-debug
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;s1&#34;&gt;                  imagePullPolicy: Always
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;s1&#34;&gt;                  command:
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;s1&#34;&gt;                  - sleep
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;s1&#34;&gt;                  args:
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;s1&#34;&gt;                  - 99d
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;s1&#34;&gt;                  volumeMounts:
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;s1&#34;&gt;                    - name: docker-config
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;s1&#34;&gt;                      mountPath: /root/.docker
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;s1&#34;&gt;                  tty: true
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;s1&#34;&gt;                volumes:
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;s1&#34;&gt;                    - name: docker-config
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;s1&#34;&gt;                      secret:
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;s1&#34;&gt;                        secretName: regcred
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;s1&#34;&gt;                        items:
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;s1&#34;&gt;                        - key: .dockerconfigjson
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;s1&#34;&gt;                          path: config.json
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;s1&#34;&gt;&amp;#39;&amp;#39;&amp;#39;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;  &lt;span class=&#34;o&#34;&gt;)&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;{&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;  node&lt;span class=&#34;o&#34;&gt;(&lt;/span&gt;POD_LABEL&lt;span class=&#34;o&#34;&gt;)&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;{&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;    stage&lt;span class=&#34;o&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;s1&#34;&gt;&amp;#39;Build with Kaniko&amp;#39;&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;)&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;{&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;      //git tag를 가져오기 위한 clone 
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;      git branch: &lt;span class=&#34;s1&#34;&gt;&amp;#39;main&amp;#39;&lt;/span&gt;,
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;        credentialsId: &lt;span class=&#34;s1&#34;&gt;&amp;#39;gitlab&amp;#39;&lt;/span&gt;,
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;        url: &lt;span class=&#34;s1&#34;&gt;&amp;#39;https://gitlab.hanhorang.link/gitlab-instance-f7cee683/aews.git&amp;#39;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;      script&lt;span class=&#34;o&#34;&gt;(){&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;          &lt;span class=&#34;nv&#34;&gt;GIT_TAG&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; sh &lt;span class=&#34;o&#34;&gt;(&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;            script: &lt;span class=&#34;s1&#34;&gt;&amp;#39;git describe --always&amp;#39;&lt;/span&gt;,
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;            returnStdout: &lt;span class=&#34;nb&#34;&gt;true&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;          &lt;span class=&#34;o&#34;&gt;)&lt;/span&gt;.trim&lt;span class=&#34;o&#34;&gt;()&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;      &lt;span class=&#34;o&#34;&gt;}&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;	  //Image build 
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;      container&lt;span class=&#34;o&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;s1&#34;&gt;&amp;#39;kaniko&amp;#39;&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;)&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;{&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;        //kaniko 에서 빌드하기 위해 소스코드 clone
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;        git branch: &lt;span class=&#34;s1&#34;&gt;&amp;#39;main&amp;#39;&lt;/span&gt;,
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;          credentialsId: &lt;span class=&#34;s1&#34;&gt;&amp;#39;gitlab&amp;#39;&lt;/span&gt;,
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;          url: &lt;span class=&#34;s1&#34;&gt;&amp;#39;https://gitlab.hanhorang.link/gitlab-instance-f7cee683/aews.git&amp;#39;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;        // kaniko 실행
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;        sh &lt;span class=&#34;s1&#34;&gt;&amp;#39;/kaniko/executor -f Dockerfile -c `pwd` --insecure --skip-tls-verify --cache=true --destination=harbor.hanhorang.link/aews/test:&amp;#39;&lt;/span&gt; + GIT_TAG 
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;      &lt;span class=&#34;o&#34;&gt;}&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;    &lt;span class=&#34;o&#34;&gt;}&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;  &lt;span class=&#34;o&#34;&gt;}&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;o&#34;&gt;}&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;p&gt;파이프라인에서 중요하게 볼 점은 도커 빌드를 위한 도구로 &lt;code&gt;kaniko&lt;/code&gt; 를 사용한 점이다. kaniko 는 Google Cloud에서 개발한 오픈 소스 도구로 &lt;strong&gt;Docker 데몬이 없는 환경&lt;/strong&gt;에서  Docker 이미지를 빌드할 수 있다. 이 &lt;strong&gt;Docker 데몬이 없는 환경&lt;/strong&gt; 라는 단어가 쿠버네티스에서는 특히 중요하다.&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;호환성 제공 : eks 1.24 이상 버전에서 docker 가 deprecated 되어 더 이상 docker 이미지 빌드를 할 수 없다는 점(커스텀 노드면 docker 설치해서 가능하긴 하다)에서&lt;/li&gt;
+&lt;li&gt;보안 이슈 제거  : Docker 데몬은 루트 권한으로 실행되기 때문에, 악의적인 이미지가 Docker 데몬에 액세스하게 되면 시스템 전체를 위험에 빠뜨릴 수 있다. 이와 반면 Kaniko는 사용자 공간(user-space)에서 실행되므로 이러한 보안 문제를 완화한다.&lt;/li&gt;
+&lt;li&gt;효율성 : Kaniko는 이미지 빌드 과정을 Kubernetes 팟 내에서 직접 수행하므로, 별도의 빌드 서버를 유지할 필요가 없다. 이는 관리 오버헤드를 줄이고 리소스 사용을 최적화할 수 있어 효율적이다.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;이러한 점에서 필자는 kaniko를 사용하여 이미지를 빌드하였다. kaniko에서는 또한 docker login 기능을 제공한다. 베스천 서버에서 harbor 도커레지스트리에 접근하기 위한 시크릿 정보를 생성하고 파이프라인을 빌드하자. 빌드가 정상적으로 처리되면 jenkins에서의 결과 화면과 harbor에서 푸쉬된 이미지를 확인할 수 있다!&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
+&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code&gt;&lt;span class=&#34;lnt&#34;&gt;1
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;2
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;3
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;4
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;5
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;c1&#34;&gt;# 시크릿 생성&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;kubectl create secret docker-registry regcred -n jenkins &lt;span class=&#34;se&#34;&gt;\
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;se&#34;&gt;&lt;/span&gt;--docker-username&lt;span class=&#34;o&#34;&gt;=&lt;/span&gt;admin &lt;span class=&#34;se&#34;&gt;\
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;se&#34;&gt;&lt;/span&gt;--docker-password&lt;span class=&#34;o&#34;&gt;=&lt;/span&gt;Harbor12345 &lt;span class=&#34;se&#34;&gt;\
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;se&#34;&gt;&lt;/span&gt;--docker-server&lt;span class=&#34;o&#34;&gt;=&lt;/span&gt;harbor.hanhorang.link
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;p&gt;&lt;img loading=&#34;lazy&#34; 
+    src=&#34;https://HanHoRang31.github.io/aews-gitops/auto11.png&#34; 
+    alt=&#34;auto11.png&#34; 
+     
+    width=1757 
+    height=&#34;656&#34;  /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img loading=&#34;lazy&#34; 
+    src=&#34;https://HanHoRang31.github.io/aews-gitops/harbor1.png&#34; 
+    alt=&#34;harbor1.png&#34; 
+     
+    width=1856 
+    height=&#34;721&#34;  /&gt;&lt;/p&gt;
+&lt;h3 id=&#34;2-argocd-를-통한-cd-구성&#34;&gt;
+    &lt;a href=&#34;#2-argocd-%eb%a5%bc-%ed%86%b5%ed%95%9c-cd-%ea%b5%ac%ec%84%b1&#34; class=&#34;anchor&#34;&gt;
+        &lt;svg class=&#34;icon&#34; aria-hidden=&#34;true&#34; focusable=&#34;false&#34; height=&#34;16&#34; version=&#34;1.1&#34; viewBox=&#34;0 0 16 16&#34; width=&#34;16&#34;&gt;
+            &lt;path fill-rule=&#34;evenodd&#34;
+                d=&#34;M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z&#34;&gt;
+            &lt;/path&gt;
+        &lt;/svg&gt;
+    &lt;/a&gt;
+    2. ArgoCD 를 통한 CD 구성
+&lt;/h3&gt;
+&lt;p&gt;&lt;img loading=&#34;lazy&#34; 
+    src=&#34;https://HanHoRang31.github.io/aews-gitops/cd10.png&#34; 
+    alt=&#34;cd10.png&#34; 
+     
+    width=1144 
+    height=&#34;460&#34;  /&gt;&lt;/p&gt;
+&lt;p&gt;CI 구성은 이미지 푸쉬가 끝이 아니다. 이미지 푸쉬가 완료되고 배포 차트에 이미지 태그 업데이트까지 시켜줘야 한다. 차트의 이미지 태그를 업데이트해야 Argocd를 통해서 자동으로 쿠버네티스에 배포되기 때문이다. 이를 위해 깃랩에서 새로운 프로젝트를 생성해서 배포 차트를 구성하자. 차트 구성은 &lt;a href=&#34;https://github.com/HanHoRang31/blog-share/tree/main/pkos-gitops/python-flask/app-chart&#34;&gt;필자의 깃 레파지토리&lt;/a&gt;를 확인하자. 차트를 확인하면 kustomize 를 통해 차트를 구성한 것을 확인할 수 있다. Kustomize는 기존 YAML 파일을 수정하지 않고, 오버레이와 패치를 통해 구성을 수정하거나 확장하는 기능을 제공하는 도구로서 추후 dev,ops 환경에서 배포를 고려하여 도입하였다.&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
+&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code&gt;&lt;span class=&#34;lnt&#34;&gt;1
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;2
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;c1&#34;&gt;# 설치 &lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;curl -s &lt;span class=&#34;s2&#34;&gt;&amp;#34;https://raw.githubusercontent.com/kubernetes-sigs/kustomize/master/hack/install_kustomize.sh&amp;#34;&lt;/span&gt;  &lt;span class=&#34;p&#34;&gt;|&lt;/span&gt; bash
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
+&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code&gt;&lt;span class=&#34;lnt&#34;&gt;1
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;2
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;3
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;4
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;5
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;6
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;7
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;8
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;9
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;c1&#34;&gt;# kustomize 차트 구성&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;├── base
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;│   ├── deployment.yaml
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;│   ├── kustomization.yaml
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;│   └── service.yaml
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;├── overlays
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;│   └── dev
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;│       └── kustomization.yaml
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;└── README.md
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
+&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code&gt;&lt;span class=&#34;lnt&#34;&gt;1
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;2
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;3
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;4
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;c1&#34;&gt;# 배포 &lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;c1&#34;&gt;# overlays/dev &lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;kubectl apply -k . 
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;--
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;p&gt;애플리케이션 동작을 확인했으면 argocd를 통해 sync 작업을 진행하겠다.&lt;/p&gt;
+&lt;p&gt;ArgoCD 에 접속하여 gialab 접근을 위한 시크릿 정보를 입력하겠다.  Argocd → Setting → Repo 에서 다음의 사진처럼 k8s-chart 레파지토리와 gitlab 접근 토큰을 입력하자.&lt;/p&gt;
+&lt;p&gt;&lt;img loading=&#34;lazy&#34; 
+    src=&#34;https://HanHoRang31.github.io/aews-gitops/auto13.png&#34; 
+    alt=&#34;auto13.png&#34; 
+     
+    width=1838 
+    height=&#34;881&#34;  /&gt;&lt;/p&gt;
+&lt;p&gt;연결이 정상적이면 Succeesful로 표 될 것이다. 이어서 APP sync 를 진행하자. 왼쪽 Application에서 다음과 같이 정보를 입력하자.&lt;/p&gt;
+&lt;p&gt;&lt;img loading=&#34;lazy&#34; 
+    src=&#34;https://HanHoRang31.github.io/aews-gitops/auto12.png&#34; 
+    alt=&#34;auto12.png&#34; 
+     
+    width=1851 
+    height=&#34;952&#34;  /&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Source : 차트 타켓이 되는 정보를 입력한다. 중요한 것은 Path 인데 실행 경로로 &lt;code&gt;overlays/dev&lt;/code&gt; 로 설정하자.&lt;/li&gt;
+&lt;li&gt;Destination : 배포 클러스터 정보의 입력란이다. 다음과 같이 클러스터 서비스 이름과 네임스페이스를 입력하자.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;입력이 완료되면 다음과 같이 확인할 수 있다.&lt;/p&gt;
+&lt;p&gt;&lt;img loading=&#34;lazy&#34; 
+    src=&#34;https://HanHoRang31.github.io/aews-gitops/auto14.png&#34; 
+    alt=&#34;auto14.png&#34; 
+     
+    width=1853 
+    height=&#34;869&#34;  /&gt;&lt;/p&gt;
+&lt;h3 id=&#34;3-ci--cd-연동&#34;&gt;
+    &lt;a href=&#34;#3-ci--cd-%ec%97%b0%eb%8f%99&#34; class=&#34;anchor&#34;&gt;
+        &lt;svg class=&#34;icon&#34; aria-hidden=&#34;true&#34; focusable=&#34;false&#34; height=&#34;16&#34; version=&#34;1.1&#34; viewBox=&#34;0 0 16 16&#34; width=&#34;16&#34;&gt;
+            &lt;path fill-rule=&#34;evenodd&#34;
+                d=&#34;M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z&#34;&gt;
+            &lt;/path&gt;
+        &lt;/svg&gt;
+    &lt;/a&gt;
+    3. CI &amp;amp; CD 연동
+&lt;/h3&gt;
+&lt;p&gt;&lt;img loading=&#34;lazy&#34; 
+    src=&#34;https://HanHoRang31.github.io/aews-gitops/cd11.png&#34; 
+    alt=&#34;cd11.png&#34; 
+     
+    width=1129 
+    height=&#34;436&#34;  /&gt;&lt;/p&gt;
+&lt;p&gt;드디어 마지막 단계이다! 앞에서 구성한 파이프라인의 stage 단계를 추가하여 CD 구성 차트의 이미지 태그를 업데이트하는 부분을 추가할 것이다.&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
+&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code&gt;&lt;span class=&#34;lnt&#34;&gt; 1
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 2
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 3
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 4
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 5
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 6
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 7
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 8
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 9
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;10
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;11
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;12
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;13
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;14
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;15
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;16
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;17
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;18
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;19
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;20
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;21
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;22
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;c1&#34;&gt;# Jekins pipeline&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;.
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;.
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;.
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;stage&lt;span class=&#34;o&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;s1&#34;&gt;&amp;#39;Update k8s chart&amp;#39;&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;)&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;{&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;      withCredentials&lt;span class=&#34;o&#34;&gt;([&lt;/span&gt;usernamePassword&lt;span class=&#34;o&#34;&gt;(&lt;/span&gt;credentialsId: &lt;span class=&#34;s1&#34;&gt;&amp;#39;gitlab&amp;#39;&lt;/span&gt;, usernameVariable: &lt;span class=&#34;s1&#34;&gt;&amp;#39;GITLAB_USERNAME&amp;#39;&lt;/span&gt;, passwordVariable: &lt;span class=&#34;s1&#34;&gt;&amp;#39;GITLAB_ACCESS_TOKEN&amp;#39;&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;)])&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;{&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;        dir&lt;span class=&#34;o&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;s2&#34;&gt;&amp;#34;~/&amp;#34;&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;)&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;{&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;          git branch: &lt;span class=&#34;s1&#34;&gt;&amp;#39;main&amp;#39;&lt;/span&gt;,
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;            credentialsId: &lt;span class=&#34;s1&#34;&gt;&amp;#39;gitlab&amp;#39;&lt;/span&gt;,
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;            url: &lt;span class=&#34;s1&#34;&gt;&amp;#39;https://gitlab.hanhorang.link/han/k8s-chart.git&amp;#39;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;          sh &lt;span class=&#34;s1&#34;&gt;&amp;#39;echo $GITLAB_ACCESS_TOKEN $GITLAB_USERNAME&amp;#39;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;          sh &lt;span class=&#34;s1&#34;&gt;&amp;#39;git config --global credential.helper store&amp;#39;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;          sh &lt;span class=&#34;s1&#34;&gt;&amp;#39;git config --global user.name &amp;#34;han&amp;#34;&amp;#39;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;          sh &lt;span class=&#34;s1&#34;&gt;&amp;#39;git config --global user.email &amp;#34;han@gmail.com&amp;#34;&amp;#39;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;          sh &lt;span class=&#34;s1&#34;&gt;&amp;#39;git remote set-url origin https://han:glpat-yznZ6zHSNN7UaoSHZ-rr@gitlab.hanhorang.link/han/k8s-chart.git&amp;#39;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;          sh &lt;span class=&#34;s1&#34;&gt;&amp;#39;sed -i &amp;#34;s|newTag:.*|newTag: &amp;#39;&lt;/span&gt; + GIT_TAG + &lt;span class=&#34;s1&#34;&gt;&amp;#39;|&amp;#34; overlays/dev/kustomization.yaml&amp;#39;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;          sh &lt;span class=&#34;s1&#34;&gt;&amp;#39;git add .&amp;#39;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;          sh &lt;span class=&#34;s1&#34;&gt;&amp;#39;git commit -m &amp;#34;updated the image tag to &amp;#39;&lt;/span&gt; + GIT_TAG + &lt;span class=&#34;s1&#34;&gt;&amp;#39;&amp;#34; || true&amp;#39;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;          sh &lt;span class=&#34;s1&#34;&gt;&amp;#39;git push origin main&amp;#39;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;        &lt;span class=&#34;o&#34;&gt;}&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;      &lt;span class=&#34;o&#34;&gt;}&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;    &lt;span class=&#34;o&#34;&gt;}&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;p&gt;&lt;strong&gt;트러블슈팅&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;해당 단계에서 깃 푸쉬가 안되어 많은 시행 착오를 겪었다. 케이스별로 묶어 정리하니 참고하자.&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;code&gt;git not&lt;/code&gt;&lt;/p&gt;
+&lt;p&gt;Console Output 에서 로그가 다음과 같이 git을 인식하지 못하는 문제이다.&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
+&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code&gt;&lt;span class=&#34;lnt&#34;&gt;1
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;2
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;3
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;.
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;.
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;/home/jenkins/agent/workspace/aews-pipeline-test/~@tmp/durable-bda4026d/script.sh: line 1: git: not
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;p&gt;근본적인 원인은 git이 stage container 에 설치되지 않았기 때문이다. 커맨드로 git 설치하는 방법도 있지만, 필자의 경우 리소스 오버헤드를 고려하여 jenkins 옵션에서 git을 활성화하였다.&lt;/p&gt;
+&lt;p&gt;&lt;img loading=&#34;lazy&#34; 
+    src=&#34;https://HanHoRang31.github.io/aews-gitops/auto17.png&#34; 
+    alt=&#34;auto17.png&#34; 
+     
+    width=1758 
+    height=&#34;879&#34;  /&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;code&gt;URL using bad/illegal format or missing URL&lt;/code&gt; , &lt;code&gt;fatal: could not read Username for &#39;https://gitlab.hanhorang.link&#39;: No such device or address&lt;/code&gt;&lt;/p&gt;
+&lt;p&gt;gitlab 원격저장소를 잘못 설정하여 생긴 문제이다. 원인을 찾는 것은 쉬웠지만, 어디서 잘못되었는 지 테스트에 오래걸렸다.  필자의 경우 깃랩 토큰 노출을 고려하여 withCredentials 를 사용하였는데 다음과 같이 **** 로 표시로 원격저장소를 인식하지 못하였다.&lt;/p&gt;
+&lt;p&gt;&lt;img loading=&#34;lazy&#34; 
+    src=&#34;https://HanHoRang31.github.io/aews-gitops/auto21.png&#34; 
+    alt=&#34;auto21.png&#34; 
+     
+    width=1132 
+    height=&#34;569&#34;  /&gt;&lt;/p&gt;
+&lt;p&gt;해결 방법으로 하드 코딩이나 환경 변수로 설정하는 것을 추천한다.&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id=&#34;gitops-기반-ci--cd-테스트&#34;&gt;
+    &lt;a href=&#34;#gitops-%ea%b8%b0%eb%b0%98-ci--cd-%ed%85%8c%ec%8a%a4%ed%8a%b8&#34; class=&#34;anchor&#34;&gt;
+        &lt;svg class=&#34;icon&#34; aria-hidden=&#34;true&#34; focusable=&#34;false&#34; height=&#34;16&#34; version=&#34;1.1&#34; viewBox=&#34;0 0 16 16&#34; width=&#34;16&#34;&gt;
+            &lt;path fill-rule=&#34;evenodd&#34;
+                d=&#34;M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z&#34;&gt;
+            &lt;/path&gt;
+        &lt;/svg&gt;
+    &lt;/a&gt;
+    Gitops 기반 CI &amp;amp; CD 테스트
+&lt;/h2&gt;
+&lt;p&gt;앞 단계에서 필자는 CI &amp;amp; CD 구성을 완료하였다. 이제 본격적인 운영 시나리오로 들어가서 GItops 기반에서 CI &amp;amp; CD 프로세스가 정상적으로 작동되는 지 확인해보겠다. 밑의 아키텍처처럼 소스코드 레파지토리에 코드를 수정하여 푸쉬시 jenkins를 통해서 이미지가 새로 푸쉬되고, k8s-chart 의 이미지 태그가 업데이트되어 최종적으로 쿠버네티스 애플리케이션이 수정되는 것을 확인해보겠다.&lt;/p&gt;
+&lt;p&gt;&lt;img loading=&#34;lazy&#34; 
+    src=&#34;https://HanHoRang31.github.io/aews-gitops/gitlab-archi1.png&#34; 
+    alt=&#34;gitlab-archi.png&#34; 
+     
+    width=1296 
+    height=&#34;465&#34;  /&gt;&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;
+&lt;p&gt;Commit Change&lt;/p&gt;
+&lt;p&gt;예제 파일 구성시 플라스트 실행 파일에 대해 수정이 필요하여 파일을 수정하고 Commit을 진행하였다.&lt;/p&gt;
+&lt;p&gt;&lt;img loading=&#34;lazy&#34; 
+    src=&#34;https://HanHoRang31.github.io/aews-gitops/ci1.png&#34; 
+    alt=&#34;ci1.png&#34; 
+     
+    width=1100 
+    height=&#34;318&#34;  /&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Jenkins 파이프라인 확인&lt;/p&gt;
+&lt;p&gt;Commit 진행시, Webhook를 통해 다음과 같이 자동으로 설정한 파이프라인이 실행된다.&lt;/p&gt;
+&lt;p&gt;&lt;img loading=&#34;lazy&#34; 
+    src=&#34;https://HanHoRang31.github.io/aews-gitops/ci2.png&#34; 
+    alt=&#34;ci2.png&#34; 
+     
+    width=933 
+    height=&#34;693&#34;  /&gt;&lt;/p&gt;
+&lt;p&gt;각 파이프라인의 로그를 확인하면 레파지토리와 k8s-chart에 대해 작업을 수행한 것을 확인할 수 있다.&lt;/p&gt;
+&lt;p&gt;&lt;img loading=&#34;lazy&#34; 
+    src=&#34;https://HanHoRang31.github.io/aews-gitops/ci6.png&#34; 
+    alt=&#34;ci6.png&#34; 
+     
+    width=1402 
+    height=&#34;773&#34;  /&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;ArgoCD Sync 확인&lt;/p&gt;
+&lt;p&gt;ArgoCD 의 설정한 Sync 옵션에 따라 자동으로 k8s에 배포된 것을 확인할 수 있다.&lt;/p&gt;
+&lt;p&gt;&lt;img loading=&#34;lazy&#34; 
+    src=&#34;https://HanHoRang31.github.io/aews-gitops/ci7.png&#34; 
+    alt=&#34;ci7.png&#34; 
+     
+    width=1430 
+    height=&#34;782&#34;  /&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h2 id=&#34;마치며&#34;&gt;
+    &lt;a href=&#34;#%eb%a7%88%ec%b9%98%eb%a9%b0&#34; class=&#34;anchor&#34;&gt;
+        &lt;svg class=&#34;icon&#34; aria-hidden=&#34;true&#34; focusable=&#34;false&#34; height=&#34;16&#34; version=&#34;1.1&#34; viewBox=&#34;0 0 16 16&#34; width=&#34;16&#34;&gt;
+            &lt;path fill-rule=&#34;evenodd&#34;
+                d=&#34;M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z&#34;&gt;
+            &lt;/path&gt;
+        &lt;/svg&gt;
+    &lt;/a&gt;
+    마치며
+&lt;/h2&gt;
+&lt;p&gt;이번 주에는 CI / CD 에 대한 본격적인 맛보기로 예제를 들어 gitops ci &amp;amp; cd를 구성하였다. 이것을 기반으로 확장하여 애플리케이션 트래픽 관리를 위한 argo rollout 적용, 개발 &amp;amp; 운영 환경에 대한 관리, 이미지 태그 관리 등등.. 확장 기능들이 많다. 또 나중에 기회가 된다면 정리해서 공유하도록 하겠다!&lt;/p&gt;
+
+    </description>
+    </item>
+    
     <item>
     <title>[AEWS] AWS 서비스를 통한 EKS 보안 구성</title>
     <link>https://HanHoRang31.github.io/post/eks-security-allinone/</link>
@@ -17082,959 +18035,6 @@ level=error ts=2023-04-16T13:32:00.115479121Z caller=series_index_store.go:583 o
     마치며
 &lt;/h2&gt;
 &lt;p&gt;kops 간단하다! 특히 마스터 노드를 직접 접근하여 컨트롤할 수 있어 클러스터 동작 이해에 좋은 툴이였다. 공식문서도 참고할 것이 많다. 공식 문서 kops operation 에 재밌는 주제들(카펜터)이 많던데 얼른 테스트해보고 싶은 마음이다. 시간나는대로 정리해서 올려보겠다.&lt;/p&gt;
-
-    </description>
-    </item>
-    
-    <item>
-    <title></title>
-    <link>https://HanHoRang31.github.io/post/aews-gitops/</link>
-    <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
-    
-    <guid>https://HanHoRang31.github.io/post/aews-gitops/</guid>
-    <description>
-        &lt;h1 id=&#34;gitops-ci--cd-구성&#34;&gt;
-    &lt;a href=&#34;#gitops-ci--cd-%ea%b5%ac%ec%84%b1&#34; class=&#34;anchor&#34;&gt;
-        &lt;svg class=&#34;icon&#34; aria-hidden=&#34;true&#34; focusable=&#34;false&#34; height=&#34;16&#34; version=&#34;1.1&#34; viewBox=&#34;0 0 16 16&#34; width=&#34;16&#34;&gt;
-            &lt;path fill-rule=&#34;evenodd&#34;
-                d=&#34;M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z&#34;&gt;
-            &lt;/path&gt;
-        &lt;/svg&gt;
-    &lt;/a&gt;
-    Gitops CI / CD 구성
-&lt;/h1&gt;
-&lt;p&gt;스터디 마지막 시간에는 EKS Automation 을 주제로 진행하였다. 여기서 Automation 단어는 인프라 프로비저닝 및 코드 배포를 포함하여 소프트웨어 제공 수명 주기의 일부를 자동화를 의미한다. 스터디에서는 모임장님께서 AWS 서비스 기반의 Automation(ACK)를 소개해주셨는데 실무에 도입하기에는 아직 보완할 서비스라 느껴, 다른 주제(gitops ci / cd 파이프라인 구성)를 선정하여 블로그를 작성한다.&lt;/p&gt;
-&lt;p&gt;&lt;a href=&#34;https://hanhorang31.github.io/post/pkos2-3-gitops/&#34;&gt;사실 지난 스터디에서 다룬 주제&lt;/a&gt;였지만, 내부 트러블슈팅으로 절반(CD 파이프라인 구성) 정도 밖에 구성하지 못하였다. 다시 스터디를 통해 계기가 생긴 만큼 이번 글에서는 CI 파이프라인 구성 확장 및 CD 연결까지 다룰 예정이다. 사용한 코드들은 &lt;a href=&#34;https://github.com/HanHoRang31/blog-share/tree/main/pkos-gitops&#34;&gt;필자의 레파지토리&lt;/a&gt;에서 확인이 가능하다.&lt;/p&gt;
-&lt;h3 id=&#34;ci--cd&#34;&gt;
-    &lt;a href=&#34;#ci--cd&#34; class=&#34;anchor&#34;&gt;
-        &lt;svg class=&#34;icon&#34; aria-hidden=&#34;true&#34; focusable=&#34;false&#34; height=&#34;16&#34; version=&#34;1.1&#34; viewBox=&#34;0 0 16 16&#34; width=&#34;16&#34;&gt;
-            &lt;path fill-rule=&#34;evenodd&#34;
-                d=&#34;M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z&#34;&gt;
-            &lt;/path&gt;
-        &lt;/svg&gt;
-    &lt;/a&gt;
-    CI / CD
-&lt;/h3&gt;
-&lt;p&gt;코드가 변경될 때마다 자동적으로 코드 통합(CI)와 배포(CD)를 수행하는 소프트웨어 개발 방식이다. 이를 통해 애플리케이션을 보다 짧은 주기로 서비스를 제공할 수 있어 비즈니스 이점이 큰 기술로 최근 devops 핵심 기술이라 할 수 있다.&lt;/p&gt;
-&lt;p&gt;&lt;img loading=&#34;lazy&#34; 
-    src=&#34;https://HanHoRang31.github.io/aews-gitops/cicd1.png&#34; 
-    alt=&#34;&amp;lt;a href=&amp;#34;https://server-engineer.tistory.com/800&amp;#34;&amp;gt;https://server-engineer.tistory.com/800&amp;lt;/a&amp;gt;&#34; 
-     
-    width=717 
-    height=&#34;170&#34;  /&gt;&lt;/p&gt;
-&lt;p&gt;&lt;a href=&#34;https://server-engineer.tistory.com/800&#34;&gt;https://server-engineer.tistory.com/800&lt;/a&gt;&lt;/p&gt;
-&lt;h3 id=&#34;gitops는-ci--cd일까&#34;&gt;
-    &lt;a href=&#34;#gitops%eb%8a%94-ci--cd%ec%9d%bc%ea%b9%8c&#34; class=&#34;anchor&#34;&gt;
-        &lt;svg class=&#34;icon&#34; aria-hidden=&#34;true&#34; focusable=&#34;false&#34; height=&#34;16&#34; version=&#34;1.1&#34; viewBox=&#34;0 0 16 16&#34; width=&#34;16&#34;&gt;
-            &lt;path fill-rule=&#34;evenodd&#34;
-                d=&#34;M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z&#34;&gt;
-            &lt;/path&gt;
-        &lt;/svg&gt;
-    &lt;/a&gt;
-    Gitops는 CI / CD일까?
-&lt;/h3&gt;
-&lt;p&gt;엄밀히 말하면 다르다. GitOps는 이런 CI/CD 프로세스에 git를 사용하여 인프라와 애플리케이션의 설정을 관리하는 방법이다. 달리 말하면, CI/CD는 코드 변경을 효과적으로 관리하고 배포하는 프로세스이며, GitOps는 이런 프로세스를 git을 통해 조정하고 관리하는 방식이라고 할 수 있다. 이 둘은 상호 보완적인 개념으로, GitOps는 CI/CD 파이프라인을 통해 애플리케이션을 배포하고 관리하는 데 사용될 수 있다.&lt;/p&gt;
-&lt;p&gt;&lt;img loading=&#34;lazy&#34; 
-    src=&#34;https://HanHoRang31.github.io/aews-gitops/gitops1.png&#34; 
-    alt=&#34;&amp;lt;a href=&amp;#34;https://blogs.vmware.com/cloud/2021/02/24/gitops-cloud-operating-model/&amp;#34;&amp;gt;https://blogs.vmware.com/cloud/2021/02/24/gitops-cloud-operating-model/&amp;lt;/a&amp;gt;&#34; 
-     
-    width=622 
-    height=&#34;244&#34;  /&gt;&lt;/p&gt;
-&lt;p&gt;&lt;a href=&#34;https://blogs.vmware.com/cloud/2021/02/24/gitops-cloud-operating-model/&#34;&gt;https://blogs.vmware.com/cloud/2021/02/24/gitops-cloud-operating-model/&lt;/a&gt;&lt;/p&gt;
-&lt;p&gt;이번 시간에는 EKS 환경에서 CI / CD 구성을 목표로 애플리케이션을 코드에서 배포까지 자동화하는 작업을 진행하고자 한다. CD 구성 같은 경우 &lt;a href=&#34;https://hanhorang31.github.io/post/pkos2-3-gitops/&#34;&gt;지난 블로그 글&lt;/a&gt;을 통해 진행하였고, 이어서 CI 구성과 gitops ci/cd 까지 확장하여 다룰 것이다. CI 구성에 사용한 도구는 보편적으로 가장 많이 사용하는 젠킨스(jenkins)를 사용핬고 gitops ci cd 구성을 위해 CD(Argocd), container registry(harbor), gitops(gitlab) 을 이용하였다.  구성 아키텍처는 다음과 같다.&lt;/p&gt;
-&lt;p&gt;&lt;img loading=&#34;lazy&#34; 
-    src=&#34;https://HanHoRang31.github.io/aews-gitops/gitlab-archi.png&#34; 
-    alt=&#34;gitlab-archi.png&#34; 
-     
-    width=1296 
-    height=&#34;465&#34;  /&gt;&lt;/p&gt;
-&lt;p&gt;복잡해보이지만, 각 도구들을 나눠서 확인하고 도구별 연동 방법에 대해 소개하겠다.&lt;/p&gt;
-&lt;h2 id=&#34;젠킨스jenkins&#34;&gt;
-    &lt;a href=&#34;#%ec%a0%a0%ed%82%a8%ec%8a%a4jenkins&#34; class=&#34;anchor&#34;&gt;
-        &lt;svg class=&#34;icon&#34; aria-hidden=&#34;true&#34; focusable=&#34;false&#34; height=&#34;16&#34; version=&#34;1.1&#34; viewBox=&#34;0 0 16 16&#34; width=&#34;16&#34;&gt;
-            &lt;path fill-rule=&#34;evenodd&#34;
-                d=&#34;M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z&#34;&gt;
-            &lt;/path&gt;
-        &lt;/svg&gt;
-    &lt;/a&gt;
-    젠킨스(Jenkins)
-&lt;/h2&gt;
-&lt;p&gt;CI 빌드 도구가 많지만, 젠킨스를 선택한 이유는 확장성과 커뮤니티 활성도가 압도적으로 높아서다. 젠킨스는 지속적 통합을 위한 오픈 소스 자동화 도구이다. 파이프라인 중 도커 이미지빌드 및 테스트, git에 업데이트(통합)까지의 과정을 구성해주는 도구이다. 젠킨스는 다양한 플러그인이 제공되어 기능 확장이 쉽게 가능하다. 대표적으로 쿠버네티스 플러그인을 통해서 쿠버네티스 APi 서버와 통신하여 코드 테스트(unit test)을 담당하는 Slave 파드를 동적으로 생성하고 관리할 수 있다. 이를 통해서 얻을 수 있는 이점은 다음과 같다.&lt;/p&gt;
-&lt;ol&gt;
-&lt;li&gt;&lt;strong&gt;동적 스케일링:&lt;/strong&gt; 쿠버네티스는 Jenkins 내 유닛 테스트(Jenkins Slaves)를 파드로 실행할 수 있다. 이렇게 하면 빌드/테스트 워크로드에 따라 파드를 동적으로 스케일링 할 수 있다. 즉, 추가적인 빌드 요구 사항이 있을 때마다 쿠버네티스는 새로운 유닛 테스트 파드를 생성하고, 작업이 완료되면 이를 제거할 수 있고 요청량에 따라 파드를 조절할 수 있다. 이를 통해 리소스를 효율적으로 사용할 수 있다.&lt;/li&gt;
-&lt;li&gt;&lt;strong&gt;고가용성:&lt;/strong&gt; 쿠버네티스의 내장된 고가용성 기능 덕분에, Jenkins 마스터의 다운타임을 크게 줄일 수 있다. 이는 Jenkins 마스터가 다운되더라도 쿠버네티스가 자동으로 새 인스턴스를 시작하여 서비스 중단 시간을 최소화할 수 있다는 것을 의미한다.&lt;/li&gt;
-&lt;/ol&gt;
-&lt;p&gt;&lt;img loading=&#34;lazy&#34; 
-    src=&#34;https://HanHoRang31.github.io/aews-gitops/jenkins-architecture-1024x657.png.webp&#34; 
-    alt=&#34;&amp;lt;a href=&amp;#34;https://devopscube.com/jenkins-architecture-explained/&amp;#34;&amp;gt;https://devopscube.com/jenkins-architecture-explained/&amp;lt;/a&amp;gt;&#34; 
-     
-    width=1024 
-    height=&#34;657&#34;  /&gt;&lt;/p&gt;
-&lt;p&gt;&lt;a href=&#34;https://devopscube.com/jenkins-architecture-explained/&#34;&gt;https://devopscube.com/jenkins-architecture-explained/&lt;/a&gt;&lt;/p&gt;
-&lt;p&gt;아키텍처도 간단하다. jekins 배포시 마스터 파드가 배포되며 해당 파드에서 jenkins https 서버(UI) 실행 및 빌드 스케쥴러, 유저, 플러그인, 보안 정보들을 관리한다.&lt;/p&gt;
-&lt;h3 id=&#34;jenkins-배포&#34;&gt;
-    &lt;a href=&#34;#jenkins-%eb%b0%b0%ed%8f%ac&#34; class=&#34;anchor&#34;&gt;
-        &lt;svg class=&#34;icon&#34; aria-hidden=&#34;true&#34; focusable=&#34;false&#34; height=&#34;16&#34; version=&#34;1.1&#34; viewBox=&#34;0 0 16 16&#34; width=&#34;16&#34;&gt;
-            &lt;path fill-rule=&#34;evenodd&#34;
-                d=&#34;M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z&#34;&gt;
-            &lt;/path&gt;
-        &lt;/svg&gt;
-    &lt;/a&gt;
-    Jenkins 배포
-&lt;/h3&gt;
-&lt;p&gt;헬름으로 젠킨스를 배포하면서 구성 아키텍처를 확인하겠다. 먼저, 차트를 가져오자.&lt;/p&gt;
-&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
-&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
-&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code&gt;&lt;span class=&#34;lnt&#34;&gt;1
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;2
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;3
-&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
-&lt;td class=&#34;lntd&#34;&gt;
-&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;helm repo add jenkins https://charts.jenkins.io
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;helm repo update
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;helm fetch jenkins/jenkins --untar --version 4.3.9
-&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
-&lt;/div&gt;
-&lt;/div&gt;&lt;p&gt;차트에는 마스터(컨트롤러), Agent(노드), 플러그인 설정, PV 및 백업 설정, 보안적 요소가 들어가있다. 또한, 젠킨스 차트에는 VALUES_SUMMERY.md 이 포함되는데 전체 파라미터에 대한 설명이 알기 쉽게 들어가있다.&lt;/p&gt;
-&lt;p&gt;구성 차트는 다음과 같이 수정했다.&lt;/p&gt;
-&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
-&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
-&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code&gt;&lt;span class=&#34;lnt&#34;&gt; 1
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 2
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 3
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 4
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 5
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 6
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 7
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 8
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 9
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;10
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;11
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;12
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;13
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;14
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;15
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;16
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;17
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;18
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;19
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;20
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;21
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;22
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;23
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;24
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;25
-&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
-&lt;td class=&#34;lntd&#34;&gt;
-&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;c1&#34;&gt;# values-jenkins.yaml&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;controller:
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;  adminUser: &lt;span class=&#34;s2&#34;&gt;&amp;#34;admin&amp;#34;&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;  adminPassword: &lt;span class=&#34;s2&#34;&gt;&amp;#34;admin1234&amp;#34;&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;  jenkinsUriPrefix: &lt;span class=&#34;s2&#34;&gt;&amp;#34;/jenkins&amp;#34;&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;  installPlugins:
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;  - kubernetes
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;  - workflow-aggregator
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;  - git
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;  - configuration-as-code
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;  - pipeline-stage-view
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;  - gitlab
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;  ingress: 
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;    enabled: &lt;span class=&#34;nb&#34;&gt;true&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;    apiVersion: &lt;span class=&#34;s2&#34;&gt;&amp;#34;networking.k8s.io/v1&amp;#34;&lt;/span&gt; 
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;    annotations: 
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;      alb.ingress.kubernetes.io/scheme: internet-facing
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;      alb.ingress.kubernetes.io/target-type: ip
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;      alb.ingress.kubernetes.io/listen-ports: &lt;span class=&#34;s1&#34;&gt;&amp;#39;[{&amp;#34;HTTPS&amp;#34;:443}, {&amp;#34;HTTP&amp;#34;:80}]&amp;#39;&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;      alb.ingress.kubernetes.io/certificate-arn: &amp;lt;cert ARN 입력&amp;gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;      alb.ingress.kubernetes.io/healthcheck-path: /login
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;      kubernetes.io/ingress.class: alb
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;      ingressClassName: alb
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;    hostName: &amp;lt;host domain 입력&amp;gt; 
-&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
-&lt;/div&gt;
-&lt;/div&gt;&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
-&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
-&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code&gt;&lt;span class=&#34;lnt&#34;&gt;1
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;2
-&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
-&lt;td class=&#34;lntd&#34;&gt;
-&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;kubectl create ns jenkins
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;helm install jenkins jenkins/jenkins -f values-jenkins.yaml --namespace jenkins --version 4.3.9
-&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
-&lt;/div&gt;
-&lt;/div&gt;&lt;p&gt;배포 후 jekins 페이지에 접속이 잘되는 지 확인해보자. 위 차트에서 확인했듯이 admin 아이디와 비밀번호는 admin / admin1234 이다.&lt;/p&gt;
-&lt;p&gt;&lt;img loading=&#34;lazy&#34; 
-    src=&#34;https://HanHoRang31.github.io/aews-gitops/jenkins1.png&#34; 
-    alt=&#34;jenkins1.png&#34; 
-     
-    width=717 
-    height=&#34;725&#34;  /&gt;&lt;/p&gt;
-&lt;h3 id=&#34;jenkins--쿠버네티스-연동&#34;&gt;
-    &lt;a href=&#34;#jenkins--%ec%bf%a0%eb%b2%84%eb%84%a4%ed%8b%b0%ec%8a%a4-%ec%97%b0%eb%8f%99&#34; class=&#34;anchor&#34;&gt;
-        &lt;svg class=&#34;icon&#34; aria-hidden=&#34;true&#34; focusable=&#34;false&#34; height=&#34;16&#34; version=&#34;1.1&#34; viewBox=&#34;0 0 16 16&#34; width=&#34;16&#34;&gt;
-            &lt;path fill-rule=&#34;evenodd&#34;
-                d=&#34;M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z&#34;&gt;
-            &lt;/path&gt;
-        &lt;/svg&gt;
-    &lt;/a&gt;
-    Jenkins &amp;amp; 쿠버네티스 연동
-&lt;/h3&gt;
-&lt;p&gt;젠킨스 파이프라인 작업을 쿠버네티스에서 작업시키려면 쿠버네티스와 연동이 필요하다. 다음 그림과 같이 젠킨스에서 쿠버네티스 주소를 입력하고, 쿠버네티스 접근 정보를 입력하자.&lt;/p&gt;
-&lt;p&gt;jenkins 관리 → 노드 관리 → Configure Clouds 접근 후 쿠버네티스 연동을 진행하자, 연동을 위해 kubernetes URL과 접근 정보가 필요하다. kubernetes URL과 접근 정보는 베스천 서버에 접근 파일에서 확인할 수 있다. 이를 복사해서 젠킨스 마스터 서버에 등록하자.&lt;/p&gt;
-&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
-&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
-&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code&gt;&lt;span class=&#34;lnt&#34;&gt; 1
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 2
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 3
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 4
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 5
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 6
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 7
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 8
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 9
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;10
-&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
-&lt;td class=&#34;lntd&#34;&gt;
-&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;c1&#34;&gt;# 베스천 서버 &lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;vi ~/.kube/config 
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;---
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;apiVersion: v1
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;clusters:
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;- cluster:
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;    certificate-authority-data: &amp;lt;auth-data&amp;gt; 
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;    server: https://api.hanhorang.link 
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;  name: hanhorang.link
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;contexts:
-&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
-&lt;/div&gt;
-&lt;/div&gt;&lt;p&gt;&lt;img loading=&#34;lazy&#34; 
-    src=&#34;https://HanHoRang31.github.io/aews-gitops/add-auth.png&#34; 
-    alt=&#34;add-auth.png&#34; 
-     
-    width=625 
-    height=&#34;840&#34;  /&gt;&lt;/p&gt;
-&lt;p&gt;쿠버네티스 URL 입력 후 접근 파일(config)을 등록하자.&lt;/p&gt;
-&lt;p&gt;&lt;img loading=&#34;lazy&#34; 
-    src=&#34;https://HanHoRang31.github.io/aews-gitops/kube-auth.png&#34; 
-    alt=&#34;kube-auth.png&#34; 
-     
-    width=703 
-    height=&#34;741&#34;  /&gt;&lt;/p&gt;
-&lt;p&gt;Test Connection 버튼을 통해 연동 테스트를 진행하자.&lt;/p&gt;
-&lt;p&gt;&lt;img loading=&#34;lazy&#34; 
-    src=&#34;https://HanHoRang31.github.io/aews-gitops/test.png&#34; 
-    alt=&#34;test.png&#34; 
-     
-    width=596 
-    height=&#34;227&#34;  /&gt;&lt;/p&gt;
-&lt;p&gt;그림과 같이 Connected to kubernetes가 나오면 연동이 완료된 것이다. Save를 통해 Configure Clouds 정보를 저장시키자.&lt;/p&gt;
-&lt;h2 id=&#34;ci----cd-구성-전-사전-작업&#34;&gt;
-    &lt;a href=&#34;#ci----cd-%ea%b5%ac%ec%84%b1-%ec%a0%84-%ec%82%ac%ec%a0%84-%ec%9e%91%ec%97%85&#34; class=&#34;anchor&#34;&gt;
-        &lt;svg class=&#34;icon&#34; aria-hidden=&#34;true&#34; focusable=&#34;false&#34; height=&#34;16&#34; version=&#34;1.1&#34; viewBox=&#34;0 0 16 16&#34; width=&#34;16&#34;&gt;
-            &lt;path fill-rule=&#34;evenodd&#34;
-                d=&#34;M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z&#34;&gt;
-            &lt;/path&gt;
-        &lt;/svg&gt;
-    &lt;/a&gt;
-    CI  &amp;amp;  CD 구성 전 사전 작업
-&lt;/h2&gt;
-&lt;blockquote&gt;
-&lt;p&gt;사전 작업으로 추가 구성이 필요합니다. 아래 블로그 글을 참고하여 필요 툴을 설치해주세요.
-컨테이너 이미지 레지스트리(harbor) : &lt;a href=&#34;https://hanhorang31.github.io/post/tech-private-docker/&#34;&gt;https://hanhorang31.github.io/post/tech-private-docker/&lt;/a&gt;
-gitlab &amp;amp; argocd : &lt;a href=&#34;https://hanhorang31.github.io/post/pkos2-3-gitops/&#34;&gt;https://hanhorang31.github.io/post/pkos2-3-gitops/&lt;/a&gt;&lt;/p&gt;
-&lt;/blockquote&gt;
-&lt;p&gt;구성전 도구 연동 &lt;strong&gt;[Gitlab-Jenkins-Harbor]&lt;/strong&gt; 을 위해 사전 작업이 필요하다.&lt;/p&gt;
-&lt;h3 id=&#34;gitlab-설정&#34;&gt;
-    &lt;a href=&#34;#gitlab-%ec%84%a4%ec%a0%95&#34; class=&#34;anchor&#34;&gt;
-        &lt;svg class=&#34;icon&#34; aria-hidden=&#34;true&#34; focusable=&#34;false&#34; height=&#34;16&#34; version=&#34;1.1&#34; viewBox=&#34;0 0 16 16&#34; width=&#34;16&#34;&gt;
-            &lt;path fill-rule=&#34;evenodd&#34;
-                d=&#34;M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z&#34;&gt;
-            &lt;/path&gt;
-        &lt;/svg&gt;
-    &lt;/a&gt;
-    GItlab 설정
-&lt;/h3&gt;
-&lt;ol&gt;
-&lt;li&gt;
-&lt;p&gt;사용자, 그룹 생성 &amp;amp; 접근 토큰 발급 (사용자 : han  /  토큰 glpat-yznZ6zHSNN7UaoSHZ-rr)&lt;/p&gt;
-&lt;ol&gt;
-&lt;li&gt;
-&lt;p&gt;admin→ users→ 계정생성
-비밀번호는 user 생성 후 edit 에서 설정할 수 있다.&lt;/p&gt;
-&lt;p&gt;&lt;img loading=&#34;lazy&#34; 
-    src=&#34;https://HanHoRang31.github.io/aews-gitops/gitlab-user-token.png&#34; 
-    alt=&#34;gitlab-user-token.png&#34; 
-     
-    width=931 
-    height=&#34;548&#34;  /&gt;&lt;/p&gt;
-&lt;p&gt;&lt;img loading=&#34;lazy&#34; 
-    src=&#34;https://HanHoRang31.github.io/aews-gitops/gitlab-admin-user.png&#34; 
-    alt=&#34;gitlab-admin-user.png&#34; 
-     
-    width=1756 
-    height=&#34;860&#34;  /&gt;&lt;/p&gt;
-&lt;/li&gt;
-&lt;li&gt;
-&lt;p&gt;users→ 사용자 → Impersonation Token을 통해 토큰 발급&lt;/p&gt;
-&lt;p&gt;&lt;img loading=&#34;lazy&#34; 
-    src=&#34;https://HanHoRang31.github.io/aews-gitops/gitops-token.png&#34; 
-    alt=&#34;gitops-token.png&#34; 
-     
-    width=1269 
-    height=&#34;878&#34;  /&gt;&lt;/p&gt;
-&lt;/li&gt;
-&lt;/ol&gt;
-&lt;/li&gt;
-&lt;li&gt;
-&lt;p&gt;프로젝트 생성 (test) 및 옵션 설정&lt;/p&gt;
-&lt;ol&gt;
-&lt;li&gt;
-&lt;p&gt;프로젝트 → Setting → CI / CD → Devops 파이프라인 설정&lt;/p&gt;
-&lt;p&gt;&lt;img loading=&#34;lazy&#34; 
-    src=&#34;https://HanHoRang31.github.io/aews-gitops/gitlab1.png&#34; 
-    alt=&#34;gitlab1.png&#34; 
-     
-    width=917 
-    height=&#34;868&#34;  /&gt;&lt;/p&gt;
-&lt;/li&gt;
-&lt;li&gt;
-&lt;p&gt;Repository 접근 제어 설정&lt;/p&gt;
-&lt;p&gt;프로젝트 → Setting → Repository 접근 아래와 같이 설정&lt;/p&gt;
-&lt;p&gt;&lt;img loading=&#34;lazy&#34; 
-    src=&#34;https://HanHoRang31.github.io/aews-gitops/gitops2.png&#34; 
-    alt=&#34;gitops2.png&#34; 
-     
-    width=864 
-    height=&#34;814&#34;  /&gt;&lt;/p&gt;
-&lt;/li&gt;
-&lt;/ol&gt;
-&lt;/li&gt;
-&lt;li&gt;
-&lt;p&gt;빌드 코드 작성(예제 코드) 및 Repo에 Push&lt;/p&gt;
-&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
-&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
-&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code&gt;&lt;span class=&#34;lnt&#34;&gt; 1
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 2
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 3
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 4
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 5
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 6
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 7
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 8
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 9
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;10
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;11
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;12
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;13
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;14
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;15
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;16
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;17
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;18
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;19
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;20
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;21
-&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
-&lt;td class=&#34;lntd&#34;&gt;
-&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;git config --global user.email han@gmail.com
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;git config --global user.name han
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;git add . 
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;git commit -m &lt;span class=&#34;s2&#34;&gt;&amp;#34;update code&amp;#34;&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;o&#34;&gt;[&lt;/span&gt;main 01f9418&lt;span class=&#34;o&#34;&gt;]&lt;/span&gt; update code
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt; &lt;span class=&#34;m&#34;&gt;3&lt;/span&gt; files changed, &lt;span class=&#34;m&#34;&gt;29&lt;/span&gt; insertions&lt;span class=&#34;o&#34;&gt;(&lt;/span&gt;+&lt;span class=&#34;o&#34;&gt;)&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt; create mode &lt;span class=&#34;m&#34;&gt;100644&lt;/span&gt; Dockerfile
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt; create mode &lt;span class=&#34;m&#34;&gt;100644&lt;/span&gt; app.py
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt; create mode &lt;span class=&#34;m&#34;&gt;100644&lt;/span&gt; requirements.txt
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;git push origin main
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;Username &lt;span class=&#34;k&#34;&gt;for&lt;/span&gt; &lt;span class=&#34;s1&#34;&gt;&amp;#39;https://gitlab.hanhorang.link&amp;#39;&lt;/span&gt;: han  
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;Password &lt;span class=&#34;k&#34;&gt;for&lt;/span&gt; &lt;span class=&#34;s1&#34;&gt;&amp;#39;https://han@gitlab.hanhorang.link&amp;#39;&lt;/span&gt;: 
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;Enumerating objects: 6, &lt;span class=&#34;k&#34;&gt;done&lt;/span&gt;.
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;Counting objects: 100% &lt;span class=&#34;o&#34;&gt;(&lt;/span&gt;6/6&lt;span class=&#34;o&#34;&gt;)&lt;/span&gt;, &lt;span class=&#34;k&#34;&gt;done&lt;/span&gt;.
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;Delta compression using up to &lt;span class=&#34;m&#34;&gt;2&lt;/span&gt; threads
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;Compressing objects: 100% &lt;span class=&#34;o&#34;&gt;(&lt;/span&gt;4/4&lt;span class=&#34;o&#34;&gt;)&lt;/span&gt;, &lt;span class=&#34;k&#34;&gt;done&lt;/span&gt;.
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;Writing objects: 100% &lt;span class=&#34;o&#34;&gt;(&lt;/span&gt;5/5&lt;span class=&#34;o&#34;&gt;)&lt;/span&gt;, &lt;span class=&#34;m&#34;&gt;824&lt;/span&gt; bytes &lt;span class=&#34;p&#34;&gt;|&lt;/span&gt; 824.00 KiB/s, &lt;span class=&#34;k&#34;&gt;done&lt;/span&gt;.
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;Total &lt;span class=&#34;m&#34;&gt;5&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;(&lt;/span&gt;delta 0&lt;span class=&#34;o&#34;&gt;)&lt;/span&gt;, reused &lt;span class=&#34;m&#34;&gt;0&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;(&lt;/span&gt;delta 0&lt;span class=&#34;o&#34;&gt;)&lt;/span&gt;, pack-reused &lt;span class=&#34;m&#34;&gt;0&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;To https://gitlab.hanhorang.link/gitlab-instance-0d144142/test.git
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;   347dcae..01f9418  main -&amp;gt; main
-&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
-&lt;/div&gt;
-&lt;/div&gt;&lt;p&gt;&lt;img loading=&#34;lazy&#34; 
-    src=&#34;https://HanHoRang31.github.io/aews-gitops/giops4.png&#34; 
-    alt=&#34;giops4.png&#34; 
-     
-    width=874 
-    height=&#34;608&#34;  /&gt;&lt;/p&gt;
-&lt;/li&gt;
-&lt;/ol&gt;
-&lt;h3 id=&#34;harbor-설정&#34;&gt;
-    &lt;a href=&#34;#harbor-%ec%84%a4%ec%a0%95&#34; class=&#34;anchor&#34;&gt;
-        &lt;svg class=&#34;icon&#34; aria-hidden=&#34;true&#34; focusable=&#34;false&#34; height=&#34;16&#34; version=&#34;1.1&#34; viewBox=&#34;0 0 16 16&#34; width=&#34;16&#34;&gt;
-            &lt;path fill-rule=&#34;evenodd&#34;
-                d=&#34;M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z&#34;&gt;
-            &lt;/path&gt;
-        &lt;/svg&gt;
-    &lt;/a&gt;
-    Harbor 설정
-&lt;/h3&gt;
-&lt;ol&gt;
-&lt;li&gt;
-&lt;p&gt;사용자 생성 (ID : han / PW)&lt;/p&gt;
-&lt;/li&gt;
-&lt;li&gt;
-&lt;p&gt;버킷 생성 (bucket name : aews) 및 버킷 접근 제어 설정(han에 권한 부여)&lt;/p&gt;
-&lt;p&gt;&lt;img loading=&#34;lazy&#34; 
-    src=&#34;https://HanHoRang31.github.io/aews-gitops/automation1.png&#34; 
-    alt=&#34;automation1.png&#34; 
-     
-    width=1863 
-    height=&#34;890&#34;  /&gt;&lt;/p&gt;
-&lt;/li&gt;
-&lt;/ol&gt;
-&lt;h3 id=&#34;jenkins-설정&#34;&gt;
-    &lt;a href=&#34;#jenkins-%ec%84%a4%ec%a0%95&#34; class=&#34;anchor&#34;&gt;
-        &lt;svg class=&#34;icon&#34; aria-hidden=&#34;true&#34; focusable=&#34;false&#34; height=&#34;16&#34; version=&#34;1.1&#34; viewBox=&#34;0 0 16 16&#34; width=&#34;16&#34;&gt;
-            &lt;path fill-rule=&#34;evenodd&#34;
-                d=&#34;M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z&#34;&gt;
-            &lt;/path&gt;
-        &lt;/svg&gt;
-    &lt;/a&gt;
-    Jenkins 설정
-&lt;/h3&gt;
-&lt;p&gt;&lt;strong&gt;Credentials 추가 ( Gitlab, Harbor ID &amp;amp; PWD)&lt;/strong&gt;&lt;/p&gt;
-&lt;p&gt;&lt;img loading=&#34;lazy&#34; 
-    src=&#34;https://HanHoRang31.github.io/aews-gitops/auto2.png&#34; 
-    alt=&#34;auto2.png&#34; 
-     
-    width=1752 
-    height=&#34;911&#34;  /&gt;&lt;/p&gt;
-&lt;p&gt;&lt;img loading=&#34;lazy&#34; 
-    src=&#34;https://HanHoRang31.github.io/aews-gitops/auto3.png&#34; 
-    alt=&#34;auto3.png&#34; 
-     
-    width=1596 
-    height=&#34;801&#34;  /&gt;&lt;/p&gt;
-&lt;h3 id=&#34;jenkins--gitlab-webhook-연동&#34;&gt;
-    &lt;a href=&#34;#jenkins--gitlab-webhook-%ec%97%b0%eb%8f%99&#34; class=&#34;anchor&#34;&gt;
-        &lt;svg class=&#34;icon&#34; aria-hidden=&#34;true&#34; focusable=&#34;false&#34; height=&#34;16&#34; version=&#34;1.1&#34; viewBox=&#34;0 0 16 16&#34; width=&#34;16&#34;&gt;
-            &lt;path fill-rule=&#34;evenodd&#34;
-                d=&#34;M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z&#34;&gt;
-            &lt;/path&gt;
-        &lt;/svg&gt;
-    &lt;/a&gt;
-    Jenkins &amp;amp; gitlab webhook 연동
-&lt;/h3&gt;
-&lt;p&gt;&lt;img loading=&#34;lazy&#34; 
-    src=&#34;https://HanHoRang31.github.io/aews-gitops/webhook.png&#34; 
-    alt=&#34;webhook.png&#34; 
-     
-    width=1138 
-    height=&#34;484&#34;  /&gt;&lt;/p&gt;
-&lt;p&gt;gitlab 에서 이벤트 발생(코드 변경)시 jenkins에 알려 코드 파이프라인이 바로 실행 될 수 있도록 webhook 을 구성하겠다. 다음과 같이 configure system → gitalb 에서 gitlab 연결을 테스트하여 등록한다.&lt;/p&gt;
-&lt;p&gt;&lt;img loading=&#34;lazy&#34; 
-    src=&#34;https://HanHoRang31.github.io/aews-gitops/webhook1.png&#34; 
-    alt=&#34;webhook1.png&#34; 
-     
-    width=1726 
-    height=&#34;895&#34;  /&gt;&lt;/p&gt;
-&lt;p&gt;&lt;img loading=&#34;lazy&#34; 
-    src=&#34;https://HanHoRang31.github.io/aews-gitops/webhook2.png&#34; 
-    alt=&#34;webhook2.png&#34; 
-     
-    width=1393 
-    height=&#34;723&#34;  /&gt;&lt;/p&gt;
-&lt;ul&gt;
-&lt;li&gt;해당 메뉴가 보이지 않을 경우 플러그인 &lt;code&gt;gitlab&lt;/code&gt; 을 설치하자&lt;/li&gt;
-&lt;/ul&gt;
-&lt;p&gt;이어서 gitlab 과 jenkins 파이프라인을 연결하자. 우선 아래 메뉴에서 파이프라인을 생성하자.&lt;/p&gt;
-&lt;p&gt;&lt;img loading=&#34;lazy&#34; 
-    src=&#34;https://HanHoRang31.github.io/aews-gitops/webhook10.png&#34; 
-    alt=&#34;webhook10.png&#34; 
-     
-    width=1774 
-    height=&#34;966&#34;  /&gt;&lt;/p&gt;
-&lt;p&gt;그 다음 general에서 아래와 같이 설정한 후, [빌드 유발]에서 Secret token 토큰을 발급받고 webhook URL을 복사하자, 복사한 정보는 gitlab webhook 등록에 사용할 것이다.&lt;/p&gt;
-&lt;p&gt;&lt;img loading=&#34;lazy&#34; 
-    src=&#34;https://HanHoRang31.github.io/aews-gitops/webhook3.png&#34; 
-    alt=&#34;webhook3.png&#34; 
-     
-    width=1270 
-    height=&#34;799&#34;  /&gt;&lt;/p&gt;
-&lt;p&gt;&lt;img loading=&#34;lazy&#34; 
-    src=&#34;https://HanHoRang31.github.io/aews-gitops/webhook6.png&#34; 
-    alt=&#34;webhook6.png&#34; 
-     
-    width=1253 
-    height=&#34;688&#34;  /&gt;&lt;/p&gt;
-&lt;p&gt;&lt;img loading=&#34;lazy&#34; 
-    src=&#34;https://HanHoRang31.github.io/aews-gitops/webhook7.png&#34; 
-    alt=&#34;webhook7.png&#34; 
-     
-    width=1252 
-    height=&#34;842&#34;  /&gt;&lt;/p&gt;
-&lt;p&gt;확인한 정보값을 gitlab project → setting → webhook 에 입력하여 연동을 진행하자.&lt;/p&gt;
-&lt;p&gt;&lt;img loading=&#34;lazy&#34; 
-    src=&#34;https://HanHoRang31.github.io/aews-gitops/webhook8.png&#34; 
-    alt=&#34;webhook8.png&#34; 
-     
-    width=1733 
-    height=&#34;921&#34;  /&gt;&lt;/p&gt;
-&lt;h2 id=&#34;ci----cd-구성&#34;&gt;
-    &lt;a href=&#34;#ci----cd-%ea%b5%ac%ec%84%b1&#34; class=&#34;anchor&#34;&gt;
-        &lt;svg class=&#34;icon&#34; aria-hidden=&#34;true&#34; focusable=&#34;false&#34; height=&#34;16&#34; version=&#34;1.1&#34; viewBox=&#34;0 0 16 16&#34; width=&#34;16&#34;&gt;
-            &lt;path fill-rule=&#34;evenodd&#34;
-                d=&#34;M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z&#34;&gt;
-            &lt;/path&gt;
-        &lt;/svg&gt;
-    &lt;/a&gt;
-    CI  &amp;amp;  CD 구성
-&lt;/h2&gt;
-&lt;h3 id=&#34;1--ci-파이프라인-구성&#34;&gt;
-    &lt;a href=&#34;#1--ci-%ed%8c%8c%ec%9d%b4%ed%94%84%eb%9d%bc%ec%9d%b8-%ea%b5%ac%ec%84%b1&#34; class=&#34;anchor&#34;&gt;
-        &lt;svg class=&#34;icon&#34; aria-hidden=&#34;true&#34; focusable=&#34;false&#34; height=&#34;16&#34; version=&#34;1.1&#34; viewBox=&#34;0 0 16 16&#34; width=&#34;16&#34;&gt;
-            &lt;path fill-rule=&#34;evenodd&#34;
-                d=&#34;M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z&#34;&gt;
-            &lt;/path&gt;
-        &lt;/svg&gt;
-    &lt;/a&gt;
-    1.  CI 파이프라인 구성
-&lt;/h3&gt;
-&lt;p&gt;&lt;img loading=&#34;lazy&#34; 
-    src=&#34;https://HanHoRang31.github.io/aews-gitops/ci11.png&#34; 
-    alt=&#34;ci11.png&#34; 
-     
-    width=1199 
-    height=&#34;485&#34;  /&gt;&lt;/p&gt;
-&lt;p&gt;위 단계에서 생성한 파이프라인에서 스크립트를 다음과 같이 작성하자.&lt;/p&gt;
-&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
-&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
-&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code&gt;&lt;span class=&#34;lnt&#34;&gt; 1
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 2
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 3
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 4
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 5
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 6
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 7
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 8
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 9
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;10
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;11
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;12
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;13
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;14
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;15
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;16
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;17
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;18
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;19
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;20
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;21
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;22
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;23
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;24
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;25
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;26
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;27
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;28
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;29
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;30
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;31
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;32
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;33
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;34
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;35
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;36
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;37
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;38
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;39
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;40
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;41
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;42
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;43
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;44
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;45
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;46
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;47
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;48
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;49
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;50
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;51
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;52
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;53
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;54
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;55
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;56
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;57
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;58
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;59
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;60
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;61
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;62
-&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
-&lt;td class=&#34;lntd&#34;&gt;
-&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;podTemplate&lt;span class=&#34;o&#34;&gt;(&lt;/span&gt;yaml: &lt;span class=&#34;s1&#34;&gt;&amp;#39;&amp;#39;&amp;#39;
-&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;s1&#34;&gt;              kind: Pod
-&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;s1&#34;&gt;              metadata:
-&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;s1&#34;&gt;                name: kaniko-image-build-pod
-&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;s1&#34;&gt;              spec:
-&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;s1&#34;&gt;                containers:
-&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;s1&#34;&gt;                - name: yq
-&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;s1&#34;&gt;                  image: linuxserver/yq:amd64-latest
-&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;s1&#34;&gt;                  imagePullPolicy: Always
-&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;s1&#34;&gt;                  tty : true
-&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;s1&#34;&gt;                  command:
-&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;s1&#34;&gt;                  - sleep
-&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;s1&#34;&gt;                  args:
-&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;s1&#34;&gt;                  - 99d
-&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;s1&#34;&gt;                - name: kaniko
-&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;s1&#34;&gt;                  image: gcr.io/kaniko-project/executor:v1.6.0-debug
-&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;s1&#34;&gt;                  imagePullPolicy: Always
-&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;s1&#34;&gt;                  command:
-&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;s1&#34;&gt;                  - sleep
-&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;s1&#34;&gt;                  args:
-&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;s1&#34;&gt;                  - 99d
-&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;s1&#34;&gt;                  volumeMounts:
-&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;s1&#34;&gt;                    - name: docker-config
-&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;s1&#34;&gt;                      mountPath: /root/.docker
-&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;s1&#34;&gt;                  tty: true
-&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;s1&#34;&gt;                volumes:
-&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;s1&#34;&gt;                    - name: docker-config
-&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;s1&#34;&gt;                      secret:
-&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;s1&#34;&gt;                        secretName: regcred
-&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;s1&#34;&gt;                        items:
-&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;s1&#34;&gt;                        - key: .dockerconfigjson
-&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;s1&#34;&gt;                          path: config.json
-&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;s1&#34;&gt;&amp;#39;&amp;#39;&amp;#39;&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;  &lt;span class=&#34;o&#34;&gt;)&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;{&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;  node&lt;span class=&#34;o&#34;&gt;(&lt;/span&gt;POD_LABEL&lt;span class=&#34;o&#34;&gt;)&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;{&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;    stage&lt;span class=&#34;o&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;s1&#34;&gt;&amp;#39;Build with Kaniko&amp;#39;&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;)&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;{&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;      //git tag를 가져오기 위한 clone 
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;      git branch: &lt;span class=&#34;s1&#34;&gt;&amp;#39;main&amp;#39;&lt;/span&gt;,
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;        credentialsId: &lt;span class=&#34;s1&#34;&gt;&amp;#39;gitlab&amp;#39;&lt;/span&gt;,
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;        url: &lt;span class=&#34;s1&#34;&gt;&amp;#39;https://gitlab.hanhorang.link/gitlab-instance-f7cee683/aews.git&amp;#39;&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;      script&lt;span class=&#34;o&#34;&gt;(){&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;          &lt;span class=&#34;nv&#34;&gt;GIT_TAG&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; sh &lt;span class=&#34;o&#34;&gt;(&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;            script: &lt;span class=&#34;s1&#34;&gt;&amp;#39;git describe --always&amp;#39;&lt;/span&gt;,
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;            returnStdout: &lt;span class=&#34;nb&#34;&gt;true&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;          &lt;span class=&#34;o&#34;&gt;)&lt;/span&gt;.trim&lt;span class=&#34;o&#34;&gt;()&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;      &lt;span class=&#34;o&#34;&gt;}&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;	  //Image build 
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;      container&lt;span class=&#34;o&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;s1&#34;&gt;&amp;#39;kaniko&amp;#39;&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;)&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;{&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;        //kaniko 에서 빌드하기 위해 소스코드 clone
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;        git branch: &lt;span class=&#34;s1&#34;&gt;&amp;#39;main&amp;#39;&lt;/span&gt;,
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;          credentialsId: &lt;span class=&#34;s1&#34;&gt;&amp;#39;gitlab&amp;#39;&lt;/span&gt;,
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;          url: &lt;span class=&#34;s1&#34;&gt;&amp;#39;https://gitlab.hanhorang.link/gitlab-instance-f7cee683/aews.git&amp;#39;&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;        // kaniko 실행
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;        sh &lt;span class=&#34;s1&#34;&gt;&amp;#39;/kaniko/executor -f Dockerfile -c `pwd` --insecure --skip-tls-verify --cache=true --destination=harbor.hanhorang.link/aews/test:&amp;#39;&lt;/span&gt; + GIT_TAG 
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;      &lt;span class=&#34;o&#34;&gt;}&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;    &lt;span class=&#34;o&#34;&gt;}&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;  &lt;span class=&#34;o&#34;&gt;}&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;o&#34;&gt;}&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
-&lt;/div&gt;
-&lt;/div&gt;&lt;p&gt;파이프라인에서 중요하게 볼 점은 도커 빌드를 위한 도구로 &lt;code&gt;kaniko&lt;/code&gt; 를 사용한 점이다. kaniko 는 Google Cloud에서 개발한 오픈 소스 도구로 &lt;strong&gt;Docker 데몬이 없는 환경&lt;/strong&gt;에서  Docker 이미지를 빌드할 수 있다. 이 &lt;strong&gt;Docker 데몬이 없는 환경&lt;/strong&gt; 라는 단어가 쿠버네티스에서는 특히 중요하다.&lt;/p&gt;
-&lt;ul&gt;
-&lt;li&gt;호환성 제공 : eks 1.24 이상 버전에서 docker 가 deprecated 되어 더 이상 docker 이미지 빌드를 할 수 없다는 점(커스텀 노드면 docker 설치해서 가능하긴 하다)에서&lt;/li&gt;
-&lt;li&gt;보안 이슈 제거  : Docker 데몬은 루트 권한으로 실행되기 때문에, 악의적인 이미지가 Docker 데몬에 액세스하게 되면 시스템 전체를 위험에 빠뜨릴 수 있다. 이와 반면 Kaniko는 사용자 공간(user-space)에서 실행되므로 이러한 보안 문제를 완화한다.&lt;/li&gt;
-&lt;li&gt;효율성 : Kaniko는 이미지 빌드 과정을 Kubernetes 팟 내에서 직접 수행하므로, 별도의 빌드 서버를 유지할 필요가 없다. 이는 관리 오버헤드를 줄이고 리소스 사용을 최적화할 수 있어 효율적이다.&lt;/li&gt;
-&lt;/ul&gt;
-&lt;p&gt;이러한 점에서 필자는 kaniko를 사용하여 이미지를 빌드하였다. kaniko에서는 또한 docker login 기능을 제공한다. 베스천 서버에서 harbor 도커레지스트리에 접근하기 위한 시크릿 정보를 생성하고 파이프라인을 빌드하자. 빌드가 정상적으로 처리되면 jenkins에서의 결과 화면과 harbor에서 푸쉬된 이미지를 확인할 수 있다!&lt;/p&gt;
-&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
-&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
-&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code&gt;&lt;span class=&#34;lnt&#34;&gt;1
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;2
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;3
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;4
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;5
-&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
-&lt;td class=&#34;lntd&#34;&gt;
-&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;c1&#34;&gt;# 시크릿 생성&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;kubectl create secret docker-registry regcred -n jenkins &lt;span class=&#34;se&#34;&gt;\
-&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;se&#34;&gt;&lt;/span&gt;--docker-username&lt;span class=&#34;o&#34;&gt;=&lt;/span&gt;admin &lt;span class=&#34;se&#34;&gt;\
-&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;se&#34;&gt;&lt;/span&gt;--docker-password&lt;span class=&#34;o&#34;&gt;=&lt;/span&gt;Harbor12345 &lt;span class=&#34;se&#34;&gt;\
-&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;se&#34;&gt;&lt;/span&gt;--docker-server&lt;span class=&#34;o&#34;&gt;=&lt;/span&gt;harbor.hanhorang.link
-&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
-&lt;/div&gt;
-&lt;/div&gt;&lt;p&gt;&lt;img loading=&#34;lazy&#34; 
-    src=&#34;https://HanHoRang31.github.io/aews-gitops/auto11.png&#34; 
-    alt=&#34;auto11.png&#34; 
-     
-    width=1757 
-    height=&#34;656&#34;  /&gt;&lt;/p&gt;
-&lt;p&gt;&lt;img loading=&#34;lazy&#34; 
-    src=&#34;https://HanHoRang31.github.io/aews-gitops/harbor1.png&#34; 
-    alt=&#34;harbor1.png&#34; 
-     
-    width=1856 
-    height=&#34;721&#34;  /&gt;&lt;/p&gt;
-&lt;h3 id=&#34;2-argocd-를-통한-cd-구성&#34;&gt;
-    &lt;a href=&#34;#2-argocd-%eb%a5%bc-%ed%86%b5%ed%95%9c-cd-%ea%b5%ac%ec%84%b1&#34; class=&#34;anchor&#34;&gt;
-        &lt;svg class=&#34;icon&#34; aria-hidden=&#34;true&#34; focusable=&#34;false&#34; height=&#34;16&#34; version=&#34;1.1&#34; viewBox=&#34;0 0 16 16&#34; width=&#34;16&#34;&gt;
-            &lt;path fill-rule=&#34;evenodd&#34;
-                d=&#34;M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z&#34;&gt;
-            &lt;/path&gt;
-        &lt;/svg&gt;
-    &lt;/a&gt;
-    2. ArgoCD 를 통한 CD 구성
-&lt;/h3&gt;
-&lt;p&gt;&lt;img loading=&#34;lazy&#34; 
-    src=&#34;https://HanHoRang31.github.io/aews-gitops/cd10.png&#34; 
-    alt=&#34;cd10.png&#34; 
-     
-    width=1144 
-    height=&#34;460&#34;  /&gt;&lt;/p&gt;
-&lt;p&gt;CI 구성은 이미지 푸쉬가 끝이 아니다. 이미지 푸쉬가 완료되고 배포 차트에 이미지 태그 업데이트까지 시켜줘야 한다. 차트의 이미지 태그를 업데이트해야 Argocd를 통해서 자동으로 쿠버네티스에 배포되기 때문이다. 이를 위해 깃랩에서 새로운 프로젝트를 생성해서 배포 차트를 구성하자. 차트 구성은 &lt;a href=&#34;https://github.com/HanHoRang31/blog-share/tree/main/pkos-gitops/python-flask/app-chart&#34;&gt;필자의 깃 레파지토리&lt;/a&gt;를 확인하자. 차트를 확인하면 kustomize 를 통해 차트를 구성한 것을 확인할 수 있다. Kustomize는 기존 YAML 파일을 수정하지 않고, 오버레이와 패치를 통해 구성을 수정하거나 확장하는 기능을 제공하는 도구로서 추후 dev,ops 환경에서 배포를 고려하여 도입하였다.&lt;/p&gt;
-&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
-&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
-&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code&gt;&lt;span class=&#34;lnt&#34;&gt;1
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;2
-&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
-&lt;td class=&#34;lntd&#34;&gt;
-&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;c1&#34;&gt;# 설치 &lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;curl -s &lt;span class=&#34;s2&#34;&gt;&amp;#34;https://raw.githubusercontent.com/kubernetes-sigs/kustomize/master/hack/install_kustomize.sh&amp;#34;&lt;/span&gt;  &lt;span class=&#34;p&#34;&gt;|&lt;/span&gt; bash
-&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
-&lt;/div&gt;
-&lt;/div&gt;&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
-&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
-&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code&gt;&lt;span class=&#34;lnt&#34;&gt;1
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;2
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;3
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;4
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;5
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;6
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;7
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;8
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;9
-&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
-&lt;td class=&#34;lntd&#34;&gt;
-&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;c1&#34;&gt;# kustomize 차트 구성&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;├── base
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;│   ├── deployment.yaml
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;│   ├── kustomization.yaml
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;│   └── service.yaml
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;├── overlays
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;│   └── dev
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;│       └── kustomization.yaml
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;└── README.md
-&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
-&lt;/div&gt;
-&lt;/div&gt;&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
-&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
-&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code&gt;&lt;span class=&#34;lnt&#34;&gt;1
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;2
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;3
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;4
-&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
-&lt;td class=&#34;lntd&#34;&gt;
-&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;c1&#34;&gt;# 배포 &lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;c1&#34;&gt;# overlays/dev &lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;kubectl apply -k . 
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;--
-&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
-&lt;/div&gt;
-&lt;/div&gt;&lt;p&gt;애플리케이션 동작을 확인했으면 argocd를 통해 sync 작업을 진행하겠다.&lt;/p&gt;
-&lt;p&gt;ArgoCD 에 접속하여 gialab 접근을 위한 시크릿 정보를 입력하겠다.  Argocd → Setting → Repo 에서 다음의 사진처럼 k8s-chart 레파지토리와 gitlab 접근 토큰을 입력하자.&lt;/p&gt;
-&lt;p&gt;&lt;img loading=&#34;lazy&#34; 
-    src=&#34;https://HanHoRang31.github.io/aews-gitops/auto13.png&#34; 
-    alt=&#34;auto13.png&#34; 
-     
-    width=1838 
-    height=&#34;881&#34;  /&gt;&lt;/p&gt;
-&lt;p&gt;연결이 정상적이면 Succeesful로 표 될 것이다. 이어서 APP sync 를 진행하자. 왼쪽 Application에서 다음과 같이 정보를 입력하자.&lt;/p&gt;
-&lt;p&gt;&lt;img loading=&#34;lazy&#34; 
-    src=&#34;https://HanHoRang31.github.io/aews-gitops/auto12.png&#34; 
-    alt=&#34;auto12.png&#34; 
-     
-    width=1851 
-    height=&#34;952&#34;  /&gt;&lt;/p&gt;
-&lt;ul&gt;
-&lt;li&gt;Source : 차트 타켓이 되는 정보를 입력한다. 중요한 것은 Path 인데 실행 경로로 &lt;code&gt;overlays/dev&lt;/code&gt; 로 설정하자.&lt;/li&gt;
-&lt;li&gt;Destination : 배포 클러스터 정보의 입력란이다. 다음과 같이 클러스터 서비스 이름과 네임스페이스를 입력하자.&lt;/li&gt;
-&lt;/ul&gt;
-&lt;p&gt;입력이 완료되면 다음과 같이 확인할 수 있다.&lt;/p&gt;
-&lt;p&gt;&lt;img loading=&#34;lazy&#34; 
-    src=&#34;https://HanHoRang31.github.io/aews-gitops/auto14.png&#34; 
-    alt=&#34;auto14.png&#34; 
-     
-    width=1853 
-    height=&#34;869&#34;  /&gt;&lt;/p&gt;
-&lt;h3 id=&#34;3-ci--cd-연동&#34;&gt;
-    &lt;a href=&#34;#3-ci--cd-%ec%97%b0%eb%8f%99&#34; class=&#34;anchor&#34;&gt;
-        &lt;svg class=&#34;icon&#34; aria-hidden=&#34;true&#34; focusable=&#34;false&#34; height=&#34;16&#34; version=&#34;1.1&#34; viewBox=&#34;0 0 16 16&#34; width=&#34;16&#34;&gt;
-            &lt;path fill-rule=&#34;evenodd&#34;
-                d=&#34;M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z&#34;&gt;
-            &lt;/path&gt;
-        &lt;/svg&gt;
-    &lt;/a&gt;
-    3. CI &amp;amp; CD 연동
-&lt;/h3&gt;
-&lt;p&gt;&lt;img loading=&#34;lazy&#34; 
-    src=&#34;https://HanHoRang31.github.io/aews-gitops/cd11.png&#34; 
-    alt=&#34;cd11.png&#34; 
-     
-    width=1129 
-    height=&#34;436&#34;  /&gt;&lt;/p&gt;
-&lt;p&gt;드디어 마지막 단계이다! 앞에서 구성한 파이프라인의 stage 단계를 추가하여 CD 구성 차트의 이미지 태그를 업데이트하는 부분을 추가할 것이다.&lt;/p&gt;
-&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
-&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
-&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code&gt;&lt;span class=&#34;lnt&#34;&gt; 1
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 2
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 3
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 4
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 5
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 6
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 7
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 8
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 9
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;10
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;11
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;12
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;13
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;14
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;15
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;16
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;17
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;18
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;19
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;20
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;21
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;22
-&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
-&lt;td class=&#34;lntd&#34;&gt;
-&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;c1&#34;&gt;# Jekins pipeline&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;.
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;.
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;.
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;stage&lt;span class=&#34;o&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;s1&#34;&gt;&amp;#39;Update k8s chart&amp;#39;&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;)&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;{&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;      withCredentials&lt;span class=&#34;o&#34;&gt;([&lt;/span&gt;usernamePassword&lt;span class=&#34;o&#34;&gt;(&lt;/span&gt;credentialsId: &lt;span class=&#34;s1&#34;&gt;&amp;#39;gitlab&amp;#39;&lt;/span&gt;, usernameVariable: &lt;span class=&#34;s1&#34;&gt;&amp;#39;GITLAB_USERNAME&amp;#39;&lt;/span&gt;, passwordVariable: &lt;span class=&#34;s1&#34;&gt;&amp;#39;GITLAB_ACCESS_TOKEN&amp;#39;&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;)])&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;{&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;        dir&lt;span class=&#34;o&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;s2&#34;&gt;&amp;#34;~/&amp;#34;&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;)&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;{&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;          git branch: &lt;span class=&#34;s1&#34;&gt;&amp;#39;main&amp;#39;&lt;/span&gt;,
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;            credentialsId: &lt;span class=&#34;s1&#34;&gt;&amp;#39;gitlab&amp;#39;&lt;/span&gt;,
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;            url: &lt;span class=&#34;s1&#34;&gt;&amp;#39;https://gitlab.hanhorang.link/han/k8s-chart.git&amp;#39;&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;          sh &lt;span class=&#34;s1&#34;&gt;&amp;#39;echo $GITLAB_ACCESS_TOKEN $GITLAB_USERNAME&amp;#39;&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;          sh &lt;span class=&#34;s1&#34;&gt;&amp;#39;git config --global credential.helper store&amp;#39;&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;          sh &lt;span class=&#34;s1&#34;&gt;&amp;#39;git config --global user.name &amp;#34;han&amp;#34;&amp;#39;&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;          sh &lt;span class=&#34;s1&#34;&gt;&amp;#39;git config --global user.email &amp;#34;han@gmail.com&amp;#34;&amp;#39;&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;          sh &lt;span class=&#34;s1&#34;&gt;&amp;#39;git remote set-url origin https://han:glpat-yznZ6zHSNN7UaoSHZ-rr@gitlab.hanhorang.link/han/k8s-chart.git&amp;#39;&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;          sh &lt;span class=&#34;s1&#34;&gt;&amp;#39;sed -i &amp;#34;s|newTag:.*|newTag: &amp;#39;&lt;/span&gt; + GIT_TAG + &lt;span class=&#34;s1&#34;&gt;&amp;#39;|&amp;#34; overlays/dev/kustomization.yaml&amp;#39;&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;          sh &lt;span class=&#34;s1&#34;&gt;&amp;#39;git add .&amp;#39;&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;          sh &lt;span class=&#34;s1&#34;&gt;&amp;#39;git commit -m &amp;#34;updated the image tag to &amp;#39;&lt;/span&gt; + GIT_TAG + &lt;span class=&#34;s1&#34;&gt;&amp;#39;&amp;#34; || true&amp;#39;&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;          sh &lt;span class=&#34;s1&#34;&gt;&amp;#39;git push origin main&amp;#39;&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;        &lt;span class=&#34;o&#34;&gt;}&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;      &lt;span class=&#34;o&#34;&gt;}&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;    &lt;span class=&#34;o&#34;&gt;}&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
-&lt;/div&gt;
-&lt;/div&gt;&lt;p&gt;&lt;strong&gt;트러블슈팅&lt;/strong&gt;&lt;/p&gt;
-&lt;p&gt;해당 단계에서 깃 푸쉬가 안되어 많은 시행 착오를 겪었다. 케이스별로 묶어 정리하니 참고하자.&lt;/p&gt;
-&lt;ul&gt;
-&lt;li&gt;
-&lt;p&gt;&lt;code&gt;git not&lt;/code&gt;&lt;/p&gt;
-&lt;p&gt;Console Output 에서 로그가 다음과 같이 git을 인식하지 못하는 문제이다.&lt;/p&gt;
-&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
-&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
-&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code&gt;&lt;span class=&#34;lnt&#34;&gt;1
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;2
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;3
-&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
-&lt;td class=&#34;lntd&#34;&gt;
-&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;.
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;.
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;/home/jenkins/agent/workspace/aews-pipeline-test/~@tmp/durable-bda4026d/script.sh: line 1: git: not
-&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
-&lt;/div&gt;
-&lt;/div&gt;&lt;p&gt;근본적인 원인은 git이 stage container 에 설치되지 않았기 때문이다. 커맨드로 git 설치하는 방법도 있지만, 필자의 경우 리소스 오버헤드를 고려하여 jenkins 옵션에서 git을 활성화하였다.&lt;/p&gt;
-&lt;p&gt;&lt;img loading=&#34;lazy&#34; 
-    src=&#34;https://HanHoRang31.github.io/aews-gitops/auto17.png&#34; 
-    alt=&#34;auto17.png&#34; 
-     
-    width=1758 
-    height=&#34;879&#34;  /&gt;&lt;/p&gt;
-&lt;/li&gt;
-&lt;li&gt;
-&lt;p&gt;&lt;code&gt;URL using bad/illegal format or missing URL&lt;/code&gt; , &lt;code&gt;fatal: could not read Username for &#39;https://gitlab.hanhorang.link&#39;: No such device or address&lt;/code&gt;&lt;/p&gt;
-&lt;p&gt;gitlab 원격저장소를 잘못 설정하여 생긴 문제이다. 원인을 찾는 것은 쉬웠지만, 어디서 잘못되었는 지 테스트에 오래걸렸다.  필자의 경우 깃랩 토큰 노출을 고려하여 withCredentials 를 사용하였는데 다음과 같이 **** 로 표시로 원격저장소를 인식하지 못하였다.&lt;/p&gt;
-&lt;p&gt;&lt;img loading=&#34;lazy&#34; 
-    src=&#34;https://HanHoRang31.github.io/aews-gitops/auto21.png&#34; 
-    alt=&#34;auto21.png&#34; 
-     
-    width=1132 
-    height=&#34;569&#34;  /&gt;&lt;/p&gt;
-&lt;p&gt;해결 방법으로 하드 코딩이나 환경 변수로 설정하는 것을 추천한다.&lt;/p&gt;
-&lt;/li&gt;
-&lt;/ul&gt;
-&lt;h2 id=&#34;gitops-기반-ci--cd-테스트&#34;&gt;
-    &lt;a href=&#34;#gitops-%ea%b8%b0%eb%b0%98-ci--cd-%ed%85%8c%ec%8a%a4%ed%8a%b8&#34; class=&#34;anchor&#34;&gt;
-        &lt;svg class=&#34;icon&#34; aria-hidden=&#34;true&#34; focusable=&#34;false&#34; height=&#34;16&#34; version=&#34;1.1&#34; viewBox=&#34;0 0 16 16&#34; width=&#34;16&#34;&gt;
-            &lt;path fill-rule=&#34;evenodd&#34;
-                d=&#34;M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z&#34;&gt;
-            &lt;/path&gt;
-        &lt;/svg&gt;
-    &lt;/a&gt;
-    Gitops 기반 CI &amp;amp; CD 테스트
-&lt;/h2&gt;
-&lt;p&gt;앞 단계에서 필자는 CI &amp;amp; CD 구성을 완료하였다. 이제 본격적인 운영 시나리오로 들어가서 GItops 기반에서 CI &amp;amp; CD 프로세스가 정상적으로 작동되는 지 확인해보겠다. 밑의 아키텍처처럼 소스코드 레파지토리에 코드를 수정하여 푸쉬시 jenkins를 통해서 이미지가 새로 푸쉬되고, k8s-chart 의 이미지 태그가 업데이트되어 최종적으로 쿠버네티스 애플리케이션이 수정되는 것을 확인해보겠다.&lt;/p&gt;
-&lt;p&gt;&lt;img loading=&#34;lazy&#34; 
-    src=&#34;https://HanHoRang31.github.io/aews-gitops/gitlab-archi1.png&#34; 
-    alt=&#34;gitlab-archi.png&#34; 
-     
-    width=1296 
-    height=&#34;465&#34;  /&gt;&lt;/p&gt;
-&lt;ol&gt;
-&lt;li&gt;
-&lt;p&gt;Commit Change&lt;/p&gt;
-&lt;p&gt;예제 파일 구성시 플라스트 실행 파일에 대해 수정이 필요하여 파일을 수정하고 Commit을 진행하였다.&lt;/p&gt;
-&lt;p&gt;&lt;img loading=&#34;lazy&#34; 
-    src=&#34;https://HanHoRang31.github.io/aews-gitops/ci1.png&#34; 
-    alt=&#34;ci1.png&#34; 
-     
-    width=1100 
-    height=&#34;318&#34;  /&gt;&lt;/p&gt;
-&lt;/li&gt;
-&lt;li&gt;
-&lt;p&gt;Jenkins 파이프라인 확인&lt;/p&gt;
-&lt;p&gt;Commit 진행시, Webhook를 통해 다음과 같이 자동으로 설정한 파이프라인이 실행된다.&lt;/p&gt;
-&lt;p&gt;&lt;img loading=&#34;lazy&#34; 
-    src=&#34;https://HanHoRang31.github.io/aews-gitops/ci2.png&#34; 
-    alt=&#34;ci2.png&#34; 
-     
-    width=933 
-    height=&#34;693&#34;  /&gt;&lt;/p&gt;
-&lt;p&gt;각 파이프라인의 로그를 확인하면 레파지토리와 k8s-chart에 대해 작업을 수행한 것을 확인할 수 있다.&lt;/p&gt;
-&lt;p&gt;&lt;img loading=&#34;lazy&#34; 
-    src=&#34;https://HanHoRang31.github.io/aews-gitops/ci6.png&#34; 
-    alt=&#34;ci6.png&#34; 
-     
-    width=1402 
-    height=&#34;773&#34;  /&gt;&lt;/p&gt;
-&lt;/li&gt;
-&lt;li&gt;
-&lt;p&gt;ArgoCD Sync 확인&lt;/p&gt;
-&lt;p&gt;ArgoCD 의 설정한 Sync 옵션에 따라 자동으로 k8s에 배포된 것을 확인할 수 있다.&lt;/p&gt;
-&lt;p&gt;&lt;img loading=&#34;lazy&#34; 
-    src=&#34;https://HanHoRang31.github.io/aews-gitops/ci7.png&#34; 
-    alt=&#34;ci7.png&#34; 
-     
-    width=1430 
-    height=&#34;782&#34;  /&gt;&lt;/p&gt;
-&lt;/li&gt;
-&lt;/ol&gt;
-&lt;h2 id=&#34;마치며&#34;&gt;
-    &lt;a href=&#34;#%eb%a7%88%ec%b9%98%eb%a9%b0&#34; class=&#34;anchor&#34;&gt;
-        &lt;svg class=&#34;icon&#34; aria-hidden=&#34;true&#34; focusable=&#34;false&#34; height=&#34;16&#34; version=&#34;1.1&#34; viewBox=&#34;0 0 16 16&#34; width=&#34;16&#34;&gt;
-            &lt;path fill-rule=&#34;evenodd&#34;
-                d=&#34;M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z&#34;&gt;
-            &lt;/path&gt;
-        &lt;/svg&gt;
-    &lt;/a&gt;
-    마치며
-&lt;/h2&gt;
-&lt;p&gt;이번 주에는 CI / CD 에 대한 본격적인 맛보기로 예제를 들어 gitops ci &amp;amp; cd를 구성하였다. 이것을 기반으로 확장하여 애플리케이션 트래픽 관리를 위한 argo rollout 적용, 개발 &amp;amp; 운영 환경에 대한 관리, 이미지 태그 관리 등등.. 확장 기능들이 많다. 또 나중에 기회가 된다면 정리해서 공유하도록 하겠다!&lt;/p&gt;
 
     </description>
     </item>
