@@ -44,7 +44,7 @@
     },
     "datePublished": "0001-01-01",
     "description": "",
-    "wordCount":  0 ,
+    "wordCount":  2073 ,
     "mainEntityOfPage": "True",
     "dateModified": "0001-01-01",
     "publisher": {
@@ -133,7 +133,7 @@
                               
                             
                             By Hugo Tania | <time>January 01, 0001</time>
-                            | 0 minutes
+                            | 10 minutes
                         </div>
                         <div class="tags">
                             
@@ -145,7 +145,949 @@
     </article>
 
     <div class="article-post">
-    
+    <h1 id="gitops-ci--cd-구성">
+    <a href="#gitops-ci--cd-%ea%b5%ac%ec%84%b1" class="anchor">
+        <svg class="icon" aria-hidden="true" focusable="false" height="16" version="1.1" viewBox="0 0 16 16" width="16">
+            <path fill-rule="evenodd"
+                d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z">
+            </path>
+        </svg>
+    </a>
+    Gitops CI / CD 구성
+</h1>
+<p>스터디 마지막 시간에는 EKS Automation 을 주제로 진행하였다. 여기서 Automation 단어는 인프라 프로비저닝 및 코드 배포를 포함하여 소프트웨어 제공 수명 주기의 일부를 자동화를 의미한다. 스터디에서는 모임장님께서 AWS 서비스 기반의 Automation(ACK)를 소개해주셨는데 실무에 도입하기에는 아직 보완할 서비스라 느껴, 다른 주제(gitops ci / cd 파이프라인 구성)를 선정하여 블로그를 작성한다.</p>
+<p><a href="https://hanhorang31.github.io/post/pkos2-3-gitops/">사실 지난 스터디에서 다룬 주제</a>였지만, 내부 트러블슈팅으로 절반(CD 파이프라인 구성) 정도 밖에 구성하지 못하였다. 다시 스터디를 통해 계기가 생긴 만큼 이번 글에서는 CI 파이프라인 구성 확장 및 CD 연결까지 다룰 예정이다. 사용한 코드들은 <a href="https://github.com/HanHoRang31/blog-share/tree/main/pkos-gitops">필자의 레파지토리</a>에서 확인이 가능하다.</p>
+<h3 id="ci--cd">
+    <a href="#ci--cd" class="anchor">
+        <svg class="icon" aria-hidden="true" focusable="false" height="16" version="1.1" viewBox="0 0 16 16" width="16">
+            <path fill-rule="evenodd"
+                d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z">
+            </path>
+        </svg>
+    </a>
+    CI / CD
+</h3>
+<p>코드가 변경될 때마다 자동적으로 코드 통합(CI)와 배포(CD)를 수행하는 소프트웨어 개발 방식이다. 이를 통해 애플리케이션을 보다 짧은 주기로 서비스를 제공할 수 있어 비즈니스 이점이 큰 기술로 최근 devops 핵심 기술이라 할 수 있다.</p>
+<p><img loading="lazy" 
+    src="/aews-gitops/cicd1.png" 
+    alt="&lt;a href=&#34;https://server-engineer.tistory.com/800&#34;&gt;https://server-engineer.tistory.com/800&lt;/a&gt;" 
+     
+    width=717 
+    height="170"  /></p>
+<p><a href="https://server-engineer.tistory.com/800">https://server-engineer.tistory.com/800</a></p>
+<h3 id="gitops는-ci--cd일까">
+    <a href="#gitops%eb%8a%94-ci--cd%ec%9d%bc%ea%b9%8c" class="anchor">
+        <svg class="icon" aria-hidden="true" focusable="false" height="16" version="1.1" viewBox="0 0 16 16" width="16">
+            <path fill-rule="evenodd"
+                d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z">
+            </path>
+        </svg>
+    </a>
+    Gitops는 CI / CD일까?
+</h3>
+<p>엄밀히 말하면 다르다. GitOps는 이런 CI/CD 프로세스에 git를 사용하여 인프라와 애플리케이션의 설정을 관리하는 방법이다. 달리 말하면, CI/CD는 코드 변경을 효과적으로 관리하고 배포하는 프로세스이며, GitOps는 이런 프로세스를 git을 통해 조정하고 관리하는 방식이라고 할 수 있다. 이 둘은 상호 보완적인 개념으로, GitOps는 CI/CD 파이프라인을 통해 애플리케이션을 배포하고 관리하는 데 사용될 수 있다.</p>
+<p><img loading="lazy" 
+    src="/aews-gitops/gitops1.png" 
+    alt="&lt;a href=&#34;https://blogs.vmware.com/cloud/2021/02/24/gitops-cloud-operating-model/&#34;&gt;https://blogs.vmware.com/cloud/2021/02/24/gitops-cloud-operating-model/&lt;/a&gt;" 
+     
+    width=622 
+    height="244"  /></p>
+<p><a href="https://blogs.vmware.com/cloud/2021/02/24/gitops-cloud-operating-model/">https://blogs.vmware.com/cloud/2021/02/24/gitops-cloud-operating-model/</a></p>
+<p>이번 시간에는 EKS 환경에서 CI / CD 구성을 목표로 애플리케이션을 코드에서 배포까지 자동화하는 작업을 진행하고자 한다. CD 구성 같은 경우 <a href="https://hanhorang31.github.io/post/pkos2-3-gitops/">지난 블로그 글</a>을 통해 진행하였고, 이어서 CI 구성과 gitops ci/cd 까지 확장하여 다룰 것이다. CI 구성에 사용한 도구는 보편적으로 가장 많이 사용하는 젠킨스(jenkins)를 사용핬고 gitops ci cd 구성을 위해 CD(Argocd), container registry(harbor), gitops(gitlab) 을 이용하였다.  구성 아키텍처는 다음과 같다.</p>
+<p><img loading="lazy" 
+    src="/aews-gitops/gitlab-archi.png" 
+    alt="gitlab-archi.png" 
+     
+    width=1296 
+    height="465"  /></p>
+<p>복잡해보이지만, 각 도구들을 나눠서 확인하고 도구별 연동 방법에 대해 소개하겠다.</p>
+<h2 id="젠킨스jenkins">
+    <a href="#%ec%a0%a0%ed%82%a8%ec%8a%a4jenkins" class="anchor">
+        <svg class="icon" aria-hidden="true" focusable="false" height="16" version="1.1" viewBox="0 0 16 16" width="16">
+            <path fill-rule="evenodd"
+                d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z">
+            </path>
+        </svg>
+    </a>
+    젠킨스(Jenkins)
+</h2>
+<p>CI 빌드 도구가 많지만, 젠킨스를 선택한 이유는 확장성과 커뮤니티 활성도가 압도적으로 높아서다. 젠킨스는 지속적 통합을 위한 오픈 소스 자동화 도구이다. 파이프라인 중 도커 이미지빌드 및 테스트, git에 업데이트(통합)까지의 과정을 구성해주는 도구이다. 젠킨스는 다양한 플러그인이 제공되어 기능 확장이 쉽게 가능하다. 대표적으로 쿠버네티스 플러그인을 통해서 쿠버네티스 APi 서버와 통신하여 코드 테스트(unit test)을 담당하는 Slave 파드를 동적으로 생성하고 관리할 수 있다. 이를 통해서 얻을 수 있는 이점은 다음과 같다.</p>
+<ol>
+<li><strong>동적 스케일링:</strong> 쿠버네티스는 Jenkins 내 유닛 테스트(Jenkins Slaves)를 파드로 실행할 수 있다. 이렇게 하면 빌드/테스트 워크로드에 따라 파드를 동적으로 스케일링 할 수 있다. 즉, 추가적인 빌드 요구 사항이 있을 때마다 쿠버네티스는 새로운 유닛 테스트 파드를 생성하고, 작업이 완료되면 이를 제거할 수 있고 요청량에 따라 파드를 조절할 수 있다. 이를 통해 리소스를 효율적으로 사용할 수 있다.</li>
+<li><strong>고가용성:</strong> 쿠버네티스의 내장된 고가용성 기능 덕분에, Jenkins 마스터의 다운타임을 크게 줄일 수 있다. 이는 Jenkins 마스터가 다운되더라도 쿠버네티스가 자동으로 새 인스턴스를 시작하여 서비스 중단 시간을 최소화할 수 있다는 것을 의미한다.</li>
+</ol>
+<p><img loading="lazy" 
+    src="/aews-gitops/jenkins-architecture-1024x657.png.webp" 
+    alt="&lt;a href=&#34;https://devopscube.com/jenkins-architecture-explained/&#34;&gt;https://devopscube.com/jenkins-architecture-explained/&lt;/a&gt;" 
+     
+    width=1024 
+    height="657"  /></p>
+<p><a href="https://devopscube.com/jenkins-architecture-explained/">https://devopscube.com/jenkins-architecture-explained/</a></p>
+<p>아키텍처도 간단하다. jekins 배포시 마스터 파드가 배포되며 해당 파드에서 jenkins https 서버(UI) 실행 및 빌드 스케쥴러, 유저, 플러그인, 보안 정보들을 관리한다.</p>
+<h3 id="jenkins-배포">
+    <a href="#jenkins-%eb%b0%b0%ed%8f%ac" class="anchor">
+        <svg class="icon" aria-hidden="true" focusable="false" height="16" version="1.1" viewBox="0 0 16 16" width="16">
+            <path fill-rule="evenodd"
+                d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z">
+            </path>
+        </svg>
+    </a>
+    Jenkins 배포
+</h3>
+<p>헬름으로 젠킨스를 배포하면서 구성 아키텍처를 확인하겠다. 먼저, 차트를 가져오자.</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">helm repo add jenkins https://charts.jenkins.io
+</span></span><span class="line"><span class="cl">helm repo update
+</span></span><span class="line"><span class="cl">helm fetch jenkins/jenkins --untar --version 4.3.9
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>차트에는 마스터(컨트롤러), Agent(노드), 플러그인 설정, PV 및 백업 설정, 보안적 요소가 들어가있다. 또한, 젠킨스 차트에는 VALUES_SUMMERY.md 이 포함되는데 전체 파라미터에 대한 설명이 알기 쉽게 들어가있다.</p>
+<p>구성 차트는 다음과 같이 수정했다.</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl"><span class="c1"># values-jenkins.yaml</span>
+</span></span><span class="line"><span class="cl">controller:
+</span></span><span class="line"><span class="cl">  adminUser: <span class="s2">&#34;admin&#34;</span>
+</span></span><span class="line"><span class="cl">  adminPassword: <span class="s2">&#34;admin1234&#34;</span>
+</span></span><span class="line"><span class="cl">  jenkinsUriPrefix: <span class="s2">&#34;/jenkins&#34;</span>
+</span></span><span class="line"><span class="cl">  installPlugins:
+</span></span><span class="line"><span class="cl">  - kubernetes
+</span></span><span class="line"><span class="cl">  - workflow-aggregator
+</span></span><span class="line"><span class="cl">  - git
+</span></span><span class="line"><span class="cl">  - configuration-as-code
+</span></span><span class="line"><span class="cl">  - pipeline-stage-view
+</span></span><span class="line"><span class="cl">  - gitlab
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">  ingress: 
+</span></span><span class="line"><span class="cl">    enabled: <span class="nb">true</span>
+</span></span><span class="line"><span class="cl">    apiVersion: <span class="s2">&#34;networking.k8s.io/v1&#34;</span> 
+</span></span><span class="line"><span class="cl">    annotations: 
+</span></span><span class="line"><span class="cl">      alb.ingress.kubernetes.io/scheme: internet-facing
+</span></span><span class="line"><span class="cl">      alb.ingress.kubernetes.io/target-type: ip
+</span></span><span class="line"><span class="cl">      alb.ingress.kubernetes.io/listen-ports: <span class="s1">&#39;[{&#34;HTTPS&#34;:443}, {&#34;HTTP&#34;:80}]&#39;</span>
+</span></span><span class="line"><span class="cl">      alb.ingress.kubernetes.io/certificate-arn: &lt;cert ARN 입력&gt;
+</span></span><span class="line"><span class="cl">      alb.ingress.kubernetes.io/healthcheck-path: /login
+</span></span><span class="line"><span class="cl">      kubernetes.io/ingress.class: alb
+</span></span><span class="line"><span class="cl">      ingressClassName: alb
+</span></span><span class="line"><span class="cl">    hostName: &lt;host domain 입력&gt; 
+</span></span></code></pre></td></tr></table>
+</div>
+</div><div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">kubectl create ns jenkins
+</span></span><span class="line"><span class="cl">helm install jenkins jenkins/jenkins -f values-jenkins.yaml --namespace jenkins --version 4.3.9
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>배포 후 jekins 페이지에 접속이 잘되는 지 확인해보자. 위 차트에서 확인했듯이 admin 아이디와 비밀번호는 admin / admin1234 이다.</p>
+<p><img loading="lazy" 
+    src="/aews-gitops/jenkins1.png" 
+    alt="jenkins1.png" 
+     
+    width=717 
+    height="725"  /></p>
+<h3 id="jenkins--쿠버네티스-연동">
+    <a href="#jenkins--%ec%bf%a0%eb%b2%84%eb%84%a4%ed%8b%b0%ec%8a%a4-%ec%97%b0%eb%8f%99" class="anchor">
+        <svg class="icon" aria-hidden="true" focusable="false" height="16" version="1.1" viewBox="0 0 16 16" width="16">
+            <path fill-rule="evenodd"
+                d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z">
+            </path>
+        </svg>
+    </a>
+    Jenkins &amp; 쿠버네티스 연동
+</h3>
+<p>젠킨스 파이프라인 작업을 쿠버네티스에서 작업시키려면 쿠버네티스와 연동이 필요하다. 다음 그림과 같이 젠킨스에서 쿠버네티스 주소를 입력하고, 쿠버네티스 접근 정보를 입력하자.</p>
+<p>jenkins 관리 → 노드 관리 → Configure Clouds 접근 후 쿠버네티스 연동을 진행하자, 연동을 위해 kubernetes URL과 접근 정보가 필요하다. kubernetes URL과 접근 정보는 베스천 서버에 접근 파일에서 확인할 수 있다. 이를 복사해서 젠킨스 마스터 서버에 등록하자.</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl"><span class="c1"># 베스천 서버 </span>
+</span></span><span class="line"><span class="cl">vi ~/.kube/config 
+</span></span><span class="line"><span class="cl">---
+</span></span><span class="line"><span class="cl">apiVersion: v1
+</span></span><span class="line"><span class="cl">clusters:
+</span></span><span class="line"><span class="cl">- cluster:
+</span></span><span class="line"><span class="cl">    certificate-authority-data: &lt;auth-data&gt; 
+</span></span><span class="line"><span class="cl">    server: https://api.hanhorang.link 
+</span></span><span class="line"><span class="cl">  name: hanhorang.link
+</span></span><span class="line"><span class="cl">contexts:
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p><img loading="lazy" 
+    src="/aews-gitops/add-auth.png" 
+    alt="add-auth.png" 
+     
+    width=625 
+    height="840"  /></p>
+<p>쿠버네티스 URL 입력 후 접근 파일(config)을 등록하자.</p>
+<p><img loading="lazy" 
+    src="/aews-gitops/kube-auth.png" 
+    alt="kube-auth.png" 
+     
+    width=703 
+    height="741"  /></p>
+<p>Test Connection 버튼을 통해 연동 테스트를 진행하자.</p>
+<p><img loading="lazy" 
+    src="/aews-gitops/test.png" 
+    alt="test.png" 
+     
+    width=596 
+    height="227"  /></p>
+<p>그림과 같이 Connected to kubernetes가 나오면 연동이 완료된 것이다. Save를 통해 Configure Clouds 정보를 저장시키자.</p>
+<h2 id="ci----cd-구성-전-사전-작업">
+    <a href="#ci----cd-%ea%b5%ac%ec%84%b1-%ec%a0%84-%ec%82%ac%ec%a0%84-%ec%9e%91%ec%97%85" class="anchor">
+        <svg class="icon" aria-hidden="true" focusable="false" height="16" version="1.1" viewBox="0 0 16 16" width="16">
+            <path fill-rule="evenodd"
+                d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z">
+            </path>
+        </svg>
+    </a>
+    CI  &amp;  CD 구성 전 사전 작업
+</h2>
+<blockquote>
+<p>사전 작업으로 추가 구성이 필요합니다. 아래 블로그 글을 참고하여 필요 툴을 설치해주세요.
+컨테이너 이미지 레지스트리(harbor) : <a href="https://hanhorang31.github.io/post/tech-private-docker/">https://hanhorang31.github.io/post/tech-private-docker/</a>
+gitlab &amp; argocd : <a href="https://hanhorang31.github.io/post/pkos2-3-gitops/">https://hanhorang31.github.io/post/pkos2-3-gitops/</a></p>
+</blockquote>
+<p>구성전 도구 연동 <strong>[Gitlab-Jenkins-Harbor]</strong> 을 위해 사전 작업이 필요하다.</p>
+<h3 id="gitlab-설정">
+    <a href="#gitlab-%ec%84%a4%ec%a0%95" class="anchor">
+        <svg class="icon" aria-hidden="true" focusable="false" height="16" version="1.1" viewBox="0 0 16 16" width="16">
+            <path fill-rule="evenodd"
+                d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z">
+            </path>
+        </svg>
+    </a>
+    GItlab 설정
+</h3>
+<ol>
+<li>
+<p>사용자, 그룹 생성 &amp; 접근 토큰 발급 (사용자 : han  /  토큰 glpat-yznZ6zHSNN7UaoSHZ-rr)</p>
+<ol>
+<li>
+<p>admin→ users→ 계정생성
+비밀번호는 user 생성 후 edit 에서 설정할 수 있다.</p>
+<p><img loading="lazy" 
+    src="/aews-gitops/gitlab-user-token.png" 
+    alt="gitlab-user-token.png" 
+     
+    width=931 
+    height="548"  /></p>
+<p><img loading="lazy" 
+    src="/aews-gitops/gitlab-admin-user.png" 
+    alt="gitlab-admin-user.png" 
+     
+    width=1756 
+    height="860"  /></p>
+</li>
+<li>
+<p>users→ 사용자 → Impersonation Token을 통해 토큰 발급</p>
+<p><img loading="lazy" 
+    src="/aews-gitops/gitops-token.png" 
+    alt="gitops-token.png" 
+     
+    width=1269 
+    height="878"  /></p>
+</li>
+</ol>
+</li>
+<li>
+<p>프로젝트 생성 (test) 및 옵션 설정</p>
+<ol>
+<li>
+<p>프로젝트 → Setting → CI / CD → Devops 파이프라인 설정</p>
+<p><img loading="lazy" 
+    src="/aews-gitops/gitlab1.png" 
+    alt="gitlab1.png" 
+     
+    width=917 
+    height="868"  /></p>
+</li>
+<li>
+<p>Repository 접근 제어 설정</p>
+<p>프로젝트 → Setting → Repository 접근 아래와 같이 설정</p>
+<p><img loading="lazy" 
+    src="/aews-gitops/gitops2.png" 
+    alt="gitops2.png" 
+     
+    width=864 
+    height="814"  /></p>
+</li>
+</ol>
+</li>
+<li>
+<p>빌드 코드 작성(예제 코드) 및 Repo에 Push</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">git config --global user.email han@gmail.com
+</span></span><span class="line"><span class="cl">git config --global user.name han
+</span></span><span class="line"><span class="cl">git add . 
+</span></span><span class="line"><span class="cl">git commit -m <span class="s2">&#34;update code&#34;</span>
+</span></span><span class="line"><span class="cl"><span class="o">[</span>main 01f9418<span class="o">]</span> update code
+</span></span><span class="line"><span class="cl"> <span class="m">3</span> files changed, <span class="m">29</span> insertions<span class="o">(</span>+<span class="o">)</span>
+</span></span><span class="line"><span class="cl"> create mode <span class="m">100644</span> Dockerfile
+</span></span><span class="line"><span class="cl"> create mode <span class="m">100644</span> app.py
+</span></span><span class="line"><span class="cl"> create mode <span class="m">100644</span> requirements.txt
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">git push origin main
+</span></span><span class="line"><span class="cl">Username <span class="k">for</span> <span class="s1">&#39;https://gitlab.hanhorang.link&#39;</span>: han  
+</span></span><span class="line"><span class="cl">Password <span class="k">for</span> <span class="s1">&#39;https://han@gitlab.hanhorang.link&#39;</span>: 
+</span></span><span class="line"><span class="cl">Enumerating objects: 6, <span class="k">done</span>.
+</span></span><span class="line"><span class="cl">Counting objects: 100% <span class="o">(</span>6/6<span class="o">)</span>, <span class="k">done</span>.
+</span></span><span class="line"><span class="cl">Delta compression using up to <span class="m">2</span> threads
+</span></span><span class="line"><span class="cl">Compressing objects: 100% <span class="o">(</span>4/4<span class="o">)</span>, <span class="k">done</span>.
+</span></span><span class="line"><span class="cl">Writing objects: 100% <span class="o">(</span>5/5<span class="o">)</span>, <span class="m">824</span> bytes <span class="p">|</span> 824.00 KiB/s, <span class="k">done</span>.
+</span></span><span class="line"><span class="cl">Total <span class="m">5</span> <span class="o">(</span>delta 0<span class="o">)</span>, reused <span class="m">0</span> <span class="o">(</span>delta 0<span class="o">)</span>, pack-reused <span class="m">0</span>
+</span></span><span class="line"><span class="cl">To https://gitlab.hanhorang.link/gitlab-instance-0d144142/test.git
+</span></span><span class="line"><span class="cl">   347dcae..01f9418  main -&gt; main
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p><img loading="lazy" 
+    src="/aews-gitops/giops4.png" 
+    alt="giops4.png" 
+     
+    width=874 
+    height="608"  /></p>
+</li>
+</ol>
+<h3 id="harbor-설정">
+    <a href="#harbor-%ec%84%a4%ec%a0%95" class="anchor">
+        <svg class="icon" aria-hidden="true" focusable="false" height="16" version="1.1" viewBox="0 0 16 16" width="16">
+            <path fill-rule="evenodd"
+                d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z">
+            </path>
+        </svg>
+    </a>
+    Harbor 설정
+</h3>
+<ol>
+<li>
+<p>사용자 생성 (ID : han / PW)</p>
+</li>
+<li>
+<p>버킷 생성 (bucket name : aews) 및 버킷 접근 제어 설정(han에 권한 부여)</p>
+<p><img loading="lazy" 
+    src="/aews-gitops/automation1.png" 
+    alt="automation1.png" 
+     
+    width=1863 
+    height="890"  /></p>
+</li>
+</ol>
+<h3 id="jenkins-설정">
+    <a href="#jenkins-%ec%84%a4%ec%a0%95" class="anchor">
+        <svg class="icon" aria-hidden="true" focusable="false" height="16" version="1.1" viewBox="0 0 16 16" width="16">
+            <path fill-rule="evenodd"
+                d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z">
+            </path>
+        </svg>
+    </a>
+    Jenkins 설정
+</h3>
+<p><strong>Credentials 추가 ( Gitlab, Harbor ID &amp; PWD)</strong></p>
+<p><img loading="lazy" 
+    src="/aews-gitops/auto2.png" 
+    alt="auto2.png" 
+     
+    width=1752 
+    height="911"  /></p>
+<p><img loading="lazy" 
+    src="/aews-gitops/auto3.png" 
+    alt="auto3.png" 
+     
+    width=1596 
+    height="801"  /></p>
+<h3 id="jenkins--gitlab-webhook-연동">
+    <a href="#jenkins--gitlab-webhook-%ec%97%b0%eb%8f%99" class="anchor">
+        <svg class="icon" aria-hidden="true" focusable="false" height="16" version="1.1" viewBox="0 0 16 16" width="16">
+            <path fill-rule="evenodd"
+                d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z">
+            </path>
+        </svg>
+    </a>
+    Jenkins &amp; gitlab webhook 연동
+</h3>
+<p><img loading="lazy" 
+    src="/aews-gitops/webhook.png" 
+    alt="webhook.png" 
+     
+    width=1138 
+    height="484"  /></p>
+<p>gitlab 에서 이벤트 발생(코드 변경)시 jenkins에 알려 코드 파이프라인이 바로 실행 될 수 있도록 webhook 을 구성하겠다. 다음과 같이 configure system → gitalb 에서 gitlab 연결을 테스트하여 등록한다.</p>
+<p><img loading="lazy" 
+    src="/aews-gitops/webhook1.png" 
+    alt="webhook1.png" 
+     
+    width=1726 
+    height="895"  /></p>
+<p><img loading="lazy" 
+    src="/aews-gitops/webhook2.png" 
+    alt="webhook2.png" 
+     
+    width=1393 
+    height="723"  /></p>
+<ul>
+<li>해당 메뉴가 보이지 않을 경우 플러그인 <code>gitlab</code> 을 설치하자</li>
+</ul>
+<p>이어서 gitlab 과 jenkins 파이프라인을 연결하자. 우선 아래 메뉴에서 파이프라인을 생성하자.</p>
+<p><img loading="lazy" 
+    src="/aews-gitops/webhook10.png" 
+    alt="webhook10.png" 
+     
+    width=1774 
+    height="966"  /></p>
+<p>그 다음 general에서 아래와 같이 설정한 후, [빌드 유발]에서 Secret token 토큰을 발급받고 webhook URL을 복사하자, 복사한 정보는 gitlab webhook 등록에 사용할 것이다.</p>
+<p><img loading="lazy" 
+    src="/aews-gitops/webhook3.png" 
+    alt="webhook3.png" 
+     
+    width=1270 
+    height="799"  /></p>
+<p><img loading="lazy" 
+    src="/aews-gitops/webhook6.png" 
+    alt="webhook6.png" 
+     
+    width=1253 
+    height="688"  /></p>
+<p><img loading="lazy" 
+    src="/aews-gitops/webhook7.png" 
+    alt="webhook7.png" 
+     
+    width=1252 
+    height="842"  /></p>
+<p>확인한 정보값을 gitlab project → setting → webhook 에 입력하여 연동을 진행하자.</p>
+<p><img loading="lazy" 
+    src="/aews-gitops/webhook8.png" 
+    alt="webhook8.png" 
+     
+    width=1733 
+    height="921"  /></p>
+<h2 id="ci----cd-구성">
+    <a href="#ci----cd-%ea%b5%ac%ec%84%b1" class="anchor">
+        <svg class="icon" aria-hidden="true" focusable="false" height="16" version="1.1" viewBox="0 0 16 16" width="16">
+            <path fill-rule="evenodd"
+                d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z">
+            </path>
+        </svg>
+    </a>
+    CI  &amp;  CD 구성
+</h2>
+<h3 id="1--ci-파이프라인-구성">
+    <a href="#1--ci-%ed%8c%8c%ec%9d%b4%ed%94%84%eb%9d%bc%ec%9d%b8-%ea%b5%ac%ec%84%b1" class="anchor">
+        <svg class="icon" aria-hidden="true" focusable="false" height="16" version="1.1" viewBox="0 0 16 16" width="16">
+            <path fill-rule="evenodd"
+                d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z">
+            </path>
+        </svg>
+    </a>
+    1.  CI 파이프라인 구성
+</h3>
+<p><img loading="lazy" 
+    src="/aews-gitops/ci11.png" 
+    alt="ci11.png" 
+     
+    width=1199 
+    height="485"  /></p>
+<p>위 단계에서 생성한 파이프라인에서 스크립트를 다음과 같이 작성하자.</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span><span class="lnt">31
+</span><span class="lnt">32
+</span><span class="lnt">33
+</span><span class="lnt">34
+</span><span class="lnt">35
+</span><span class="lnt">36
+</span><span class="lnt">37
+</span><span class="lnt">38
+</span><span class="lnt">39
+</span><span class="lnt">40
+</span><span class="lnt">41
+</span><span class="lnt">42
+</span><span class="lnt">43
+</span><span class="lnt">44
+</span><span class="lnt">45
+</span><span class="lnt">46
+</span><span class="lnt">47
+</span><span class="lnt">48
+</span><span class="lnt">49
+</span><span class="lnt">50
+</span><span class="lnt">51
+</span><span class="lnt">52
+</span><span class="lnt">53
+</span><span class="lnt">54
+</span><span class="lnt">55
+</span><span class="lnt">56
+</span><span class="lnt">57
+</span><span class="lnt">58
+</span><span class="lnt">59
+</span><span class="lnt">60
+</span><span class="lnt">61
+</span><span class="lnt">62
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">podTemplate<span class="o">(</span>yaml: <span class="s1">&#39;&#39;&#39;
+</span></span></span><span class="line"><span class="cl"><span class="s1">              kind: Pod
+</span></span></span><span class="line"><span class="cl"><span class="s1">              metadata:
+</span></span></span><span class="line"><span class="cl"><span class="s1">                name: kaniko-image-build-pod
+</span></span></span><span class="line"><span class="cl"><span class="s1">              spec:
+</span></span></span><span class="line"><span class="cl"><span class="s1">                containers:
+</span></span></span><span class="line"><span class="cl"><span class="s1">                - name: yq
+</span></span></span><span class="line"><span class="cl"><span class="s1">                  image: linuxserver/yq:amd64-latest
+</span></span></span><span class="line"><span class="cl"><span class="s1">                  imagePullPolicy: Always
+</span></span></span><span class="line"><span class="cl"><span class="s1">                  tty : true
+</span></span></span><span class="line"><span class="cl"><span class="s1">                  command:
+</span></span></span><span class="line"><span class="cl"><span class="s1">                  - sleep
+</span></span></span><span class="line"><span class="cl"><span class="s1">                  args:
+</span></span></span><span class="line"><span class="cl"><span class="s1">                  - 99d
+</span></span></span><span class="line"><span class="cl"><span class="s1">                - name: kaniko
+</span></span></span><span class="line"><span class="cl"><span class="s1">                  image: gcr.io/kaniko-project/executor:v1.6.0-debug
+</span></span></span><span class="line"><span class="cl"><span class="s1">                  imagePullPolicy: Always
+</span></span></span><span class="line"><span class="cl"><span class="s1">                  command:
+</span></span></span><span class="line"><span class="cl"><span class="s1">                  - sleep
+</span></span></span><span class="line"><span class="cl"><span class="s1">                  args:
+</span></span></span><span class="line"><span class="cl"><span class="s1">                  - 99d
+</span></span></span><span class="line"><span class="cl"><span class="s1">                  volumeMounts:
+</span></span></span><span class="line"><span class="cl"><span class="s1">                    - name: docker-config
+</span></span></span><span class="line"><span class="cl"><span class="s1">                      mountPath: /root/.docker
+</span></span></span><span class="line"><span class="cl"><span class="s1">                  tty: true
+</span></span></span><span class="line"><span class="cl"><span class="s1">                volumes:
+</span></span></span><span class="line"><span class="cl"><span class="s1">                    - name: docker-config
+</span></span></span><span class="line"><span class="cl"><span class="s1">                      secret:
+</span></span></span><span class="line"><span class="cl"><span class="s1">                        secretName: regcred
+</span></span></span><span class="line"><span class="cl"><span class="s1">                        items:
+</span></span></span><span class="line"><span class="cl"><span class="s1">                        - key: .dockerconfigjson
+</span></span></span><span class="line"><span class="cl"><span class="s1">                          path: config.json
+</span></span></span><span class="line"><span class="cl"><span class="s1">&#39;&#39;&#39;</span>
+</span></span><span class="line"><span class="cl">  <span class="o">)</span> <span class="o">{</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">  node<span class="o">(</span>POD_LABEL<span class="o">)</span> <span class="o">{</span>
+</span></span><span class="line"><span class="cl">    stage<span class="o">(</span><span class="s1">&#39;Build with Kaniko&#39;</span><span class="o">)</span> <span class="o">{</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">      //git tag를 가져오기 위한 clone 
+</span></span><span class="line"><span class="cl">      git branch: <span class="s1">&#39;main&#39;</span>,
+</span></span><span class="line"><span class="cl">        credentialsId: <span class="s1">&#39;gitlab&#39;</span>,
+</span></span><span class="line"><span class="cl">        url: <span class="s1">&#39;https://gitlab.hanhorang.link/gitlab-instance-f7cee683/aews.git&#39;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">      script<span class="o">(){</span>
+</span></span><span class="line"><span class="cl">          <span class="nv">GIT_TAG</span> <span class="o">=</span> sh <span class="o">(</span>
+</span></span><span class="line"><span class="cl">            script: <span class="s1">&#39;git describe --always&#39;</span>,
+</span></span><span class="line"><span class="cl">            returnStdout: <span class="nb">true</span>
+</span></span><span class="line"><span class="cl">          <span class="o">)</span>.trim<span class="o">()</span>
+</span></span><span class="line"><span class="cl">      <span class="o">}</span>
+</span></span><span class="line"><span class="cl">	  //Image build 
+</span></span><span class="line"><span class="cl">      container<span class="o">(</span><span class="s1">&#39;kaniko&#39;</span><span class="o">)</span> <span class="o">{</span>
+</span></span><span class="line"><span class="cl">        //kaniko 에서 빌드하기 위해 소스코드 clone
+</span></span><span class="line"><span class="cl">        git branch: <span class="s1">&#39;main&#39;</span>,
+</span></span><span class="line"><span class="cl">          credentialsId: <span class="s1">&#39;gitlab&#39;</span>,
+</span></span><span class="line"><span class="cl">          url: <span class="s1">&#39;https://gitlab.hanhorang.link/gitlab-instance-f7cee683/aews.git&#39;</span>
+</span></span><span class="line"><span class="cl">        // kaniko 실행
+</span></span><span class="line"><span class="cl">        sh <span class="s1">&#39;/kaniko/executor -f Dockerfile -c `pwd` --insecure --skip-tls-verify --cache=true --destination=harbor.hanhorang.link/aews/test:&#39;</span> + GIT_TAG 
+</span></span><span class="line"><span class="cl">      <span class="o">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="o">}</span>
+</span></span><span class="line"><span class="cl">  <span class="o">}</span>
+</span></span><span class="line"><span class="cl"><span class="o">}</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>파이프라인에서 중요하게 볼 점은 도커 빌드를 위한 도구로 <code>kaniko</code> 를 사용한 점이다. kaniko 는 Google Cloud에서 개발한 오픈 소스 도구로 <strong>Docker 데몬이 없는 환경</strong>에서  Docker 이미지를 빌드할 수 있다. 이 <strong>Docker 데몬이 없는 환경</strong> 라는 단어가 쿠버네티스에서는 특히 중요하다.</p>
+<ul>
+<li>호환성 제공 : eks 1.24 이상 버전에서 docker 가 deprecated 되어 더 이상 docker 이미지 빌드를 할 수 없다는 점(커스텀 노드면 docker 설치해서 가능하긴 하다)에서</li>
+<li>보안 이슈 제거  : Docker 데몬은 루트 권한으로 실행되기 때문에, 악의적인 이미지가 Docker 데몬에 액세스하게 되면 시스템 전체를 위험에 빠뜨릴 수 있다. 이와 반면 Kaniko는 사용자 공간(user-space)에서 실행되므로 이러한 보안 문제를 완화한다.</li>
+<li>효율성 : Kaniko는 이미지 빌드 과정을 Kubernetes 팟 내에서 직접 수행하므로, 별도의 빌드 서버를 유지할 필요가 없다. 이는 관리 오버헤드를 줄이고 리소스 사용을 최적화할 수 있어 효율적이다.</li>
+</ul>
+<p>이러한 점에서 필자는 kaniko를 사용하여 이미지를 빌드하였다. kaniko에서는 또한 docker login 기능을 제공한다. 베스천 서버에서 harbor 도커레지스트리에 접근하기 위한 시크릿 정보를 생성하고 파이프라인을 빌드하자. 빌드가 정상적으로 처리되면 jenkins에서의 결과 화면과 harbor에서 푸쉬된 이미지를 확인할 수 있다!</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl"><span class="c1"># 시크릿 생성</span>
+</span></span><span class="line"><span class="cl">kubectl create secret docker-registry regcred -n jenkins <span class="se">\
+</span></span></span><span class="line"><span class="cl"><span class="se"></span>--docker-username<span class="o">=</span>admin <span class="se">\
+</span></span></span><span class="line"><span class="cl"><span class="se"></span>--docker-password<span class="o">=</span>Harbor12345 <span class="se">\
+</span></span></span><span class="line"><span class="cl"><span class="se"></span>--docker-server<span class="o">=</span>harbor.hanhorang.link
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p><img loading="lazy" 
+    src="/aews-gitops/auto11.png" 
+    alt="auto11.png" 
+     
+    width=1757 
+    height="656"  /></p>
+<p><img loading="lazy" 
+    src="/aews-gitops/harbor1.png" 
+    alt="harbor1.png" 
+     
+    width=1856 
+    height="721"  /></p>
+<h3 id="2-argocd-를-통한-cd-구성">
+    <a href="#2-argocd-%eb%a5%bc-%ed%86%b5%ed%95%9c-cd-%ea%b5%ac%ec%84%b1" class="anchor">
+        <svg class="icon" aria-hidden="true" focusable="false" height="16" version="1.1" viewBox="0 0 16 16" width="16">
+            <path fill-rule="evenodd"
+                d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z">
+            </path>
+        </svg>
+    </a>
+    2. ArgoCD 를 통한 CD 구성
+</h3>
+<p><img loading="lazy" 
+    src="/aews-gitops/cd10.png" 
+    alt="cd10.png" 
+     
+    width=1144 
+    height="460"  /></p>
+<p>CI 구성은 이미지 푸쉬가 끝이 아니다. 이미지 푸쉬가 완료되고 배포 차트에 이미지 태그 업데이트까지 시켜줘야 한다. 차트의 이미지 태그를 업데이트해야 Argocd를 통해서 자동으로 쿠버네티스에 배포되기 때문이다. 이를 위해 깃랩에서 새로운 프로젝트를 생성해서 배포 차트를 구성하자. 차트 구성은 <a href="https://github.com/HanHoRang31/blog-share/tree/main/pkos-gitops/python-flask/app-chart">필자의 깃 레파지토리</a>를 확인하자. 차트를 확인하면 kustomize 를 통해 차트를 구성한 것을 확인할 수 있다. Kustomize는 기존 YAML 파일을 수정하지 않고, 오버레이와 패치를 통해 구성을 수정하거나 확장하는 기능을 제공하는 도구로서 추후 dev,ops 환경에서 배포를 고려하여 도입하였다.</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl"><span class="c1"># 설치 </span>
+</span></span><span class="line"><span class="cl">curl -s <span class="s2">&#34;https://raw.githubusercontent.com/kubernetes-sigs/kustomize/master/hack/install_kustomize.sh&#34;</span>  <span class="p">|</span> bash
+</span></span></code></pre></td></tr></table>
+</div>
+</div><div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span><span class="lnt">8
+</span><span class="lnt">9
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl"><span class="c1"># kustomize 차트 구성</span>
+</span></span><span class="line"><span class="cl">├── base
+</span></span><span class="line"><span class="cl">│   ├── deployment.yaml
+</span></span><span class="line"><span class="cl">│   ├── kustomization.yaml
+</span></span><span class="line"><span class="cl">│   └── service.yaml
+</span></span><span class="line"><span class="cl">├── overlays
+</span></span><span class="line"><span class="cl">│   └── dev
+</span></span><span class="line"><span class="cl">│       └── kustomization.yaml
+</span></span><span class="line"><span class="cl">└── README.md
+</span></span></code></pre></td></tr></table>
+</div>
+</div><div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl"><span class="c1"># 배포 </span>
+</span></span><span class="line"><span class="cl"><span class="c1"># overlays/dev </span>
+</span></span><span class="line"><span class="cl">kubectl apply -k . 
+</span></span><span class="line"><span class="cl">--
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>애플리케이션 동작을 확인했으면 argocd를 통해 sync 작업을 진행하겠다.</p>
+<p>ArgoCD 에 접속하여 gialab 접근을 위한 시크릿 정보를 입력하겠다.  Argocd → Setting → Repo 에서 다음의 사진처럼 k8s-chart 레파지토리와 gitlab 접근 토큰을 입력하자.</p>
+<p><img loading="lazy" 
+    src="/aews-gitops/auto13.png" 
+    alt="auto13.png" 
+     
+    width=1838 
+    height="881"  /></p>
+<p>연결이 정상적이면 Succeesful로 표 될 것이다. 이어서 APP sync 를 진행하자. 왼쪽 Application에서 다음과 같이 정보를 입력하자.</p>
+<p><img loading="lazy" 
+    src="/aews-gitops/auto12.png" 
+    alt="auto12.png" 
+     
+    width=1851 
+    height="952"  /></p>
+<ul>
+<li>Source : 차트 타켓이 되는 정보를 입력한다. 중요한 것은 Path 인데 실행 경로로 <code>overlays/dev</code> 로 설정하자.</li>
+<li>Destination : 배포 클러스터 정보의 입력란이다. 다음과 같이 클러스터 서비스 이름과 네임스페이스를 입력하자.</li>
+</ul>
+<p>입력이 완료되면 다음과 같이 확인할 수 있다.</p>
+<p><img loading="lazy" 
+    src="/aews-gitops/auto14.png" 
+    alt="auto14.png" 
+     
+    width=1853 
+    height="869"  /></p>
+<h3 id="3-ci--cd-연동">
+    <a href="#3-ci--cd-%ec%97%b0%eb%8f%99" class="anchor">
+        <svg class="icon" aria-hidden="true" focusable="false" height="16" version="1.1" viewBox="0 0 16 16" width="16">
+            <path fill-rule="evenodd"
+                d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z">
+            </path>
+        </svg>
+    </a>
+    3. CI &amp; CD 연동
+</h3>
+<p><img loading="lazy" 
+    src="/aews-gitops/cd11.png" 
+    alt="cd11.png" 
+     
+    width=1129 
+    height="436"  /></p>
+<p>드디어 마지막 단계이다! 앞에서 구성한 파이프라인의 stage 단계를 추가하여 CD 구성 차트의 이미지 태그를 업데이트하는 부분을 추가할 것이다.</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl"><span class="c1"># Jekins pipeline</span>
+</span></span><span class="line"><span class="cl">.
+</span></span><span class="line"><span class="cl">.
+</span></span><span class="line"><span class="cl">.
+</span></span><span class="line"><span class="cl">stage<span class="o">(</span><span class="s1">&#39;Update k8s chart&#39;</span><span class="o">)</span> <span class="o">{</span>
+</span></span><span class="line"><span class="cl">      withCredentials<span class="o">([</span>usernamePassword<span class="o">(</span>credentialsId: <span class="s1">&#39;gitlab&#39;</span>, usernameVariable: <span class="s1">&#39;GITLAB_USERNAME&#39;</span>, passwordVariable: <span class="s1">&#39;GITLAB_ACCESS_TOKEN&#39;</span><span class="o">)])</span> <span class="o">{</span>
+</span></span><span class="line"><span class="cl">        dir<span class="o">(</span><span class="s2">&#34;~/&#34;</span><span class="o">)</span> <span class="o">{</span>
+</span></span><span class="line"><span class="cl">          git branch: <span class="s1">&#39;main&#39;</span>,
+</span></span><span class="line"><span class="cl">            credentialsId: <span class="s1">&#39;gitlab&#39;</span>,
+</span></span><span class="line"><span class="cl">            url: <span class="s1">&#39;https://gitlab.hanhorang.link/han/k8s-chart.git&#39;</span>
+</span></span><span class="line"><span class="cl">          sh <span class="s1">&#39;echo $GITLAB_ACCESS_TOKEN $GITLAB_USERNAME&#39;</span>
+</span></span><span class="line"><span class="cl">          sh <span class="s1">&#39;git config --global credential.helper store&#39;</span>
+</span></span><span class="line"><span class="cl">          sh <span class="s1">&#39;git config --global user.name &#34;han&#34;&#39;</span>
+</span></span><span class="line"><span class="cl">          sh <span class="s1">&#39;git config --global user.email &#34;han@gmail.com&#34;&#39;</span>
+</span></span><span class="line"><span class="cl">          sh <span class="s1">&#39;git remote set-url origin https://han:glpat-yznZ6zHSNN7UaoSHZ-rr@gitlab.hanhorang.link/han/k8s-chart.git&#39;</span>
+</span></span><span class="line"><span class="cl">          sh <span class="s1">&#39;sed -i &#34;s|newTag:.*|newTag: &#39;</span> + GIT_TAG + <span class="s1">&#39;|&#34; overlays/dev/kustomization.yaml&#39;</span>
+</span></span><span class="line"><span class="cl">          sh <span class="s1">&#39;git add .&#39;</span>
+</span></span><span class="line"><span class="cl">          sh <span class="s1">&#39;git commit -m &#34;updated the image tag to &#39;</span> + GIT_TAG + <span class="s1">&#39;&#34; || true&#39;</span>
+</span></span><span class="line"><span class="cl">          sh <span class="s1">&#39;git push origin main&#39;</span>
+</span></span><span class="line"><span class="cl">        <span class="o">}</span>
+</span></span><span class="line"><span class="cl">      <span class="o">}</span>
+</span></span><span class="line"><span class="cl">    <span class="o">}</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p><strong>트러블슈팅</strong></p>
+<p>해당 단계에서 깃 푸쉬가 안되어 많은 시행 착오를 겪었다. 케이스별로 묶어 정리하니 참고하자.</p>
+<ul>
+<li>
+<p><code>git not</code></p>
+<p>Console Output 에서 로그가 다음과 같이 git을 인식하지 못하는 문제이다.</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">.
+</span></span><span class="line"><span class="cl">.
+</span></span><span class="line"><span class="cl">/home/jenkins/agent/workspace/aews-pipeline-test/~@tmp/durable-bda4026d/script.sh: line 1: git: not
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>근본적인 원인은 git이 stage container 에 설치되지 않았기 때문이다. 커맨드로 git 설치하는 방법도 있지만, 필자의 경우 리소스 오버헤드를 고려하여 jenkins 옵션에서 git을 활성화하였다.</p>
+<p><img loading="lazy" 
+    src="/aews-gitops/auto17.png" 
+    alt="auto17.png" 
+     
+    width=1758 
+    height="879"  /></p>
+</li>
+<li>
+<p><code>URL using bad/illegal format or missing URL</code> , <code>fatal: could not read Username for 'https://gitlab.hanhorang.link': No such device or address</code></p>
+<p>gitlab 원격저장소를 잘못 설정하여 생긴 문제이다. 원인을 찾는 것은 쉬웠지만, 어디서 잘못되었는 지 테스트에 오래걸렸다.  필자의 경우 깃랩 토큰 노출을 고려하여 withCredentials 를 사용하였는데 다음과 같이 **** 로 표시로 원격저장소를 인식하지 못하였다.</p>
+<p><img loading="lazy" 
+    src="/aews-gitops/auto21.png" 
+    alt="auto21.png" 
+     
+    width=1132 
+    height="569"  /></p>
+<p>해결 방법으로 하드 코딩이나 환경 변수로 설정하는 것을 추천한다.</p>
+</li>
+</ul>
+<h2 id="gitops-기반-ci--cd-테스트">
+    <a href="#gitops-%ea%b8%b0%eb%b0%98-ci--cd-%ed%85%8c%ec%8a%a4%ed%8a%b8" class="anchor">
+        <svg class="icon" aria-hidden="true" focusable="false" height="16" version="1.1" viewBox="0 0 16 16" width="16">
+            <path fill-rule="evenodd"
+                d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z">
+            </path>
+        </svg>
+    </a>
+    Gitops 기반 CI &amp; CD 테스트
+</h2>
+<p>앞 단계에서 필자는 CI &amp; CD 구성을 완료하였다. 이제 본격적인 운영 시나리오로 들어가서 GItops 기반에서 CI &amp; CD 프로세스가 정상적으로 작동되는 지 확인해보겠다. 밑의 아키텍처처럼 소스코드 레파지토리에 코드를 수정하여 푸쉬시 jenkins를 통해서 이미지가 새로 푸쉬되고, k8s-chart 의 이미지 태그가 업데이트되어 최종적으로 쿠버네티스 애플리케이션이 수정되는 것을 확인해보겠다.</p>
+<p><img loading="lazy" 
+    src="/aews-gitops/gitlab-archi1.png" 
+    alt="gitlab-archi.png" 
+     
+    width=1296 
+    height="465"  /></p>
+<ol>
+<li>
+<p>Commit Change</p>
+<p>예제 파일 구성시 플라스트 실행 파일에 대해 수정이 필요하여 파일을 수정하고 Commit을 진행하였다.</p>
+<p><img loading="lazy" 
+    src="/aews-gitops/ci1.png" 
+    alt="ci1.png" 
+     
+    width=1100 
+    height="318"  /></p>
+</li>
+<li>
+<p>Jenkins 파이프라인 확인</p>
+<p>Commit 진행시, Webhook를 통해 다음과 같이 자동으로 설정한 파이프라인이 실행된다.</p>
+<p><img loading="lazy" 
+    src="/aews-gitops/ci2.png" 
+    alt="ci2.png" 
+     
+    width=933 
+    height="693"  /></p>
+<p>각 파이프라인의 로그를 확인하면 레파지토리와 k8s-chart에 대해 작업을 수행한 것을 확인할 수 있다.</p>
+<p><img loading="lazy" 
+    src="/aews-gitops/ci6.png" 
+    alt="ci6.png" 
+     
+    width=1402 
+    height="773"  /></p>
+</li>
+<li>
+<p>ArgoCD Sync 확인</p>
+<p>ArgoCD 의 설정한 Sync 옵션에 따라 자동으로 k8s에 배포된 것을 확인할 수 있다.</p>
+<p><img loading="lazy" 
+    src="/aews-gitops/ci7.png" 
+    alt="ci7.png" 
+     
+    width=1430 
+    height="782"  /></p>
+</li>
+</ol>
+<h2 id="마치며">
+    <a href="#%eb%a7%88%ec%b9%98%eb%a9%b0" class="anchor">
+        <svg class="icon" aria-hidden="true" focusable="false" height="16" version="1.1" viewBox="0 0 16 16" width="16">
+            <path fill-rule="evenodd"
+                d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z">
+            </path>
+        </svg>
+    </a>
+    마치며
+</h2>
+<p>이번 주에는 CI / CD 에 대한 본격적인 맛보기로 예제를 들어 gitops ci &amp; cd를 구성하였다. 이것을 기반으로 확장하여 애플리케이션 트래픽 관리를 위한 argo rollout 적용, 개발 &amp; 운영 환경에 대한 관리, 이미지 태그 관리 등등.. 확장 기능들이 많다. 또 나중에 기회가 된다면 정리해서 공유하도록 하겠다!</p>
+
     </div>
 </div>
 
