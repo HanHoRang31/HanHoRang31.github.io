@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html lang="en-us">
+    
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="theme-color" content="dark">
+    <title>HanHoRang Tech Blog</title>
+
+    
+    
+    
+    <meta property="og:site_name" content="HanHoRang Tech Blog by Tania in Hugo" />
+    <meta property="og:title" content="HanHoRang Tech Blog"/>
+    <meta itemprop="name" content="HanHoRang Tech Blog" />
+    <meta name="twitter:title" content="HanHoRang Tech Blog" />
+    <meta name="application-name" content="HanHoRang Tech Blog" /><meta name="twitter:card" content="summary"/>
+
+    <meta name="description" content="HanHoRang Cloud Tech Blog" />
+    <meta name="twitter:description" content="HanHoRang Cloud Tech Blog"/>
+    <meta itemprop="description" content="HanHoRang Cloud Tech Blog"/>
+    <meta property="og:description" content="HanHoRang Cloud Tech Blog" />
+
+    
+
+<meta property="og:type" content="article" />
+<meta property="article:publisher" content="Hugo Tania" />
+<meta property="og:article:published_time" content=0001-01-01T00:00:00Z />
+<meta property="article:published_time" content=0001-01-01T00:00:00Z />
+
+
+
+
+
+<script defer type="application/ld+json">
+  {
+    "@context": "http://schema.org",
+    "@type": "Article",
+    "headline": "",
+    "author": {
+      "@type": "Person",
+      "name": "Hugo Tania"
+    },
+    "datePublished": "0001-01-01",
+    "description": "",
+    "wordCount":  768 ,
+    "mainEntityOfPage": "True",
+    "dateModified": "0001-01-01",
+    "publisher": {
+      "@type": "Organization",
+      "name": "Hugo Tania",
+      "logo": {
+        "@type": "imageObject",
+        "url": "https:\/\/HanHoRang31.github.io\/favicon.ico"
+      }
+    }
+  }
+</script>
+
+
+
+    <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico" />
+    
+    <link rel="stylesheet" href="/sass/main.min.ab99ff095f832511e24ffb2fba2b51ad473b2f7e9301d674eba2c6c3a6e8bd81.css">
+    
+</head>
+    
+    <script>
+        (function() {
+            const colorSchemeKey = 'ThemeColorScheme';
+            if(!localStorage.getItem(colorSchemeKey)){
+                localStorage.setItem(colorSchemeKey, "auto");
+            }
+        })();
+    </script><script>
+    (function() {
+        const colorSchemeKey = 'ThemeColorScheme';
+        const colorSchemeItem = localStorage.getItem(colorSchemeKey);
+        const supportDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches === true;
+
+        if (colorSchemeItem == 'dark' || colorSchemeItem === 'auto' && supportDarkMode) {
+            
+
+            document.documentElement.dataset.userColorScheme = 'dark';
+        } else {
+            document.documentElement.dataset.userColorScheme = 'light';
+        }
+    })();
+</script>
+
+
+    <body class="dark">
+        <nav class="navbar">
+    <div class="container">
+        <div class="flex">
+            <div>
+                <a class="brand" href="/">
+                    
+                    
+                        <img src="/favicon.ico" />
+                    
+                    HanHoRang Tech Blog
+                    </a>
+            </div>
+            <div class="flex">
+                
+                <a href="/articles/">Articles</a>
+                
+                
+                    <button id="dark-mode-button">
+                    <svg class="light" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" aria-hidden="true" focusable="false" width="1em" height="1em" style="-ms-transform: rotate(360deg); -webkit-transform: rotate(360deg); transform: rotate(360deg);" preserveAspectRatio="xMidYMid meet" viewBox="0 0 36 36"><path fill="#FFD983" d="M30.312.776C32 19 20 32 .776 30.312c8.199 7.717 21.091 7.588 29.107-.429C37.9 21.867 38.03 8.975 30.312.776z"/><path d="M30.705 15.915a1.163 1.163 0 1 0 1.643 1.641a1.163 1.163 0 0 0-1.643-1.641zm-16.022 14.38a1.74 1.74 0 0 0 0 2.465a1.742 1.742 0 1 0 0-2.465zm13.968-2.147a2.904 2.904 0 0 1-4.108 0a2.902 2.902 0 0 1 0-4.107a2.902 2.902 0 0 1 4.108 0a2.902 2.902 0 0 1 0 4.107z" fill="#FFCC4D"/><rect x="0" y="0" width="36" height="36" fill="rgba(0, 0, 0, 0)" /></svg>
+                    <svg class="dark" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" aria-hidden="true" focusable="false" width="1em" height="1em" style="-ms-transform: rotate(360deg); -webkit-transform: rotate(360deg); transform: rotate(360deg);" preserveAspectRatio="xMidYMid meet" viewBox="0 0 36 36"><path fill="#FFD983" d="M16 2s0-2 2-2s2 2 2 2v2s0 2-2 2s-2-2-2-2V2zm18 14s2 0 2 2s-2 2-2 2h-2s-2 0-2-2s2-2 2-2h2zM4 16s2 0 2 2s-2 2-2 2H2s-2 0-2-2s2-2 2-2h2zm5.121-8.707s1.414 1.414 0 2.828s-2.828 0-2.828 0L4.878 8.708s-1.414-1.414 0-2.829c1.415-1.414 2.829 0 2.829 0l1.414 1.414zm21 21s1.414 1.414 0 2.828s-2.828 0-2.828 0l-1.414-1.414s-1.414-1.414 0-2.828s2.828 0 2.828 0l1.414 1.414zm-.413-18.172s-1.414 1.414-2.828 0s0-2.828 0-2.828l1.414-1.414s1.414-1.414 2.828 0s0 2.828 0 2.828l-1.414 1.414zm-21 21s-1.414 1.414-2.828 0s0-2.828 0-2.828l1.414-1.414s1.414-1.414 2.828 0s0 2.828 0 2.828l-1.414 1.414zM16 32s0-2 2-2s2 2 2 2v2s0 2-2 2s-2-2-2-2v-2z"/><circle fill="#FFD983" cx="18" cy="18" r="10"/><rect x="0" y="0" width="36" height="36" fill="rgba(0, 0, 0, 0)" /></svg>
+                    </button>
+                
+            </div>
+            </div>
+    </div>
+</nav>
+
+        <main>
+            
+<div class="container">
+    <article>
+        <header class="article-header">
+            <div class="thumb">
+                <div>
+                    <h1></h1>
+                    <div class="post-meta">
+                        <div>
+                            
+                            
+                              
+                            
+                            By Hugo Tania | <time>January 01, 0001</time>
+                            | 4 minutes
+                        </div>
+                        <div class="tags">
+                            
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </header>
+    </article>
+
+    <div class="article-post">
+    <h1 id="자격증-aws-devops-professnaldop-c02-취득-후기">
+    <a href="#%ec%9e%90%ea%b2%a9%ec%a6%9d-aws-devops-professnaldop-c02-%ec%b7%a8%eb%93%9d-%ed%9b%84%ea%b8%b0" class="anchor">
+        <svg class="icon" aria-hidden="true" focusable="false" height="16" version="1.1" viewBox="0 0 16 16" width="16">
+            <path fill-rule="evenodd"
+                d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z">
+            </path>
+        </svg>
+    </a>
+    [자격증] AWS Devops Professnal(DOP-C02) 취득 후기
+</h1>
+<p><img loading="lazy" 
+    src="/./AWS-Devops-Professnal/cert1.png" 
+    alt="cert1.png" 
+     
+    width=667 
+    height="504"  /></p>
+<p>이번 글에서는 최근에 취득한 AWS Devops Professnal(DOP-C02) 자격증 관련하여 취득 후기를 공유하고자 한다. 해당 자격증은 23년 4월 이후로 업데이트된 자격증으로 인터넷에 관련 취득 글이 없다. 이 글을 보고 자격증 취득에 도움이 되었으면 좋겠다는 마음으로 글을 작성한다.</p>
+<h2 id="dop-c02-">
+    <a href="#dop-c02-" class="anchor">
+        <svg class="icon" aria-hidden="true" focusable="false" height="16" version="1.1" viewBox="0 0 16 16" width="16">
+            <path fill-rule="evenodd"
+                d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z">
+            </path>
+        </svg>
+    </a>
+    DOP-C02 ?
+</h2>
+<p>AWS DOP-C02 자격증의 명칭은 AWS Certified DevOps Engineer - Professional 로  Devops 분야에 특화된 전문 지식을 요구하는 자격증이다.  AWS 공식사이트의 설명은 다음 그림과 같이 Devops 지식을 전문적으로 확인하는 시험이다.  공식 문서에서 자격증 소개는 다음과 같이 소개되어 있다.</p>
+<p><img loading="lazy" 
+    src="/./AWS-Devops-Professnal/aws1.png" 
+    alt="aws1.png" 
+     
+    width=1155 
+    height="256"  /></p>
+<p>Devops 시험에서 요구하는 전문 지식과 구성은 다음과 같다.</p>
+<p><img loading="lazy" 
+    src="/./AWS-Devops-Professnal/Cert3.png" 
+    alt="Cert3.png" 
+     
+    width=738 
+    height="155"  /></p>
+<ul>
+<li>SDLC 자동화 :  소프트웨어 개발 생명 주기 (Software Development Life Cycle, SDLC) 자동화는 소프트웨어 개발 과정의 다양한 단계를 자동화시켜주는 프로세스이다. 프로세스로 지속적인 통합(CI), 지속적인 배포(CD), 지속적인 테스팅(CT), 인프라스트럭쳐 자동화가 포함되어 있다. 시험에서는 해당 프로세스의 AWS 서비스인 Opsworks, CodeStack의 내용이 주가 되었다.</li>
+<li>구성 관리 및 IaC :  구성 관리는 시스템의 설정을 통제하고 추적하여 일관성을 유지하는 프로세스이다.  시험에서는 AWS Cloudformation 기능 관련 문제가 많았다.</li>
+<li>탄력적인 클라우드 솔루션 :  요구사항에 따라서 자동으로 리소스를 확장하거나 축소할 수 있는 클라우드 컴퓨팅 모델을 의미한다. 시험에서는 특히 고가용성 및 자연 재해 대비를 위한 지역 간 복제 인프라 구성 및 운영 문제가 특히 많이 나왔다. DB 와 기타 리소스 인프라의 구성법이 다르니 반드시 확인할 것을 추천한다.</li>
+<li>모니터링 및 로깅 : 모니터링은 시스템의 성능과 가용성을 실시간으로 추적하고 분석하는 것을 의미하며, 로깅은 시스템에서 발생하는 이벤트를 기록하고 저장하는 것을 의미한다. 시험에서는 주로 어떤 서비스를 운영하는데 모니터링, 로깅 솔루션을 어떻게 구축할 것인지에 대해 물어봤는데 결국 Cloudwatch, Cloudwatch log, kinesis &amp; S3 , Cloudtrail 서비스 중 어떤 서비스를 이용하여 구축할 것인지에 대한 질문으로 각 서비스별 기능 확인이 필요하다.</li>
+<li>인시던트 및 이벤트 대응 : 시스템에서 발생하는 문제나 이벤트에 대한 적절한 대응과 조치를 수행하는 것을 의미한다. 이 부분이이전 DOP-C01과 많이 달라진 분야다. 결국에는 서비스별 어떻게 연동할 것 인지에 대해 물어보는데 DOP-C01에서는 람다로 연동을 처리했다면, DOP-C02에서는 EventBridge 로 연동한다고 보면 된다. 기간이 지나면서 서비스가 고도화되는데 이 부분에서 내용이 공유된 것 같다.</li>
+<li>보안 및 규정 준수 : 시스템을 보호하는 것뿐만 아니라, 개인 정보 보호 및 기타 규정 준수와 관련된 법률을 준수하는 것을 포함하여 관련 기능을 물어본다. AWS 서비스 중 AWS Inspector(취약점), AWS Trusted Advisor(최적화 방법 안내), AWS Config(히스토리 추적 및 변화 감사), AWS GuardDuty(워협 탐지) 가 주로 나온다. 각 서비스별로 특징만 기억해두면 문제없이 넘어갈 수 있는 분야다.</li>
+</ul>
+<p>시험 문제가 업데이트되었다고 하여 EKS, Docker 모델에서 모니터링, 이벤트 대응, CI &amp; CD 가 많이 나올 것이라 예상했지만,, 3문제 정도 그것도 구성 문제정도만 출제되었다. 모델별로 봤을 때는 3티어 애플리케이션 및 하이브리드 구성에서 마이그레이션과 운영 내용이 주가 된 것으로 봤을 때 실제 수요를 반영하여 문제를 업데이트한 것이 아닐까 예상한다.</p>
+<h2 id="자격증-취득-후기">
+    <a href="#%ec%9e%90%ea%b2%a9%ec%a6%9d-%ec%b7%a8%eb%93%9d-%ed%9b%84%ea%b8%b0" class="anchor">
+        <svg class="icon" aria-hidden="true" focusable="false" height="16" version="1.1" viewBox="0 0 16 16" width="16">
+            <path fill-rule="evenodd"
+                d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z">
+            </path>
+        </svg>
+    </a>
+    자격증 취득 후기
+</h2>
+<p>아마 많은 분들이 이 부분에 대하여 찾지 않을까 생각된다. 필자 또한 취득 공유기를 얻고자 인터넷을 많이 서치하였고, 이전 버전(DOP-C01) 후기로는 덤프만 보고 학습하면 통과할 수 있는 수준으로 이해하였다. <strong>DOP-C02 학습법도 동일했는데 문제는 덤프의 답이 필자 생각과 너무 달랐던 것이 문제였다.</strong></p>
+<p>이 부분이 가장 걱정이였다. 필자가 작년 AWS Solution Architect  Professional 자격증을 취득했을 때를 회고해보면 덤프에서 나온 문제와 답을 그대로 찍었음에도 턱걸이로 합격했었는데, 덤프 답이 애초에 오답이 아닐까 라고 생각했었다. 아니나 다를까 이번에도 어김없이 덤프 답이 이상할 정도로 오답이 많다.</p>
+<p>이를 해결하기 위해 문제 풀이에 많은 시간을 소비하였다. 며칠 굴러보니 이론적인 학습에 너무나 시간이 많이 들어 비효율적이라 느껴 새로운 접근 방법으로 접근하였다. 다른 덤프 사이트를 서치하니 집단 지식을 활용하여 덤프 답을 파악할 수 있는 사이트가 존재하였고, <a href="https://www.examtopics.com/exams/amazon/aws-certified-devops-engineer-professional-dop-c02/view/">해당 사이트</a>를 통해 답을 비교하며 학습을 진행하였다.</p>
+<p>해당 사이트는 examtopics 라는 사이트인데 아래 사진과 같이 문제를 확인함과 동시에 댓글로 여러 사람들의 답과 생각을 확인할 수 있어 학습에 큰 도움이 되었다.</p>
+<p><img loading="lazy" 
+    src="/./AWS-Devops-Professnal/cert5.png" 
+    alt="cert5.png" 
+     
+    width=1081 
+    height="896"  /></p>
+<p>답을 비교하고, 체크하면서 학습하였고 시험을 본 결과 덤프의 문제가 80%이상 나왔다. 문제풀이한 답이 맞으면 상관이 없다고 생각하여 나머지 문제를 푼 결과 아래와 같이 좋은 점수로 자격증을 취득할 수 있었다.</p>
+<p><img loading="lazy" 
+    src="/./AWS-Devops-Professnal/Cert2.png" 
+    alt="Cert2.png" 
+     
+    width=780 
+    height="424"  /></p>
+<p>사실 시험보기 전까지도 걱정이 많았는데 전혀 예상치 못한 점수가 나왔다. 취득한 점수를 토대로 덤프 보완점을 고려하자면 다음과 같다.</p>
+<ul>
+<li>덤프 답에 오답이 너무 많다. 집단 지식을 활용하자.</li>
+<li>집단 지식에서의 답 비율이 많다고 해서 무조건 정답은 아니다. 필자의 경우 최신 댓글과 답이 다른 것들은 직접 기능을 확인해봤는데 최신 댓글이 답인 경우가 많았다.</li>
+<li>나머지 20% 문제는?  결국에는 같은 분야의 문제가 나오기 때문에 덤프 문제를 학습하면서 이해할 정도면 푸는 것에 크게 어려움이 없을 것이라 생각된다.</li>
+<li>DOP-C01 덤프의 출제 비중? 비교하니 대략 20%정도되는 것 같다. 물론 위 사이트의 DOP-C02 덤프에서 이전 버전의 문제도 확인할 수 있으니 C01 덤프까지 보지 않는 것을 추천한다.</li>
+<li>시험 문제는 75문제이고 23년 7월 기준 덤프 문제는 134문제이다. 절반 정도이지만 출제 비율이 80프로이니 반드시 학습하자.</li>
+</ul>
+<p>문제 외적으로 유의 사항은 다른 취득 후기와 다를 것이 없다. 취득 후기 관련하여서는 이만 글을 줄이겠다.</p>
+<h2 id="자격증-취득이-끝이-아니다">
+    <a href="#%ec%9e%90%ea%b2%a9%ec%a6%9d-%ec%b7%a8%eb%93%9d%ec%9d%b4-%eb%81%9d%ec%9d%b4-%ec%95%84%eb%8b%88%eb%8b%a4" class="anchor">
+        <svg class="icon" aria-hidden="true" focusable="false" height="16" version="1.1" viewBox="0 0 16 16" width="16">
+            <path fill-rule="evenodd"
+                d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z">
+            </path>
+        </svg>
+    </a>
+    자격증 취득이 끝이 아니다.
+</h2>
+<p>경험한 바 덤프로 공부해서 학습한 내용들은 이론적이고 결국에는 문제의 답을 그대로 외우기 때문에 이해를 못한 기능들이 많아 아쉬웠다. 이대로 놔두면 아마 1달내로 관련 지식이 초기화될 것이 뻔하다. 이를 실무에서 활용하기위해 덤프에서 학습 내용들을 정리하고 실습한 내용들을 공유할까 한다. 다음 글에서는 EventBridge 와 보완 인프라 구축 및 블루/그린 배포 관련하여 작성할 예정이다.</p>
+
+    </div>
+</div>
+
+<div class="container">
+    
+    <nav class="flex container suggested">
+        
+        
+        
+        <a rel="next" href="/post/pkos2-1-kops/" title="Next post (newer)">
+            <span>Next</span>
+            [PKOS] Kops로 클러스터 구축하기
+            </a> 
+        
+    </nav>
+    
+</div>
+ 
+<div class="container">
+    
+    <script src="https://giscus.app/client.js" 
+        data-repo="WingLim/hugo-tania"
+        data-repo-id="MDEwOlJlcG9zaXRvcnkzMTYyNjQzMDc="
+        
+        data-category="Comments"
+        data-category-id="DIC_kwDOEtnPc84B_WKP"
+        
+        data-mapping="pathname"
+        data-reactions-enabled="1"
+        data-emit-metadata="0"
+        data-theme="light"
+        crossorigin="anonymous"
+        async
+        >
+</script>
+
+<script>
+    function setGiscusTeheme(theme) {
+        let giscus = document.querySelector('.giscus iframe');
+        if (giscus) {
+            giscus.contentWindow.postMessage(
+                {
+                    giscus: {
+                        setConfig: {
+                            theme: theme
+                        }
+                    }
+                },
+                'https://giscus.app'
+            )
+        }
+    }
+
+    addEventListener('message', event => {
+        if (event.origin !== 'https://giscus.app') return;
+        setGiscusTeheme(document.documentElement.dataset.userColorScheme)
+    });
+
+    window.addEventListener('onColorSchemeChange', (e) => {
+        setGiscusTeheme(e.detail)
+    })
+</script>
+
+</div>
+
+</main>
+
+
+        </main>
+        <footer class="footer flex">
+    <section class="container">
+        <nav class="footer-links">
+            
+            <a href="/index.xml">RSS</a>
+            
+        </nav>
+
+        
+    </section>
+    <script defer src="/ts/features.706a523ba43e6d0427c7fdf2b9d05dbd0920d3f12942b453690b495cb2522743.js" 
+    data-enable-footnotes="true"
+    ></script>
+</footer>
+
+    </body>
+</html>
