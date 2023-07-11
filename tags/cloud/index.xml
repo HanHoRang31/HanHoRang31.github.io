@@ -6,7 +6,17 @@
     <description>Recent content in cloud on HanHoRang Tech Blog</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <lastBuildDate>Fri, 09 Jun 2023 00:00:00 +0000</lastBuildDate><atom:link href="https://HanHoRang31.github.io/tags/cloud/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Mon, 10 Jul 2023 00:00:00 +0000</lastBuildDate><atom:link href="https://HanHoRang31.github.io/tags/cloud/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>[자격증] AWS Devops Professnal(DOP-C02) 취득 후기</title>
+      <link>https://HanHoRang31.github.io/post/aws-devops-professnal/</link>
+      <pubDate>Mon, 10 Jul 2023 00:00:00 +0000</pubDate>
+      
+      <guid>https://HanHoRang31.github.io/post/aws-devops-professnal/</guid>
+      <description>이번 글에서는 최근에 취득한 AWS Devops Professnal(DOP-C02) 자격증 관련하여 취득 후기를 공유하고자 한다. 해당 자격증은 23년 4월 이후로 업데이트된 자격증으로 인터넷에 관련 취득 글이 없다. 이 글을 보고 자격증 취득에 도움이 되었으면 좋겠다는 마음으로 글을 작성한다.
+DOP-C02 ? AWS DOP-C02 자격증의 명칭은 AWS Certified DevOps Engineer - Professional 로 Devops 분야에 특화된 전문 지식을 요구하는 자격증이다. AWS 공식사이트의 설명은 다음 그림과 같이 Devops 지식을 전문적으로 확인하는 시험이다. 공식 문서에서 자격증 소개는 다음과 같이 소개되어 있다.</description>
+    </item>
+    
     <item>
       <title>[AEWS] Gitops CI &amp; CD 구성</title>
       <link>https://HanHoRang31.github.io/post/aews-gitops/</link>
