@@ -48,7 +48,7 @@
     },
     "datePublished": "2023-05-12",
     "description": "EKS VPC 와 EKS Workshop Netwroking 실습",
-    "wordCount":  5189 ,
+    "wordCount":  5190 ,
     "mainEntityOfPage": "True",
     "dateModified": "2023-05-12",
     "publisher": {
@@ -929,7 +929,7 @@
 </span></span><span class="line"><span class="cl"><span class="c1"># ExternalDNS 배포</span>
 </span></span><span class="line"><span class="cl">curl -s -O https://raw.githubusercontent.com/gasida/PKOS/main/aews/externaldns.yaml
 </span></span><span class="line"><span class="cl">cat externaldns.yaml <span class="p">|</span> yh
-</span></span><span class="line"><span class="cl"><span class="nv">MyDomain</span><span class="o">=</span><span class="nv">$MyDomain</span> <span class="nv">MyDnzHostedZoneId</span><span class="o">=</span><span class="nv">$MyDnzHostedZoneId</span> envsubst &lt; externaldns.yaml <span class="p">|</span> kubectl apply -
+</span></span><span class="line"><span class="cl"><span class="nv">MyDomain</span><span class="o">=</span><span class="nv">$MyDomain</span> <span class="nv">MyDnzHostedZoneId</span><span class="o">=</span><span class="nv">$MyDnzHostedZoneId</span> envsubst &lt; externaldns.yaml <span class="p">|</span> kubectl apply -f -
 </span></span><span class="line"><span class="cl">
 </span></span><span class="line"><span class="cl"><span class="c1"># 로그 확인 </span>
 </span></span><span class="line"><span class="cl">kubectl get pods -A
