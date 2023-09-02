@@ -7,7 +7,7 @@
     <language>en-us</language>
     <lastBuildDate>Fri, 01 Sep 2023 00:00:00 +0000</lastBuildDate><atom:link href="https://HanHoRang31.github.io/index.xml" rel="self" type="application/rss+xml" />
     <item>
-    <title>[T101] Terraform을 활용한 EKS 멀티클러스터 마이그레이션</title>
+    <title>[T101] 테라폼을 활용한 EKS 멀티클러스터 마이그레이션</title>
     <link>https://HanHoRang31.github.io/post/t101-multicluster-migration/</link>
     <pubDate>Fri, 01 Sep 2023 00:00:00 +0000</pubDate>
     <author>HanHoRnag</author>
@@ -1206,363 +1206,6 @@
     </item>
     
     <item>
-    <title>[T101] Terraform으로 EKS 구축하기</title>
-    <link>https://HanHoRang31.github.io/post/t101-eks-build/</link>
-    <pubDate>Mon, 28 Aug 2023 00:00:00 +0000</pubDate>
-    <author>HanHoRnag</author>
-    <guid>https://HanHoRang31.github.io/post/t101-eks-build/</guid>
-    <description>
-        &lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
-&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
-&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code&gt;&lt;span class=&#34;lnt&#34;&gt;1
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;2
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;3
-&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
-&lt;td class=&#34;lntd&#34;&gt;
-&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-markdown&#34; data-lang=&#34;markdown&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;T101(=Terraform 101 Study)는 Terraform 실무 실습 스터디입니다.
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;CloudNet@ Gasida(가시다)이 진행하시며, 책 &amp;#34;Terraform Up &lt;span class=&#34;err&#34;&gt;&amp;amp;&lt;/span&gt; Running&amp;#34;을 기반으로 진행하고 있습니다.
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;22년 9월 기준 학습 내용입니다. 블로그 이주로 다시 포스트합니다. 
-&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
-&lt;/div&gt;
-&lt;/div&gt;&lt;p&gt;테라폼 스터디 4주차가 지났다. 스터디를 진행하면서 테라폼 기능과 툴을 학습하였고, 예제로 AWS 서비스 3티어 아키텍처를 구성할 정도가 되었다. 그렇다면 EKS 처럼 AWS 서비스가 복잡하게 얽혀있는 것도 테라폼으로 구축이 가능할까? 라는 생각으로 글을 작성한다.&lt;/p&gt;
-&lt;p&gt;구글에 검색해보니 테라폼을 통해 EKS 구축하는 자료들을 쉽게 접할 수 있었다. 자료를 참고하는 것도 많은 도움이 되었지만, 실제 애플리케이션을 운영한다는 것을 가정하고 예제 코드를 수정하고 추가하는 것이 스스로의 실력 향상에 도움이 된다고 생각하여 가상의 주제를 정하였다.&lt;/p&gt;
-&lt;p&gt;EKS 구축 목적은 &lt;code&gt;가상의 사내 클라우드 저장소 운영&lt;/code&gt;으로 정하였다. 여러 글에 나눠 구축 경험을 공유할 예정이다.  여기서의  클라우드 저장소는 사내에서만 접근가능하며, 관리자만이 외부에서 베스천 서버를 통해 클러스터 접근이 가능하도록 한정하였다.&lt;/p&gt;
-&lt;p&gt;먼저 구성 아키텍처는 다음과 같다.&lt;/p&gt;
-&lt;p&gt;&lt;img loading=&#34;lazy&#34; 
-    src=&#34;https://HanHoRang31.github.io/t101-eks-build/1.png&#34; 
-    alt=&#34;t101 아키텍처.png&#34; 
-     
-    width=1076 
-    height=&#34;831&#34;  /&gt;&lt;/p&gt;
-&lt;ul&gt;
-&lt;li&gt;본 포스터 글에서는 테라폼 모듈들로 AWS 서비스를 구축하는 것까지 진행하였다.
-실제 애플리케이션이나 운영 add-on서비스들은 추후 블로그 글을 통해 정리할 예정이다.&lt;/li&gt;
-&lt;li&gt;구성 아키텍처의 테라폼 코드들은 &lt;a href=&#34;https://github.com/HanHoRang31/T101-Terraform-EKS&#34;&gt;깃허브 링크&lt;/a&gt;를 통해서 확인이 가능하다.&lt;/li&gt;
-&lt;/ul&gt;
-&lt;p&gt;레파지토리의 내용을 보면 EKS 구축에 필요한 AWS 서비스들과 사용 변수들을 파일들을 나눠 구성하였다.&lt;/p&gt;
-&lt;p&gt;&lt;img loading=&#34;lazy&#34; 
-    src=&#34;https://HanHoRang31.github.io/t101-eks-build/2.png&#34; 
-    alt=&#34;아키텍처2.png&#34; 
-     
-    width=328 
-    height=&#34;755&#34;  /&gt;&lt;/p&gt;
-&lt;ul&gt;
-&lt;li&gt;&lt;a href=&#34;http://c1-version.tf&#34;&gt;c1-version.tf&lt;/a&gt; : AWS 프로바이더와 지역을 설정하였다.&lt;/li&gt;
-&lt;li&gt;c2-01,c2-02 :  AWS 지역과 EKS 구성시 태그 정보나 지역 정보를 지역 변수로 정의한 파일이다.&lt;/li&gt;
-&lt;li&gt;c3 : VPC 서비스를 구축하기 위한 모듈들을 정리했다.&lt;/li&gt;
-&lt;li&gt;c4 : 베스천 서버를 목적으로 EC2를 구성한 파일이다. 또한, EKS 워크 노드 접속 설정과 외부에서 베스천 서버로 접속하기 위해 설정 모듈들이 정의되어 있다.&lt;/li&gt;
-&lt;li&gt;c5 : EKS 구축을 위한 리소스를 정의했다.&lt;/li&gt;
-&lt;li&gt;~vars 파일들 : 실제 사용 변수들을 정의했다.&lt;/li&gt;
-&lt;/ul&gt;
-&lt;p&gt;EKS 구축에 사용한 모듈은 테라폼 레지스트리에서 인증된 AWS 모듈과 리소스를 사용했다. 테라폼 레지스트리에는 여러 모듈이 있지만, 외부 노출과 사용 안정성 면에서 공인적으로 인증된 모듈 사용을 적극 추천한다.&lt;/p&gt;
-&lt;p&gt;&lt;img loading=&#34;lazy&#34; 
-    src=&#34;https://HanHoRang31.github.io/t101-eks-build/3.png&#34; 
-    alt=&#34;공식 인증, 검증 마크 표시&#34; 
-     
-    width=234 
-    height=&#34;216&#34;  /&gt;&lt;/p&gt;
-&lt;p&gt;공식 인증, 검증 마크 표시&lt;/p&gt;
-&lt;p&gt;&lt;img loading=&#34;lazy&#34; 
-    src=&#34;https://HanHoRang31.github.io/t101-eks-build/4.png&#34; 
-    alt=&#34; 옆 마크 표시를 확인하자! &#34; 
-     
-    width=1365 
-    height=&#34;673&#34;  /&gt;&lt;/p&gt;
-&lt;p&gt;옆 마크 표시를 확인하자!&lt;/p&gt;
-&lt;p&gt;테라폼 레지스트리에서는 여러 예제를 제공한다. 필자는 테라폼 학습시 예제를 통해 학습한 모듈의 내용을 확인하였고 추가 옵션 필요시 레지스트리 내 변수를 확인하여 옵션을 설정하였다.&lt;/p&gt;
-&lt;p&gt;&lt;img loading=&#34;lazy&#34; 
-    src=&#34;https://HanHoRang31.github.io/t101-eks-build/5.png&#34; 
-    alt=&#34;ec2_instance 모듈 예제&#34; 
-     
-    width=1368 
-    height=&#34;597&#34;  /&gt;&lt;/p&gt;
-&lt;p&gt;ec2_instance 모듈 예제&lt;/p&gt;
-&lt;p&gt;&lt;img loading=&#34;lazy&#34; 
-    src=&#34;https://HanHoRang31.github.io/t101-eks-build/6.png&#34; 
-    alt=&#34;모듈 내 key_name 옵션 확인&#34; 
-     
-    width=1206 
-    height=&#34;841&#34;  /&gt;&lt;/p&gt;
-&lt;p&gt;모듈 내 key_name 옵션 확인&lt;/p&gt;
-&lt;p&gt;다음의 글은 필자가 커스터마이징을 진행한 부분과 정리가 필요한 내용들을 작성하였다.&lt;/p&gt;
-&lt;h3 id=&#34;eks-구성&#34;&gt;
-    &lt;a href=&#34;#eks-%ea%b5%ac%ec%84%b1&#34; class=&#34;anchor&#34;&gt;
-        &lt;svg class=&#34;icon&#34; aria-hidden=&#34;true&#34; focusable=&#34;false&#34; height=&#34;16&#34; version=&#34;1.1&#34; viewBox=&#34;0 0 16 16&#34; width=&#34;16&#34;&gt;
-            &lt;path fill-rule=&#34;evenodd&#34;
-                d=&#34;M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z&#34;&gt;
-            &lt;/path&gt;
-        &lt;/svg&gt;
-    &lt;/a&gt;
-    EKS 구성
-&lt;/h3&gt;
-&lt;p&gt;필자는 사내 클라우드 저장소 구성을 목표로 EKS를 구축했다. 이를 위해 EKS 워크 노드 그룹을 프라이빗 서브넷에 배포하여 VPC 외부에서 접근하지 못하게 구성하였습니다. 또한, API 서버 액세스는 프라이빗 액세스로 설정했다.&lt;/p&gt;
-&lt;p&gt;EKS 보안 그룹은 크게 3가지로 설정이 가능하다. 클러스터 보안 그룹, 추가 보안그룹(컨트롤 노드 보안 그룹), 워크 노드 보안 그룹으로 나눠지며 세부적으로 포트 제어가 가능하다. 클러스터 보안 그룹은 컨트롤 노드 그룹과 워크 노드 그룹 동시에 적용되는 보안 그룹이다. 해당 보안 그룹을 통해 컨트롤 노드와 워크 노드의 통신이 가능하도록 기본적으로 제공되는 보안 그룹이다. 공식 문서를 통해서는 최소 네트워크 허용 포트를 다음의 그림과 같이 권고한다.&lt;/p&gt;
-&lt;p&gt;&lt;img loading=&#34;lazy&#34; 
-    src=&#34;https://HanHoRang31.github.io/t101-eks-build/7.png&#34; 
-    alt=&#34;&amp;lt;a href=&amp;#34;https://github.com/terraform-aws-modules/terraform-aws-eks/blob/master/docs/network_connectivity.md&amp;#34;&amp;gt;https://github.com/terraform-aws-modules/terraform-aws-eks/blob/master/docs/network_connectivity.md&amp;lt;/a&amp;gt;&#34; 
-     
-    width=1300 
-    height=&#34;1109&#34;  /&gt;&lt;/p&gt;
-&lt;p&gt;&lt;a href=&#34;https://github.com/terraform-aws-modules/terraform-aws-eks/blob/master/docs/network_connectivity.md&#34;&gt;https://github.com/terraform-aws-modules/terraform-aws-eks/blob/master/docs/network_connectivity.md&lt;/a&gt;&lt;/p&gt;
-&lt;p&gt;다만, 이번 포스트에서는 EKS 구축과 테스트 용으로 진행하는 것이 목적이라 클러스터 보안 그룹을 0.0.0.0/0 으로 설정하였다.&lt;/p&gt;
-&lt;h3 id=&#34;노드-그룹-설정&#34;&gt;
-    &lt;a href=&#34;#%eb%85%b8%eb%93%9c-%ea%b7%b8%eb%a3%b9-%ec%84%a4%ec%a0%95&#34; class=&#34;anchor&#34;&gt;
-        &lt;svg class=&#34;icon&#34; aria-hidden=&#34;true&#34; focusable=&#34;false&#34; height=&#34;16&#34; version=&#34;1.1&#34; viewBox=&#34;0 0 16 16&#34; width=&#34;16&#34;&gt;
-            &lt;path fill-rule=&#34;evenodd&#34;
-                d=&#34;M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z&#34;&gt;
-            &lt;/path&gt;
-        &lt;/svg&gt;
-    &lt;/a&gt;
-    노드 그룹 설정
-&lt;/h3&gt;
-&lt;p&gt;운영 단위로 나눠 워크 노드 그룹을 구축하였다. 각 노드 그룹 분리는 실제 인프라간 영향을 최소화를 목적으로 분리하였다. 애플리케이션 운영을 위한 노드 그룹인 &lt;code&gt;ops&lt;/code&gt; 와 클러스터 addon 서비스 운영을 위한 &lt;code&gt;addon&lt;/code&gt; 로 구성하였고, 추후 모니터링이나 CI/CD 필요시 노드 그룹을 추가 구성할 예정이다.&lt;/p&gt;
-&lt;h3 id=&#34;관리자-서버-접근-설정&#34;&gt;
-    &lt;a href=&#34;#%ea%b4%80%eb%a6%ac%ec%9e%90-%ec%84%9c%eb%b2%84-%ec%a0%91%ea%b7%bc-%ec%84%a4%ec%a0%95&#34; class=&#34;anchor&#34;&gt;
-        &lt;svg class=&#34;icon&#34; aria-hidden=&#34;true&#34; focusable=&#34;false&#34; height=&#34;16&#34; version=&#34;1.1&#34; viewBox=&#34;0 0 16 16&#34; width=&#34;16&#34;&gt;
-            &lt;path fill-rule=&#34;evenodd&#34;
-                d=&#34;M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z&#34;&gt;
-            &lt;/path&gt;
-        &lt;/svg&gt;
-    &lt;/a&gt;
-    관리자 서버 접근 설정
-&lt;/h3&gt;
-&lt;p&gt;EKS 관리를 위해 베스천 서버를 추가로 구성하였다. 베스천 서버는 외부에서 접근이 가능하도록 구성하였고, 베스천 서버에서 EKS API server 와 워크 노드에 접근이 가능하도록 구성했다.&lt;/p&gt;
-&lt;p&gt;&lt;img loading=&#34;lazy&#34; 
-    src=&#34;https://HanHoRang31.github.io/t101-eks-build/8.png&#34; 
-    alt=&#34;SSH 아키텍처.png&#34; 
-     
-    width=1660 
-    height=&#34;1374&#34;  /&gt;&lt;/p&gt;
-&lt;p&gt;빨간 선은 관리자가 접근하게 되는 통신 경로이다. 이를 구성하기 위해 3가지 작업을 진행하였다.&lt;/p&gt;
-&lt;ol&gt;
-&lt;li&gt;
-&lt;p&gt;베스천 서버 접근 SSH 설정&lt;/p&gt;
-&lt;p&gt;먼저 SSH 접속을 위해 AWS에서 pem key를 발급받아 &lt;code&gt;private-key&lt;/code&gt; 폴더에 저장하였다. 이후 테라폼에서 베스천 서버 생성시 테라폼 프로비저너(provisioner)을 통해 로컬과 원격에서 SSH 키를 등록하도록 구성하였다. 프로비저너를 통한 스크립트는 다음과 같다.&lt;/p&gt;
-&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
-&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
-&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code&gt;&lt;span class=&#34;lnt&#34;&gt; 1
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 2
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 3
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 4
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 5
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 6
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 7
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 8
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 9
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;10
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;11
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;12
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;13
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;14
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;15
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;16
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;17
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;18
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;19
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;20
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;21
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;22
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;23
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;24
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;25
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;26
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;27
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;28
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;29
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;30
-&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
-&lt;td class=&#34;lntd&#34;&gt;
-&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;c1&#34;&gt;# Create a Null Resource and Provisioners&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;resource &lt;span class=&#34;s2&#34;&gt;&amp;#34;null_resource&amp;#34;&lt;/span&gt; &lt;span class=&#34;s2&#34;&gt;&amp;#34;copy_ec2_keys&amp;#34;&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;{&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;  &lt;span class=&#34;nv&#34;&gt;depends_on&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;[&lt;/span&gt;module.ec2_public&lt;span class=&#34;o&#34;&gt;]&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;  &lt;span class=&#34;c1&#34;&gt;# Connection Block for Provisioners to connect to EC2 Instance&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;  connection &lt;span class=&#34;o&#34;&gt;{&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;    &lt;span class=&#34;nb&#34;&gt;type&lt;/span&gt;     &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;s2&#34;&gt;&amp;#34;ssh&amp;#34;&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;    &lt;span class=&#34;nv&#34;&gt;host&lt;/span&gt;     &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; aws_eip.bastion_eip.public_ip    
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;    &lt;span class=&#34;nv&#34;&gt;user&lt;/span&gt;     &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;s2&#34;&gt;&amp;#34;ec2-user&amp;#34;&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;    &lt;span class=&#34;nv&#34;&gt;password&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;s2&#34;&gt;&amp;#34;&amp;#34;&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;    &lt;span class=&#34;nv&#34;&gt;private_key&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; file&lt;span class=&#34;o&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;s2&#34;&gt;&amp;#34;private-key/eks-terraform-key.pem&amp;#34;&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;)&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;  &lt;span class=&#34;o&#34;&gt;}&lt;/span&gt;  
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;c1&#34;&gt;## File Provisioner: Copies the terraform-key.pem file to /tmp/terraform-key.pem&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;  provisioner &lt;span class=&#34;s2&#34;&gt;&amp;#34;file&amp;#34;&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;{&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;    &lt;span class=&#34;nb&#34;&gt;source&lt;/span&gt;      &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;s2&#34;&gt;&amp;#34;private-key/eks-terraform-key.pem&amp;#34;&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;    &lt;span class=&#34;nv&#34;&gt;destination&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;s2&#34;&gt;&amp;#34;/tmp/eks-terraform-key.pem&amp;#34;&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;  &lt;span class=&#34;o&#34;&gt;}&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;c1&#34;&gt;## Remote Exec Provisioner: Using remote-exec provisioner fix the private key permissions on Bastion Host&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;  provisioner &lt;span class=&#34;s2&#34;&gt;&amp;#34;remote-exec&amp;#34;&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;{&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;    &lt;span class=&#34;nv&#34;&gt;inline&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;[&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;      &lt;span class=&#34;s2&#34;&gt;&amp;#34;sudo chmod 400 /tmp/eks-terraform-key.pem&amp;#34;&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;    &lt;span class=&#34;o&#34;&gt;]&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;  &lt;span class=&#34;o&#34;&gt;}&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;c1&#34;&gt;## Local Exec Provisioner:  local-exec provisioner (Creation-Time Provisioner - Triggered during Create Resource)&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;  provisioner &lt;span class=&#34;s2&#34;&gt;&amp;#34;local-exec&amp;#34;&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;{&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;    &lt;span class=&#34;nb&#34;&gt;command&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;s2&#34;&gt;&amp;#34;echo VPC created on `date` and VPC ID: &lt;/span&gt;&lt;span class=&#34;si&#34;&gt;${&lt;/span&gt;&lt;span class=&#34;nv&#34;&gt;module&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.vpc.vpc_id&lt;/span&gt;&lt;span class=&#34;si&#34;&gt;}&lt;/span&gt;&lt;span class=&#34;s2&#34;&gt; &amp;gt;&amp;gt; creation-time-vpc-id.txt&amp;#34;&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;    &lt;span class=&#34;nv&#34;&gt;working_dir&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;s2&#34;&gt;&amp;#34;local-exec-output-files/&amp;#34;&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;    &lt;span class=&#34;c1&#34;&gt;#on_failure = continue&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;  &lt;span class=&#34;o&#34;&gt;}&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;o&#34;&gt;}&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
-&lt;/div&gt;
-&lt;/div&gt;&lt;ul&gt;
-&lt;li&gt;&lt;code&gt;resource.connection&lt;/code&gt; : EC2 SSH 접속 정보 설정&lt;/li&gt;
-&lt;li&gt;&lt;code&gt;resource.file&lt;/code&gt;  : EC2 서버 내 파일 저장, 접근 키를 서버내로 복사&lt;/li&gt;
-&lt;li&gt;&lt;code&gt;rresource.remote-exec&lt;/code&gt; : EC2 서버 내 스크립트 실행, 접근 키에 대한 권한 설정&lt;/li&gt;
-&lt;li&gt;&lt;code&gt;resource.local-exec&lt;/code&gt; :  로컬에서 스크립트 실행, 서버 생성 후 VPC 정보를 &lt;code&gt;local-exec-output-files/&lt;/code&gt; 폴더에 저장&lt;/li&gt;
-&lt;/ul&gt;
-&lt;/li&gt;
-&lt;li&gt;
-&lt;p&gt;워크 노드 접근 SSH 설정&lt;/p&gt;
-&lt;p&gt;베스천서버에서 워크노드로 접근하기 위해 다음과 같이 테라폼 코드 내에서 앞서 생성한 접근 키 설정하였다.&lt;/p&gt;
-&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
-&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
-&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code&gt;&lt;span class=&#34;lnt&#34;&gt;1
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;2
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;3
-&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
-&lt;td class=&#34;lntd&#34;&gt;
-&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-markdown&#34; data-lang=&#34;markdown&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;remote_access {
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;    ec2_ssh_key = &amp;#34;eks-terraform-key&amp;#34;    
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;}
-&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
-&lt;/div&gt;
-&lt;/div&gt;&lt;/li&gt;
-&lt;li&gt;
-&lt;p&gt;API server 접근 설정&lt;/p&gt;
-&lt;p&gt;API Server를 접근하기 위해서는 네트워크 확인과 config 키 등록이 필요하다. 먼저 네트워크는 베스천 서버와 EKS 클러스터를 동일 VPC에 생성하였고, 보안 그룹을 0.0.0.0/0 으로 설정하여 접근이 가능하도록 구성하였다. config 등록은 클러스터 구축 이후 테스트 단계에서 진행하겠다.&lt;/p&gt;
-&lt;/li&gt;
-&lt;/ol&gt;
-&lt;h3 id=&#34;구현&#34;&gt;
-    &lt;a href=&#34;#%ea%b5%ac%ed%98%84&#34; class=&#34;anchor&#34;&gt;
-        &lt;svg class=&#34;icon&#34; aria-hidden=&#34;true&#34; focusable=&#34;false&#34; height=&#34;16&#34; version=&#34;1.1&#34; viewBox=&#34;0 0 16 16&#34; width=&#34;16&#34;&gt;
-            &lt;path fill-rule=&#34;evenodd&#34;
-                d=&#34;M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z&#34;&gt;
-            &lt;/path&gt;
-        &lt;/svg&gt;
-    &lt;/a&gt;
-    구현
-&lt;/h3&gt;
-&lt;p&gt;실제 구축은 테라폼 명령어를 통해 쉽게 구축이 가능하다. 다음의 그림은 테라폼 명령어 세부 동작에 대해 자세히 정리되어 있는 그림이 있어 공유한다.&lt;/p&gt;
-&lt;p&gt;&lt;img loading=&#34;lazy&#34; 
-    src=&#34;https://HanHoRang31.github.io/t101-eks-build/9.png&#34; 
-    alt=&#34;@StackSimplfy&#34; 
-     
-    width=2138 
-    height=&#34;1122&#34;  /&gt;&lt;/p&gt;
-&lt;p&gt;@StackSimplfy&lt;/p&gt;
-&lt;ul&gt;
-&lt;li&gt;terraform init : 코드에서 정의한 프로바이더를 테라폼 레지스트리에서 확인하고 다운받는다.&lt;/li&gt;
-&lt;li&gt;terraform validate :  테라폼 코드에 대해 유효 테스트를 진행해준다.&lt;/li&gt;
-&lt;li&gt;terraform plan : 테라폼 코드가 어떻게 구현되는지 예측 결과를 보여준다.  예측 결과는 desired state로 정의되어 terraform.tfstate 파일로 저장된다.&lt;/li&gt;
-&lt;li&gt;terraform apply : 구현 단계이다. 앞서 단계에서 생성한 파일을 토대로 실제 서비스를 구축한다.&lt;/li&gt;
-&lt;li&gt;terraform destroy : 삭제 명령어다. 실행시 서비스를 삭제한다.&lt;/li&gt;
-&lt;/ul&gt;
-&lt;p&gt;필자 또한 테라폼 명령어를 통해 EKS를 구축하였다. EKS 구축까지 대략 20분이 소비되었다. 구축이 완료되면 AWS 콘솔로 접속하여 구축한 EKS 정보를 확인할 수 있다.&lt;/p&gt;
-&lt;p&gt;&lt;img loading=&#34;lazy&#34; 
-    src=&#34;https://HanHoRang31.github.io/t101-eks-build/10.png&#34; 
-    alt=&#34;EKS 구축 확인&#34; 
-     
-    width=2138 
-    height=&#34;1382&#34;  /&gt;&lt;/p&gt;
-&lt;p&gt;EKS 구축 확인&lt;/p&gt;
-&lt;h3 id=&#34;테스트&#34;&gt;
-    &lt;a href=&#34;#%ed%85%8c%ec%8a%a4%ed%8a%b8&#34; class=&#34;anchor&#34;&gt;
-        &lt;svg class=&#34;icon&#34; aria-hidden=&#34;true&#34; focusable=&#34;false&#34; height=&#34;16&#34; version=&#34;1.1&#34; viewBox=&#34;0 0 16 16&#34; width=&#34;16&#34;&gt;
-            &lt;path fill-rule=&#34;evenodd&#34;
-                d=&#34;M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z&#34;&gt;
-            &lt;/path&gt;
-        &lt;/svg&gt;
-    &lt;/a&gt;
-    테스트
-&lt;/h3&gt;
-&lt;p&gt;EKS 구축이 완료되었으면 실제 테스트를 진행해보자. 관리자 입장에서 베스천 서버를 접근하고 클러스터 접근이 가능한지 확인하겠다. 먼저, 베스천서버의 EIP를 확인하고 발급받은 키를 통해 베스천서버로 접속하겠다.&lt;/p&gt;
-&lt;p&gt;&lt;img loading=&#34;lazy&#34; 
-    src=&#34;https://HanHoRang31.github.io/t101-eks-build/11.png&#34; 
-    alt=&#34;EIP 확인&#34; 
-     
-    width=2846 
-    height=&#34;1292&#34;  /&gt;&lt;/p&gt;
-&lt;p&gt;EIP 확인&lt;/p&gt;
-&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
-&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
-&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code&gt;&lt;span class=&#34;lnt&#34;&gt;1
-&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
-&lt;td class=&#34;lntd&#34;&gt;
-&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;ssh -i private-key/eks-terraform-key.pem ec2-user@3.35.41.234
-&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
-&lt;/div&gt;
-&lt;/div&gt;&lt;p&gt;베스천 서버에서 일부 워크 노드 접근도 바로 가능하다. 확인을 위해 일부 워크 노드 IP(10.0.1.161)로 SSH 접근해보았다.&lt;/p&gt;
-&lt;p&gt;&lt;img loading=&#34;lazy&#34; 
-    src=&#34;https://HanHoRang31.github.io/t101-eks-build/12.png&#34; 
-    alt=&#34;베스천 서버에서 워크 노드로 접근&#34; 
-     
-    width=618 
-    height=&#34;187&#34;  /&gt;&lt;/p&gt;
-&lt;p&gt;베스천 서버에서 워크 노드로 접근&lt;/p&gt;
-&lt;p&gt;마지막으로 클러스터 관리를 위해 API Server 접근하기 위해서는 쿠버네티스 명령어 도구인 kubectl 설치와 클러스터에 접근하기 위한 키 등록이 필요하다. kubectl 설치는 &lt;a href=&#34;https://kubernetes.io/ko/docs/tasks/tools/install-kubectl-linux/&#34;&gt;링크&lt;/a&gt;를 참고했고, EKS 클러스터 접근 키는 AWS 명령어를 통해 kubeconfig를 생성했다.&lt;/p&gt;
-&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
-&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
-&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code&gt;&lt;span class=&#34;lnt&#34;&gt;1
-&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
-&lt;td class=&#34;lntd&#34;&gt;
-&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;aws eks --region ap-northeast-2 update-kubeconfig --name &amp;lt;cluster-name&amp;gt;
-&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
-&lt;/div&gt;
-&lt;/div&gt;&lt;p&gt;EKS 접근 키 발급시 AWS 인증이 필요하다, 액세스 키와 보안키를 등록하고 EKS 클러스터 접근 키를 발급받자.&lt;/p&gt;
-&lt;p&gt;&lt;img loading=&#34;lazy&#34; 
-    src=&#34;https://HanHoRang31.github.io/t101-eks-build/13.png&#34; 
-    alt=&#34;kube 접근 토큰 발급&#34; 
-     
-    width=745 
-    height=&#34;117&#34;  /&gt;&lt;/p&gt;
-&lt;p&gt;kube 접근 토큰 발급&lt;/p&gt;
-&lt;p&gt;마지막으로 클러스터 접근 키를 통해 클러스터 노드 정보를 확인하고, 노드그룹 확인을 위해 노드 그룹 라벨을 확인하면 테스트가 완료된다.&lt;/p&gt;
-&lt;p&gt;&lt;img loading=&#34;lazy&#34; 
-    src=&#34;https://HanHoRang31.github.io/t101-eks-build/14.png&#34; 
-    alt=&#34;노드 정보 확인&#34; 
-     
-    width=1154 
-    height=&#34;766&#34;  /&gt;&lt;/p&gt;
-&lt;p&gt;노드 정보 확인&lt;/p&gt;
-&lt;h3 id=&#34;끝으로&#34;&gt;
-    &lt;a href=&#34;#%eb%81%9d%ec%9c%bc%eb%a1%9c&#34; class=&#34;anchor&#34;&gt;
-        &lt;svg class=&#34;icon&#34; aria-hidden=&#34;true&#34; focusable=&#34;false&#34; height=&#34;16&#34; version=&#34;1.1&#34; viewBox=&#34;0 0 16 16&#34; width=&#34;16&#34;&gt;
-            &lt;path fill-rule=&#34;evenodd&#34;
-                d=&#34;M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z&#34;&gt;
-            &lt;/path&gt;
-        &lt;/svg&gt;
-    &lt;/a&gt;
-    끝으로
-&lt;/h3&gt;
-&lt;p&gt;사족이지만, T101 스터디를 통해서 여러 테라폼 툴을 접해보았다. EKS 구축을 진행하면서 사용했던 툴에 대한 경험을 공유하고자 한다.&lt;/p&gt;
-&lt;ul&gt;
-&lt;li&gt;
-&lt;p&gt;테라폼 시각화 툴, pluralith(&lt;a href=&#34;https://www.pluralith.com/&#34;&gt;https://www.pluralith.com/&lt;/a&gt;)&lt;/p&gt;
-&lt;p&gt;테라폼 시각화 툴이지만, 아직 알파 버전으로 업데이트가 필요하였던 툴이다. 특히 EKS 같이 여러 리소스가 혼합되어 복잡해지면 시각화에 한계가 있었다. 또한, pluralith 서버 내 시각화 실행 메모리가 낮게 측정되어 있었다. 처음 시각화 진행시 버그 이슈로 시각화가 안되어 깃허브 이슈를 통해서 원인을 요청하였고 pluralith 측에서 메모리가 낮게 설정되어 있던 것을 확인하였다. 해당 툴 사용시 시각화 단계에서 버그를 뱉는다면 깃허브 이슈로 문의해보자.&lt;/p&gt;
-&lt;p&gt;&lt;img loading=&#34;lazy&#34; 
-    src=&#34;https://HanHoRang31.github.io/t101-eks-build/15.png&#34; 
-    alt=&#34;시각화툴.png&#34; 
-     
-    width=2316 
-    height=&#34;1078&#34;  /&gt;&lt;/p&gt;
-&lt;/li&gt;
-&lt;li&gt;
-&lt;p&gt;테라폼 비용 계산 툴, infracost(&lt;a href=&#34;https://www.infracost.io/docs/&#34;&gt;https://www.infracost.io/docs/&lt;/a&gt;)&lt;/p&gt;
-&lt;p&gt;테라폼에서 정의한 서비스들에 대해 비용을 측정해주는 툴이다. 사용하기 편했고 비용 측정에 있어 한눈에 알아볼 수 있어 유용했다. 아래는 이번 포스트에서 구축한 EKS 운영 비용이다. 206달러라니.. 비용이 상당하다.&lt;/p&gt;
-&lt;p&gt;&lt;img loading=&#34;lazy&#34; 
-    src=&#34;https://HanHoRang31.github.io/t101-eks-build/infracost.png&#34; 
-    alt=&#34;infracost.png&#34; 
-     
-    width=733 
-    height=&#34;597&#34;  /&gt;&lt;/p&gt;
-&lt;/li&gt;
-&lt;/ul&gt;
-&lt;p&gt;이로써 EKS 구축이 끝났다! 다음 블로그 글에서는 EKS addon를 테라폼으로 구축하는 경험을 공유할 예정이다.&lt;/p&gt;
-
-    </description>
-    </item>
-    
-    <item>
     <title>[T101] 테라폼으로 EKS 관리하기</title>
     <link>https://HanHoRang31.github.io/post/t101-eks-manage/</link>
     <pubDate>Mon, 28 Aug 2023 00:00:00 +0000</pubDate>
@@ -2103,6 +1746,363 @@
     끝으로
 &lt;/h3&gt;
 &lt;p&gt;이것으로 테라폼에서 EKS 관리를 위한 3가지의 과정을 끝냈다! 다음 포스트 글에서는 EKS 기능 확장을 위한 addon 설치 방법을 다룰 예정이다.&lt;/p&gt;
+
+    </description>
+    </item>
+    
+    <item>
+    <title>[T101] 테라폼으로 EKS 구축하기</title>
+    <link>https://HanHoRang31.github.io/post/t101-eks-build/</link>
+    <pubDate>Mon, 28 Aug 2023 00:00:00 +0000</pubDate>
+    <author>HanHoRnag</author>
+    <guid>https://HanHoRang31.github.io/post/t101-eks-build/</guid>
+    <description>
+        &lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
+&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code&gt;&lt;span class=&#34;lnt&#34;&gt;1
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;2
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;3
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-markdown&#34; data-lang=&#34;markdown&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;T101(=Terraform 101 Study)는 Terraform 실무 실습 스터디입니다.
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;CloudNet@ Gasida(가시다)이 진행하시며, 책 &amp;#34;Terraform Up &lt;span class=&#34;err&#34;&gt;&amp;amp;&lt;/span&gt; Running&amp;#34;을 기반으로 진행하고 있습니다.
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;22년 9월 기준 학습 내용입니다. 블로그 이주로 다시 포스트합니다. 
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;p&gt;테라폼 스터디 4주차가 지났다. 스터디를 진행하면서 테라폼 기능과 툴을 학습하였고, 예제로 AWS 서비스 3티어 아키텍처를 구성할 정도가 되었다. 그렇다면 EKS 처럼 AWS 서비스가 복잡하게 얽혀있는 것도 테라폼으로 구축이 가능할까? 라는 생각으로 글을 작성한다.&lt;/p&gt;
+&lt;p&gt;구글에 검색해보니 테라폼을 통해 EKS 구축하는 자료들을 쉽게 접할 수 있었다. 자료를 참고하는 것도 많은 도움이 되었지만, 실제 애플리케이션을 운영한다는 것을 가정하고 예제 코드를 수정하고 추가하는 것이 스스로의 실력 향상에 도움이 된다고 생각하여 가상의 주제를 정하였다.&lt;/p&gt;
+&lt;p&gt;EKS 구축 목적은 &lt;code&gt;가상의 사내 클라우드 저장소 운영&lt;/code&gt;으로 정하였다. 여러 글에 나눠 구축 경험을 공유할 예정이다.  여기서의  클라우드 저장소는 사내에서만 접근가능하며, 관리자만이 외부에서 베스천 서버를 통해 클러스터 접근이 가능하도록 한정하였다.&lt;/p&gt;
+&lt;p&gt;먼저 구성 아키텍처는 다음과 같다.&lt;/p&gt;
+&lt;p&gt;&lt;img loading=&#34;lazy&#34; 
+    src=&#34;https://HanHoRang31.github.io/t101-eks-build/1.png&#34; 
+    alt=&#34;t101 아키텍처.png&#34; 
+     
+    width=1076 
+    height=&#34;831&#34;  /&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;본 포스터 글에서는 테라폼 모듈들로 AWS 서비스를 구축하는 것까지 진행하였다.
+실제 애플리케이션이나 운영 add-on서비스들은 추후 블로그 글을 통해 정리할 예정이다.&lt;/li&gt;
+&lt;li&gt;구성 아키텍처의 테라폼 코드들은 &lt;a href=&#34;https://github.com/HanHoRang31/T101-Terraform-EKS&#34;&gt;깃허브 링크&lt;/a&gt;를 통해서 확인이 가능하다.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;레파지토리의 내용을 보면 EKS 구축에 필요한 AWS 서비스들과 사용 변수들을 파일들을 나눠 구성하였다.&lt;/p&gt;
+&lt;p&gt;&lt;img loading=&#34;lazy&#34; 
+    src=&#34;https://HanHoRang31.github.io/t101-eks-build/2.png&#34; 
+    alt=&#34;아키텍처2.png&#34; 
+     
+    width=328 
+    height=&#34;755&#34;  /&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;a href=&#34;http://c1-version.tf&#34;&gt;c1-version.tf&lt;/a&gt; : AWS 프로바이더와 지역을 설정하였다.&lt;/li&gt;
+&lt;li&gt;c2-01,c2-02 :  AWS 지역과 EKS 구성시 태그 정보나 지역 정보를 지역 변수로 정의한 파일이다.&lt;/li&gt;
+&lt;li&gt;c3 : VPC 서비스를 구축하기 위한 모듈들을 정리했다.&lt;/li&gt;
+&lt;li&gt;c4 : 베스천 서버를 목적으로 EC2를 구성한 파일이다. 또한, EKS 워크 노드 접속 설정과 외부에서 베스천 서버로 접속하기 위해 설정 모듈들이 정의되어 있다.&lt;/li&gt;
+&lt;li&gt;c5 : EKS 구축을 위한 리소스를 정의했다.&lt;/li&gt;
+&lt;li&gt;~vars 파일들 : 실제 사용 변수들을 정의했다.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;EKS 구축에 사용한 모듈은 테라폼 레지스트리에서 인증된 AWS 모듈과 리소스를 사용했다. 테라폼 레지스트리에는 여러 모듈이 있지만, 외부 노출과 사용 안정성 면에서 공인적으로 인증된 모듈 사용을 적극 추천한다.&lt;/p&gt;
+&lt;p&gt;&lt;img loading=&#34;lazy&#34; 
+    src=&#34;https://HanHoRang31.github.io/t101-eks-build/3.png&#34; 
+    alt=&#34;공식 인증, 검증 마크 표시&#34; 
+     
+    width=234 
+    height=&#34;216&#34;  /&gt;&lt;/p&gt;
+&lt;p&gt;공식 인증, 검증 마크 표시&lt;/p&gt;
+&lt;p&gt;&lt;img loading=&#34;lazy&#34; 
+    src=&#34;https://HanHoRang31.github.io/t101-eks-build/4.png&#34; 
+    alt=&#34; 옆 마크 표시를 확인하자! &#34; 
+     
+    width=1365 
+    height=&#34;673&#34;  /&gt;&lt;/p&gt;
+&lt;p&gt;옆 마크 표시를 확인하자!&lt;/p&gt;
+&lt;p&gt;테라폼 레지스트리에서는 여러 예제를 제공한다. 필자는 테라폼 학습시 예제를 통해 학습한 모듈의 내용을 확인하였고 추가 옵션 필요시 레지스트리 내 변수를 확인하여 옵션을 설정하였다.&lt;/p&gt;
+&lt;p&gt;&lt;img loading=&#34;lazy&#34; 
+    src=&#34;https://HanHoRang31.github.io/t101-eks-build/5.png&#34; 
+    alt=&#34;ec2_instance 모듈 예제&#34; 
+     
+    width=1368 
+    height=&#34;597&#34;  /&gt;&lt;/p&gt;
+&lt;p&gt;ec2_instance 모듈 예제&lt;/p&gt;
+&lt;p&gt;&lt;img loading=&#34;lazy&#34; 
+    src=&#34;https://HanHoRang31.github.io/t101-eks-build/6.png&#34; 
+    alt=&#34;모듈 내 key_name 옵션 확인&#34; 
+     
+    width=1206 
+    height=&#34;841&#34;  /&gt;&lt;/p&gt;
+&lt;p&gt;모듈 내 key_name 옵션 확인&lt;/p&gt;
+&lt;p&gt;다음의 글은 필자가 커스터마이징을 진행한 부분과 정리가 필요한 내용들을 작성하였다.&lt;/p&gt;
+&lt;h3 id=&#34;eks-구성&#34;&gt;
+    &lt;a href=&#34;#eks-%ea%b5%ac%ec%84%b1&#34; class=&#34;anchor&#34;&gt;
+        &lt;svg class=&#34;icon&#34; aria-hidden=&#34;true&#34; focusable=&#34;false&#34; height=&#34;16&#34; version=&#34;1.1&#34; viewBox=&#34;0 0 16 16&#34; width=&#34;16&#34;&gt;
+            &lt;path fill-rule=&#34;evenodd&#34;
+                d=&#34;M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z&#34;&gt;
+            &lt;/path&gt;
+        &lt;/svg&gt;
+    &lt;/a&gt;
+    EKS 구성
+&lt;/h3&gt;
+&lt;p&gt;필자는 사내 클라우드 저장소 구성을 목표로 EKS를 구축했다. 이를 위해 EKS 워크 노드 그룹을 프라이빗 서브넷에 배포하여 VPC 외부에서 접근하지 못하게 구성하였습니다. 또한, API 서버 액세스는 프라이빗 액세스로 설정했다.&lt;/p&gt;
+&lt;p&gt;EKS 보안 그룹은 크게 3가지로 설정이 가능하다. 클러스터 보안 그룹, 추가 보안그룹(컨트롤 노드 보안 그룹), 워크 노드 보안 그룹으로 나눠지며 세부적으로 포트 제어가 가능하다. 클러스터 보안 그룹은 컨트롤 노드 그룹과 워크 노드 그룹 동시에 적용되는 보안 그룹이다. 해당 보안 그룹을 통해 컨트롤 노드와 워크 노드의 통신이 가능하도록 기본적으로 제공되는 보안 그룹이다. 공식 문서를 통해서는 최소 네트워크 허용 포트를 다음의 그림과 같이 권고한다.&lt;/p&gt;
+&lt;p&gt;&lt;img loading=&#34;lazy&#34; 
+    src=&#34;https://HanHoRang31.github.io/t101-eks-build/7.png&#34; 
+    alt=&#34;&amp;lt;a href=&amp;#34;https://github.com/terraform-aws-modules/terraform-aws-eks/blob/master/docs/network_connectivity.md&amp;#34;&amp;gt;https://github.com/terraform-aws-modules/terraform-aws-eks/blob/master/docs/network_connectivity.md&amp;lt;/a&amp;gt;&#34; 
+     
+    width=1300 
+    height=&#34;1109&#34;  /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;a href=&#34;https://github.com/terraform-aws-modules/terraform-aws-eks/blob/master/docs/network_connectivity.md&#34;&gt;https://github.com/terraform-aws-modules/terraform-aws-eks/blob/master/docs/network_connectivity.md&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;다만, 이번 포스트에서는 EKS 구축과 테스트 용으로 진행하는 것이 목적이라 클러스터 보안 그룹을 0.0.0.0/0 으로 설정하였다.&lt;/p&gt;
+&lt;h3 id=&#34;노드-그룹-설정&#34;&gt;
+    &lt;a href=&#34;#%eb%85%b8%eb%93%9c-%ea%b7%b8%eb%a3%b9-%ec%84%a4%ec%a0%95&#34; class=&#34;anchor&#34;&gt;
+        &lt;svg class=&#34;icon&#34; aria-hidden=&#34;true&#34; focusable=&#34;false&#34; height=&#34;16&#34; version=&#34;1.1&#34; viewBox=&#34;0 0 16 16&#34; width=&#34;16&#34;&gt;
+            &lt;path fill-rule=&#34;evenodd&#34;
+                d=&#34;M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z&#34;&gt;
+            &lt;/path&gt;
+        &lt;/svg&gt;
+    &lt;/a&gt;
+    노드 그룹 설정
+&lt;/h3&gt;
+&lt;p&gt;운영 단위로 나눠 워크 노드 그룹을 구축하였다. 각 노드 그룹 분리는 실제 인프라간 영향을 최소화를 목적으로 분리하였다. 애플리케이션 운영을 위한 노드 그룹인 &lt;code&gt;ops&lt;/code&gt; 와 클러스터 addon 서비스 운영을 위한 &lt;code&gt;addon&lt;/code&gt; 로 구성하였고, 추후 모니터링이나 CI/CD 필요시 노드 그룹을 추가 구성할 예정이다.&lt;/p&gt;
+&lt;h3 id=&#34;관리자-서버-접근-설정&#34;&gt;
+    &lt;a href=&#34;#%ea%b4%80%eb%a6%ac%ec%9e%90-%ec%84%9c%eb%b2%84-%ec%a0%91%ea%b7%bc-%ec%84%a4%ec%a0%95&#34; class=&#34;anchor&#34;&gt;
+        &lt;svg class=&#34;icon&#34; aria-hidden=&#34;true&#34; focusable=&#34;false&#34; height=&#34;16&#34; version=&#34;1.1&#34; viewBox=&#34;0 0 16 16&#34; width=&#34;16&#34;&gt;
+            &lt;path fill-rule=&#34;evenodd&#34;
+                d=&#34;M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z&#34;&gt;
+            &lt;/path&gt;
+        &lt;/svg&gt;
+    &lt;/a&gt;
+    관리자 서버 접근 설정
+&lt;/h3&gt;
+&lt;p&gt;EKS 관리를 위해 베스천 서버를 추가로 구성하였다. 베스천 서버는 외부에서 접근이 가능하도록 구성하였고, 베스천 서버에서 EKS API server 와 워크 노드에 접근이 가능하도록 구성했다.&lt;/p&gt;
+&lt;p&gt;&lt;img loading=&#34;lazy&#34; 
+    src=&#34;https://HanHoRang31.github.io/t101-eks-build/8.png&#34; 
+    alt=&#34;SSH 아키텍처.png&#34; 
+     
+    width=1660 
+    height=&#34;1374&#34;  /&gt;&lt;/p&gt;
+&lt;p&gt;빨간 선은 관리자가 접근하게 되는 통신 경로이다. 이를 구성하기 위해 3가지 작업을 진행하였다.&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;
+&lt;p&gt;베스천 서버 접근 SSH 설정&lt;/p&gt;
+&lt;p&gt;먼저 SSH 접속을 위해 AWS에서 pem key를 발급받아 &lt;code&gt;private-key&lt;/code&gt; 폴더에 저장하였다. 이후 테라폼에서 베스천 서버 생성시 테라폼 프로비저너(provisioner)을 통해 로컬과 원격에서 SSH 키를 등록하도록 구성하였다. 프로비저너를 통한 스크립트는 다음과 같다.&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
+&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code&gt;&lt;span class=&#34;lnt&#34;&gt; 1
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 2
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 3
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 4
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 5
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 6
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 7
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 8
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 9
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;10
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;11
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;12
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;13
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;14
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;15
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;16
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;17
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;18
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;19
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;20
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;21
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;22
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;23
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;24
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;25
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;26
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;27
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;28
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;29
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;30
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;c1&#34;&gt;# Create a Null Resource and Provisioners&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;resource &lt;span class=&#34;s2&#34;&gt;&amp;#34;null_resource&amp;#34;&lt;/span&gt; &lt;span class=&#34;s2&#34;&gt;&amp;#34;copy_ec2_keys&amp;#34;&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;{&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;  &lt;span class=&#34;nv&#34;&gt;depends_on&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;[&lt;/span&gt;module.ec2_public&lt;span class=&#34;o&#34;&gt;]&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;  &lt;span class=&#34;c1&#34;&gt;# Connection Block for Provisioners to connect to EC2 Instance&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;  connection &lt;span class=&#34;o&#34;&gt;{&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;    &lt;span class=&#34;nb&#34;&gt;type&lt;/span&gt;     &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;s2&#34;&gt;&amp;#34;ssh&amp;#34;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;    &lt;span class=&#34;nv&#34;&gt;host&lt;/span&gt;     &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; aws_eip.bastion_eip.public_ip    
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;    &lt;span class=&#34;nv&#34;&gt;user&lt;/span&gt;     &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;s2&#34;&gt;&amp;#34;ec2-user&amp;#34;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;    &lt;span class=&#34;nv&#34;&gt;password&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;s2&#34;&gt;&amp;#34;&amp;#34;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;    &lt;span class=&#34;nv&#34;&gt;private_key&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; file&lt;span class=&#34;o&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;s2&#34;&gt;&amp;#34;private-key/eks-terraform-key.pem&amp;#34;&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;)&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;  &lt;span class=&#34;o&#34;&gt;}&lt;/span&gt;  
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;c1&#34;&gt;## File Provisioner: Copies the terraform-key.pem file to /tmp/terraform-key.pem&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;  provisioner &lt;span class=&#34;s2&#34;&gt;&amp;#34;file&amp;#34;&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;{&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;    &lt;span class=&#34;nb&#34;&gt;source&lt;/span&gt;      &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;s2&#34;&gt;&amp;#34;private-key/eks-terraform-key.pem&amp;#34;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;    &lt;span class=&#34;nv&#34;&gt;destination&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;s2&#34;&gt;&amp;#34;/tmp/eks-terraform-key.pem&amp;#34;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;  &lt;span class=&#34;o&#34;&gt;}&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;c1&#34;&gt;## Remote Exec Provisioner: Using remote-exec provisioner fix the private key permissions on Bastion Host&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;  provisioner &lt;span class=&#34;s2&#34;&gt;&amp;#34;remote-exec&amp;#34;&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;{&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;    &lt;span class=&#34;nv&#34;&gt;inline&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;[&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;      &lt;span class=&#34;s2&#34;&gt;&amp;#34;sudo chmod 400 /tmp/eks-terraform-key.pem&amp;#34;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;    &lt;span class=&#34;o&#34;&gt;]&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;  &lt;span class=&#34;o&#34;&gt;}&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;c1&#34;&gt;## Local Exec Provisioner:  local-exec provisioner (Creation-Time Provisioner - Triggered during Create Resource)&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;  provisioner &lt;span class=&#34;s2&#34;&gt;&amp;#34;local-exec&amp;#34;&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;{&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;    &lt;span class=&#34;nb&#34;&gt;command&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;s2&#34;&gt;&amp;#34;echo VPC created on `date` and VPC ID: &lt;/span&gt;&lt;span class=&#34;si&#34;&gt;${&lt;/span&gt;&lt;span class=&#34;nv&#34;&gt;module&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.vpc.vpc_id&lt;/span&gt;&lt;span class=&#34;si&#34;&gt;}&lt;/span&gt;&lt;span class=&#34;s2&#34;&gt; &amp;gt;&amp;gt; creation-time-vpc-id.txt&amp;#34;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;    &lt;span class=&#34;nv&#34;&gt;working_dir&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;s2&#34;&gt;&amp;#34;local-exec-output-files/&amp;#34;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;    &lt;span class=&#34;c1&#34;&gt;#on_failure = continue&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;  &lt;span class=&#34;o&#34;&gt;}&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;o&#34;&gt;}&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;resource.connection&lt;/code&gt; : EC2 SSH 접속 정보 설정&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;resource.file&lt;/code&gt;  : EC2 서버 내 파일 저장, 접근 키를 서버내로 복사&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;rresource.remote-exec&lt;/code&gt; : EC2 서버 내 스크립트 실행, 접근 키에 대한 권한 설정&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;resource.local-exec&lt;/code&gt; :  로컬에서 스크립트 실행, 서버 생성 후 VPC 정보를 &lt;code&gt;local-exec-output-files/&lt;/code&gt; 폴더에 저장&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;워크 노드 접근 SSH 설정&lt;/p&gt;
+&lt;p&gt;베스천서버에서 워크노드로 접근하기 위해 다음과 같이 테라폼 코드 내에서 앞서 생성한 접근 키 설정하였다.&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
+&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code&gt;&lt;span class=&#34;lnt&#34;&gt;1
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;2
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;3
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-markdown&#34; data-lang=&#34;markdown&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;remote_access {
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;    ec2_ssh_key = &amp;#34;eks-terraform-key&amp;#34;    
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;}
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;API server 접근 설정&lt;/p&gt;
+&lt;p&gt;API Server를 접근하기 위해서는 네트워크 확인과 config 키 등록이 필요하다. 먼저 네트워크는 베스천 서버와 EKS 클러스터를 동일 VPC에 생성하였고, 보안 그룹을 0.0.0.0/0 으로 설정하여 접근이 가능하도록 구성하였다. config 등록은 클러스터 구축 이후 테스트 단계에서 진행하겠다.&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h3 id=&#34;구현&#34;&gt;
+    &lt;a href=&#34;#%ea%b5%ac%ed%98%84&#34; class=&#34;anchor&#34;&gt;
+        &lt;svg class=&#34;icon&#34; aria-hidden=&#34;true&#34; focusable=&#34;false&#34; height=&#34;16&#34; version=&#34;1.1&#34; viewBox=&#34;0 0 16 16&#34; width=&#34;16&#34;&gt;
+            &lt;path fill-rule=&#34;evenodd&#34;
+                d=&#34;M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z&#34;&gt;
+            &lt;/path&gt;
+        &lt;/svg&gt;
+    &lt;/a&gt;
+    구현
+&lt;/h3&gt;
+&lt;p&gt;실제 구축은 테라폼 명령어를 통해 쉽게 구축이 가능하다. 다음의 그림은 테라폼 명령어 세부 동작에 대해 자세히 정리되어 있는 그림이 있어 공유한다.&lt;/p&gt;
+&lt;p&gt;&lt;img loading=&#34;lazy&#34; 
+    src=&#34;https://HanHoRang31.github.io/t101-eks-build/9.png&#34; 
+    alt=&#34;@StackSimplfy&#34; 
+     
+    width=2138 
+    height=&#34;1122&#34;  /&gt;&lt;/p&gt;
+&lt;p&gt;@StackSimplfy&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;terraform init : 코드에서 정의한 프로바이더를 테라폼 레지스트리에서 확인하고 다운받는다.&lt;/li&gt;
+&lt;li&gt;terraform validate :  테라폼 코드에 대해 유효 테스트를 진행해준다.&lt;/li&gt;
+&lt;li&gt;terraform plan : 테라폼 코드가 어떻게 구현되는지 예측 결과를 보여준다.  예측 결과는 desired state로 정의되어 terraform.tfstate 파일로 저장된다.&lt;/li&gt;
+&lt;li&gt;terraform apply : 구현 단계이다. 앞서 단계에서 생성한 파일을 토대로 실제 서비스를 구축한다.&lt;/li&gt;
+&lt;li&gt;terraform destroy : 삭제 명령어다. 실행시 서비스를 삭제한다.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;필자 또한 테라폼 명령어를 통해 EKS를 구축하였다. EKS 구축까지 대략 20분이 소비되었다. 구축이 완료되면 AWS 콘솔로 접속하여 구축한 EKS 정보를 확인할 수 있다.&lt;/p&gt;
+&lt;p&gt;&lt;img loading=&#34;lazy&#34; 
+    src=&#34;https://HanHoRang31.github.io/t101-eks-build/10.png&#34; 
+    alt=&#34;EKS 구축 확인&#34; 
+     
+    width=2138 
+    height=&#34;1382&#34;  /&gt;&lt;/p&gt;
+&lt;p&gt;EKS 구축 확인&lt;/p&gt;
+&lt;h3 id=&#34;테스트&#34;&gt;
+    &lt;a href=&#34;#%ed%85%8c%ec%8a%a4%ed%8a%b8&#34; class=&#34;anchor&#34;&gt;
+        &lt;svg class=&#34;icon&#34; aria-hidden=&#34;true&#34; focusable=&#34;false&#34; height=&#34;16&#34; version=&#34;1.1&#34; viewBox=&#34;0 0 16 16&#34; width=&#34;16&#34;&gt;
+            &lt;path fill-rule=&#34;evenodd&#34;
+                d=&#34;M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z&#34;&gt;
+            &lt;/path&gt;
+        &lt;/svg&gt;
+    &lt;/a&gt;
+    테스트
+&lt;/h3&gt;
+&lt;p&gt;EKS 구축이 완료되었으면 실제 테스트를 진행해보자. 관리자 입장에서 베스천 서버를 접근하고 클러스터 접근이 가능한지 확인하겠다. 먼저, 베스천서버의 EIP를 확인하고 발급받은 키를 통해 베스천서버로 접속하겠다.&lt;/p&gt;
+&lt;p&gt;&lt;img loading=&#34;lazy&#34; 
+    src=&#34;https://HanHoRang31.github.io/t101-eks-build/11.png&#34; 
+    alt=&#34;EIP 확인&#34; 
+     
+    width=2846 
+    height=&#34;1292&#34;  /&gt;&lt;/p&gt;
+&lt;p&gt;EIP 확인&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
+&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code&gt;&lt;span class=&#34;lnt&#34;&gt;1
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;ssh -i private-key/eks-terraform-key.pem ec2-user@3.35.41.234
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;p&gt;베스천 서버에서 일부 워크 노드 접근도 바로 가능하다. 확인을 위해 일부 워크 노드 IP(10.0.1.161)로 SSH 접근해보았다.&lt;/p&gt;
+&lt;p&gt;&lt;img loading=&#34;lazy&#34; 
+    src=&#34;https://HanHoRang31.github.io/t101-eks-build/12.png&#34; 
+    alt=&#34;베스천 서버에서 워크 노드로 접근&#34; 
+     
+    width=618 
+    height=&#34;187&#34;  /&gt;&lt;/p&gt;
+&lt;p&gt;베스천 서버에서 워크 노드로 접근&lt;/p&gt;
+&lt;p&gt;마지막으로 클러스터 관리를 위해 API Server 접근하기 위해서는 쿠버네티스 명령어 도구인 kubectl 설치와 클러스터에 접근하기 위한 키 등록이 필요하다. kubectl 설치는 &lt;a href=&#34;https://kubernetes.io/ko/docs/tasks/tools/install-kubectl-linux/&#34;&gt;링크&lt;/a&gt;를 참고했고, EKS 클러스터 접근 키는 AWS 명령어를 통해 kubeconfig를 생성했다.&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
+&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code&gt;&lt;span class=&#34;lnt&#34;&gt;1
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;aws eks --region ap-northeast-2 update-kubeconfig --name &amp;lt;cluster-name&amp;gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;p&gt;EKS 접근 키 발급시 AWS 인증이 필요하다, 액세스 키와 보안키를 등록하고 EKS 클러스터 접근 키를 발급받자.&lt;/p&gt;
+&lt;p&gt;&lt;img loading=&#34;lazy&#34; 
+    src=&#34;https://HanHoRang31.github.io/t101-eks-build/13.png&#34; 
+    alt=&#34;kube 접근 토큰 발급&#34; 
+     
+    width=745 
+    height=&#34;117&#34;  /&gt;&lt;/p&gt;
+&lt;p&gt;kube 접근 토큰 발급&lt;/p&gt;
+&lt;p&gt;마지막으로 클러스터 접근 키를 통해 클러스터 노드 정보를 확인하고, 노드그룹 확인을 위해 노드 그룹 라벨을 확인하면 테스트가 완료된다.&lt;/p&gt;
+&lt;p&gt;&lt;img loading=&#34;lazy&#34; 
+    src=&#34;https://HanHoRang31.github.io/t101-eks-build/14.png&#34; 
+    alt=&#34;노드 정보 확인&#34; 
+     
+    width=1154 
+    height=&#34;766&#34;  /&gt;&lt;/p&gt;
+&lt;p&gt;노드 정보 확인&lt;/p&gt;
+&lt;h3 id=&#34;끝으로&#34;&gt;
+    &lt;a href=&#34;#%eb%81%9d%ec%9c%bc%eb%a1%9c&#34; class=&#34;anchor&#34;&gt;
+        &lt;svg class=&#34;icon&#34; aria-hidden=&#34;true&#34; focusable=&#34;false&#34; height=&#34;16&#34; version=&#34;1.1&#34; viewBox=&#34;0 0 16 16&#34; width=&#34;16&#34;&gt;
+            &lt;path fill-rule=&#34;evenodd&#34;
+                d=&#34;M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z&#34;&gt;
+            &lt;/path&gt;
+        &lt;/svg&gt;
+    &lt;/a&gt;
+    끝으로
+&lt;/h3&gt;
+&lt;p&gt;사족이지만, T101 스터디를 통해서 여러 테라폼 툴을 접해보았다. EKS 구축을 진행하면서 사용했던 툴에 대한 경험을 공유하고자 한다.&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;테라폼 시각화 툴, pluralith(&lt;a href=&#34;https://www.pluralith.com/&#34;&gt;https://www.pluralith.com/&lt;/a&gt;)&lt;/p&gt;
+&lt;p&gt;테라폼 시각화 툴이지만, 아직 알파 버전으로 업데이트가 필요하였던 툴이다. 특히 EKS 같이 여러 리소스가 혼합되어 복잡해지면 시각화에 한계가 있었다. 또한, pluralith 서버 내 시각화 실행 메모리가 낮게 측정되어 있었다. 처음 시각화 진행시 버그 이슈로 시각화가 안되어 깃허브 이슈를 통해서 원인을 요청하였고 pluralith 측에서 메모리가 낮게 설정되어 있던 것을 확인하였다. 해당 툴 사용시 시각화 단계에서 버그를 뱉는다면 깃허브 이슈로 문의해보자.&lt;/p&gt;
+&lt;p&gt;&lt;img loading=&#34;lazy&#34; 
+    src=&#34;https://HanHoRang31.github.io/t101-eks-build/15.png&#34; 
+    alt=&#34;시각화툴.png&#34; 
+     
+    width=2316 
+    height=&#34;1078&#34;  /&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;테라폼 비용 계산 툴, infracost(&lt;a href=&#34;https://www.infracost.io/docs/&#34;&gt;https://www.infracost.io/docs/&lt;/a&gt;)&lt;/p&gt;
+&lt;p&gt;테라폼에서 정의한 서비스들에 대해 비용을 측정해주는 툴이다. 사용하기 편했고 비용 측정에 있어 한눈에 알아볼 수 있어 유용했다. 아래는 이번 포스트에서 구축한 EKS 운영 비용이다. 206달러라니.. 비용이 상당하다.&lt;/p&gt;
+&lt;p&gt;&lt;img loading=&#34;lazy&#34; 
+    src=&#34;https://HanHoRang31.github.io/t101-eks-build/infracost.png&#34; 
+    alt=&#34;infracost.png&#34; 
+     
+    width=733 
+    height=&#34;597&#34;  /&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;이로써 EKS 구축이 끝났다! 다음 블로그 글에서는 EKS addon를 테라폼으로 구축하는 경험을 공유할 예정이다.&lt;/p&gt;
 
     </description>
     </item>
