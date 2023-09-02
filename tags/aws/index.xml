@@ -213,5 +213,15 @@ GitOps는 GIt을 진실의 원천(SSOT, Single Source of Truth) 으로 사용하
       <description>1 2 Production Kubernetes Online Study (=PKOS)는 쿠버네티스 실무 실습 스터디입니다. CloudNet@ Gasida(가시다)님이 진행하시며, 책 &amp;#34;24단계 실습으로 정복하는 쿠버네티스&amp;#34;을 기반으로 진행하고 있습니다. PKOS 1주차 스터디 내용과 느낌점을 정리하고자 한다. 스터디하면서 매번 느끼는 거지만 정말 괴수분들 너무 많고, 배울 점이 정말 많다… 특히 모임장님이신 가시다님의 스터디 내용은 볼 때마다 감탄만 나온다. 쿠버네티스에 대한 원리와 세부 컴포넌트에 대한 명령어까지 배운 점이 많다. 본 글에서는 필자가 배운 내용을 정리함과 동시에 개념에 대해 몰랐던 부분이나, 트러블슈팅에 대한 내용을 중점적으로 정리하였다.</description>
     </item>
     
+    <item>
+      <title>[T101] Terraform으로 EKS 구축하기</title>
+      <link>https://HanHoRang31.github.io/post/t101-eks-build/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://HanHoRang31.github.io/post/t101-eks-build/</guid>
+      <description>1 2 3 T101(=Terraform 101 Study)는 Terraform 실무 실습 스터디입니다. CloudNet@ Gasida(가시다)이 진행하시며, 책 &amp;#34;Terraform Up &amp;amp; Running&amp;#34;을 기반으로 진행하고 있습니다. 22년 9월 기준 학습 내용입니다. 블로그 이주로 다시 포스트합니다. 테라폼 스터디 4주차가 지났다. 스터디를 진행하면서 테라폼 기능과 툴을 학습하였고, 예제로 AWS 서비스 3티어 아키텍처를 구성할 정도가 되었다. 그렇다면 EKS 처럼 AWS 서비스가 복잡하게 얽혀있는 것도 테라폼으로 구축이 가능할까? 라는 생각으로 글을 작성한다.
+구글에 검색해보니 테라폼을 통해 EKS 구축하는 자료들을 쉽게 접할 수 있었다.</description>
+    </item>
+    
   </channel>
 </rss>
