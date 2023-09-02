@@ -26,5 +26,15 @@
 구글에 검색해보니 테라폼을 통해 EKS 구축하는 자료들을 쉽게 접할 수 있었다.</description>
     </item>
     
+    <item>
+      <title>[T101] 테라폼으로 EKS 관리하기</title>
+      <link>https://HanHoRang31.github.io/post/t101-eks-manage/</link>
+      <pubDate>Mon, 28 Aug 2023 00:00:00 +0000</pubDate>
+      
+      <guid>https://HanHoRang31.github.io/post/t101-eks-manage/</guid>
+      <description>1 2 3 T101(=Terraform 101 Study)는 Terraform 실무 실습 스터디입니다. CloudNet@ Gasida(가시다)이 진행하시며, 책 &amp;#34;Terraform Up &amp;amp; Running&amp;#34;을 기반으로 진행하고 있습니다. 22년 9월 기준 학습 내용입니다. 블로그 이주로 다시 포스트합니다. 지난 글에서는 테라폼으로 EKS Private 클러스터를 구성하였다. 오늘은 EKS 클러스터 구축 이후, 운영적인 부분으로 테라폼으로 EKS 관리를 위한 추가 설정에 대해 소개하고자 한다.
+추가 설정은 총 3가지로 나눠 다룰 예정이다. 테라폼 상태 관리, 상태 격리와 마지막으로 AWS 서비스에 접근하기 위한 보안 설정이다.</description>
+    </item>
+    
   </channel>
 </rss>

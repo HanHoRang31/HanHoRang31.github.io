@@ -1,0 +1,785 @@
+<!DOCTYPE html>
+<html lang="en-us">
+    
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="theme-color" content="dark">
+    <title>[T101] 테라폼으로 EKS 관리하기 | HanHoRang Tech Blog</title>
+
+    
+    
+    
+    <meta property="og:site_name" content="HanHoRang Tech Blog by Tania in Hugo" />
+    <meta property="og:title" content="[T101] 테라폼으로 EKS 관리하기 | HanHoRang Tech Blog"/>
+    <meta itemprop="name" content="[T101] 테라폼으로 EKS 관리하기 | HanHoRang Tech Blog" />
+    <meta name="twitter:title" content="[T101] 테라폼으로 EKS 관리하기 | HanHoRang Tech Blog" />
+    <meta name="application-name" content="[T101] 테라폼으로 EKS 관리하기 | HanHoRang Tech Blog" /><meta name="twitter:card" content="summary"/>
+
+    <meta name="description" content="테라폼을 통한 EKS 상태관리와 IRSA 설정이해하기" />
+    <meta name="twitter:description" content="테라폼을 통한 EKS 상태관리와 IRSA 설정이해하기 "/>
+    <meta itemprop="description" content=" 테라폼을 통한 EKS 상태관리와 IRSA 설정이해하기 "/>
+    <meta property="og:description" content=" 테라폼을 통한 EKS 상태관리와 IRSA 설정이해하기 " />
+
+    
+
+<meta property="og:type" content="article" />
+<meta property="article:publisher" content="Hugo Tania" />
+<meta property="og:article:published_time" content=2023-08-28T00:00:00Z />
+<meta property="article:published_time" content=2023-08-28T00:00:00Z />
+
+
+  <meta property="og:article:author" content="Han ho rnag" />
+  <meta property="article:author" content="Han ho rnag" />
+  <meta name="author" content="Han ho rnag" />
+
+
+
+
+<script defer type="application/ld+json">
+  {
+    "@context": "http://schema.org",
+    "@type": "Article",
+    "headline": "[T101] 테라폼으로 EKS 관리하기",
+    "author": {
+      "@type": "Person",
+      "name": "Hugo Tania"
+    },
+    "datePublished": "2023-08-28",
+    "description": "테라폼을 통한 EKS 상태관리와 IRSA 설정이해하기",
+    "wordCount":  1599 ,
+    "mainEntityOfPage": "True",
+    "dateModified": "2023-08-28",
+    "publisher": {
+      "@type": "Organization",
+      "name": "Hugo Tania",
+      "logo": {
+        "@type": "imageObject",
+        "url": "https:\/\/HanHoRang31.github.io\/favicon.ico"
+      }
+    }
+  }
+</script>
+
+
+
+    <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico" />
+    
+    <link rel="stylesheet" href="/sass/main.min.ab99ff095f832511e24ffb2fba2b51ad473b2f7e9301d674eba2c6c3a6e8bd81.css">
+    
+</head>
+    
+    <script>
+        (function() {
+            const colorSchemeKey = 'ThemeColorScheme';
+            if(!localStorage.getItem(colorSchemeKey)){
+                localStorage.setItem(colorSchemeKey, "auto");
+            }
+        })();
+    </script><script>
+    (function() {
+        const colorSchemeKey = 'ThemeColorScheme';
+        const colorSchemeItem = localStorage.getItem(colorSchemeKey);
+        const supportDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches === true;
+
+        if (colorSchemeItem == 'dark' || colorSchemeItem === 'auto' && supportDarkMode) {
+            
+
+            document.documentElement.dataset.userColorScheme = 'dark';
+        } else {
+            document.documentElement.dataset.userColorScheme = 'light';
+        }
+    })();
+</script>
+
+
+    <body class="dark">
+        <nav class="navbar">
+    <div class="container">
+        <div class="flex">
+            <div>
+                <a class="brand" href="/">
+                    
+                    
+                        <img src="/favicon.ico" />
+                    
+                    HanHoRang Tech Blog
+                    </a>
+            </div>
+            <div class="flex">
+                
+                <a href="/articles/">Articles</a>
+                
+                
+                    <button id="dark-mode-button">
+                    <svg class="light" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" aria-hidden="true" focusable="false" width="1em" height="1em" style="-ms-transform: rotate(360deg); -webkit-transform: rotate(360deg); transform: rotate(360deg);" preserveAspectRatio="xMidYMid meet" viewBox="0 0 36 36"><path fill="#FFD983" d="M30.312.776C32 19 20 32 .776 30.312c8.199 7.717 21.091 7.588 29.107-.429C37.9 21.867 38.03 8.975 30.312.776z"/><path d="M30.705 15.915a1.163 1.163 0 1 0 1.643 1.641a1.163 1.163 0 0 0-1.643-1.641zm-16.022 14.38a1.74 1.74 0 0 0 0 2.465a1.742 1.742 0 1 0 0-2.465zm13.968-2.147a2.904 2.904 0 0 1-4.108 0a2.902 2.902 0 0 1 0-4.107a2.902 2.902 0 0 1 4.108 0a2.902 2.902 0 0 1 0 4.107z" fill="#FFCC4D"/><rect x="0" y="0" width="36" height="36" fill="rgba(0, 0, 0, 0)" /></svg>
+                    <svg class="dark" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" aria-hidden="true" focusable="false" width="1em" height="1em" style="-ms-transform: rotate(360deg); -webkit-transform: rotate(360deg); transform: rotate(360deg);" preserveAspectRatio="xMidYMid meet" viewBox="0 0 36 36"><path fill="#FFD983" d="M16 2s0-2 2-2s2 2 2 2v2s0 2-2 2s-2-2-2-2V2zm18 14s2 0 2 2s-2 2-2 2h-2s-2 0-2-2s2-2 2-2h2zM4 16s2 0 2 2s-2 2-2 2H2s-2 0-2-2s2-2 2-2h2zm5.121-8.707s1.414 1.414 0 2.828s-2.828 0-2.828 0L4.878 8.708s-1.414-1.414 0-2.829c1.415-1.414 2.829 0 2.829 0l1.414 1.414zm21 21s1.414 1.414 0 2.828s-2.828 0-2.828 0l-1.414-1.414s-1.414-1.414 0-2.828s2.828 0 2.828 0l1.414 1.414zm-.413-18.172s-1.414 1.414-2.828 0s0-2.828 0-2.828l1.414-1.414s1.414-1.414 2.828 0s0 2.828 0 2.828l-1.414 1.414zm-21 21s-1.414 1.414-2.828 0s0-2.828 0-2.828l1.414-1.414s1.414-1.414 2.828 0s0 2.828 0 2.828l-1.414 1.414zM16 32s0-2 2-2s2 2 2 2v2s0 2-2 2s-2-2-2-2v-2z"/><circle fill="#FFD983" cx="18" cy="18" r="10"/><rect x="0" y="0" width="36" height="36" fill="rgba(0, 0, 0, 0)" /></svg>
+                    </button>
+                
+            </div>
+            </div>
+    </div>
+</nav>
+
+        <main>
+            
+<div class="container">
+    <article>
+        <header class="article-header">
+            <div class="thumb">
+                <div>
+                    <h1>[T101] 테라폼으로 EKS 관리하기</h1>
+                    <div class="post-meta">
+                        <div>
+                            
+                            
+                            By HanHoRnag | <time>August 28, 2023</time>
+                            | 8 minutes
+                        </div>
+                        <div class="tags">
+                            
+                            <a href="/tags/t101/">T101</a>
+                            
+                            <a href="/tags/eks/">eks</a>
+                            
+                            <a href="/tags/cloud/">cloud</a>
+                            
+                            <a href="/tags/aws/">AWS</a>
+                            
+                            <a href="/tags/terraform/">Terraform</a>
+                            
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </header>
+    </article>
+
+    <div class="article-post">
+    <div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-markdown" data-lang="markdown"><span class="line"><span class="cl">T101(=Terraform 101 Study)는 Terraform 실무 실습 스터디입니다.
+</span></span><span class="line"><span class="cl">CloudNet@ Gasida(가시다)이 진행하시며, 책 &#34;Terraform Up <span class="err">&amp;</span> Running&#34;을 기반으로 진행하고 있습니다.
+</span></span><span class="line"><span class="cl">22년 9월 기준 학습 내용입니다. 블로그 이주로 다시 포스트합니다. 
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>지난 글에서는 테라폼으로 EKS Private 클러스터를 구성하였다.  오늘은 EKS 클러스터 구축 이후, 운영적인 부분으로 <code>테라폼으로 EKS 관리</code>를 위한 추가 설정에 대해 소개하고자 한다.</p>
+<p>추가 설정은 총 3가지로 나눠 다룰 예정이다. 테라폼 상태 관리, 상태 격리와 마지막으로 AWS 서비스에 접근하기 위한 보안 설정이다.  테라폼 상태 관리와 상태 격리는 테라폼에서 인프라(EKS) 관리를 위한 기능이다.  구체적으로는 테라폼 상태 파일을 팀 단위에서 관리하기 위한 방법과 모듈 분리에 대한 방법을 소개할 것이다. AWS 서비스에 접근하기 위한 보안 설정은 EKS 의 기능 확장을 위한 사전 작업으로 필요한 과정이다. 기능 확장을 위해서는  <code>Addon</code> 이라는 모듈의 설치가 필요하며 각 <code>Addon</code> 들은 AWS 서비스들 이용하기에 필요한 보안 작업이다.</p>
+<p>마찬가지로 이번 포스트에 대한 코드들은 필자의 <a href="https://github.com/HanHoRang31/T101-Terraform-EKS/tree/main/2.Managing-EKS-with-Terraform">깃허브 레파지토리</a>에서 확인이 가능하다.</p>
+<h3 id="상태-관리">
+    <a href="#%ec%83%81%ed%83%9c-%ea%b4%80%eb%a6%ac" class="anchor">
+        <svg class="icon" aria-hidden="true" focusable="false" height="16" version="1.1" viewBox="0 0 16 16" width="16">
+            <path fill-rule="evenodd"
+                d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z">
+            </path>
+        </svg>
+    </a>
+    상태 관리
+</h3>
+<p>테라폼에서 선언한 상태 정보들은 실행 디렉토리 내 <code>terraform.tfstate</code> 파일에 저장된다. <code>terraform.tfstate</code> 파일은 테라폼 내 프라이빗 API 로 오직 테라폼 내부에서만 사용이 가능하며 직접 편집하거나 직접 읽는 코드로 작성해서는 안된다.</p>
+<p>이처럼 테라폼에서는 tfstate 파일을 통해 상태를 관리하지만, 팀 단위의 버전 관리시 추가 작업이 필요하다. 예를 들면, 팀 단위로 테라폼을 사용했을 시 관리자마다 테라폼에 대한 상태파일이 독립적으로 생성되어 인프라 유지에 어려움이 있을 것이다.</p>
+<p>이에 대한 해결책으로 원격 상태 스토리지를 이용한다. 원격 상태 스토리지를 이용하면 테라폼 상태 파일이 원격 스토리지에 저장되며 관리자들은 동일한 스토리지에서 상태 파일을 바라보기 때문에 버전 관리가 가능해진다.</p>
+<p><img loading="lazy" 
+    src="/t101-eks-manage/Untitled.png" 
+    alt="기본 상태 파일과 원격 상태 파일에 대한 비교 (출처.StakSimplify)" 
+     
+    width=1920 
+    height="1005"  /></p>
+<p>기본 상태 파일과 원격 상태 파일에 대한 비교 (출처.StakSimplify)</p>
+<p><strong>상태 관리 구현</strong></p>
+<p>상태 관리는 테라폼 내 기능인 <code>Backend</code> 을 통해 구현이 가능하다.<code>Backend</code> 는 상태 파일을 저장하고 동시 수정을 차단(locking)할 수 있는 기능을 제공한다.  필자 또한 해당 기능을 사용하여 상태 파일을 원격 스토리지에 저장시키도록 설정하였다. 원격 스토리지는 AWS에서 제공하는 객체 스토리지 서비스인 S3와 동시 수정을 제어할 수 있는 DynamoDB를 사용하였다. Backend 기능을 사용하기 전 원격 스토리지인 S3, DynamoDB 구축이 필요하다.</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span><span class="lnt">31
+</span><span class="lnt">32
+</span><span class="lnt">33
+</span><span class="lnt">34
+</span><span class="lnt">35
+</span><span class="lnt">36
+</span><span class="lnt">37
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl"><span class="c1"># 00-ekscluster-remote-stoarge/c0-remote-storage.tf</span>
+</span></span><span class="line"><span class="cl">provider <span class="s2">&#34;aws&#34;</span> <span class="o">{</span>
+</span></span><span class="line"><span class="cl">  <span class="nv">region</span> <span class="o">=</span> <span class="s2">&#34;ap-northeast-2&#34;</span>
+</span></span><span class="line"><span class="cl"><span class="o">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">resource <span class="s2">&#34;aws_s3_bucket&#34;</span> <span class="s2">&#34;t101-remote-bucket&#34;</span> <span class="o">{</span>
+</span></span><span class="line"><span class="cl">  <span class="nv">bucket</span> <span class="o">=</span> &lt;Bucket_NAME&gt;
+</span></span><span class="line"><span class="cl"><span class="o">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1"># Enable versioning so you can see the full revision history of your state files</span>
+</span></span><span class="line"><span class="cl">resource <span class="s2">&#34;aws_s3_bucket_versioning&#34;</span> <span class="s2">&#34;t101-remote-bucket_versioning&#34;</span> <span class="o">{</span>
+</span></span><span class="line"><span class="cl">  <span class="nv">bucket</span> <span class="o">=</span> aws_s3_bucket.t101-remote-bucket.id
+</span></span><span class="line"><span class="cl">  versioning_configuration <span class="o">{</span>
+</span></span><span class="line"><span class="cl">    <span class="nv">status</span> <span class="o">=</span> <span class="s2">&#34;Enabled&#34;</span>
+</span></span><span class="line"><span class="cl">  <span class="o">}</span>
+</span></span><span class="line"><span class="cl"><span class="o">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">resource <span class="s2">&#34;aws_dynamodb_table&#34;</span> <span class="s2">&#34;t101-remote-dynamodbtable&#34;</span> <span class="o">{</span>
+</span></span><span class="line"><span class="cl">  <span class="nv">name</span>         <span class="o">=</span> <span class="s2">&#34;terraform-locks&#34;</span>
+</span></span><span class="line"><span class="cl">  <span class="nv">billing_mode</span> <span class="o">=</span> <span class="s2">&#34;PAY_PER_REQUEST&#34;</span>
+</span></span><span class="line"><span class="cl">  <span class="nv">hash_key</span>     <span class="o">=</span> <span class="s2">&#34;LockID&#34;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">  attribute <span class="o">{</span>
+</span></span><span class="line"><span class="cl">    <span class="nv">name</span> <span class="o">=</span> <span class="s2">&#34;LockID&#34;</span>
+</span></span><span class="line"><span class="cl">    <span class="nb">type</span> <span class="o">=</span> <span class="s2">&#34;S&#34;</span>
+</span></span><span class="line"><span class="cl">  <span class="o">}</span>
+</span></span><span class="line"><span class="cl"><span class="o">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">output <span class="s2">&#34;s3_bucket_arn&#34;</span> <span class="o">{</span>
+</span></span><span class="line"><span class="cl">  <span class="nv">value</span>       <span class="o">=</span> aws_s3_bucket.t101-remote-bucket.arn
+</span></span><span class="line"><span class="cl">  <span class="nv">description</span> <span class="o">=</span> <span class="s2">&#34;The ARN of the S3 bucket&#34;</span>
+</span></span><span class="line"><span class="cl"><span class="o">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">output <span class="s2">&#34;dynamodb_table_name&#34;</span> <span class="o">{</span>
+</span></span><span class="line"><span class="cl">  <span class="nv">value</span>       <span class="o">=</span> aws_dynamodb_table.t101-remote-dynamodbtable.name
+</span></span><span class="line"><span class="cl">  <span class="nv">description</span> <span class="o">=</span> <span class="s2">&#34;The name of the DynamoDB table&#34;</span>
+</span></span><span class="line"><span class="cl"><span class="o">}</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p><code>Backend</code> 사용 방법은 간단하다. 위에서 생성한 S3 버켓과 DynamoDB 이름을 작성하면 된다.</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl"><span class="c1"># </span>
+</span></span><span class="line"><span class="cl"><span class="c1"># Terraform Settings Block</span>
+</span></span><span class="line"><span class="cl">terraform <span class="o">{</span>
+</span></span><span class="line"><span class="cl">  <span class="nv">required_version</span> <span class="o">=</span> <span class="s2">&#34;&gt;= 1.0.0&#34;</span>
+</span></span><span class="line"><span class="cl">  required_providers <span class="o">{</span>
+</span></span><span class="line"><span class="cl">    <span class="nv">aws</span> <span class="o">=</span> <span class="o">{</span>
+</span></span><span class="line"><span class="cl">      <span class="nb">source</span> <span class="o">=</span> <span class="s2">&#34;hashicorp/aws&#34;</span>
+</span></span><span class="line"><span class="cl">      <span class="nv">version</span> <span class="o">=</span> <span class="s2">&#34;~&gt; 3.70&#34;</span>
+</span></span><span class="line"><span class="cl">     <span class="o">}</span>
+</span></span><span class="line"><span class="cl">  <span class="o">}</span>
+</span></span><span class="line"><span class="cl">  <span class="c1"># Adding Backend as S3 for Remote State Storage</span>
+</span></span><span class="line"><span class="cl">  backend <span class="s2">&#34;s3&#34;</span> <span class="o">{</span>
+</span></span><span class="line"><span class="cl">    <span class="nv">bucket</span> <span class="o">=</span> &lt;Bucket_NAME&gt;
+</span></span><span class="line"><span class="cl">    <span class="nv">key</span>    <span class="o">=</span> <span class="s2">&#34;t101/eks-cluster/terraform.tfstate&#34;</span>
+</span></span><span class="line"><span class="cl">    <span class="nv">region</span> <span class="o">=</span> <span class="s2">&#34;ap-northeast-2&#34;</span> 
+</span></span><span class="line"><span class="cl"> 
+</span></span><span class="line"><span class="cl">    <span class="c1"># For State Locking</span>
+</span></span><span class="line"><span class="cl">    <span class="nv">dynamodb_table</span> <span class="o">=</span> <span class="s2">&#34;t101-remote-dynamodbtable&#34;</span>    
+</span></span><span class="line"><span class="cl">  <span class="o">}</span>  
+</span></span><span class="line"><span class="cl"><span class="o">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1"># Terraform Provider Block</span>
+</span></span><span class="line"><span class="cl">provider <span class="s2">&#34;aws&#34;</span> <span class="o">{</span>
+</span></span><span class="line"><span class="cl">  <span class="nv">region</span> <span class="o">=</span> var.aws_region
+</span></span><span class="line"><span class="cl"><span class="o">}</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h3 id="상태-격리">
+    <a href="#%ec%83%81%ed%83%9c-%ea%b2%a9%eb%a6%ac" class="anchor">
+        <svg class="icon" aria-hidden="true" focusable="false" height="16" version="1.1" viewBox="0 0 16 16" width="16">
+            <path fill-rule="evenodd"
+                d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z">
+            </path>
+        </svg>
+    </a>
+    상태 격리
+</h3>
+<p>상태 파일 격리을 이용하면 이미 구축한 인프라 정보들을 기반으로 모듈을 분리시킬 수 있다. 이는 유지 보수성과 관리측면에서 정말 유용한 기능이다. 만약 하나의 상태 파일에서 모든 인프라 구성을 관리하게 된다면 코드에 대한 유지보수성이 떨어지며, 인프라 수정시 전체 인프라에 대한 구성 정보를 확인하게 되어 테라폼 실행 속도가 현저히 늦어질 것이다.</p>
+<p>이번 글에서도 상태 파일을 이용하여 모듈을 분리하여 애드온을 설치한 내용들을 소개할 예정이다. 구체적으로는 지난 시간에 구축한 EKS 클러스터에 대해 독립적으로 테라폼 상태 파일을 구성하여 애드온을 설치할 예정이다. 밑의 그림은 상태 격리를 통한 모듈 분리 방법을 도식화한 그림이다. 상태 격리의 핵심은 상태 파일을 읽어오는 것으로 상태 관리에서 원격 스토리지에 저장한 상태파일을 읽어오는 것으로 이해하면 된다.</p>
+<p><img loading="lazy" 
+    src="/t101-eks-manage/2-1.png" 
+    alt="테라폼 구축과 addon 설치에 대한 모듈 분리 " 
+     
+    width=809 
+    height="490"  /></p>
+<p>테라폼 구축과 addon 설치에 대한 모듈 분리</p>
+<p><strong>상태 파일 격리 구현</strong></p>
+<p>상태 파일 격리 구현은 모듈별 실행 디렉토리 분리하는 것으로 시작한다. 모듈 분리로 필자에 대한 디렉터리을 일부 확인하면 지난 시간에 구축한 EKS 클러스터 내용을 확장하였다. 또한, 앞서 구성한 원격 스토리지 저장에 대한 모듈(00-ekscluster-remote-stoarge)을 분리하였고 바로 뒤에 소개할 보안 모듈(02-eks-irsa-terraform-manifests)을 분리하였다.</p>
+<p><img loading="lazy" 
+    src="/t101-eks-manage/2-2.png" 
+    alt="모듈 분리 디렉터리" 
+     
+    width=654 
+    height="238"  /></p>
+<p>모듈 분리 디렉터리</p>
+<p>격리 파일 구현의 핵심은 프로바이더를 통한 상태 읽기다. 원격 스토리지에 저장한 EKS 상태 파일을 읽는 방법으로 테라폼 Kubernetes 프로바이더와 Helm 프로바이더를 사용하였다. 아래 코드처럼 <code>data</code>를 선언하여 EKS 클러스터의 상태 파일이 저장된 파일들을 불러온다.</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span><span class="lnt">8
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl"><span class="c1"># Terraform Remote State Datasource - Remote Backend AWS S3</span>
+</span></span><span class="line"><span class="cl">data <span class="s2">&#34;terraform_remote_state&#34;</span> <span class="s2">&#34;eks&#34;</span> <span class="o">{</span>
+</span></span><span class="line"><span class="cl">  <span class="nv">backend</span> <span class="o">=</span> <span class="s2">&#34;s3&#34;</span>
+</span></span><span class="line"><span class="cl">  <span class="nv">config</span> <span class="o">=</span> <span class="o">{</span>
+</span></span><span class="line"><span class="cl">    <span class="nv">bucket</span> <span class="o">=</span> &lt;Bucket_NAME&gt;
+</span></span><span class="line"><span class="cl">    <span class="nv">key</span>    <span class="o">=</span> <span class="s2">&#34;t101/eks-cluster/terraform.tfstate&#34;</span>
+</span></span><span class="line"><span class="cl">    <span class="nv">region</span> <span class="o">=</span> var.aws_region
+</span></span><span class="line"><span class="cl">  <span class="o">}</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>그 다음 과정으로 프로바이더를 이용하여 EKS 클러스터 접근 정보를 등록한다. 접근 등록 이후 프로바이더 내 리소스들을 사용하면 자동으로 EKS 클러스터 내부에 쿠버네티스 리소스가 배포된다.</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl"><span class="c1"># Terraform Kubernetes Provider</span>
+</span></span><span class="line"><span class="cl">provider <span class="s2">&#34;kubernetes&#34;</span> <span class="o">{</span>
+</span></span><span class="line"><span class="cl">  <span class="nv">host</span> <span class="o">=</span> data.terraform_remote_state.eks.outputs.cluster_endpoint 
+</span></span><span class="line"><span class="cl">  <span class="nv">cluster_ca_certificate</span> <span class="o">=</span> base64decode<span class="o">(</span>data.terraform_remote_state.eks.outputs.cluster_certificate_authority_data<span class="o">)</span>
+</span></span><span class="line"><span class="cl">  <span class="nv">token</span> <span class="o">=</span> data.aws_eks_cluster_auth.cluster.token
+</span></span><span class="line"><span class="cl"><span class="o">}</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h3 id="irsa-iam-roles-for-service-accounts">
+    <a href="#irsa-iam-roles-for-service-accounts" class="anchor">
+        <svg class="icon" aria-hidden="true" focusable="false" height="16" version="1.1" viewBox="0 0 16 16" width="16">
+            <path fill-rule="evenodd"
+                d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z">
+            </path>
+        </svg>
+    </a>
+    IRSA (IAM Roles for Service Accounts)
+</h3>
+<p>EKS addon 서비스를 사용하기 위한 추가 설정으로 AWS 서비스들에 대한 권한을 허용받기 위한 IRSA 설정이 필요하다. 설정 이유는 addon 서비스가 AWS 서비스를 이용하여 DNS, 로드밸런서, 볼륨 등의 기능을 확장하기 때문이다.</p>
+<table>
+<thead>
+<tr>
+<th>Addon 서비스</th>
+<th>사용 AWS 서비스</th>
+<th>목적</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>EBS CSI Controller</td>
+<td>AWS EBS Volumes</td>
+<td>영구 블록 스토리지 볼륨 사용</td>
+</tr>
+<tr>
+<td>EFS CSI Controller</td>
+<td>AWS EFS Volumes</td>
+<td>공용 파일 스토리지 볼륨 사용</td>
+</tr>
+<tr>
+<td>Load Balancer Controller</td>
+<td>AWS Elastic Load Balancer(ELB)</td>
+<td>네트워크 로드밸런스 사용</td>
+</tr>
+<tr>
+<td>External DNS Controller</td>
+<td>AWS Route53</td>
+<td>DNS 사용</td>
+</tr>
+</tbody>
+</table>
+<p>표에 보면 알겠지만 EKS addon을 요약하자면, AWS 서비스를 사용한다. 하지만 EKS 내부 클러스터에서 AWS 서비스를 사용하기 위해선 AWS 서비스를 사용할 권한이 필요하다. 예를 들어 EKS 내부 클러스터의 리소스에서 AWS S3를 사용한다고 하면 access denied 으로 S3의 접근이 안될 것이다.</p>
+<p><img loading="lazy" 
+    src="/t101-eks-manage/3-1.png" 
+    alt="S3 접근 에러 (출처.StakSimplify)" 
+     
+    width=1395 
+    height="574"  /></p>
+<p>S3 접근 에러 (출처.StakSimplify)</p>
+<p>따라서, AWS 서비스를 접근하기 위해 IRSA 설정이 필요하다. EKS IRSA은 EKS 클러스터 내 서비스 어카운트가AWS 서비스의 권한을 위임받는 과정이다. 권한 위임은 AWS 자격 증명 서비스인 IAM를 통해 진행되며 권한 위임은 다음과 같이 진행된다.</p>
+<p><img loading="lazy" 
+    src="/t101-eks-manage/3-2.png" 
+    alt="IRSA를 통한 AWS 서비스 접근 과정 " 
+     
+    width=1416 
+    height="705"  /></p>
+<p>IRSA를 통한 AWS 서비스 접근 과정</p>
+<p>Pre. AWS 서비스 이용 권한을 가진 IAM Role 를 k8s Service Account에 할당한다.</p>
+<ol>
+<li>AWS 서비스 접근시, k8s Service Account 가 IAM에 보안 자격 증명 토큰(JWT 토큰)을 요청한다.</li>
+<li>IAM 은 AWS STS를 통해 임시 자격 증명 토큰 발급한다.</li>
+<li>AWS STS는 발급한 접근 토큰을 k8s Service Account 에 위임한다.</li>
+<li>접근 토큰을 가진 k8s Service Account 는 AWS 서비스에 접근이 가능해진다.</li>
+</ol>
+<p>IRSA 설정</p>
+<p>IRSA 설정하기 위해서 가장 먼저 EKS에 OIDC 자격 증명 프로바이더를 연결해야한다. 여기서 OIDC 자격 프로바이더는 EKS에서 AWS 서비스를 이용할 수 있도록 지원하기 위해 필요로 한다. OIDC 자격 증명 프로바이더 생성과 연결으로 테라폼 AWS 리소스인 <code>aws_iam_openid_connect_provider</code> 를 사용하였다.</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl"><span class="c1">#01-ekscluster-terraform-manifests/c6-02-iam-oidc-connect-provider.tf</span>
+</span></span><span class="line"><span class="cl">data <span class="s2">&#34;aws_partition&#34;</span> <span class="s2">&#34;current&#34;</span> <span class="o">{}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1"># Resource: AWS IAM Open ID Connect Provider</span>
+</span></span><span class="line"><span class="cl">resource <span class="s2">&#34;aws_iam_openid_connect_provider&#34;</span> <span class="s2">&#34;oidc_provider&#34;</span> <span class="o">{</span>
+</span></span><span class="line"><span class="cl">  <span class="nv">client_id_list</span>  <span class="o">=</span> <span class="o">[</span><span class="s2">&#34;sts.</span><span class="si">${</span><span class="nv">data</span><span class="p">.aws_partition.current.dns_suffix</span><span class="si">}</span><span class="s2">&#34;</span><span class="o">]</span>
+</span></span><span class="line"><span class="cl">  <span class="nv">thumbprint_list</span> <span class="o">=</span> <span class="o">[</span>var.eks_oidc_root_ca_thumbprint<span class="o">]</span>
+</span></span><span class="line"><span class="cl">  <span class="nv">url</span>             <span class="o">=</span> aws_eks_cluster.eks_cluster.identity<span class="o">[</span>0<span class="o">]</span>.oidc<span class="o">[</span>0<span class="o">]</span>.issuer <span class="c1"># 1 </span>
+</span></span><span class="line"><span class="cl"> 
+</span></span><span class="line"><span class="cl">  <span class="nv">tags</span> <span class="o">=</span> merge<span class="o">(</span>
+</span></span><span class="line"><span class="cl">    <span class="o">{</span>
+</span></span><span class="line"><span class="cl">      <span class="nv">Name</span> <span class="o">=</span> <span class="s2">&#34;</span><span class="si">${</span><span class="nv">var</span><span class="p">.cluster_name</span><span class="si">}</span><span class="s2">-eks-irsa&#34;</span>
+</span></span><span class="line"><span class="cl">    <span class="o">}</span>,
+</span></span><span class="line"><span class="cl">    local.common_tags
+</span></span><span class="line"><span class="cl">  <span class="o">)</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><ul>
+<li><code>data.aws_partition</code> 는 현재 테라폼이 운영 중인 파티션 (지역) 정보를 가져오는 것에 사용된다.</li>
+<li><code>resource.aws_iam_openid_connect_provider.client_id_list</code> : 자격 증명(STS) 정보가 입력된다.</li>
+<li><code>resource.aws_iam_openid_connect_provider.thumbprint_list</code> : 자격 증명 CA로 기본 할당(2037년까지 유효) 정보를 사용하였다.</li>
+<li><code>resource.aws_iam_openid_connect_provider.url</code> : 공급자로 EKS 정보가 입력된다.</li>
+</ul>
+<p>IRSA 생성 시 AWS 콘솔 - IAM - 자격증명 공급자에서 다음과 같이 확인할 수 있다.</p>
+<p><img loading="lazy" 
+    src="/t101-eks-manage/3-3.png" 
+    alt="3-3.png" 
+     
+    width=1507 
+    height="570"  /></p>
+<p>OIDC 자격 증명 프로바이더 설정이 끝났다. 이제 IAM 정책 생성 및 k8s ServiceAccount 에 할당하면 서비스에 접근이 가능해진다. 앞으로의 addons 서비스들도 마찬가지로 필요한 권한(IAM role)을 가진 정책을 생성하여 ServiceAccount 에 할당할 것이다.  이번 장에서는 예제로 파드에서 AWS S3에 접근하기 위한 데모를 진행하겠다.</p>
+<p>다음의 테라폼 코드는 Iam role, policy 생성하는 코드이다.</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span><span class="lnt">31
+</span><span class="lnt">32
+</span><span class="lnt">33
+</span><span class="lnt">34
+</span><span class="lnt">35
+</span><span class="lnt">36
+</span><span class="lnt">37
+</span><span class="lnt">38
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl"><span class="c1">#data.terraform_remote_state.eks.outputs.aws_iam_openid_connect_provider_arn</span>
+</span></span><span class="line"><span class="cl"><span class="c1">#data.terraform_remote_state.eks.outputs.aws_iam_openid_connect_provider_extract_from_arn</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1"># Resource: Create IAM Role and associate the EBS IAM Policy to it</span>
+</span></span><span class="line"><span class="cl">resource <span class="s2">&#34;aws_iam_role&#34;</span> <span class="s2">&#34;irsa_iam_role&#34;</span> <span class="o">{</span>
+</span></span><span class="line"><span class="cl">  <span class="nv">name</span> <span class="o">=</span> <span class="s2">&#34;</span><span class="si">${</span><span class="nv">local</span><span class="p">.name</span><span class="si">}</span><span class="s2">-irsa-iam-role&#34;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">  <span class="c1"># Terraform&#39;s &#34;jsonencode&#34; function converts a Terraform expression result to valid JSON syntax.</span>
+</span></span><span class="line"><span class="cl">  <span class="nv">assume_role_policy</span> <span class="o">=</span> jsonencode<span class="o">({</span>
+</span></span><span class="line"><span class="cl">    <span class="nv">Version</span> <span class="o">=</span> <span class="s2">&#34;2012-10-17&#34;</span>
+</span></span><span class="line"><span class="cl">    <span class="nv">Statement</span> <span class="o">=</span> <span class="o">[</span>
+</span></span><span class="line"><span class="cl">      <span class="o">{</span>
+</span></span><span class="line"><span class="cl">        <span class="nv">Action</span> <span class="o">=</span> <span class="s2">&#34;sts:AssumeRoleWithWebIdentity&#34;</span>
+</span></span><span class="line"><span class="cl">        <span class="nv">Effect</span> <span class="o">=</span> <span class="s2">&#34;Allow&#34;</span>
+</span></span><span class="line"><span class="cl">        <span class="nv">Sid</span>    <span class="o">=</span> <span class="s2">&#34;&#34;</span>
+</span></span><span class="line"><span class="cl">        <span class="nv">Principal</span> <span class="o">=</span> <span class="o">{</span>
+</span></span><span class="line"><span class="cl">          <span class="nv">Federated</span> <span class="o">=</span> <span class="s2">&#34;</span><span class="si">${</span><span class="nv">data</span><span class="p">.terraform_remote_state.eks.outputs.aws_iam_openid_connect_provider_arn</span><span class="si">}</span><span class="s2">&#34;</span>
+</span></span><span class="line"><span class="cl">        <span class="o">}</span>
+</span></span><span class="line"><span class="cl">        <span class="nv">Condition</span> <span class="o">=</span> <span class="o">{</span>
+</span></span><span class="line"><span class="cl">          <span class="nv">StringEquals</span> <span class="o">=</span> <span class="o">{</span>            
+</span></span><span class="line"><span class="cl">            <span class="s2">&#34;</span><span class="si">${</span><span class="nv">data</span><span class="p">.terraform_remote_state.eks.outputs.aws_iam_openid_connect_provider_extract_from_arn</span><span class="si">}</span><span class="s2">:sub&#34;</span>: <span class="s2">&#34;system:serviceaccount:default:irsa-demo-sa&#34;</span>
+</span></span><span class="line"><span class="cl">          <span class="o">}</span>
+</span></span><span class="line"><span class="cl">        <span class="o">}</span>        
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">      <span class="o">}</span>,
+</span></span><span class="line"><span class="cl">    <span class="o">]</span>
+</span></span><span class="line"><span class="cl">  <span class="o">})</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">  <span class="nv">tags</span> <span class="o">=</span> <span class="o">{</span>
+</span></span><span class="line"><span class="cl">    tag-key <span class="o">=</span> <span class="s2">&#34;</span><span class="si">${</span><span class="nv">local</span><span class="p">.name</span><span class="si">}</span><span class="s2">-irsa-iam-role&#34;</span>
+</span></span><span class="line"><span class="cl">  <span class="o">}</span>
+</span></span><span class="line"><span class="cl"><span class="o">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1"># Associate IAM Role and Policy</span>
+</span></span><span class="line"><span class="cl">resource <span class="s2">&#34;aws_iam_role_policy_attachment&#34;</span> <span class="s2">&#34;irsa_iam_role_policy_attach&#34;</span> <span class="o">{</span>
+</span></span><span class="line"><span class="cl">  <span class="nv">policy_arn</span> <span class="o">=</span> <span class="s2">&#34;arn:aws:iam::aws:policy/AmazonS3ReadOnlyAccess&#34;</span>
+</span></span><span class="line"><span class="cl">  <span class="nv">role</span>       <span class="o">=</span> aws_iam_role.irsa_iam_role.name
+</span></span><span class="line"><span class="cl"><span class="o">}</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><ul>
+<li><code>resource.aws_iam_role.irsa_iam_role</code> 는 IRSA 에서 STS 을 이용하기 위해 처음 role 생성시 K8s serviceaccount 에 STS 사용 위임정책을 선언한다.</li>
+<li><code>resource.aws_iam_role_policy_attachment.irsa_iam_role_policy_attach</code> 는 S3 서비스를 읽기 위한 정책을 role에 할당한다.</li>
+</ul>
+<p>IAM 설정이 끝났다면 AWS 서비스를 사용할 K8s 리소스에 생성한 serviceaccount를 할당하면 IRSA 설정이 끝난다.  아래 코드는 S3 버켓을 확인하기 위한 잡 리소스이다.</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl"><span class="c1"># Resource: Kubernetes Job</span>
+</span></span><span class="line"><span class="cl">resource <span class="s2">&#34;kubernetes_job_v1&#34;</span> <span class="s2">&#34;irsa_demo&#34;</span> <span class="o">{</span>
+</span></span><span class="line"><span class="cl">  metadata <span class="o">{</span>
+</span></span><span class="line"><span class="cl">    <span class="nv">name</span> <span class="o">=</span> <span class="s2">&#34;irsa-demo&#34;</span>
+</span></span><span class="line"><span class="cl">  <span class="o">}</span>
+</span></span><span class="line"><span class="cl">  spec <span class="o">{</span>
+</span></span><span class="line"><span class="cl">    template <span class="o">{</span>
+</span></span><span class="line"><span class="cl">      metadata <span class="o">{</span>
+</span></span><span class="line"><span class="cl">        <span class="nv">labels</span> <span class="o">=</span> <span class="o">{</span>
+</span></span><span class="line"><span class="cl">          <span class="nv">app</span> <span class="o">=</span> <span class="s2">&#34;irsa-demo&#34;</span>
+</span></span><span class="line"><span class="cl">        <span class="o">}</span>
+</span></span><span class="line"><span class="cl">      <span class="o">}</span>
+</span></span><span class="line"><span class="cl">      spec <span class="o">{</span>
+</span></span><span class="line"><span class="cl">        <span class="nv">service_account_name</span> <span class="o">=</span> kubernetes_service_account_v1.irsa_demo_sa.metadata.0.name 
+</span></span><span class="line"><span class="cl">        container <span class="o">{</span>
+</span></span><span class="line"><span class="cl">          <span class="nv">name</span>    <span class="o">=</span> <span class="s2">&#34;irsa-demo&#34;</span>
+</span></span><span class="line"><span class="cl">          <span class="nv">image</span>   <span class="o">=</span> <span class="s2">&#34;amazon/aws-cli:latest&#34;</span>
+</span></span><span class="line"><span class="cl">          <span class="nv">args</span> <span class="o">=</span> <span class="o">[</span><span class="s2">&#34;s3&#34;</span>, <span class="s2">&#34;ls&#34;</span><span class="o">]</span>
+</span></span><span class="line"><span class="cl">          <span class="c1">#args = [&#34;ec2&#34;, &#34;describe-instances&#34;, &#34;--region&#34;, &#34;${var.aws_region}&#34;] # Should fail as we don&#39;t have access to EC2 Describe Instances for IAM Role</span>
+</span></span><span class="line"><span class="cl">        <span class="o">}</span>
+</span></span><span class="line"><span class="cl">        <span class="nv">restart_policy</span> <span class="o">=</span> <span class="s2">&#34;Never&#34;</span>
+</span></span><span class="line"><span class="cl">      <span class="o">}</span>
+</span></span><span class="line"><span class="cl">    <span class="o">}</span>
+</span></span><span class="line"><span class="cl">  <span class="o">}</span>
+</span></span><span class="line"><span class="cl"><span class="o">}</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><ul>
+<li>쿠버네티스 리소스 선언 파일 상에서는 별도의 IRSA 설정 필요없이 serviceaccount만 할당하면 된다!</li>
+</ul>
+<p>사족이지만 테라폼에서 쿠버네티스 리소스 생성시, context deadlin exceeded 에러를 볼 수 있다.</p>
+<p><img loading="lazy" 
+    src="/t101-eks-manage/3-4.png" 
+    alt="3-4.png" 
+     
+    width=668 
+    height="134"  /></p>
+<p>해당 에러는 테라폼 실행 PC에서 EKS 컨트롤플레인의 API 서버에 접근하지 못할 때 발생한다. 이를 해결하기 위해서는 API 서버의 엔드포인트를 프라이빗으로 열고 테라폼 실행 PC에서만 접근이 가능하도록 설정하면 된다.</p>
+<p>Serviceaccount 할당 후 쿠버네티스 잡을 테라폼으로 배포하면 다음과 같이 잡의 로그를 통해 S3의 버켓을 확인할 수 있다.</p>
+<p><img loading="lazy" 
+    src="/t101-eks-manage/3-5.png" 
+    alt="3-5.png" 
+     
+    width=515 
+    height="99"  /></p>
+<h3 id="끝으로">
+    <a href="#%eb%81%9d%ec%9c%bc%eb%a1%9c" class="anchor">
+        <svg class="icon" aria-hidden="true" focusable="false" height="16" version="1.1" viewBox="0 0 16 16" width="16">
+            <path fill-rule="evenodd"
+                d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z">
+            </path>
+        </svg>
+    </a>
+    끝으로
+</h3>
+<p>이것으로 테라폼에서 EKS 관리를 위한 3가지의 과정을 끝냈다! 다음 포스트 글에서는 EKS 기능 확장을 위한 addon 설치 방법을 다룰 예정이다.</p>
+
+    </div>
+</div>
+
+<div class="container">
+    
+    <nav class="flex container suggested">
+        
+        <a rel="prev" href="/post/archi-scale-up/" title="Previous post (older)">
+            <span>Previous</span>
+            [아키텍처] AWS로 이해하는 시스템 규모의 확장
+            </a>
+        
+        
+        
+        <a rel="next" href="/post/t101-eks-build/" title="Next post (newer)">
+            <span>Next</span>
+            [T101] Terraform으로 EKS 구축하기
+            </a> 
+        
+    </nav>
+    
+</div>
+ 
+<div class="container">
+    
+    <script src="https://giscus.app/client.js" 
+        data-repo="WingLim/hugo-tania"
+        data-repo-id="MDEwOlJlcG9zaXRvcnkzMTYyNjQzMDc="
+        
+        data-category="Comments"
+        data-category-id="DIC_kwDOEtnPc84B_WKP"
+        
+        data-mapping="pathname"
+        data-reactions-enabled="1"
+        data-emit-metadata="0"
+        data-theme="light"
+        crossorigin="anonymous"
+        async
+        >
+</script>
+
+<script>
+    function setGiscusTeheme(theme) {
+        let giscus = document.querySelector('.giscus iframe');
+        if (giscus) {
+            giscus.contentWindow.postMessage(
+                {
+                    giscus: {
+                        setConfig: {
+                            theme: theme
+                        }
+                    }
+                },
+                'https://giscus.app'
+            )
+        }
+    }
+
+    addEventListener('message', event => {
+        if (event.origin !== 'https://giscus.app') return;
+        setGiscusTeheme(document.documentElement.dataset.userColorScheme)
+    });
+
+    window.addEventListener('onColorSchemeChange', (e) => {
+        setGiscusTeheme(e.detail)
+    })
+</script>
+
+</div>
+
+</main>
+
+
+        </main>
+        <footer class="footer flex">
+    <section class="container">
+        <nav class="footer-links">
+            
+            <a href="/index.xml">RSS</a>
+            
+        </nav>
+
+        
+    </section>
+    <script defer src="/ts/features.706a523ba43e6d0427c7fdf2b9d05dbd0920d3f12942b453690b495cb2522743.js" 
+    data-enable-footnotes="true"
+    ></script>
+</footer>
+
+    </body>
+</html>
