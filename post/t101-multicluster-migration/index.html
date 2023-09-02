@@ -6,16 +6,16 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="theme-color" content="dark">
-    <title>[T101] 테라폼을 활용한 EKS 멀티클러스터 마이그레이션 | HanHoRang Tech Blog</title>
+    <title>[T101] 테라폼을 활용한 EKS 클러스터 마이그레이션 | HanHoRang Tech Blog</title>
 
     
     
     
     <meta property="og:site_name" content="HanHoRang Tech Blog by Tania in Hugo" />
-    <meta property="og:title" content="[T101] 테라폼을 활용한 EKS 멀티클러스터 마이그레이션 | HanHoRang Tech Blog"/>
-    <meta itemprop="name" content="[T101] 테라폼을 활용한 EKS 멀티클러스터 마이그레이션 | HanHoRang Tech Blog" />
-    <meta name="twitter:title" content="[T101] 테라폼을 활용한 EKS 멀티클러스터 마이그레이션 | HanHoRang Tech Blog" />
-    <meta name="application-name" content="[T101] 테라폼을 활용한 EKS 멀티클러스터 마이그레이션 | HanHoRang Tech Blog" /><meta name="twitter:card" content="summary"/>
+    <meta property="og:title" content="[T101] 테라폼을 활용한 EKS 클러스터 마이그레이션 | HanHoRang Tech Blog"/>
+    <meta itemprop="name" content="[T101] 테라폼을 활용한 EKS 클러스터 마이그레이션 | HanHoRang Tech Blog" />
+    <meta name="twitter:title" content="[T101] 테라폼을 활용한 EKS 클러스터 마이그레이션 | HanHoRang Tech Blog" />
+    <meta name="application-name" content="[T101] 테라폼을 활용한 EKS 클러스터 마이그레이션 | HanHoRang Tech Blog" /><meta name="twitter:card" content="summary"/>
 
     <meta name="description" content="운영 EKS를 코드화하여 무중단으로 클러스터 마이그레이션하기" />
     <meta name="twitter:description" content="운영 EKS를 코드화하여 무중단으로 클러스터 마이그레이션하기 "/>
@@ -41,14 +41,14 @@
   {
     "@context": "http://schema.org",
     "@type": "Article",
-    "headline": "[T101] 테라폼을 활용한 EKS 멀티클러스터 마이그레이션",
+    "headline": "[T101] 테라폼을 활용한 EKS 클러스터 마이그레이션",
     "author": {
       "@type": "Person",
       "name": "Hugo Tania"
     },
     "datePublished": "2023-09-01",
     "description": "운영 EKS를 코드화하여 무중단으로 클러스터 마이그레이션하기",
-    "wordCount":  2947 ,
+    "wordCount":  2946 ,
     "mainEntityOfPage": "True",
     "dateModified": "2023-09-01",
     "publisher": {
@@ -129,7 +129,7 @@
         <header class="article-header">
             <div class="thumb">
                 <div>
-                    <h1>[T101] 테라폼을 활용한 EKS 멀티클러스터 마이그레이션</h1>
+                    <h1>[T101] 테라폼을 활용한 EKS 클러스터 마이그레이션</h1>
                     <div class="post-meta">
                         <div>
                             
@@ -1056,17 +1056,17 @@
 </span></span><span class="line"><span class="cl"><span class="c1"># .. 이후 선수작업의 네트워크 addon 과 예제 애플리케이션 배포</span>
 </span></span></code></pre></td></tr></table>
 </div>
-</div><h2 id="멀티클러스터-업그레이드">
-    <a href="#%eb%a9%80%ed%8b%b0%ed%81%b4%eb%9f%ac%ec%8a%a4%ed%84%b0-%ec%97%85%ea%b7%b8%eb%a0%88%ec%9d%b4%eb%93%9c" class="anchor">
+</div><h2 id="클러스터-마이그레이션">
+    <a href="#%ed%81%b4%eb%9f%ac%ec%8a%a4%ed%84%b0-%eb%a7%88%ec%9d%b4%ea%b7%b8%eb%a0%88%ec%9d%b4%ec%85%98" class="anchor">
         <svg class="icon" aria-hidden="true" focusable="false" height="16" version="1.1" viewBox="0 0 16 16" width="16">
             <path fill-rule="evenodd"
                 d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z">
             </path>
         </svg>
     </a>
-    멀티클러스터 업그레이드
+    클러스터 마이그레이션
 </h2>
-<p>두 개의 다른 클러스터에서 같은 도메인을 등록하여 애플리케이션을 등록하였다. 등록한 어플리케이션에 트래픽 조절을 구 클러스터에서 새 클러스터로 바꾸면 멀티클러스터 업그레이드는 완료다.  새 클러스터에서 vote 애플리케이션을 똑같이 배포하면, route53에 등록된 dns가 구 클러스터에서 새 클러스터에서 수정되며 등록되는 시간 약 5분동안 순단이 발생한다. 무중단으로 트래픽을 전환하기 위한 작업이 필요하다.</p>
+<p>두 개의 다른 클러스터에서 같은 도메인을 등록하여 애플리케이션을 등록하였다. 등록한 어플리케이션에 트래픽 조절을 구 클러스터에서 새 클러스터로 바꾸면 마이그레이션은 완료다.  새 클러스터에서 vote 애플리케이션을 똑같이 배포하면, route53에 등록된 dns가 구 클러스터에서 새 클러스터에서 수정되며 등록되는 시간 약 5분동안 순단이 발생한다. 무중단으로 트래픽을 전환하기 위한 작업이 필요하다.</p>
 <h3 id="route53-가중치-라우팅을-통한-트래픽-전환">
     <a href="#route53-%ea%b0%80%ec%a4%91%ec%b9%98-%eb%9d%bc%ec%9a%b0%ed%8c%85%ec%9d%84-%ed%86%b5%ed%95%9c-%ed%8a%b8%eb%9e%98%ed%94%bd-%ec%a0%84%ed%99%98" class="anchor">
         <svg class="icon" aria-hidden="true" focusable="false" height="16" version="1.1" viewBox="0 0 16 16" width="16">
