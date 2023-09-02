@@ -1,0 +1,1442 @@
+<!DOCTYPE html>
+<html lang="en-us">
+    
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="theme-color" content="dark">
+    <title>[T101] Terraform을 활용한 EKS 멀티클러스터 마이그레이션 | HanHoRang Tech Blog</title>
+
+    
+    
+    
+    <meta property="og:site_name" content="HanHoRang Tech Blog by Tania in Hugo" />
+    <meta property="og:title" content="[T101] Terraform을 활용한 EKS 멀티클러스터 마이그레이션 | HanHoRang Tech Blog"/>
+    <meta itemprop="name" content="[T101] Terraform을 활용한 EKS 멀티클러스터 마이그레이션 | HanHoRang Tech Blog" />
+    <meta name="twitter:title" content="[T101] Terraform을 활용한 EKS 멀티클러스터 마이그레이션 | HanHoRang Tech Blog" />
+    <meta name="application-name" content="[T101] Terraform을 활용한 EKS 멀티클러스터 마이그레이션 | HanHoRang Tech Blog" /><meta name="twitter:card" content="summary"/>
+
+    <meta name="description" content="운영 EKS를 코드화하여 무중단으로 클러스터 마이그레이션하기" />
+    <meta name="twitter:description" content="운영 EKS를 코드화하여 무중단으로 클러스터 마이그레이션하기 "/>
+    <meta itemprop="description" content=" 운영 EKS를 코드화하여 무중단으로 클러스터 마이그레이션하기 "/>
+    <meta property="og:description" content=" 운영 EKS를 코드화하여 무중단으로 클러스터 마이그레이션하기 " />
+
+    
+
+<meta property="og:type" content="article" />
+<meta property="article:publisher" content="Hugo Tania" />
+<meta property="og:article:published_time" content=2023-09-01T00:00:00Z />
+<meta property="article:published_time" content=2023-09-01T00:00:00Z />
+
+
+  <meta property="og:article:author" content="Han ho rnag" />
+  <meta property="article:author" content="Han ho rnag" />
+  <meta name="author" content="Han ho rnag" />
+
+
+
+
+<script defer type="application/ld+json">
+  {
+    "@context": "http://schema.org",
+    "@type": "Article",
+    "headline": "[T101] Terraform을 활용한 EKS 멀티클러스터 마이그레이션",
+    "author": {
+      "@type": "Person",
+      "name": "Hugo Tania"
+    },
+    "datePublished": "2023-09-01",
+    "description": "운영 EKS를 코드화하여 무중단으로 클러스터 마이그레이션하기",
+    "wordCount":  2947 ,
+    "mainEntityOfPage": "True",
+    "dateModified": "2023-09-01",
+    "publisher": {
+      "@type": "Organization",
+      "name": "Hugo Tania",
+      "logo": {
+        "@type": "imageObject",
+        "url": "https:\/\/HanHoRang31.github.io\/favicon.ico"
+      }
+    }
+  }
+</script>
+
+
+
+    <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico" />
+    
+    <link rel="stylesheet" href="/sass/main.min.ab99ff095f832511e24ffb2fba2b51ad473b2f7e9301d674eba2c6c3a6e8bd81.css">
+    
+</head>
+    
+    <script>
+        (function() {
+            const colorSchemeKey = 'ThemeColorScheme';
+            if(!localStorage.getItem(colorSchemeKey)){
+                localStorage.setItem(colorSchemeKey, "auto");
+            }
+        })();
+    </script><script>
+    (function() {
+        const colorSchemeKey = 'ThemeColorScheme';
+        const colorSchemeItem = localStorage.getItem(colorSchemeKey);
+        const supportDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches === true;
+
+        if (colorSchemeItem == 'dark' || colorSchemeItem === 'auto' && supportDarkMode) {
+            
+
+            document.documentElement.dataset.userColorScheme = 'dark';
+        } else {
+            document.documentElement.dataset.userColorScheme = 'light';
+        }
+    })();
+</script>
+
+
+    <body class="dark">
+        <nav class="navbar">
+    <div class="container">
+        <div class="flex">
+            <div>
+                <a class="brand" href="/">
+                    
+                    
+                        <img src="/favicon.ico" />
+                    
+                    HanHoRang Tech Blog
+                    </a>
+            </div>
+            <div class="flex">
+                
+                <a href="/articles/">Articles</a>
+                
+                
+                    <button id="dark-mode-button">
+                    <svg class="light" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" aria-hidden="true" focusable="false" width="1em" height="1em" style="-ms-transform: rotate(360deg); -webkit-transform: rotate(360deg); transform: rotate(360deg);" preserveAspectRatio="xMidYMid meet" viewBox="0 0 36 36"><path fill="#FFD983" d="M30.312.776C32 19 20 32 .776 30.312c8.199 7.717 21.091 7.588 29.107-.429C37.9 21.867 38.03 8.975 30.312.776z"/><path d="M30.705 15.915a1.163 1.163 0 1 0 1.643 1.641a1.163 1.163 0 0 0-1.643-1.641zm-16.022 14.38a1.74 1.74 0 0 0 0 2.465a1.742 1.742 0 1 0 0-2.465zm13.968-2.147a2.904 2.904 0 0 1-4.108 0a2.902 2.902 0 0 1 0-4.107a2.902 2.902 0 0 1 4.108 0a2.902 2.902 0 0 1 0 4.107z" fill="#FFCC4D"/><rect x="0" y="0" width="36" height="36" fill="rgba(0, 0, 0, 0)" /></svg>
+                    <svg class="dark" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" aria-hidden="true" focusable="false" width="1em" height="1em" style="-ms-transform: rotate(360deg); -webkit-transform: rotate(360deg); transform: rotate(360deg);" preserveAspectRatio="xMidYMid meet" viewBox="0 0 36 36"><path fill="#FFD983" d="M16 2s0-2 2-2s2 2 2 2v2s0 2-2 2s-2-2-2-2V2zm18 14s2 0 2 2s-2 2-2 2h-2s-2 0-2-2s2-2 2-2h2zM4 16s2 0 2 2s-2 2-2 2H2s-2 0-2-2s2-2 2-2h2zm5.121-8.707s1.414 1.414 0 2.828s-2.828 0-2.828 0L4.878 8.708s-1.414-1.414 0-2.829c1.415-1.414 2.829 0 2.829 0l1.414 1.414zm21 21s1.414 1.414 0 2.828s-2.828 0-2.828 0l-1.414-1.414s-1.414-1.414 0-2.828s2.828 0 2.828 0l1.414 1.414zm-.413-18.172s-1.414 1.414-2.828 0s0-2.828 0-2.828l1.414-1.414s1.414-1.414 2.828 0s0 2.828 0 2.828l-1.414 1.414zm-21 21s-1.414 1.414-2.828 0s0-2.828 0-2.828l1.414-1.414s1.414-1.414 2.828 0s0 2.828 0 2.828l-1.414 1.414zM16 32s0-2 2-2s2 2 2 2v2s0 2-2 2s-2-2-2-2v-2z"/><circle fill="#FFD983" cx="18" cy="18" r="10"/><rect x="0" y="0" width="36" height="36" fill="rgba(0, 0, 0, 0)" /></svg>
+                    </button>
+                
+            </div>
+            </div>
+    </div>
+</nav>
+
+        <main>
+            
+<div class="container">
+    <article>
+        <header class="article-header">
+            <div class="thumb">
+                <div>
+                    <h1>[T101] Terraform을 활용한 EKS 멀티클러스터 마이그레이션</h1>
+                    <div class="post-meta">
+                        <div>
+                            
+                            
+                            By HanHoRnag | <time>September 01, 2023</time>
+                            | 14 minutes
+                        </div>
+                        <div class="tags">
+                            
+                            <a href="/tags/t101/">T101</a>
+                            
+                            <a href="/tags/eks/">eks</a>
+                            
+                            <a href="/tags/cloud/">cloud</a>
+                            
+                            <a href="/tags/aws/">AWS</a>
+                            
+                            <a href="/tags/terraform/">Terraform</a>
+                            
+                            <a href="/tags/multi-cluster/">multi-cluster</a>
+                            
+                            <a href="/tags/migration/">migration</a>
+                            
+                            <a href="/tags/terraformer/">Terraformer</a>
+                            
+                            <a href="/tags/route53/">Route53</a>
+                            
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </header>
+    </article>
+
+    <div class="article-post">
+    <div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-markdown" data-lang="markdown"><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">T101 3기(=Terraform 101 Study)는 Terraform 실무 실습 스터디입니다.
+</span></span><span class="line"><span class="cl">CloudNet@ 유형욱, 윤서율님이 진행하시며, 책 &#34;테라폼으로 시작하는 IaC&#34;을 기반으로 진행하고 있습니다.
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h1 id="들어가기-전">
+    <a href="#%eb%93%a4%ec%96%b4%ea%b0%80%ea%b8%b0-%ec%a0%84" class="anchor">
+        <svg class="icon" aria-hidden="true" focusable="false" height="16" version="1.1" viewBox="0 0 16 16" width="16">
+            <path fill-rule="evenodd"
+                d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z">
+            </path>
+        </svg>
+    </a>
+    들어가기 전
+</h1>
+<p>이번 스터디 활동은 T101 3기다. 6주동안 Terraform과 관련된 실무 예제와 노하우에 대해 정리하여 공유할 예정이다. 1주차에는 IaC에 대한 기본 내용과 테라폼 소개, 문법를 스터디하였다. 이에 대한 내용을 정리할까 했지만, 앞 선 기수에 참여하신 분들의 블로그 글이 너무나 잘 되어 있어 다른 방향으로 작성할까 한다. 다른 방향은 평소 필자가 궁금했던 내용, 여러 세미나에서 주워들은 내용들에 대한 실습이 될 것 같다.</p>
+<p>먼저 포스트할 글의 주제는 <strong>테라폼 코드 Import와 멀티클러스터 마이그레이션</strong>에 대해 작성할 것이다. 이 두 개의 주제는 이어지는 시나리오일 듯 싶다. 가상의 목표로 설명하자면, 무중단 서비스 제공을 위해 운영 중인 AWS 리소스들에 대해 테라폼으로 전환한 후(IaC)한 후 <a href="https://aws.amazon.com/ko/blogs/containers/onfidos-journey-to-a-multi-cluster-amazon-eks-architecture/">멀티클러스터 방법으로 마이그레이션</a>하겠다.</p>
+<p>(Option 1 참고)</p>
+<p><img loading="lazy" 
+    src="/t101-multicluster-migration/Onfido-1-1024x429.png" 
+    alt="&lt;a href=&#34;https://aws.amazon.com/ko/blogs/containers/onfidos-journey-to-a-multi-cluster-amazon-eks-architecture/&#34;&gt;https://aws.amazon.com/ko/blogs/containers/onfidos-journey-to-a-multi-cluster-amazon-eks-architecture/&lt;/a&gt;" 
+     
+    width=1024 
+    height="429"  /></p>
+<p><a href="https://aws.amazon.com/ko/blogs/containers/onfidos-journey-to-a-multi-cluster-amazon-eks-architecture/">https://aws.amazon.com/ko/blogs/containers/onfidos-journey-to-a-multi-cluster-amazon-eks-architecture/</a></p>
+<h1 id="terraform-import">
+    <a href="#terraform-import" class="anchor">
+        <svg class="icon" aria-hidden="true" focusable="false" height="16" version="1.1" viewBox="0 0 16 16" width="16">
+            <path fill-rule="evenodd"
+                d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z">
+            </path>
+        </svg>
+    </a>
+    Terraform Import
+</h1>
+<p>Terraform Import은 기존 AWS 클라우드 리소스를 테라폼 코드로 변환하는 작업이다. 이는 클라우드를 서비스를 수동으로 관리하는 대신 코드로 인프라를 관리한다는 의미이다. 코드로 인프라를 관리하게 되면 얻을 수 있는 장점은 다음과 같다. (책 참고)</p>
+<ul>
+<li>속도와 효율성 : 자동화된 시스템은 인간의 실수를 줄이고, 보다 효율적인 리소스 관리를 가능하게 하여 비용 절감 및 생산성을 높일 수 있다. 또한, 코드로 변경하기에 기존 방식보다 변경 속도가 빠르다.</li>
+<li>버전 관리 : 코드로 인프라를 정의하면 Git과 같은 버전 관리 시스템을 통해 변경 내역을 추적하고 롤백할 수 있다.</li>
+<li>협업 :파일 형태로 되어 있어 쉽게 공유할 수 있고, 버전 관리 툴과 연계하여 공동 작업을 위한 환경을 만들 수 있다.</li>
+<li>재사용성 : 코드로 되어 있기 때문에 다른 프로젝트나 환경에서 쉽게 재사용할 수 있다.</li>
+<li>기술의 자산화: 관리 노하우와 작업 방식이 코드에 녹아 있고, 파이프라인에 통합해 자산화되어 기술 부채를 제거할 수 있다.</li>
+</ul>
+<h2 id="terraform-import-and-tools">
+    <a href="#terraform-import-and-tools" class="anchor">
+        <svg class="icon" aria-hidden="true" focusable="false" height="16" version="1.1" viewBox="0 0 16 16" width="16">
+            <path fill-rule="evenodd"
+                d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z">
+            </path>
+        </svg>
+    </a>
+    Terraform Import and Tools
+</h2>
+<p>Terraform CLI로 Import를 할 수 있지만, 리소스 별로 매칭시켜야 하는 단점이 있다.  깃허브 <a href="https://github.com/shuaibiyy/awesome-terraform">Terraform awesome-terraform</a> 를 확인하면 테라폼에 대한 여러 팁과 기술들을 확인할 수 있다. 이 중 AWS 리소스 관련 Import 도구가 존재한다.</p>
+<p>[Import Tools]</p>
+<ul>
+<li><a href="https://github.com/GoogleCloudPlatform/terraformer">terraformer</a> : 기존 인프라에서 Terraform 파일을 생성하는 CLI 도구이다. (Star 10.7K)</li>
+<li><a href="https://github.com/iann0036/former2">former2</a> : AWS 계정 내의 기존 리소스에서 Terraform 구성을 생성한다.(Star 1.9k)</li>
+<li><a href="https://github.com/cycloidio/terracognita">terracognita</a> - 기존 클라우드 제공자(역 Terraform)에서 읽고 Terraform 구성에서 인프라를 코드로 생성한다. (Star 1.8k)</li>
+<li><a href="https://github.com/aws-samples/aws2tf">aws2tf</a>  : 기존 AWS 리소스를 Terraform으로 가져오는 작업을 자동화하고 Terraform HCL 코드를 출력합니다. (Star 295)</li>
+</ul>
+<p>도구들 중 가장 Star가 많은 terrafomer를 선택하여 EKS를 TF code로 변환할 것이다.</p>
+<h2 id="aws-리소스-배포">
+    <a href="#aws-%eb%a6%ac%ec%86%8c%ec%8a%a4-%eb%b0%b0%ed%8f%ac" class="anchor">
+        <svg class="icon" aria-hidden="true" focusable="false" height="16" version="1.1" viewBox="0 0 16 16" width="16">
+            <path fill-rule="evenodd"
+                d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z">
+            </path>
+        </svg>
+    </a>
+    AWS 리소스 배포
+</h2>
+<p>테라폼 추출 리소스 대상으로 EKS를 선택하였다. EKS는 AEWS 스터디에서 공유해주신  원 클릭 파일(cloudformation, eksctl) 로 구성하였다. 참고 내용과 구성 방법은 <a href="https://hanhorang31.github.io/post/aews-1-eks/">필자의 블로그 글</a>을 확인하자.</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl"><span class="c1"># 구성 파일 다운로드 </span>
+</span></span><span class="line"><span class="cl">curl -O https://s3.ap-northeast-2.amazonaws.com/cloudformation.cloudneta.net/K8S/eks-oneclick5.yam
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1"># 배포 &lt;*&gt; 로 표시된 매개변수에 값을 입력하자. </span>
+</span></span><span class="line"><span class="cl">aws cloudformation deploy --template-file eks-oneclick5.yaml --stack-name myeks  --parameter-overrides <span class="nv">KeyName</span><span class="o">=</span>&lt;iam Key name&gt;  <span class="nv">MyIamUserAccessKeyID</span><span class="o">=</span>&lt;AWS Access Key&gt; <span class="nv">MyIamUserSecretAccessKey</span><span class="o">=</span>&lt;AWS Secret Key&gt;  <span class="nv">ClusterBaseName</span><span class="o">=</span>&lt;cluster name&gt;  --region ap-northeast-2  
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1"># 베스천 서버 접속 </span>
+</span></span><span class="line"><span class="cl">ssh -i &lt;key-file-name&gt;.pem ec2-user@<span class="k">$(</span>aws cloudformation describe-stacks --stack-name myeks --query <span class="s1">&#39;Stacks[*].Outputs[0].OutputValue&#39;</span> --output text<span class="k">)</span>
+</span></span><span class="line"><span class="cl">---
+</span></span><span class="line"><span class="cl">The authenticity of host <span class="s1">&#39;43.201.6.136 (43.201.6.136)&#39;</span> can<span class="err">&#39;</span>t be established.
+</span></span><span class="line"><span class="cl">ED25519 key fingerprint is SHA256:Ej5/5MfPW4sRGuQvwAcVkC609QUJR4nXjfBF64FEsDY.
+</span></span><span class="line"><span class="cl">This key is not known by any other names
+</span></span><span class="line"><span class="cl">Are you sure you want to <span class="k">continue</span> connecting <span class="o">(</span>yes/no/<span class="o">[</span>fingerprint<span class="o">])</span>?  yes 
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1"># 클러스터 확인,  배포 약 20분 소요</span>
+</span></span><span class="line"><span class="cl">kubectl get pods -A 
+</span></span><span class="line"><span class="cl">--
+</span></span><span class="line"><span class="cl">NAMESPACE     NAME                                 READY   STATUS    RESTARTS   AGE
+</span></span><span class="line"><span class="cl">kube-system   aws-node-9sjp9                       2/2     Running   <span class="m">0</span>          76m
+</span></span><span class="line"><span class="cl">kube-system   aws-node-wglbd                       2/2     Running   <span class="m">0</span>          76m
+</span></span><span class="line"><span class="cl">kube-system   coredns-b65b7888f-st5rb              1/1     Running   <span class="m">0</span>          73m
+</span></span><span class="line"><span class="cl">kube-system   coredns-b65b7888f-zmh5s              1/1     Running   <span class="m">0</span>          73m
+</span></span><span class="line"><span class="cl">kube-system   ebs-csi-controller-cb695654d-d2blq   6/6     Running   <span class="m">0</span>          72m
+</span></span><span class="line"><span class="cl">kube-system   ebs-csi-controller-cb695654d-fh9qz   6/6     Running   <span class="m">0</span>          72m
+</span></span><span class="line"><span class="cl">kube-system   ebs-csi-node-2689h                   3/3     Running   <span class="m">0</span>          72m
+</span></span><span class="line"><span class="cl">kube-system   ebs-csi-node-xwhh9                   3/3     Running   <span class="m">0</span>          72m
+</span></span><span class="line"><span class="cl">kube-system   kube-proxy-7mlxg                     1/1     Running   <span class="m">0</span>          74m
+</span></span><span class="line"><span class="cl">kube-system   kube-proxy-nr6xs                     1/1     Running   <span class="m">0</span>          74m
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h2 id="terraformer-를-통한-eks-import">
+    <a href="#terraformer-%eb%a5%bc-%ed%86%b5%ed%95%9c-eks-import" class="anchor">
+        <svg class="icon" aria-hidden="true" focusable="false" height="16" version="1.1" viewBox="0 0 16 16" width="16">
+            <path fill-rule="evenodd"
+                d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z">
+            </path>
+        </svg>
+    </a>
+    Terraformer 를 통한 EKS Import
+</h2>
+<p>이어서 MAC환경에서 terraformer 를 설치하고 EKS를 Import 하겠다. 설치 방법은 다음과 같다.</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl"><span class="c1"># terraformer 설치</span>
+</span></span><span class="line"><span class="cl">brew install terraformer
+</span></span><span class="line"><span class="cl"><span class="c1"># 테스트 진행</span>
+</span></span><span class="line"><span class="cl">terraformer import aws --resources<span class="o">=</span>eks 
+</span></span><span class="line"><span class="cl">---
+</span></span><span class="line"><span class="cl">2023/08/31 17:21:36 aws importing default region
+</span></span><span class="line"><span class="cl">2023/08/31 17:21:36 open /Users/mzc02-hseungho/.terraform.d/plugins/darwin_amd64: no such file or directory
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>설치 이후 Import 시 프로바이더가 없어 에러가 발생한다. 아래 시스템 아키텍처를 참고하여 프로바이더를 설치하자.  프로바이더는 <a href="https://releases.hashicorp.com/terraform-provider-aws/5.14.0/">hashicorp release</a>에서 확인할 수 있다.</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl"><span class="c1"># darwin_amd64 환경 aws 설치</span>
+</span></span><span class="line"><span class="cl">mkdir -p ~/.terraform.d/plugins/darwin_amd64
+</span></span><span class="line"><span class="cl"><span class="nb">cd</span> ~/.terraform.d/plugins/darwin_amd64
+</span></span><span class="line"><span class="cl">curl -OL https://releases.hashicorp.com/terraform-provider-aws/5.14.0/terraform-provider-aws_5.14.0_darwin_amd64.zip
+</span></span><span class="line"><span class="cl">unzip terraform-provider-aws_5.14.0_darwin_amd64.zip
+</span></span></code></pre></td></tr></table>
+</div>
+</div><div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">terraformer import aws --resources<span class="o">=</span>eks  
+</span></span><span class="line"><span class="cl">--
+</span></span><span class="line"><span class="cl">2023/08/31 17:30:22 aws importing default region
+</span></span><span class="line"><span class="cl">2023/08/31 17:30:27 aws importing... eks
+</span></span><span class="line"><span class="cl">2023/08/31 17:30:27 aws <span class="k">done</span> importing eks
+</span></span><span class="line"><span class="cl">2023/08/31 17:30:27 Number of resources <span class="k">for</span> service eks: <span class="m">2</span>
+</span></span><span class="line"><span class="cl">2023/08/31 17:30:27 Refreshing state... aws_eks_cluster.tfer--hanhorang
+</span></span><span class="line"><span class="cl">2023/08/31 17:30:27 Refreshing state... aws_eks_node_group.tfer--ng1
+</span></span><span class="line"><span class="cl">2023/08/31 17:30:27 Filtered number of resources <span class="k">for</span> service eks: <span class="m">2</span>
+</span></span><span class="line"><span class="cl">2023/08/31 17:30:27 aws Connecting.... 
+</span></span><span class="line"><span class="cl">2023/08/31 17:30:27 aws save eks
+</span></span><span class="line"><span class="cl">2023/08/31 17:30:27 aws save tfstate <span class="k">for</span> eks
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">tree .                                                                                                                 
+</span></span><span class="line"><span class="cl">---
+</span></span><span class="line"><span class="cl">.
+</span></span><span class="line"><span class="cl">├── eks_cluster.tf
+</span></span><span class="line"><span class="cl">├── eks_node_group.tf
+</span></span><span class="line"><span class="cl">├── outputs.tf
+</span></span><span class="line"><span class="cl">├── provider.tf
+</span></span><span class="line"><span class="cl">└── terraform.tfstate
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>eks만 tf로 변환되었다. 추가로, EKS와 연관된 VPC, nat gateway 와 베스천 서버도 변환이 필요하다. 깃허브 문서를 참고하면 <code>--filter</code>으로 태그에 설정된 리소스만 가져오거나, <code>--exclude</code>  전체 리소스를 가져오는 데 특정 리소스만 빼서 가져올 수 있다. 이를 조합하여 EKS가 배포된 VPC에 포함된 리소스를 가져오자.</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span><span class="lnt">31
+</span><span class="lnt">32
+</span><span class="lnt">33
+</span><span class="lnt">34
+</span><span class="lnt">35
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1"># terraformer import aws --resources=vpc,subnet,route_table,igw,sg,nat,eks,ec2 --filter=vpc=&lt;vpc-id&gt; --path-pattern=&#34;{output}/&#34;</span>
+</span></span><span class="line"><span class="cl">terraformer import aws --resources<span class="o">=</span>vpc,subnet,route_table,igw,sg,nat,eks,ec2 --filter<span class="o">=</span><span class="nv">vpc</span><span class="o">=</span>vpc-080c3cee56b75cd1d --path-pattern<span class="o">=</span><span class="s2">&#34;{output}/&#34;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">---
+</span></span><span class="line"><span class="cl">..
+</span></span><span class="line"><span class="cl">2023/08/31 18:04:59 Filtered number of resources <span class="k">for</span> service route_table: <span class="m">14</span>
+</span></span><span class="line"><span class="cl">2023/08/31 18:04:59 Filtered number of resources <span class="k">for</span> service igw: <span class="m">2</span>
+</span></span><span class="line"><span class="cl">2023/08/31 18:04:59 Filtered number of resources <span class="k">for</span> service sg: <span class="m">14</span>
+</span></span><span class="line"><span class="cl">2023/08/31 18:04:59 Filtered number of resources <span class="k">for</span> service nat: <span class="m">1</span>
+</span></span><span class="line"><span class="cl">2023/08/31 18:04:59 Filtered number of resources <span class="k">for</span> service eks: <span class="m">2</span>
+</span></span><span class="line"><span class="cl">2023/08/31 18:04:59 Filtered number of resources <span class="k">for</span> service vpc: <span class="m">1</span>
+</span></span><span class="line"><span class="cl">2023/08/31 18:04:59 Filtered number of resources <span class="k">for</span> service subnet: <span class="m">10</span>
+</span></span><span class="line"><span class="cl">2023/08/31 18:04:59 aws Connecting.... 
+</span></span><span class="line"><span class="cl">2023/08/31 18:04:59 aws save 
+</span></span><span class="line"><span class="cl">2023/08/31 18:04:59 aws save tfstate
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">tree ./generated
+</span></span><span class="line"><span class="cl">---
+</span></span><span class="line"><span class="cl">.
+</span></span><span class="line"><span class="cl">├── eks_cluster.tf
+</span></span><span class="line"><span class="cl">├── eks_node_group.tf
+</span></span><span class="line"><span class="cl">├── internet_gateway.tf
+</span></span><span class="line"><span class="cl">├── main_route_table_association.tf
+</span></span><span class="line"><span class="cl">├── nat_gateway.tf
+</span></span><span class="line"><span class="cl">├── outputs.tf
+</span></span><span class="line"><span class="cl">├── provider.tf
+</span></span><span class="line"><span class="cl">├── route_table.tf
+</span></span><span class="line"><span class="cl">├── route_table_association.tf
+</span></span><span class="line"><span class="cl">├── security_group.tf
+</span></span><span class="line"><span class="cl">├── security_group_rule.tf
+</span></span><span class="line"><span class="cl">├── subnet.tf
+</span></span><span class="line"><span class="cl">├── terraform.tfstate
+</span></span><span class="line"><span class="cl">├── variables.tf
+</span></span><span class="line"><span class="cl">└── vpc.tf
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>가져온 TF code를 기반으로 인프라 구성시 에러가 발생한다. 에러를 참고하니 provider.tf에 aws config 설정 추가와 프로바이더 교체가 필요하다.
+(공유해주신 tei님 감사합니다. <a href="https://minhan2.tistory.com/entry/terraformer-terraform-provider-%EC%97%90%EB%9F%AC-%EC%B2%98%EB%A6%AC%ED%95%98%EA%B8%B0">참고 블로그 글</a>)</p>
+<ul>
+<li><a href="http://Provider.tf">Provider.tf</a> 에 shared_config_files, shared_credentials_files 옵션 추가</li>
+</ul>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl"><span class="c1"># provider.aws 에 내용 추가 </span>
+</span></span><span class="line"><span class="cl">provider <span class="s2">&#34;aws&#34;</span> <span class="o">{</span>
+</span></span><span class="line"><span class="cl">  <span class="nv">region</span>                   <span class="o">=</span> <span class="s2">&#34;ap-northeast-2&#34;</span>
+</span></span><span class="line"><span class="cl">  <span class="nv">shared_config_files</span>      <span class="o">=</span> <span class="o">[</span><span class="s2">&#34;~/.aws/config&#34;</span><span class="o">]</span>
+</span></span><span class="line"><span class="cl">  <span class="nv">shared_credentials_files</span> <span class="o">=</span> <span class="o">[</span><span class="s2">&#34;~/.aws/credentials&#34;</span><span class="o">]</span>
+</span></span><span class="line"><span class="cl"><span class="o">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">terraform <span class="o">{</span>
+</span></span><span class="line"><span class="cl">	required_providers <span class="o">{</span>
+</span></span><span class="line"><span class="cl">		<span class="nv">aws</span> <span class="o">=</span> <span class="o">{</span>
+</span></span><span class="line"><span class="cl">	    <span class="nv">version</span> <span class="o">=</span> <span class="s2">&#34;~&gt; 5.14.0&#34;</span>
+</span></span><span class="line"><span class="cl">		<span class="o">}</span>
+</span></span><span class="line"><span class="cl">  <span class="o">}</span>
+</span></span><span class="line"><span class="cl"><span class="o">}</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><ul>
+<li>프로바이더 교체</li>
+</ul>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl"><span class="nb">cd</span> generated <span class="o">&amp;&amp;</span> terraform state replace-provider -auto-approve -- -/aws hashicorp/aws
+</span></span><span class="line"><span class="cl">---
+</span></span><span class="line"><span class="cl">Terraform will perform the following actions:
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">  ~ Updating provider:
+</span></span><span class="line"><span class="cl">    - registry.terraform.io/-/aws
+</span></span><span class="line"><span class="cl">    + registry.terraform.io/hashicorp/aws
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>프로바이더 수정 이후 프로바이더 초기화와 코드로 인프라를 배포를 진행하자. 필자의 경우 plan 으로 영향도 확인시 서브넷과 VPC에 추가 설정이 필요했다.</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span><span class="lnt">31
+</span><span class="lnt">32
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">Terraform init
+</span></span><span class="line"><span class="cl">--
+</span></span><span class="line"><span class="cl">provider downloading..
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">Terraform plan 
+</span></span><span class="line"><span class="cl">--
+</span></span><span class="line"><span class="cl">╷
+</span></span><span class="line"><span class="cl">│ Error: enable_lni_at_device_index must not be zero, got <span class="m">0</span>
+</span></span><span class="line"><span class="cl">│ 
+</span></span><span class="line"><span class="cl">│   with aws_subnet.tfer--subnet-015058ac61e07391c,
+</span></span><span class="line"><span class="cl">│   on subnet.tf line 5, in resource <span class="s2">&#34;aws_subnet&#34;</span> <span class="s2">&#34;tfer--subnet-015058ac61e07391c&#34;</span>:
+</span></span><span class="line"><span class="cl">│    5:   <span class="nv">enable_lni_at_device_index</span>                     <span class="o">=</span> <span class="s2">&#34;0&#34;</span>
+</span></span><span class="line"><span class="cl">│
+</span></span><span class="line"><span class="cl">│ Error: Missing required argument
+</span></span><span class="line"><span class="cl">│ 
+</span></span><span class="line"><span class="cl">│   with aws_subnet.tfer--subnet-015058ac61e07391c,
+</span></span><span class="line"><span class="cl">│   on subnet.tf line 9, in resource <span class="s2">&#34;aws_subnet&#34;</span> <span class="s2">&#34;tfer--subnet-015058ac61e07391c&#34;</span>:
+</span></span><span class="line"><span class="cl">│    9:   <span class="nv">map_customer_owned_ip_on_launch</span>                <span class="o">=</span> <span class="s2">&#34;false&#34;</span>
+</span></span><span class="line"><span class="cl">│ 
+</span></span><span class="line"><span class="cl">│ <span class="s2">&#34;map_customer_owned_ip_on_launch&#34;</span>: all of <span class="sb">`</span>customer_owned_ipv4_pool,map_customer_owned_ip_on_launch,outpost_arn<span class="sb">`</span> must be specified
+</span></span><span class="line"><span class="cl">╵
+</span></span><span class="line"><span class="cl">.
+</span></span><span class="line"><span class="cl">.
+</span></span><span class="line"><span class="cl">╷
+</span></span><span class="line"><span class="cl">│ Error: Missing required argument
+</span></span><span class="line"><span class="cl">│ 
+</span></span><span class="line"><span class="cl">│   with aws_vpc.tfer--vpc-087e1e27e159bf626,
+</span></span><span class="line"><span class="cl">│   on vpc.tf line 8, in resource <span class="s2">&#34;aws_vpc&#34;</span> <span class="s2">&#34;tfer--vpc-087e1e27e159bf626&#34;</span>:
+</span></span><span class="line"><span class="cl">│    8:   <span class="nv">ipv6_netmask_length</span>                  <span class="o">=</span> <span class="s2">&#34;0&#34;</span>
+</span></span><span class="line"><span class="cl">│ 
+</span></span><span class="line"><span class="cl">│ <span class="s2">&#34;ipv6_netmask_length&#34;</span>: all of <span class="sb">`</span>ipv6_ipam_pool_id,ipv6_netmask_length<span class="sb">`</span> must be specified
+</span></span><span class="line"><span class="cl">╵
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>확인이 필요한 부분은 3가지다. <a href="https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/subnet">terrafrom registry</a> 에 옵션을 참고하자.</p>
+<p><img loading="lazy" 
+    src="/t101-multicluster-migration/terraform-multi1.png" 
+    alt="terraform-multi1.png" 
+     
+    width=918 
+    height="702"  /></p>
+<p>• <code>[enable_lni_at_device_index](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/subnet#enable_lni_at_device_index)</code> - (Optional) Indicates the device position for local network interfaces in this subnet. For example, 1 indicates local network interfaces in this subnet are the secondary network interface (eth1). A local network interface cannot be the primary network interface (eth0).</p>
+<p>• <code>[map_customer_owned_ip_on_launch](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/subnet#map_customer_owned_ip_on_launch)</code> - (Optional) Specify <code>true</code> to indicate that network interfaces created in the subnet should be assigned a customer owned IP address. The <code>customer_owned_ipv4_pool</code> and <code>outpost_arn</code> arguments must be specified when set to <code>true</code>. Default is <code>false</code>.</p>
+<p>• <code>[ipv6_netmask_length](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/vpc#ipv6_netmask_length)</code> - (Optional) Netmask length to request from IPAM Pool. Conflicts with <code>ipv6_cidr_block</code>. This can be omitted if IPAM pool as a <code>allocation_default_netmask_length</code> set. Valid values: <code>56</code>.</p>
+<p>옵션 확인시 구성에 필요없는 옵션이기에 해당 옵션을 삭제했다.  다만, 삭제 후에도 몇 가지 계획 확인 과정에서 필요없는 옵션으로 에러가 발생하여 삭제를 진행하였다. 원인은 버전 호환성으로 생각된다. 영향도 확인시 13개의 변동사항이 발생하는데 모두 security group에서 발생하였다. 플래그 및 옵션 변경으로 확인된다.</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span><span class="lnt">31
+</span><span class="lnt">32
+</span><span class="lnt">33
+</span><span class="lnt">34
+</span><span class="lnt">35
+</span><span class="lnt">36
+</span><span class="lnt">37
+</span><span class="lnt">38
+</span><span class="lnt">39
+</span><span class="lnt">40
+</span><span class="lnt">41
+</span><span class="lnt">42
+</span><span class="lnt">43
+</span><span class="lnt">44
+</span><span class="lnt">45
+</span><span class="lnt">46
+</span><span class="lnt">47
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl"><span class="c1"># 계획 확인</span>
+</span></span><span class="line"><span class="cl">terraform plan
+</span></span><span class="line"><span class="cl">--
+</span></span><span class="line"><span class="cl"><span class="c1"># aws_security_group_rule.tfer--sg-00be73ec863ca7943_ingress_-1_-1_-1_sg-0435a44214aa33d8a must be replaced</span>
+</span></span><span class="line"><span class="cl">-/+ resource <span class="s2">&#34;aws_security_group_rule&#34;</span> <span class="s2">&#34;tfer--sg-00be73ec863ca7943_ingress_-1_-1_-1_sg-0435a44214aa33d8a&#34;</span> <span class="o">{</span>
+</span></span><span class="line"><span class="cl">      ~ <span class="nv">id</span>                       <span class="o">=</span> <span class="s2">&#34;sgrule-1987943007&#34;</span> -&gt; <span class="o">(</span>known after apply<span class="o">)</span>
+</span></span><span class="line"><span class="cl">      - <span class="nv">prefix_list_ids</span>          <span class="o">=</span> <span class="o">[]</span> -&gt; null
+</span></span><span class="line"><span class="cl">      ~ <span class="nv">security_group_rule_id</span>   <span class="o">=</span> <span class="s2">&#34;sgr-0466aed048c68dbd0&#34;</span> -&gt; <span class="o">(</span>known after apply<span class="o">)</span>
+</span></span><span class="line"><span class="cl">      + <span class="nv">self</span>                     <span class="o">=</span> <span class="nb">false</span> <span class="c1"># forces replacement</span>
+</span></span><span class="line"><span class="cl">        <span class="c1"># (7 unchanged attributes hidden)</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">      - timeouts <span class="o">{}</span>
+</span></span><span class="line"><span class="cl">    <span class="o">}</span>
+</span></span><span class="line"><span class="cl">.
+</span></span><span class="line"><span class="cl">Plan: <span class="m">2</span> to add, <span class="m">11</span> to change, <span class="m">2</span> to destroy.
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">Changes to Outputs:
+</span></span><span class="line"><span class="cl">  ~ aws_security_group_rule_tfer--sg-00be73ec863ca7943_egress_-1_-1_-1_0-002E-0-002E-0-002E-0-002F-0_id                    <span class="o">=</span> <span class="s2">&#34;sgrule-3558759526&#34;</span> -&gt; <span class="o">(</span>known after apply<span class="o">)</span>
+</span></span><span class="line"><span class="cl">  ~ aws_security_group_rule_tfer--sg-00be73ec863ca7943_ingress_-1_-1_-1_sg-0435a44214aa33d8a_id                            <span class="o">=</span> <span class="s2">&#34;sgrule-1987943007&#34;</span> -&gt; <span class="o">(</span>known after apply<span class="o">)</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1"># 코드 인프라 배포 </span>
+</span></span><span class="line"><span class="cl">terraform apply 
+</span></span><span class="line"><span class="cl">--
+</span></span><span class="line"><span class="cl">pply complete! Resources: <span class="m">2</span> added, <span class="m">11</span> changed, <span class="m">2</span> destroyed.
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">Outputs:
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">aws_eks_cluster_tfer--hanhorang_id <span class="o">=</span> <span class="s2">&#34;hanhorang&#34;</span>
+</span></span><span class="line"><span class="cl">aws_eks_node_group_tfer--ng1_id <span class="o">=</span> <span class="s2">&#34;hanhorang:ng1&#34;</span>
+</span></span><span class="line"><span class="cl">aws_internet_gateway_tfer--igw-01ca08858c082a0ae_id <span class="o">=</span> <span class="s2">&#34;igw-01ca08858c082a0ae&#34;</span>
+</span></span><span class="line"><span class="cl">aws_internet_gateway_tfer--igw-09
+</span></span><span class="line"><span class="cl">...
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1"># 베스천 서버 내 동작 확인 </span>
+</span></span><span class="line"><span class="cl">kubectl get pods -A 
+</span></span><span class="line"><span class="cl">---
+</span></span><span class="line"><span class="cl">NAMESPACE     NAME                                 READY   STATUS    RESTARTS   AGE
+</span></span><span class="line"><span class="cl">kube-system   aws-node-9sjp9                       2/2     Running   <span class="m">0</span>          9h
+</span></span><span class="line"><span class="cl">kube-system   aws-node-wglbd                       2/2     Running   <span class="m">0</span>          9h
+</span></span><span class="line"><span class="cl">kube-system   coredns-b65b7888f-st5rb              1/1     Running   <span class="m">0</span>          9h
+</span></span><span class="line"><span class="cl">kube-system   coredns-b65b7888f-zmh5s              1/1     Running   <span class="m">0</span>          9h
+</span></span><span class="line"><span class="cl">kube-system   ebs-csi-controller-cb695654d-d2blq   6/6     Running   <span class="m">0</span>          8h
+</span></span><span class="line"><span class="cl">kube-system   ebs-csi-controller-cb695654d-fh9qz   6/6     Running   <span class="m">0</span>          8h
+</span></span><span class="line"><span class="cl">kube-system   ebs-csi-node-2689h                   3/3     Running   <span class="m">0</span>          8h
+</span></span><span class="line"><span class="cl">kube-system   ebs-csi-node-xwhh9                   3/3     Running   <span class="m">0</span>          8h
+</span></span><span class="line"><span class="cl">kube-system   kube-proxy-7mlxg                     1/1     Running   <span class="m">0</span>          9h
+</span></span><span class="line"><span class="cl">kube-system   kube-proxy-nr6xs                     1/1     Running   <span class="m">0</span>          9h
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h1 id="멀티-클러스터-업그레이드">
+    <a href="#%eb%a9%80%ed%8b%b0-%ed%81%b4%eb%9f%ac%ec%8a%a4%ed%84%b0-%ec%97%85%ea%b7%b8%eb%a0%88%ec%9d%b4%eb%93%9c" class="anchor">
+        <svg class="icon" aria-hidden="true" focusable="false" height="16" version="1.1" viewBox="0 0 16 16" width="16">
+            <path fill-rule="evenodd"
+                d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z">
+            </path>
+        </svg>
+    </a>
+    멀티 클러스터 업그레이드
+</h1>
+<p>기존 운영 중인 클러스터를 TF코드로 가져왔으니 TF 코드를 통해 새로운 클러스터를 구축하고 트래픽을 조정하여 인프라를 변경하겠다.</p>
+<p>(Option 1)</p>
+<p><img loading="lazy" 
+    src="/t101-multicluster-migration/Onfido-1-1024x429.png" 
+    alt="&lt;a href=&#34;https://aws.amazon.com/ko/blogs/containers/onfidos-journey-to-a-multi-cluster-amazon-eks-architecture/&#34;&gt;https://aws.amazon.com/ko/blogs/containers/onfidos-journey-to-a-multi-cluster-amazon-eks-architecture/&lt;/a&gt;" 
+     
+    width=1024 
+    height="429"  /></p>
+<p><a href="https://aws.amazon.com/ko/blogs/containers/onfidos-journey-to-a-multi-cluster-amazon-eks-architecture/">https://aws.amazon.com/ko/blogs/containers/onfidos-journey-to-a-multi-cluster-amazon-eks-architecture/</a></p>
+<h2 id="선수-작업">
+    <a href="#%ec%84%a0%ec%88%98-%ec%9e%91%ec%97%85" class="anchor">
+        <svg class="icon" aria-hidden="true" focusable="false" height="16" version="1.1" viewBox="0 0 16 16" width="16">
+            <path fill-rule="evenodd"
+                d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z">
+            </path>
+        </svg>
+    </a>
+    선수 작업
+</h2>
+<p>멀티클러스터 업그레이드를 위한 사전 작업으로 운영 중인 클러스터에 네트워크 addon(external DNS, ALB z컨트롤러)와 예제를 배포하자. 여기서 ALB 컨트롤러와 예제는 새로운 클러스터에서 다시 배포할 것이다.</p>
+<ul>
+<li>네트워크 addon 설치는 필자의 <a href="https://hanhorang31.github.io/post/aews-eks-vpc-1/">포스트 글 참조</a>해주세요.</li>
+<li>예제 애플리케이션 배포 (vote App)</li>
+</ul>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl"><span class="c1"># git clone  </span>
+</span></span><span class="line"><span class="cl">git clone https://github.com/HanHoRang31/blog-share.git
+</span></span><span class="line"><span class="cl"><span class="nb">cd</span> blog-share/k8s-app/vote-app-alb
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1"># 서비스 배포 </span>
+</span></span><span class="line"><span class="cl">kubectl apply -f .
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1"># ExternaDNS 추가</span>
+</span></span><span class="line"><span class="cl"><span class="c1">## 각자 자신의 도메인 정보 입력</span>
+</span></span><span class="line"><span class="cl"><span class="c1"># MyDOMAIN1=&lt;각자 자신의 nginx 도메인 지정&gt;</span>
+</span></span><span class="line"><span class="cl"><span class="c1"># MyDOMAIN2=&lt;각자 자신의 nginx 도메인 지정&gt;</span>
+</span></span><span class="line"><span class="cl"><span class="nv">MyDOMAIN1</span><span class="o">=</span>vote.hanhorang.link
+</span></span><span class="line"><span class="cl"><span class="nv">MyDOMAIN2</span><span class="o">=</span>result.hanhorang.link
+</span></span><span class="line"><span class="cl">kubectl annotate ingress vote-ingress <span class="s2">&#34;external-dns.alpha.kubernetes.io/hostname=</span><span class="nv">$MyDOMAIN1</span><span class="s2">.&#34;</span>
+</span></span><span class="line"><span class="cl">kubectl annotate ingress result-ingress <span class="s2">&#34;external-dns.alpha.kubernetes.io/hostname=</span><span class="nv">$MyDOMAIN2</span><span class="s2">.&#34;</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>설정한 도메인에 접속하면 예제 애플리케이션을 확인할 수 있다.</p>
+<p><img loading="lazy" 
+    src="/t101-multicluster-migration/archi24.png" 
+    alt="archi24.png" 
+     
+    width=1826 
+    height="513"  /></p>
+<h2 id="새-클러스터-구성">
+    <a href="#%ec%83%88-%ed%81%b4%eb%9f%ac%ec%8a%a4%ed%84%b0-%ea%b5%ac%ec%84%b1" class="anchor">
+        <svg class="icon" aria-hidden="true" focusable="false" height="16" version="1.1" viewBox="0 0 16 16" width="16">
+            <path fill-rule="evenodd"
+                d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z">
+            </path>
+        </svg>
+    </a>
+    새 클러스터 구성
+</h2>
+<p>새로운 클러스터 배포는 TF code 에서 아래 내용을 수정하면 된다. 변수 네이밍과 태그, 그리고 클러스터 버전을 확인해서 업그레이드하자.</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span><span class="lnt">31
+</span><span class="lnt">32
+</span><span class="lnt">33
+</span><span class="lnt">34
+</span><span class="lnt">35
+</span><span class="lnt">36
+</span><span class="lnt">37
+</span><span class="lnt">38
+</span><span class="lnt">39
+</span><span class="lnt">40
+</span><span class="lnt">41
+</span><span class="lnt">42
+</span><span class="lnt">43
+</span><span class="lnt">44
+</span><span class="lnt">45
+</span><span class="lnt">46
+</span><span class="lnt">47
+</span><span class="lnt">48
+</span><span class="lnt">49
+</span><span class="lnt">50
+</span><span class="lnt">51
+</span><span class="lnt">52
+</span><span class="lnt">53
+</span><span class="lnt">54
+</span><span class="lnt">55
+</span><span class="lnt">56
+</span><span class="lnt">57
+</span><span class="lnt">58
+</span><span class="lnt">59
+</span><span class="lnt">60
+</span><span class="lnt">61
+</span><span class="lnt">62
+</span><span class="lnt">63
+</span><span class="lnt">64
+</span><span class="lnt">65
+</span><span class="lnt">66
+</span><span class="lnt">67
+</span><span class="lnt">68
+</span><span class="lnt">69
+</span><span class="lnt">70
+</span><span class="lnt">71
+</span><span class="lnt">72
+</span><span class="lnt">73
+</span><span class="lnt">74
+</span><span class="lnt">75
+</span><span class="lnt">76
+</span><span class="lnt">77
+</span><span class="lnt">78
+</span><span class="lnt">79
+</span><span class="lnt">80
+</span><span class="lnt">81
+</span><span class="lnt">82
+</span><span class="lnt">83
+</span><span class="lnt">84
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl"><span class="c1">## eks_cluster-blue.tf</span>
+</span></span><span class="line"><span class="cl">resource <span class="s2">&#34;aws_eks_cluster&#34;</span> <span class="s2">&#34;tfer--hanhorang2&#34;</span> <span class="o">{</span> <span class="c1"># 수정 </span>
+</span></span><span class="line"><span class="cl">  kubernetes_network_config <span class="o">{</span>
+</span></span><span class="line"><span class="cl">    <span class="nv">ip_family</span>         <span class="o">=</span> <span class="s2">&#34;ipv4&#34;</span>
+</span></span><span class="line"><span class="cl">    <span class="nv">service_ipv4_cidr</span> <span class="o">=</span> <span class="s2">&#34;10.100.0.0/16&#34;</span>
+</span></span><span class="line"><span class="cl">  <span class="o">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">  <span class="nv">name</span>     <span class="o">=</span> <span class="s2">&#34;hanhorang2&#34;</span>  <span class="c1"># 수정</span>
+</span></span><span class="line"><span class="cl">  <span class="nv">role_arn</span> <span class="o">=</span> <span class="s2">&#34;arn:aws:iam::955963799952:role/eksctl-hanhorang-cluster-ServiceRole-BP23R8UEH9QW&#34;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">  <span class="nv">tags</span> <span class="o">=</span> <span class="o">{</span>  <span class="c1"># 수정</span>
+</span></span><span class="line"><span class="cl">    <span class="nv">Name</span>                                          <span class="o">=</span> <span class="s2">&#34;eksctl-hanhorang-cluster/ControlPlane&#34;</span>
+</span></span><span class="line"><span class="cl">    <span class="s2">&#34;alpha.eksctl.io/cluster-name&#34;</span>                <span class="o">=</span> <span class="s2">&#34;hanhorang2&#34;</span>
+</span></span><span class="line"><span class="cl">    <span class="s2">&#34;alpha.eksctl.io/cluster-oidc-enabled&#34;</span>        <span class="o">=</span> <span class="s2">&#34;true&#34;</span>
+</span></span><span class="line"><span class="cl">    <span class="s2">&#34;alpha.eksctl.io/eksctl-version&#34;</span>              <span class="o">=</span> <span class="s2">&#34;0.154.0&#34;</span>
+</span></span><span class="line"><span class="cl">    <span class="s2">&#34;eksctl.cluster.k8s.io/v1alpha1/cluster-name&#34;</span> <span class="o">=</span> <span class="s2">&#34;hanhorang2&#34;</span>
+</span></span><span class="line"><span class="cl">  <span class="o">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">  <span class="nv">tags_all</span> <span class="o">=</span> <span class="o">{</span>
+</span></span><span class="line"><span class="cl">    <span class="nv">Name</span>                                          <span class="o">=</span> <span class="s2">&#34;eksctl-hanhorang-cluster/ControlPlane&#34;</span>
+</span></span><span class="line"><span class="cl">    <span class="s2">&#34;alpha.eksctl.io/cluster-name&#34;</span>                <span class="o">=</span> <span class="s2">&#34;hanhorang2&#34;</span>
+</span></span><span class="line"><span class="cl">    <span class="s2">&#34;alpha.eksctl.io/cluster-oidc-enabled&#34;</span>        <span class="o">=</span> <span class="s2">&#34;true&#34;</span>
+</span></span><span class="line"><span class="cl">    <span class="s2">&#34;alpha.eksctl.io/eksctl-version&#34;</span>              <span class="o">=</span> <span class="s2">&#34;0.154.0&#34;</span>
+</span></span><span class="line"><span class="cl">    <span class="s2">&#34;eksctl.cluster.k8s.io/v1alpha1/cluster-name&#34;</span> <span class="o">=</span> <span class="s2">&#34;hanhorang2&#34;</span>
+</span></span><span class="line"><span class="cl">  <span class="o">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">  <span class="nv">version</span> <span class="o">=</span> <span class="s2">&#34;1.25&#34;</span> <span class="c1"># 업그레이드 </span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">  vpc_config <span class="o">{</span>
+</span></span><span class="line"><span class="cl">    <span class="nv">endpoint_private_access</span> <span class="o">=</span> <span class="s2">&#34;false&#34;</span>
+</span></span><span class="line"><span class="cl">    <span class="nv">endpoint_public_access</span>  <span class="o">=</span> <span class="s2">&#34;true&#34;</span>
+</span></span><span class="line"><span class="cl">    <span class="nv">public_access_cidrs</span>     <span class="o">=</span> <span class="o">[</span><span class="s2">&#34;0.0.0.0/0&#34;</span><span class="o">]</span>
+</span></span><span class="line"><span class="cl">    <span class="nv">security_group_ids</span>      <span class="o">=</span> <span class="o">[</span><span class="s2">&#34;</span><span class="si">${</span><span class="nv">data</span><span class="p">.terraform_remote_state.local.outputs.aws_security_group_tfer--eksctl-hanhorang-cluster-ControlPlaneSecurityGroup-186VO6YUM9A43_sg-0270c4da847aa9121_id</span><span class="si">}</span><span class="s2">&#34;</span><span class="o">]</span>
+</span></span><span class="line"><span class="cl">    <span class="nv">subnet_ids</span>              <span class="o">=</span> <span class="o">[</span><span class="s2">&#34;</span><span class="si">${</span><span class="nv">data</span><span class="p">.terraform_remote_state.local.outputs.aws_subnet_tfer--subnet-015058ac61e07391c_id</span><span class="si">}</span><span class="s2">&#34;</span>, <span class="s2">&#34;</span><span class="si">${</span><span class="nv">data</span><span class="p">.terraform_remote_state.local.outputs.aws_subnet_tfer--subnet-0590fd1917b053a6a_id</span><span class="si">}</span><span class="s2">&#34;</span>, <span class="s2">&#34;</span><span class="si">${</span><span class="nv">data</span><span class="p">.terraform_remote_state.local.outputs.aws_subnet_tfer--subnet-0eb54f96064d4e96c_id</span><span class="si">}</span><span class="s2">&#34;</span><span class="o">]</span>
+</span></span><span class="line"><span class="cl">  <span class="o">}</span>
+</span></span><span class="line"><span class="cl"><span class="o">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1"># eks_node_group-blue.tf</span>
+</span></span><span class="line"><span class="cl">resource <span class="s2">&#34;aws_eks_node_group&#34;</span> <span class="s2">&#34;tfer--ng2&#34;</span> <span class="o">{</span>  <span class="c1"># 수정 </span>
+</span></span><span class="line"><span class="cl">  <span class="nv">ami_type</span>       <span class="o">=</span> <span class="s2">&#34;AL2_x86_64&#34;</span>
+</span></span><span class="line"><span class="cl">  <span class="nv">capacity_type</span>  <span class="o">=</span> <span class="s2">&#34;ON_DEMAND&#34;</span>
+</span></span><span class="line"><span class="cl">  <span class="nv">cluster_name</span>   <span class="o">=</span> <span class="s2">&#34;</span><span class="si">${</span><span class="nv">aws_eks_cluster</span><span class="p">.tfer--hanhorang2.name</span><span class="si">}</span><span class="s2">&#34;</span>
+</span></span><span class="line"><span class="cl">  <span class="nv">disk_size</span>      <span class="o">=</span> <span class="s2">&#34;0&#34;</span>
+</span></span><span class="line"><span class="cl">  <span class="nv">instance_types</span> <span class="o">=</span> <span class="o">[</span><span class="s2">&#34;t3.medium&#34;</span><span class="o">]</span>
+</span></span><span class="line"><span class="cl">   <span class="c1"># 수정 </span>
+</span></span><span class="line"><span class="cl">  <span class="nv">labels</span> <span class="o">=</span> <span class="o">{</span>
+</span></span><span class="line"><span class="cl">    <span class="s2">&#34;alpha.eksctl.io/cluster-name&#34;</span>   <span class="o">=</span> <span class="s2">&#34;hanhorang2&#34;</span>
+</span></span><span class="line"><span class="cl">    <span class="s2">&#34;alpha.eksctl.io/nodegroup-name&#34;</span> <span class="o">=</span> <span class="s2">&#34;ng1&#34;</span>
+</span></span><span class="line"><span class="cl">  <span class="o">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">  <span class="nv">node_group_name</span> <span class="o">=</span> <span class="s2">&#34;ng1&#34;</span>
+</span></span><span class="line"><span class="cl">  <span class="nv">node_role_arn</span>   <span class="o">=</span> <span class="s2">&#34;arn:aws:iam::955963799952:role/eksctl-hanhorang-nodegroup-ng1-NodeInstanceRole-G4237QU98U14&#34;</span>
+</span></span><span class="line"><span class="cl"> 
+</span></span><span class="line"><span class="cl">  scaling_config <span class="o">{</span>
+</span></span><span class="line"><span class="cl">    <span class="nv">desired_size</span> <span class="o">=</span> <span class="s2">&#34;2&#34;</span>
+</span></span><span class="line"><span class="cl">    <span class="nv">max_size</span>     <span class="o">=</span> <span class="s2">&#34;2&#34;</span>
+</span></span><span class="line"><span class="cl">    <span class="nv">min_size</span>     <span class="o">=</span> <span class="s2">&#34;2&#34;</span>
+</span></span><span class="line"><span class="cl">  <span class="o">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">  <span class="nv">subnet_ids</span> <span class="o">=</span> <span class="o">[</span><span class="s2">&#34;subnet-015058ac61e07391c&#34;</span>, <span class="s2">&#34;subnet-0590fd1917b053a6a&#34;</span>, <span class="s2">&#34;subnet-0eb54f96064d4e96c&#34;</span><span class="o">]</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">	<span class="c1"># 수정 </span>
+</span></span><span class="line"><span class="cl">  <span class="nv">tags</span> <span class="o">=</span> <span class="o">{</span>
+</span></span><span class="line"><span class="cl">    <span class="s2">&#34;alpha.eksctl.io/cluster-name&#34;</span>                <span class="o">=</span> <span class="s2">&#34;hanhorang2&#34;</span>
+</span></span><span class="line"><span class="cl">    <span class="s2">&#34;alpha.eksctl.io/eksctl-version&#34;</span>              <span class="o">=</span> <span class="s2">&#34;0.154.0&#34;</span>
+</span></span><span class="line"><span class="cl">    <span class="s2">&#34;alpha.eksctl.io/nodegroup-name&#34;</span>              <span class="o">=</span> <span class="s2">&#34;ng1&#34;</span>
+</span></span><span class="line"><span class="cl">    <span class="s2">&#34;alpha.eksctl.io/nodegroup-type&#34;</span>              <span class="o">=</span> <span class="s2">&#34;managed&#34;</span>
+</span></span><span class="line"><span class="cl">    <span class="s2">&#34;eksctl.cluster.k8s.io/v1alpha1/cluster-name&#34;</span> <span class="o">=</span> <span class="s2">&#34;hanhorang2&#34;</span>
+</span></span><span class="line"><span class="cl">  <span class="o">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">  <span class="nv">tags_all</span> <span class="o">=</span> <span class="o">{</span>
+</span></span><span class="line"><span class="cl">    <span class="s2">&#34;alpha.eksctl.io/cluster-name&#34;</span>                <span class="o">=</span> <span class="s2">&#34;hanhorang2&#34;</span>
+</span></span><span class="line"><span class="cl">    <span class="s2">&#34;alpha.eksctl.io/eksctl-version&#34;</span>              <span class="o">=</span> <span class="s2">&#34;0.154.0&#34;</span>
+</span></span><span class="line"><span class="cl">    <span class="s2">&#34;alpha.eksctl.io/nodegroup-name&#34;</span>              <span class="o">=</span> <span class="s2">&#34;ng1&#34;</span>
+</span></span><span class="line"><span class="cl">    <span class="s2">&#34;alpha.eksctl.io/nodegroup-type&#34;</span>              <span class="o">=</span> <span class="s2">&#34;managed&#34;</span>
+</span></span><span class="line"><span class="cl">    <span class="s2">&#34;eksctl.cluster.k8s.io/v1alpha1/cluster-name&#34;</span> <span class="o">=</span> <span class="s2">&#34;hanhorang2&#34;</span>
+</span></span><span class="line"><span class="cl">  <span class="o">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">  update_config <span class="o">{</span>
+</span></span><span class="line"><span class="cl">    <span class="nv">max_unavailable</span> <span class="o">=</span> <span class="s2">&#34;1&#34;</span>
+</span></span><span class="line"><span class="cl">  <span class="o">}</span>
+</span></span><span class="line"><span class="cl">  <span class="c1"># 노드 그룹 업그레이드 </span>
+</span></span><span class="line"><span class="cl">  <span class="nv">version</span> <span class="o">=</span> <span class="s2">&#34;1.25&#34;</span>
+</span></span><span class="line"><span class="cl"><span class="o">}</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>새 클러스터 구성 후 베스천 서버에서 새 클러스터에 접근할 수 있도록 구성을 변경하자.</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">eksctl get cluster --region<span class="o">=</span>ap-northeast-2
+</span></span><span class="line"><span class="cl">--
+</span></span><span class="line"><span class="cl">NAME            REGION          EKSCTL CREATED
+</span></span><span class="line"><span class="cl">hanhorang       ap-northeast-2  True
+</span></span><span class="line"><span class="cl">hanhorang2      ap-northeast-2  False
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">aws eks update-kubeconfig --region ap-northeast-2 --name hanhorang2 
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>kubectl 로 접근시 새 클러스터 파드에 aws-node가 붙지 않는다. 로그를 확인하면 노드 그룹에 연결된 iam role에 필요 정책이 없어 발생한 에러였다.</p>
+<p><img loading="lazy" 
+    src="/t101-multicluster-migration/t101-muti3.png" 
+    alt="t101-muti3.png" 
+     
+    width=2108 
+    height="438"  /></p>
+<p>EC2 role에 관리형 정책인 AmazonEKS_CNI_Policy 를 추가하자.</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span><span class="lnt">8
+</span><span class="lnt">9
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">kubectl get pods -A
+</span></span><span class="line"><span class="cl">---
+</span></span><span class="line"><span class="cl">NAMESPACE     NAME                       READY   STATUS    RESTARTS   AGE
+</span></span><span class="line"><span class="cl">kube-system   aws-node-5sn6g             1/1     Running   <span class="m">0</span>          62s
+</span></span><span class="line"><span class="cl">kube-system   aws-node-s2jwf             1/1     Running   <span class="m">0</span>          79s
+</span></span><span class="line"><span class="cl">kube-system   coredns-76b4dcc5cc-hp5sb   1/1     Running   <span class="m">0</span>          50m
+</span></span><span class="line"><span class="cl">kube-system   coredns-76b4dcc5cc-nwg44   1/1     Running   <span class="m">0</span>          50m
+</span></span><span class="line"><span class="cl">kube-system   kube-proxy-hq2m8           1/1     Running   <span class="m">0</span>          41m
+</span></span><span class="line"><span class="cl">kube-system   kube-proxy-vl7nv           1/1     Running   <span class="m">0</span>          41m
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>접근이 확인되면, 선수 작업에 진행한 네트워크 addon 과 예제 애플리케이션을 배포하자.</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl"><span class="c1"># 새 클러스터 OIDC 활성화</span>
+</span></span><span class="line"><span class="cl"><span class="nb">export</span> <span class="nv">cluster_name</span><span class="o">=</span>hanhorang2
+</span></span><span class="line"><span class="cl">eksctl utils associate-iam-oidc-provider --cluster <span class="nv">$cluster_name</span> --approve
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1"># .. 이후 선수작업의 네트워크 addon 과 예제 애플리케이션 배포</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h2 id="멀티클러스터-업그레이드">
+    <a href="#%eb%a9%80%ed%8b%b0%ed%81%b4%eb%9f%ac%ec%8a%a4%ed%84%b0-%ec%97%85%ea%b7%b8%eb%a0%88%ec%9d%b4%eb%93%9c" class="anchor">
+        <svg class="icon" aria-hidden="true" focusable="false" height="16" version="1.1" viewBox="0 0 16 16" width="16">
+            <path fill-rule="evenodd"
+                d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z">
+            </path>
+        </svg>
+    </a>
+    멀티클러스터 업그레이드
+</h2>
+<p>두 개의 다른 클러스터에서 같은 도메인을 등록하여 애플리케이션을 등록하였다. 등록한 어플리케이션에 트래픽 조절을 구 클러스터에서 새 클러스터로 바꾸면 멀티클러스터 업그레이드는 완료다.  새 클러스터에서 vote 애플리케이션을 똑같이 배포하면, route53에 등록된 dns가 구 클러스터에서 새 클러스터에서 수정되며 등록되는 시간 약 5분동안 순단이 발생한다. 무중단으로 트래픽을 전환하기 위한 작업이 필요하다.</p>
+<h3 id="route53-가중치-라우팅을-통한-트래픽-전환">
+    <a href="#route53-%ea%b0%80%ec%a4%91%ec%b9%98-%eb%9d%bc%ec%9a%b0%ed%8c%85%ec%9d%84-%ed%86%b5%ed%95%9c-%ed%8a%b8%eb%9e%98%ed%94%bd-%ec%a0%84%ed%99%98" class="anchor">
+        <svg class="icon" aria-hidden="true" focusable="false" height="16" version="1.1" viewBox="0 0 16 16" width="16">
+            <path fill-rule="evenodd"
+                d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z">
+            </path>
+        </svg>
+    </a>
+    Route53 가중치 라우팅을 통한 트래픽 전환
+</h3>
+<p>route53 의 가중치 기반 라우팅을 통해 blue-green 버전 사이의 트래픽을 기호에 맞게 옮길 수 있다. 이를 위해 구 클러스터의  ingress annotation 에 가중치 주석을 추가하자. (<a href="https://github.com/kubernetes-sigs/external-dns/blob/master/docs/tutorials/aws.md">기타 라우팅의 경우 external-dns 깃 참고</a>)</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl"><span class="c1"># vote-ingress.yaml </span>
+</span></span><span class="line"><span class="cl">apiVersion: networking.k8s.io/v1
+</span></span><span class="line"><span class="cl">kind: Ingress
+</span></span><span class="line"><span class="cl">metadata:
+</span></span><span class="line"><span class="cl">  name: vote-ingress
+</span></span><span class="line"><span class="cl">  annotations:
+</span></span><span class="line"><span class="cl">    kubernetes.io/ingress.class: alb
+</span></span><span class="line"><span class="cl">    alb.ingress.kubernetes.io/scheme: internet-facing
+</span></span><span class="line"><span class="cl">    alb.ingress.kubernetes.io/target-type: ip
+</span></span><span class="line"><span class="cl">    external-dns.alpha.kubernetes.io/hostname: hanhorang.link <span class="c1"># 사용자 도메인 입력 </span>
+</span></span><span class="line"><span class="cl">    external-dns.alpha.kubernetes.io/set-identifier: vote <span class="c1"># RecordID 등록, 라우팅 식별자</span>
+</span></span><span class="line"><span class="cl">    external-dns.alpha.kubernetes.io/aws-weight: <span class="s1">&#39;1&#39;</span> <span class="c1"># 가중치 기반 설정값 </span>
+</span></span><span class="line"><span class="cl">spec:
+</span></span><span class="line"><span class="cl">  rules:
+</span></span><span class="line"><span class="cl">    - http:
+</span></span><span class="line"><span class="cl">        paths:
+</span></span><span class="line"><span class="cl">          - path: /vote
+</span></span><span class="line"><span class="cl">            pathType: Prefix
+</span></span><span class="line"><span class="cl">            backend:
+</span></span><span class="line"><span class="cl">              service:
+</span></span><span class="line"><span class="cl">                name: vote
+</span></span><span class="line"><span class="cl">                port:
+</span></span><span class="line"><span class="cl">                  number: <span class="m">5000</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><ul>
+<li><code>external-dns.alpha.kubernetes.io/aws-weight</code> : 0~255 의 정수값이 들어가며, 상대적인 비율을 나타낸다. 예를 들어, A 서비스와 B서비스의 트래픽 비율을 1:1로 맞추고 싶다면, A 서비스 값을 1 설정하고 B 서비스의 값을 1로 설정하자.</li>
+</ul>
+<p>새 클러스터에서 예제 Ingress 배포를 진행하면 A레코드와,TXT 가 중복되어 route53이 업데이트 되지 않는다. 해결 방법을 찾아보니 기존의 리소스를 삭제하여 중복을 없애라는데.. 무중단으로 진행이 안된다.</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl"><span class="nv">time</span><span class="o">=</span><span class="s2">&#34;2023-09-01T13:46:50Z&#34;</span> <span class="nv">level</span><span class="o">=</span>error <span class="nv">msg</span><span class="o">=</span><span class="s2">&#34;Failure in zone hanhorang.link. [Id: /hostedzone/Z08463751O7YNWD79KKIX] when submitting change batch: InvalidChangeBatch: [RRSet with DNS name hanhorang.link., type A cannot be created as other RRSets exist with the same name and type., RRSet with DNS name hanhorang.link., type TXT cannot be created as other RRSets exist with the same name and type.]\n\tstatus code: 400, request id: 64a5953f-902c-4e8c-9bd7-2062a22c8109&#34;</span>
+</span></span><span class="line"><span class="cl"><span class="nv">time</span><span class="o">=</span><span class="s2">&#34;2023-09-01T13:46:51Z&#34;</span> <span class="nv">level</span><span class="o">=</span>error <span class="nv">msg</span><span class="o">=</span><span class="s2">&#34;failed to submit all changes for the following zones: [/hostedzone/Z08463751O7YNWD79KKIX]&#34;</span>
+</span></span><span class="line"><span class="cl"><span class="nv">time</span><span class="o">=</span><span class="s2">&#34;2023-09-01T13:47:50Z&#34;</span> <span class="nv">level</span><span class="o">=</span>info <span class="nv">msg</span><span class="o">=</span><span class="s2">&#34;Applying provider record filter for domains: [hanhorang.link. .hanhorang.link.]&#34;</span>
+</span></span><span class="line"><span class="cl"><span class="nv">time</span><span class="o">=</span><span class="s2">&#34;2023-09-01T13:47:50Z&#34;</span> <span class="nv">level</span><span class="o">=</span>info <span class="nv">msg</span><span class="o">=</span><span class="s2">&#34;Desired change: CREATE hanhorang.link A [Id: /hostedzone/Z08463751O7YNWD79KKIX]&#34;</span>
+</span></span><span class="line"><span class="cl"><span class="nv">time</span><span class="o">=</span><span class="s2">&#34;2023-09-01T13:47:50Z&#34;</span> <span class="nv">level</span><span class="o">=</span>info <span class="nv">msg</span><span class="o">=</span><span class="s2">&#34;Desired change: CREATE hanhorang.link TXT [Id: /hostedzone/Z08463751O7YNWD79KKIX]&#34;</span>
+</span></span><span class="line"><span class="cl"><span class="nv">time</span><span class="o">=</span><span class="s2">&#34;2023-09-01T13:47:50Z&#34;</span> <span class="nv">level</span><span class="o">=</span>error <span class="nv">msg</span><span class="o">=</span><span class="s2">&#34;Failure in zone hanhorang.link. [Id: /hostedzone/Z08463751O7YNWD79KKIX] when submitting change batch: InvalidChangeBatch: [RRSet with DNS name hanhorang.link., type A cannot be created as other RRSets exist with the same name and type., RRSet with DNS name hanhorang.link., type TXT cannot be created as other RRSets exist with the same name and type.]\n\tstatus code: 400, request id: 6f961338-b1bd-4ddd-93ad-1bb169fc686d&#34;</span>
+</span></span><span class="line"><span class="cl"><span class="nv">time</span><span class="o">=</span><span class="s2">&#34;2023-09-01T13:47:51Z&#34;</span> <span class="nv">level</span><span class="o">=</span>error <span class="nv">msg</span><span class="o">=</span><span class="s2">&#34;failed to submit all changes for the following zones: [/hostedzone/Z08463751O7YNWD79KKIX]&#34;</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>해결을 위해서는 클러스터별로 각기 다른 Route53 레코드ID를 갖도록 설정해야 한다.</p>
+<ul>
+<li>
+<p>1.24 EKS 클러스터(green) 설정</p>
+<p>external-dns configure</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">kubectl edit deploy  external-dns  -n kube-system
+</span></span><span class="line"><span class="cl">--
+</span></span><span class="line"><span class="cl">..
+</span></span><span class="line"><span class="cl">spec:
+</span></span><span class="line"><span class="cl">      containers:
+</span></span><span class="line"><span class="cl">      - args:
+</span></span><span class="line"><span class="cl">        - --events
+</span></span><span class="line"><span class="cl">        - --source<span class="o">=</span>service
+</span></span><span class="line"><span class="cl">        - --source<span class="o">=</span>ingress
+</span></span><span class="line"><span class="cl">        - --domain-filter<span class="o">=</span>hanhorang.link
+</span></span><span class="line"><span class="cl">        - --provider<span class="o">=</span>aws
+</span></span><span class="line"><span class="cl">        - --aws-zone-type<span class="o">=</span>public
+</span></span><span class="line"><span class="cl">        - --registry<span class="o">=</span>txt
+</span></span><span class="line"><span class="cl">        - --txt-owner-id<span class="o">=</span>blue <span class="c1"># hostzone ID에서 수정 </span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>vote-Ingress.yaml</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-yaml" data-lang="yaml"><span class="line"><span class="cl"><span class="nt">apiVersion</span><span class="p">:</span><span class="w"> </span><span class="l">networking.k8s.io/v1</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="nt">kind</span><span class="p">:</span><span class="w"> </span><span class="l">Ingress</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="nt">metadata</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l">vote-ingress</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="nt">annotations</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="nt">kubernetes.io/ingress.class</span><span class="p">:</span><span class="w"> </span><span class="l">alb</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="nt">alb.ingress.kubernetes.io/scheme</span><span class="p">:</span><span class="w"> </span><span class="l">internet-facing</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="nt">alb.ingress.kubernetes.io/target-type</span><span class="p">:</span><span class="w"> </span><span class="l">ip</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="nt">external-dns.alpha.kubernetes.io/hostname</span><span class="p">:</span><span class="w"> </span><span class="l">vote.hanhorang.link</span><span class="w"> </span><span class="c"># 도메인 입력</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="nt">external-dns.alpha.kubernetes.io/set-identifier</span><span class="p">:</span><span class="w"> </span><span class="l">green </span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="nt">external-dns.alpha.kubernetes.io/aws-weight</span><span class="p">:</span><span class="w"> </span><span class="s1">&#39;1&#39;</span><span class="w">
+</span></span></span></code></pre></td></tr></table>
+</div>
+</div></li>
+<li>
+<p>1.25 EKS 클러스터(blue) 설정</p>
+<p>external-dns</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">kubectl edit deploy  external-dns  -n kube-system
+</span></span><span class="line"><span class="cl">--
+</span></span><span class="line"><span class="cl">..
+</span></span><span class="line"><span class="cl">spec:
+</span></span><span class="line"><span class="cl">      containers:
+</span></span><span class="line"><span class="cl">      - args:
+</span></span><span class="line"><span class="cl">        - --events
+</span></span><span class="line"><span class="cl">        - --source<span class="o">=</span>service
+</span></span><span class="line"><span class="cl">        - --source<span class="o">=</span>ingress
+</span></span><span class="line"><span class="cl">        - --domain-filter<span class="o">=</span>hanhorang.link
+</span></span><span class="line"><span class="cl">        - --provider<span class="o">=</span>aws
+</span></span><span class="line"><span class="cl">        - --aws-zone-type<span class="o">=</span>public
+</span></span><span class="line"><span class="cl">        - --registry<span class="o">=</span>txt
+</span></span><span class="line"><span class="cl">        - --txt-owner-id<span class="o">=</span>green <span class="c1"># hostzone ID에서 수정 </span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>vote-Ingress.yaml</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-yaml" data-lang="yaml"><span class="line"><span class="cl"><span class="nt">apiVersion</span><span class="p">:</span><span class="w"> </span><span class="l">networking.k8s.io/v1</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="nt">kind</span><span class="p">:</span><span class="w"> </span><span class="l">Ingress</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="nt">metadata</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l">vote-ingress</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="nt">annotations</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="nt">kubernetes.io/ingress.class</span><span class="p">:</span><span class="w"> </span><span class="l">alb</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="nt">alb.ingress.kubernetes.io/scheme</span><span class="p">:</span><span class="w"> </span><span class="l">internet-facing</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="nt">alb.ingress.kubernetes.io/target-type</span><span class="p">:</span><span class="w"> </span><span class="l">ip</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="nt">external-dns.alpha.kubernetes.io/hostname</span><span class="p">:</span><span class="w"> </span><span class="l">vote.hanhorang.link</span><span class="w"> </span><span class="c"># 도메인 입력 </span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="nt">external-dns.alpha.kubernetes.io/set-identifier</span><span class="p">:</span><span class="w"> </span><span class="l">blue</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="nt">external-dns.alpha.kubernetes.io/aws-weight</span><span class="p">:</span><span class="w"> </span><span class="s1">&#39;1&#39;</span><span class="w">
+</span></span></span></code></pre></td></tr></table>
+</div>
+</div></li>
+</ul>
+<p>각 클러스터에서 예제 애플리케이션을 배포하면 콘솔에서 같은 도메인의 레코드 정보가 2개씩 생겼음을 확인할 수 있다.</p>
+<p><img loading="lazy" 
+    src="/t101-multicluster-migration/t101-multi6.png" 
+    alt="t101-multi6.png" 
+     
+    width=1435 
+    height="373"  /></p>
+<p>예제 어플리케이션 접속시 가중치에 맞게 변환되어 호출되는 것을 확인할 수 있다. 확인하면서 주의할 점이 있는데 DNS캐싱으로 한 번 DNS에 연결되면 설정된 TTL 동안 같은 DNS로 연결된다.</p>
+<p><img loading="lazy" 
+    src="/t101-multicluster-migration/multi8.png" 
+    alt="multi8.png" 
+     
+    width=2152 
+    height="1488"  /></p>
+<p>설정한 가중치 라우팅을 1:1 에서 0:1로 수정하여 테스트하면 새 버전의 서버에서만 트래픽을 전달하는 것을 확인할 수 있다.</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">kubectl edit ingress vote-ingress
+</span></span><span class="line"><span class="cl">--
+</span></span><span class="line"><span class="cl">apiVersion: networking.k8s.io/v1
+</span></span><span class="line"><span class="cl">kind: Ingress
+</span></span><span class="line"><span class="cl">metadata:
+</span></span><span class="line"><span class="cl">  annotations:
+</span></span><span class="line"><span class="cl">    alb.ingress.kubernetes.io/scheme: internet-facing
+</span></span><span class="line"><span class="cl">    alb.ingress.kubernetes.io/target-type: ip
+</span></span><span class="line"><span class="cl">    external-dns.alpha.kubernetes.io/aws-weight: <span class="s2">&#34;0&#34;</span> <span class="c1"># 1에서 0으로 수정 </span>
+</span></span><span class="line"><span class="cl">    external-dns.alpha.kubernetes.io/hostname: vote.hanhorang.link
+</span></span><span class="line"><span class="cl">    external-dns.alpha.kubernetes.io/set-identifier: green
+</span></span><span class="line"><span class="cl">    kubectl.kubernetes.io/last-applied-configuration: <span class="p">|</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p><img loading="lazy" 
+    src="/t101-multicluster-migration/multi9.png" 
+    alt="multi9.png" 
+     
+    width=1894 
+    height="1492"  /></p>
+<h1 id="마치며">
+    <a href="#%eb%a7%88%ec%b9%98%eb%a9%b0" class="anchor">
+        <svg class="icon" aria-hidden="true" focusable="false" height="16" version="1.1" viewBox="0 0 16 16" width="16">
+            <path fill-rule="evenodd"
+                d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z">
+            </path>
+        </svg>
+    </a>
+    마치며
+</h1>
+<p>테라폼과 Route53 라우팅 정책을 통해 무중단 클러스터 마이그레이션 작업을 진행하였다. 내용이 복잡했지만, External DNS 로 Route53 가중치 정책 설정 방법과 Terraformer Import 이후 수정 작업만 기억하면 된다. 추후 실무에서 도입시 기대되는 부분이다.</p>
+
+    </div>
+</div>
+
+<div class="container">
+    
+    <nav class="flex container suggested">
+        
+        <a rel="prev" href="/post/aws-devops-professnal/" title="Previous post (older)">
+            <span>Previous</span>
+            [자격증] AWS Devops Professnal(DOP-C02) 취득 후기
+            </a>
+        
+        
+        
+    </nav>
+    
+</div>
+ 
+<div class="container">
+    
+    <script src="https://giscus.app/client.js" 
+        data-repo="WingLim/hugo-tania"
+        data-repo-id="MDEwOlJlcG9zaXRvcnkzMTYyNjQzMDc="
+        
+        data-category="Comments"
+        data-category-id="DIC_kwDOEtnPc84B_WKP"
+        
+        data-mapping="pathname"
+        data-reactions-enabled="1"
+        data-emit-metadata="0"
+        data-theme="light"
+        crossorigin="anonymous"
+        async
+        >
+</script>
+
+<script>
+    function setGiscusTeheme(theme) {
+        let giscus = document.querySelector('.giscus iframe');
+        if (giscus) {
+            giscus.contentWindow.postMessage(
+                {
+                    giscus: {
+                        setConfig: {
+                            theme: theme
+                        }
+                    }
+                },
+                'https://giscus.app'
+            )
+        }
+    }
+
+    addEventListener('message', event => {
+        if (event.origin !== 'https://giscus.app') return;
+        setGiscusTeheme(document.documentElement.dataset.userColorScheme)
+    });
+
+    window.addEventListener('onColorSchemeChange', (e) => {
+        setGiscusTeheme(e.detail)
+    })
+</script>
+
+</div>
+
+</main>
+
+
+        </main>
+        <footer class="footer flex">
+    <section class="container">
+        <nav class="footer-links">
+            
+            <a href="/index.xml">RSS</a>
+            
+        </nav>
+
+        
+    </section>
+    <script defer src="/ts/features.706a523ba43e6d0427c7fdf2b9d05dbd0920d3f12942b453690b495cb2522743.js" 
+    data-enable-footnotes="true"
+    ></script>
+</footer>
+
+    </body>
+</html>
