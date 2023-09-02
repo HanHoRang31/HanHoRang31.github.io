@@ -17,6 +17,16 @@
     </item>
     
     <item>
+      <title>[T101] Terraform으로 EKS 구축하기</title>
+      <link>https://HanHoRang31.github.io/post/t101-eks-build/</link>
+      <pubDate>Mon, 28 Aug 2023 00:00:00 +0000</pubDate>
+      
+      <guid>https://HanHoRang31.github.io/post/t101-eks-build/</guid>
+      <description>1 2 3 T101(=Terraform 101 Study)는 Terraform 실무 실습 스터디입니다. CloudNet@ Gasida(가시다)이 진행하시며, 책 &amp;#34;Terraform Up &amp;amp; Running&amp;#34;을 기반으로 진행하고 있습니다. 22년 9월 기준 학습 내용입니다. 블로그 이주로 다시 포스트합니다. 테라폼 스터디 4주차가 지났다. 스터디를 진행하면서 테라폼 기능과 툴을 학습하였고, 예제로 AWS 서비스 3티어 아키텍처를 구성할 정도가 되었다. 그렇다면 EKS 처럼 AWS 서비스가 복잡하게 얽혀있는 것도 테라폼으로 구축이 가능할까? 라는 생각으로 글을 작성한다.
+구글에 검색해보니 테라폼을 통해 EKS 구축하는 자료들을 쉽게 접할 수 있었다.</description>
+    </item>
+    
+    <item>
       <title>[아키텍처] AWS로 이해하는 시스템 규모의 확장</title>
       <link>https://HanHoRang31.github.io/post/archi-scale-up/</link>
       <pubDate>Wed, 26 Jul 2023 00:00:00 +0000</pubDate>
@@ -128,16 +138,6 @@ EKS의 주요 특징은 다음과 같다.
       <description>1 2 [테크 따라잡기]는 IT 기업 기술 스택 사례를 참고하여 구현하고 정리하는 시리즈입니다. 오로지 기술 성장을 위해 작성할 예정이며 스터디 과정에서 얻는 인사이트를 공유하고자 합니다. 도커 레지스트리인 Harbor에 대해 사용 사례를 조사하던 중 배울 것이 많은 테크 블로그 글을 발견하였다. 그대로 글로만 보기에는 필자가 아쉬워서 직접 구현하고 구현 과정에서 얻는 인사이트를 공유하고자 블로그 글을 작성하였다. 참고한 테크 블로그는 다음의 링크에서 확인이 가능하다.
 https://engineering.linecorp.com/ko/blog/harbor-for-private-docker-registry
 블로그 글을 요약하자면, Private Docker Registry로 Harbor를 선택하여 구성하였고, 오픈소스 오브젝트 스토리지인 Minio를 통해 스토리지 고가용성을 보장하였다.</description>
-    </item>
-    
-    <item>
-      <title>[T101] Terraform으로 EKS 구축하기</title>
-      <link>https://HanHoRang31.github.io/post/t101-eks-build/</link>
-      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
-      
-      <guid>https://HanHoRang31.github.io/post/t101-eks-build/</guid>
-      <description>1 2 3 T101(=Terraform 101 Study)는 Terraform 실무 실습 스터디입니다. CloudNet@ Gasida(가시다)이 진행하시며, 책 &amp;#34;Terraform Up &amp;amp; Running&amp;#34;을 기반으로 진행하고 있습니다. 22년 9월 기준 학습 내용입니다. 블로그 이주로 다시 포스트합니다. 테라폼 스터디 4주차가 지났다. 스터디를 진행하면서 테라폼 기능과 툴을 학습하였고, 예제로 AWS 서비스 3티어 아키텍처를 구성할 정도가 되었다. 그렇다면 EKS 처럼 AWS 서비스가 복잡하게 얽혀있는 것도 테라폼으로 구축이 가능할까? 라는 생각으로 글을 작성한다.
-구글에 검색해보니 테라폼을 통해 EKS 구축하는 자료들을 쉽게 접할 수 있었다.</description>
     </item>
     
   </channel>
