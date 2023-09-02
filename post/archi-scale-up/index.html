@@ -1,0 +1,804 @@
+<!DOCTYPE html>
+<html lang="en-us">
+    
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="theme-color" content="dark">
+    <title>[아키텍처] AWS로 이해하는 시스템 규모의 확장 | HanHoRang Tech Blog</title>
+
+    
+    
+    
+    <meta property="og:site_name" content="HanHoRang Tech Blog by Tania in Hugo" />
+    <meta property="og:title" content="[아키텍처] AWS로 이해하는 시스템 규모의 확장 | HanHoRang Tech Blog"/>
+    <meta itemprop="name" content="[아키텍처] AWS로 이해하는 시스템 규모의 확장 | HanHoRang Tech Blog" />
+    <meta name="twitter:title" content="[아키텍처] AWS로 이해하는 시스템 규모의 확장 | HanHoRang Tech Blog" />
+    <meta name="application-name" content="[아키텍처] AWS로 이해하는 시스템 규모의 확장 | HanHoRang Tech Blog" /><meta name="twitter:card" content="summary"/>
+
+    <meta name="description" content="시스템 규모 확장에 따른 아키텍처 구성과 실습" />
+    <meta name="twitter:description" content="시스템 규모 확장에 따른 아키텍처 구성과 실습 "/>
+    <meta itemprop="description" content=" 시스템 규모 확장에 따른 아키텍처 구성과 실습 "/>
+    <meta property="og:description" content=" 시스템 규모 확장에 따른 아키텍처 구성과 실습 " />
+
+    
+
+<meta property="og:type" content="article" />
+<meta property="article:publisher" content="Hugo Tania" />
+<meta property="og:article:published_time" content=2023-07-26T00:00:00Z />
+<meta property="article:published_time" content=2023-07-26T00:00:00Z />
+
+
+  <meta property="og:article:author" content="Han ho rnag" />
+  <meta property="article:author" content="Han ho rnag" />
+  <meta name="author" content="Han ho rnag" />
+
+
+
+
+<script defer type="application/ld+json">
+  {
+    "@context": "http://schema.org",
+    "@type": "Article",
+    "headline": "[아키텍처] AWS로 이해하는 시스템 규모의 확장",
+    "author": {
+      "@type": "Person",
+      "name": "Hugo Tania"
+    },
+    "datePublished": "2023-07-26",
+    "description": "시스템 규모 확장에 따른 아키텍처 구성과 실습",
+    "wordCount":  1970 ,
+    "mainEntityOfPage": "True",
+    "dateModified": "2023-07-26",
+    "publisher": {
+      "@type": "Organization",
+      "name": "Hugo Tania",
+      "logo": {
+        "@type": "imageObject",
+        "url": "https:\/\/HanHoRang31.github.io\/favicon.ico"
+      }
+    }
+  }
+</script>
+
+
+
+    <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico" />
+    
+    <link rel="stylesheet" href="/sass/main.min.ab99ff095f832511e24ffb2fba2b51ad473b2f7e9301d674eba2c6c3a6e8bd81.css">
+    
+</head>
+    
+    <script>
+        (function() {
+            const colorSchemeKey = 'ThemeColorScheme';
+            if(!localStorage.getItem(colorSchemeKey)){
+                localStorage.setItem(colorSchemeKey, "auto");
+            }
+        })();
+    </script><script>
+    (function() {
+        const colorSchemeKey = 'ThemeColorScheme';
+        const colorSchemeItem = localStorage.getItem(colorSchemeKey);
+        const supportDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches === true;
+
+        if (colorSchemeItem == 'dark' || colorSchemeItem === 'auto' && supportDarkMode) {
+            
+
+            document.documentElement.dataset.userColorScheme = 'dark';
+        } else {
+            document.documentElement.dataset.userColorScheme = 'light';
+        }
+    })();
+</script>
+
+
+    <body class="dark">
+        <nav class="navbar">
+    <div class="container">
+        <div class="flex">
+            <div>
+                <a class="brand" href="/">
+                    
+                    
+                        <img src="/favicon.ico" />
+                    
+                    HanHoRang Tech Blog
+                    </a>
+            </div>
+            <div class="flex">
+                
+                <a href="/articles/">Articles</a>
+                
+                
+                    <button id="dark-mode-button">
+                    <svg class="light" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" aria-hidden="true" focusable="false" width="1em" height="1em" style="-ms-transform: rotate(360deg); -webkit-transform: rotate(360deg); transform: rotate(360deg);" preserveAspectRatio="xMidYMid meet" viewBox="0 0 36 36"><path fill="#FFD983" d="M30.312.776C32 19 20 32 .776 30.312c8.199 7.717 21.091 7.588 29.107-.429C37.9 21.867 38.03 8.975 30.312.776z"/><path d="M30.705 15.915a1.163 1.163 0 1 0 1.643 1.641a1.163 1.163 0 0 0-1.643-1.641zm-16.022 14.38a1.74 1.74 0 0 0 0 2.465a1.742 1.742 0 1 0 0-2.465zm13.968-2.147a2.904 2.904 0 0 1-4.108 0a2.902 2.902 0 0 1 0-4.107a2.902 2.902 0 0 1 4.108 0a2.902 2.902 0 0 1 0 4.107z" fill="#FFCC4D"/><rect x="0" y="0" width="36" height="36" fill="rgba(0, 0, 0, 0)" /></svg>
+                    <svg class="dark" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" aria-hidden="true" focusable="false" width="1em" height="1em" style="-ms-transform: rotate(360deg); -webkit-transform: rotate(360deg); transform: rotate(360deg);" preserveAspectRatio="xMidYMid meet" viewBox="0 0 36 36"><path fill="#FFD983" d="M16 2s0-2 2-2s2 2 2 2v2s0 2-2 2s-2-2-2-2V2zm18 14s2 0 2 2s-2 2-2 2h-2s-2 0-2-2s2-2 2-2h2zM4 16s2 0 2 2s-2 2-2 2H2s-2 0-2-2s2-2 2-2h2zm5.121-8.707s1.414 1.414 0 2.828s-2.828 0-2.828 0L4.878 8.708s-1.414-1.414 0-2.829c1.415-1.414 2.829 0 2.829 0l1.414 1.414zm21 21s1.414 1.414 0 2.828s-2.828 0-2.828 0l-1.414-1.414s-1.414-1.414 0-2.828s2.828 0 2.828 0l1.414 1.414zm-.413-18.172s-1.414 1.414-2.828 0s0-2.828 0-2.828l1.414-1.414s1.414-1.414 2.828 0s0 2.828 0 2.828l-1.414 1.414zm-21 21s-1.414 1.414-2.828 0s0-2.828 0-2.828l1.414-1.414s1.414-1.414 2.828 0s0 2.828 0 2.828l-1.414 1.414zM16 32s0-2 2-2s2 2 2 2v2s0 2-2 2s-2-2-2-2v-2z"/><circle fill="#FFD983" cx="18" cy="18" r="10"/><rect x="0" y="0" width="36" height="36" fill="rgba(0, 0, 0, 0)" /></svg>
+                    </button>
+                
+            </div>
+            </div>
+    </div>
+</nav>
+
+        <main>
+            
+<div class="container">
+    <article>
+        <header class="article-header">
+            <div class="thumb">
+                <div>
+                    <h1>[아키텍처] AWS로 이해하는 시스템 규모의 확장</h1>
+                    <div class="post-meta">
+                        <div>
+                            
+                            
+                            By HanHoRnag | <time>July 26, 2023</time>
+                            | 10 minutes
+                        </div>
+                        <div class="tags">
+                            
+                            <a href="/tags/eks/">eks</a>
+                            
+                            <a href="/tags/cloud/">cloud</a>
+                            
+                            <a href="/tags/aws/">AWS</a>
+                            
+                            <a href="/tags/architecture/">Architecture</a>
+                            
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </header>
+    </article>
+
+    <div class="article-post">
+    <p>이번 블로그 글의 주제로는 AWS 환경에서 시스템 규모의 확장에 따른 아키텍처에 대해 글을 쓰고자 한다. 시스템 규모의 확장은 백명의 사용자에서 수백만 사용자를 지원하는 시스템 설계를 뜻한다. 그렇다면, 처음부터 수백만의 사용자를 지원하는 시스템을 설계하면 되지 않을까라고 생각되지만, 확장에 필요한 서비스들의 비용, 작업 오버헤드 및 러닝 커브때문에 추천하지 않는다. 결국 소수의 사용자에서 몇 백만으로 이르기까지의 지속적인 계랑과 끝없는 개선이 요구되는 과정이라 볼 수 있다.</p>
+<p>그렇기 때문에 시스템 규모 확장를 이해하면 아키텍처 설계 및 이해에 큰 도움이 될 것이라 생각하며 정리한 글을 공유할 예정이다. 규모 확장을 주제로 AWS 유튜브 및 서적을 참고로 작성하였으며, 직접 실습 예제를 배포하여 규모의 확장 내용을 다룰 것이다. 또한, 컨테이너 오케스트레이션 환경인 EKS가 규모의 확장 과정에서 어떤 역할을 하는 지 살펴보겠다. 규모의 확장 환경으로는 AW 이번 글에서는 AWS 클라우드 환경 안에서를 한정하여 작성한다.</p>
+<h2 id="시스템-규모의-확장">
+    <a href="#%ec%8b%9c%ec%8a%a4%ed%85%9c-%ea%b7%9c%eb%aa%a8%ec%9d%98-%ed%99%95%ec%9e%a5" class="anchor">
+        <svg class="icon" aria-hidden="true" focusable="false" height="16" version="1.1" viewBox="0 0 16 16" width="16">
+            <path fill-rule="evenodd"
+                d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z">
+            </path>
+        </svg>
+    </a>
+    시스템 규모의 확장
+</h2>
+<h3 id="100명-이상의-사용자--기본-3티어-아키텍처">
+    <a href="#100%eb%aa%85-%ec%9d%b4%ec%83%81%ec%9d%98-%ec%82%ac%ec%9a%a9%ec%9e%90--%ea%b8%b0%eb%b3%b8-3%ed%8b%b0%ec%96%b4-%ec%95%84%ed%82%a4%ed%85%8d%ec%b2%98" class="anchor">
+        <svg class="icon" aria-hidden="true" focusable="false" height="16" version="1.1" viewBox="0 0 16 16" width="16">
+            <path fill-rule="evenodd"
+                d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z">
+            </path>
+        </svg>
+    </a>
+    100명 이상의 사용자 : 기본 3티어 아키텍처
+</h3>
+<p>아래 그림은 시스템 규모의 초기 시스템 아키텍처이다. 아키텍처는 DNS 서비스인 Route53 과 웹 서버, 데이터베이스으로 구성된다. 기본 통신 과정은 사용자가 Rouet53으로 도메인을 질의하여 웹 서버 IP 주소를 반환받고 통신된다.</p>
+<p><img loading="lazy" 
+    src="/archi-scale-up/arch1.png" 
+    alt="arch1.png" 
+     
+    width=536 
+    height="281"  /></p>
+<p>기본 시스템임에도 불구하고 수백까지의 트래픽을 감당할 수 있다. 하지만 천의 레벨로 넘어가면 어떻게 될까? 다음과 같은 고려사항이 필요하다.</p>
+<ul>
+<li>Single Point of Failure (SPOF) : 시스템 내에서 단 한 곳에서 발생한 장애가 전체 시스템의 작동을 중단시키는 구성 요소이다.  위 아키텍처 처럼 단일 서버에서 문제가 발생하면 전체 웹 서비스가 작동을 멈출 것이다. 이를 해결하기 위해 고가용성을 유지해야 한다.</li>
+<li>사용자에 따른 시스템 병목 현상 및 스케일링 : 사용자가 동시에 몰리게 되면 각 레이어에서 처리량이 증가하여 속도를 저하시기고 응답 시간이 느려지게 된다. 또한, 데이터베이스에서는 많은 사용자 처리시 동시 연결 수를 초과하여 연결 요청이 거부될 수 있고, 무결성 문제가 일으킬 수 있다.</li>
+</ul>
+<h3 id="10000명-이상의-사용자--이중화와-cdn-캐싱">
+    <a href="#10000%eb%aa%85-%ec%9d%b4%ec%83%81%ec%9d%98-%ec%82%ac%ec%9a%a9%ec%9e%90--%ec%9d%b4%ec%a4%91%ed%99%94%ec%99%80-cdn-%ec%ba%90%ec%8b%b1" class="anchor">
+        <svg class="icon" aria-hidden="true" focusable="false" height="16" version="1.1" viewBox="0 0 16 16" width="16">
+            <path fill-rule="evenodd"
+                d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z">
+            </path>
+        </svg>
+    </a>
+    10,000명 이상의 사용자 : 이중화와 CDN 캐싱
+</h3>
+<p>AWS 서비스를 사용하면 위 고려사항을 모두 해결할 수 있다. AWS 의 서비스는 관리형 서비스로 이중화 기능이 제공되기 때문이다. 또한, 기능 확장 서비스를 연계하여 추가 기능을 쉽게 추가할 수 있다. 각 레이어 별로 추가한 서비는 다음과 같이 나눌 수 있다.</p>
+<p><img loading="lazy" 
+    src="/archi-scale-up/arch11.png" 
+    alt="arch11.png" 
+     
+    width=912 
+    height="445"  /></p>
+<ul>
+<li>서버 수평 확장 : 오토스케일링을 통해 서버 수를 증가, 추가시킬 수 있는 서비스이다. 이를 통해 부하, 장애 대응, 비용 절감 효과를 부를 수 있다.</li>
+<li>ELB(Elastic Load Balancing) 을 통한 수평 확장 : 여러 서버가 생김에 따라 트래픽을 분산시켜야 한다.  AWS에서는 트래픽 부하를 고르게 분산해주는 로드밸런싱 서비스로 ELB를 제공한다. ELB는 다중 가용 영역을 지원하며, 자동으로 용량이 확장된다. 주로 서버 수평 확장에서 사용된 오토스케일링 서비스를 연계하여 사용한다.</li>
+<li>RDS 을 통한 데이터베이스 이중화 : RDS는 관리형 데이터베이스 서비스로 간편한 관리, 뛰어난 확장성, 가용성 및 내구성, 성능을 가진다. 특징 중 가용성이 이중화를 뜻하는데, 다중 가용 영역에서 master-replica 구조로 운영됨을 뜻한다. RDS에서는 Aurora라는 DB가 지원되는데 샤드 스토리지 볼륨을 통해 기본 DB 엔진에 비해 뛰어난 성능 및 확장성을 제공한다.</li>
+<li>CloudFront &amp; S3 를 통한 캐싱 : CloudFront 는 정적 컨텐츠를 전송하는데 쓰이는 CDN(Content Delivery Network)서비스이다. CloudFront를 통해 컨텐츠를 제공하면 사용자는 빠른 응답 시간과 서버 측에서의 과부하를 줄일 수 있다. 사용자가 컨텐츠 요청시 S3에 해당 컨텐츠가 있다면 서버를 거칠 필요없이 CloudFront에서 처리되기 때문이다.</li>
+</ul>
+<h3 id="100000-명-이상의-사용자---컨테이너-서비스-전환-및-db-성능-개선">
+    <a href="#100000-%eb%aa%85-%ec%9d%b4%ec%83%81%ec%9d%98-%ec%82%ac%ec%9a%a9%ec%9e%90---%ec%bb%a8%ed%85%8c%ec%9d%b4%eb%84%88-%ec%84%9c%eb%b9%84%ec%8a%a4-%ec%a0%84%ed%99%98-%eb%b0%8f-db-%ec%84%b1%eb%8a%a5-%ea%b0%9c%ec%84%a0" class="anchor">
+        <svg class="icon" aria-hidden="true" focusable="false" height="16" version="1.1" viewBox="0 0 16 16" width="16">
+            <path fill-rule="evenodd"
+                d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z">
+            </path>
+        </svg>
+    </a>
+    100,000 명 이상의 사용자  : 컨테이너 서비스 전환 및 DB 성능 개선
+</h3>
+<p>100,000명 이상의 사용자를 가진 시스템이라면 시스템 자체의 구조 개선과 DB 성능 개선이 필요하다. 이를 위한 방법으로 컨테이너 서비스와 인메모리 DB를 활용할 수 있다.</p>
+<p><strong>컨테이너 서비스 전환</strong></p>
+<p>100,000 명 이상의 사용자가 시스템을 사용한다면 컨테이너 전환를 고려할 때이다. 컨테이너란 코드, 의존성, 런타임을 묶어서 만든 하나의 Immutable 단일 객체이다. Immutable 란 운영 중 시스템을 변경하는 것이 아니라 새로운 것으로 교체하는 것을 뜻한다. 또한, 컨테이너는 표준화 및 경량화되어 있을 뿐 아니라 이식하기 쉽고 배포 측면에서 강점을 이루기 때문에 마이크로 서비스 아키텍처를 구현하는데 필수적인 플랫폼으로 여겨진다.</p>
+<p>AWS 에서는 이러한 컨테이너를 관리하는 오케스트레이션 서비스인 서비스를 제공한다. 각 컨테이너를 묶어 파드로 구성하며 관리 모델에 따라 여러 서버스(Fargate, EKS, ECS) 로 제공된다. 그 중 EKS 서비스는 쿠버네티스를 기반으로 하는 관리형 컨테이너 서비스로 쿠버네티스 구성 중 컨트롤 플레인을 관리한다. 다른 컨테이너 서비스와 달리 EKS는 쿠버네티스 API를 따르기 때문에 기존의 쿠버네티스 환경과 호환성을 보장하여 다른 클라우드 환경과 온-프레미스와 통합이 가능하다.</p>
+<p><strong>인메모리 DB를 통한 읽기 성능 개선</strong></p>
+<p>인메모리 DB란 데이터를 컴퓨터 메인 메모리(RAM)에 저장하여 데이터베이스보다 훨씬 빠른 성능을 제공하는 DB이다. 인메로리 DB를 당장의 아키텍처로 적용시 읽기 성능을 높일 수 있는 캐싱으로 적용할 수 있다. AWS 에서는 인메모리 데이터스토리지 서비스로 ElastiCache를 제공한다.  ElastiCache 는 관리형 Memcached 및 redis 엔진을 제공하며 자동 확장성, 자가 복구, 한 자리수 ms 을 가진다. 일반적으로 캐쉬, 세션 저장소, 채팅, 게임 리더 보드등에 활용되어진다.</p>
+<p><img loading="lazy" 
+    src="/archi-scale-up/archi3.png" 
+    alt="archi3.png" 
+     
+    width=1007 
+    height="477"  /></p>
+<ul>
+<li>서버 구조가 EKS로 전환됨에 따라 로깅 통합 도구가 필요하다. 아키텍처에서는 AWS 로깅 통합 서비스인 opensearch를 사용하였다.</li>
+</ul>
+<h3 id="1000000-만-이상의-사용자를-넘어서--데이터베이스-분산-및-재해-복구-멀티리전-서비스-구현">
+    <a href="#1000000-%eb%a7%8c-%ec%9d%b4%ec%83%81%ec%9d%98-%ec%82%ac%ec%9a%a9%ec%9e%90%eb%a5%bc-%eb%84%98%ec%96%b4%ec%84%9c--%eb%8d%b0%ec%9d%b4%ed%84%b0%eb%b2%a0%ec%9d%b4%ec%8a%a4-%eb%b6%84%ec%82%b0-%eb%b0%8f-%ec%9e%ac%ed%95%b4-%eb%b3%b5%ea%b5%ac-%eb%a9%80%ed%8b%b0%eb%a6%ac%ec%a0%84-%ec%84%9c%eb%b9%84%ec%8a%a4-%ea%b5%ac%ed%98%84" class="anchor">
+        <svg class="icon" aria-hidden="true" focusable="false" height="16" version="1.1" viewBox="0 0 16 16" width="16">
+            <path fill-rule="evenodd"
+                d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z">
+            </path>
+        </svg>
+    </a>
+    1,000,000 만 이상의 사용자를 넘어서 : 데이터베이스 분산 및 재해 복구, 멀티리전 서비스 구현
+</h3>
+<p>위 아키텍처를 확인하면 규모에 따라 서버가 확장되어 분산 처리되는 반면, DB는 Master에서만 쓰기를 담당하기에 기능 개선을 위해 데이터베이스 분리 및 샤딩이 필요하다. 또한, 가용성을 보장하고 데이터 손실을 예방하기 위해 재해 복구 및 멀티 리전 구성이 필요하다.</p>
+<p><strong>DB 분산</strong></p>
+<p>DB 분산 방법 중 하나로 용도에 맞는 DB 서비스를 나눠 적용시켜야 한다. AWS에서는 용도에 따라 DB 서비스를  다음과 같이 선택할 수 있다.</p>
+<p><img loading="lazy" 
+    src="/archi-scale-up/arch-db.png" 
+    alt="arch-db.png" 
+     
+    width=648 
+    height="325"  /></p>
+<p>아래 소개할 아키텍처에서는 비관계형 DB인 DynamoDB를 사용하였는데 쓰기 작업이 많이 필요한 경우(장바구니, 위시 리스트)에 적합하기 때문에 구성하였다. DynamoDB는 대규모 요청에도 한자릿수 ms 응답시간을 보장하며, 페타라이트 규모 스토리지, 다중 리전 글로벌 테이블 복제 및 DAX 를 통한 자체 읽기 및 쓰기 캐시를 제공한다.  또한, 10,000,000 명 이상의 규모 확장시 DB 자체 내 글로벌 기능을 활성화시켜 운영하는 것을 추천한다.</p>
+<p><strong>재해 복구 및 멀티리전 서비스 구현</strong></p>
+<p>스토리지 서비스인 S3의 교차 리전 기능과 DB, 서버 스냅샷을 활용하여 멀티 리전을 구성할 수 있다. 이를 통해 리전 1에서 문제가 발생할 경우 리전 2에서 빠르게 리소스를 복구시킬 수 있다. 리소스 복구 방법은 두 가지 단계가 필요하는데 DB는 글로벌 RDS나 스냅샷으로 그외 서비스는 CDK 나 클라우드포메이션, 테라폼으로 복구 시킬 수 있다.</p>
+<p><img loading="lazy" 
+    src="/archi-scale-up/arch3.png" 
+    alt="arch3.png" 
+     
+    width=893 
+    height="452"  /></p>
+<h2 id="eks-기반의-서비스-애플리케이션-구성">
+    <a href="#eks-%ea%b8%b0%eb%b0%98%ec%9d%98-%ec%84%9c%eb%b9%84%ec%8a%a4-%ec%95%a0%ed%94%8c%eb%a6%ac%ec%bc%80%ec%9d%b4%ec%85%98-%ea%b5%ac%ec%84%b1" class="anchor">
+        <svg class="icon" aria-hidden="true" focusable="false" height="16" version="1.1" viewBox="0 0 16 16" width="16">
+            <path fill-rule="evenodd"
+                d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z">
+            </path>
+        </svg>
+    </a>
+    EKS 기반의 서비스 애플리케이션 구성
+</h2>
+<p>앞 장에서 소개한 아키텍처 중 100,000 단위의 사용자 규모의 MSA 아키텍처를 구현해보겠다. MSA 는 쿠버네티스 AWS 관리형 서비스인 EKS를 활용하여 구성하였다. 구성 예제는 사용자 <a href="https://github.com/dockersamples/example-voting-app/tree/main">투표 기반의 애플리케이션</a>으로 투표 기능와 결과 화면을 제공한다. 구성 아키텍처는 다음과 같다.</p>
+<p><img loading="lazy" 
+    src="/archi-scale-up/architecture-vote.png" 
+    alt="architecture-vote.png" 
+     
+    width=860 
+    height="800"  /></p>
+<p>MSA 로 구성 기능이 나눠지고 언어별로 나눠진 것을 확인할 수 있다. 기능별로 구성부분을 나누자면 두 가지로 분류할 수 있다.</p>
+<ul>
+<li>Vote 출력 : DB 조회(Postgres)  → result (node.js)</li>
+<li>Vote 입력 : work(python) → 인메모리DB(redis)→ worker(.NET) → DB(Postgres)</li>
+</ul>
+<p>그럼, 예제 애플리케이션을 배포하여 연동, 구성 부분을 확인하자.</p>
+<p>사전 작업인 EKS 구성 및 Addon 은 구성 내용이 많아 필자의 블로그 글로 대체하였다. 본 블로그 글에서는 애플리케이션 배포와 구성 부분을 살펴볼 것이다. EKS 구성과 Addon 배포는 밑의 링크를 참고하자.</p>
+<ul>
+<li>EKS 구성 : 필자 블로그 글 <a href="https://hanhorang31.github.io/post/aews-1-eks/">[AEWS] EKS 아키텍처와 Private EKS 클러스터 배포하기</a></li>
+<li>EKS addon(로드밸런싱, Route53) : 필자 블로그 글 <a href="https://hanhorang31.github.io/post/aews-eks-vpc-1/">[AEWS] EKS VPC CNI Deep Dive</a></li>
+</ul>
+<p>EKS addon까지 구성을 완료하였으면 투표 애플리케이션을 배포하자.</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl"><span class="c1"># git clone  </span>
+</span></span><span class="line"><span class="cl">git clone https://github.com/HanHoRang31/blog-share.git
+</span></span><span class="line"><span class="cl"><span class="nb">cd</span> k8s-app/vote-app
+</span></span><span class="line"><span class="cl">tree
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1"># 네임스페이스 생성 후 변경</span>
+</span></span><span class="line"><span class="cl">kubectl create ns vote
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1"># 서비스 배포 </span>
+</span></span><span class="line"><span class="cl">kubectl apply -f .
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1"># ExternaDNS 추가</span>
+</span></span><span class="line"><span class="cl"><span class="c1">## 각자 자신의 도메인 정보 입력</span>
+</span></span><span class="line"><span class="cl"><span class="nv">MyDOMAIN1</span><span class="o">=</span>&lt;각자 자신의 nginx 도메인 지정&gt;
+</span></span><span class="line"><span class="cl"><span class="nv">MyDOMAIN1</span><span class="o">=</span>vote.hanhorang.link
+</span></span><span class="line"><span class="cl"><span class="nv">MyDOMAIN2</span><span class="o">=</span>result.hanhorang.link
+</span></span><span class="line"><span class="cl">kubectl annotate service vote <span class="s2">&#34;external-dns.alpha.kubernetes.io/hostname=</span><span class="nv">$MyDOMAIN1</span><span class="s2">.&#34;</span>
+</span></span><span class="line"><span class="cl">kubectl annotate service result <span class="s2">&#34;external-dns.alpha.kubernetes.io/hostname=</span><span class="nv">$MyDOMAIN2</span><span class="s2">.&#34;</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>애플리케이션 배포 후 입력한 도메인에서 기능을 확인할 수 있다.</p>
+<p><img loading="lazy" 
+    src="/archi-scale-up/archi24.png" 
+    alt="archi24.png" 
+     
+    width=1826 
+    height="513"  /></p>
+<p>투표 입력과 투표 결과가 정상적으로 작동한다. 기능을 확인했으니, 기능별로 각 구성의 핵심 부분을 살펴보자</p>
+<h3 id="db-구성">
+    <a href="#db-%ea%b5%ac%ec%84%b1" class="anchor">
+        <svg class="icon" aria-hidden="true" focusable="false" height="16" version="1.1" viewBox="0 0 16 16" width="16">
+            <path fill-rule="evenodd"
+                d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z">
+            </path>
+        </svg>
+    </a>
+    DB 구성
+</h3>
+<p>애플리케이션 구성시 선수 작업으로 DB 구성이 필요하다. 예제 애플리케이션에서는 PostgresDB 를 통해 DB를 구성하였다.  특별히 유심히 본 부분은 DB 스키마를 서비스 배포시 자동적으로 구성하도록 진행하였는데, 매니페스트파일에서도 확인할 수 없어 코드 레벨까지 살펴보았다.</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl"><span class="c1"># PostgreDB 접속</span>
+</span></span><span class="line"><span class="cl">kubectl run my-release-postgresql-ha-client --rm --tty -i --restart<span class="o">=</span><span class="s1">&#39;Never&#39;</span> --namespace default --image docker.io/bitnami/postgresql-repmgr:15.3.0-debian-11-r23 --env<span class="o">=</span><span class="s2">&#34;PGPASSWORD=postgres&#34;</span>  <span class="se">\
+</span></span></span><span class="line"><span class="cl"><span class="se"></span>--command -- psql -h db.default.svc.cluster.local -p <span class="m">5432</span> -U postgres -d postgres
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1"># DB 확인 </span>
+</span></span><span class="line"><span class="cl"><span class="nv">postgres</span><span class="o">=</span><span class="c1"># \l</span>
+</span></span><span class="line"><span class="cl">                                                List of databases
+</span></span><span class="line"><span class="cl">   Name    <span class="p">|</span>  Owner   <span class="p">|</span> Encoding <span class="p">|</span>  Collate   <span class="p">|</span>   Ctype    <span class="p">|</span> ICU Locale <span class="p">|</span> Locale Provider <span class="p">|</span>   Access privileges   
+</span></span><span class="line"><span class="cl">-----------+----------+----------+------------+------------+------------+-----------------+-----------------------
+</span></span><span class="line"><span class="cl"> postgres  <span class="p">|</span> postgres <span class="p">|</span> UTF8     <span class="p">|</span> en_US.utf8 <span class="p">|</span> en_US.utf8 <span class="p">|</span>            <span class="p">|</span> libc            <span class="p">|</span> 
+</span></span><span class="line"><span class="cl"> template0 <span class="p">|</span> postgres <span class="p">|</span> UTF8     <span class="p">|</span> en_US.utf8 <span class="p">|</span> en_US.utf8 <span class="p">|</span>            <span class="p">|</span> libc            <span class="p">|</span> <span class="o">=</span>c/postgres          +
+</span></span><span class="line"><span class="cl">           <span class="p">|</span>          <span class="p">|</span>          <span class="p">|</span>            <span class="p">|</span>            <span class="p">|</span>            <span class="p">|</span>                 <span class="p">|</span> <span class="nv">postgres</span><span class="o">=</span>CTc/postgres
+</span></span><span class="line"><span class="cl"> template1 <span class="p">|</span> postgres <span class="p">|</span> UTF8     <span class="p">|</span> en_US.utf8 <span class="p">|</span> en_US.utf8 <span class="p">|</span>            <span class="p">|</span> libc            <span class="p">|</span> <span class="o">=</span>c/postgres          +
+</span></span><span class="line"><span class="cl">           <span class="p">|</span>          <span class="p">|</span>          <span class="p">|</span>            <span class="p">|</span>            <span class="p">|</span>            <span class="p">|</span>                 <span class="p">|</span> <span class="nv">postgres</span><span class="o">=</span>CTc/postgres
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>PostgresDB 배포시 기본 DB만 배포되었다. 테이블 구성 부분을 찾아보자.</p>
+<p>테이블 구성 부분은 데이터 입력 구성 서비스인 .NET에서 DB 연결 및 스키마를 구성하였다. DB 연결 함수의 코드는 다음과 같다.</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span><span class="lnt">31
+</span><span class="lnt">32
+</span><span class="lnt">33
+</span><span class="lnt">34
+</span><span class="lnt">35
+</span><span class="lnt">36
+</span><span class="lnt">37
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-csharp" data-lang="csharp"><span class="line"><span class="cl"><span class="c1">// k8s-app/vote-app/worker/</span>
+</span></span><span class="line"><span class="cl"><span class="k">private</span> <span class="k">static</span> <span class="n">NpgsqlConnection</span> <span class="n">OpenDbConnection</span><span class="p">(</span><span class="kt">string</span> <span class="n">connectionString</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">        <span class="p">{</span>
+</span></span><span class="line"><span class="cl">            <span class="n">NpgsqlConnection</span> <span class="n">connection</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">            <span class="k">while</span> <span class="p">(</span><span class="k">true</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">            <span class="p">{</span>
+</span></span><span class="line"><span class="cl">                <span class="k">try</span>
+</span></span><span class="line"><span class="cl">                <span class="p">{</span>
+</span></span><span class="line"><span class="cl">                    <span class="n">connection</span> <span class="p">=</span> <span class="k">new</span> <span class="n">NpgsqlConnection</span><span class="p">(</span><span class="n">connectionString</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">                    <span class="n">connection</span><span class="p">.</span><span class="n">Open</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl">                    <span class="k">break</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">                <span class="p">}</span>
+</span></span><span class="line"><span class="cl">                <span class="k">catch</span> <span class="p">(</span><span class="n">SocketException</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">                <span class="p">{</span>
+</span></span><span class="line"><span class="cl">                    <span class="n">Console</span><span class="p">.</span><span class="n">Error</span><span class="p">.</span><span class="n">WriteLine</span><span class="p">(</span><span class="s">&#34;Waiting for db&#34;</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">                    <span class="n">Thread</span><span class="p">.</span><span class="n">Sleep</span><span class="p">(</span><span class="m">1000</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">                <span class="p">}</span>
+</span></span><span class="line"><span class="cl">                <span class="k">catch</span> <span class="p">(</span><span class="n">DbException</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">                <span class="p">{</span>
+</span></span><span class="line"><span class="cl">                    <span class="n">Console</span><span class="p">.</span><span class="n">Error</span><span class="p">.</span><span class="n">WriteLine</span><span class="p">(</span><span class="s">&#34;Waiting for db&#34;</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">                    <span class="n">Thread</span><span class="p">.</span><span class="n">Sleep</span><span class="p">(</span><span class="m">1000</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">                <span class="p">}</span>
+</span></span><span class="line"><span class="cl">            <span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">            <span class="n">Console</span><span class="p">.</span><span class="n">Error</span><span class="p">.</span><span class="n">WriteLine</span><span class="p">(</span><span class="s">&#34;Connected to db&#34;</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">            <span class="kt">var</span> <span class="n">command</span> <span class="p">=</span> <span class="n">connection</span><span class="p">.</span><span class="n">CreateCommand</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl">						<span class="c1">// DB 스키마 구성</span>
+</span></span><span class="line"><span class="cl">            <span class="n">command</span><span class="p">.</span><span class="n">CommandText</span> <span class="p">=</span> <span class="s">@&#34;CREATE TABLE IF NOT EXISTS votes (
+</span></span></span><span class="line"><span class="cl"><span class="s">                                        id VARCHAR(255) NOT NULL UNIQUE,
+</span></span></span><span class="line"><span class="cl"><span class="s">                                        vote VARCHAR(255) NOT NULL
+</span></span></span><span class="line"><span class="cl"><span class="s">                                    )&#34;</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">            <span class="n">command</span><span class="p">.</span><span class="n">ExecuteNonQuery</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">            <span class="k">return</span> <span class="n">connection</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">        <span class="p">}</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><ul>
+<li>
+<p>DB 연결은 C#의 Npgsql 라이브러리를 통해 연결하였다. 함수 호출의 매개변수는 다음과 같이 string 값을 넣어서 진행하였다.</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-csharp" data-lang="csharp"><span class="line"><span class="cl"><span class="kt">var</span> <span class="n">pgsql</span> <span class="p">=</span> <span class="n">OpenDbConnection</span><span class="p">(</span><span class="s">&#34;Server=db;Username=postgres;Password=postgres;&#34;</span><span class="p">);</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div></li>
+<li>
+<p>예제 애플리케이션이라 DB 정보가 하드코딩되어 있다. 실제 애플리케이션에서는 쿠버네티스 시크릿이나 키 관리 서비스를 활용해야 한다.</p>
+</li>
+</ul>
+<h3 id="vote-결과-출력">
+    <a href="#vote-%ea%b2%b0%ea%b3%bc-%ec%b6%9c%eb%a0%a5" class="anchor">
+        <svg class="icon" aria-hidden="true" focusable="false" height="16" version="1.1" viewBox="0 0 16 16" width="16">
+            <path fill-rule="evenodd"
+                d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z">
+            </path>
+        </svg>
+    </a>
+    Vote 결과 출력
+</h3>
+<p>DB 조회(Postgres)  → result (node.js) 연동 부분이다.</p>
+<p>살펴볼 것은 Vote 조회 부분이다. node.js 내 데이터 조회 부분은 다음과 같다.</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-jsx" data-lang="jsx"><span class="line"><span class="cl"><span class="c1">// k8s-app/vote-app/result/
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="kd">var</span> <span class="nx">express</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">&#39;express&#39;</span><span class="p">),</span>
+</span></span><span class="line"><span class="cl">    <span class="kr">async</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">&#39;async&#39;</span><span class="p">),</span>
+</span></span><span class="line"><span class="cl">    <span class="nx">pg</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">&#39;pg&#39;</span><span class="p">),</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1">// DB 연결
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="kd">var</span> <span class="nx">pool</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">pg</span><span class="p">.</span><span class="nx">Pool</span><span class="p">({</span>
+</span></span><span class="line"><span class="cl">  <span class="nx">connectionString</span><span class="o">:</span> <span class="s1">&#39;postgres://postgres:postgres@db/postgres&#39;</span>
+</span></span><span class="line"><span class="cl"><span class="p">});</span>
+</span></span><span class="line"><span class="cl"><span class="p">.</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1">// DB 데이터 조회
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="kd">function</span> <span class="nx">getVotes</span><span class="p">(</span><span class="nx">client</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">  <span class="nx">client</span><span class="p">.</span><span class="nx">query</span><span class="p">(</span><span class="s1">&#39;SELECT vote, COUNT(id) AS count FROM votes GROUP BY vote&#39;</span><span class="p">,</span> <span class="p">[],</span> <span class="kd">function</span><span class="p">(</span><span class="nx">err</span><span class="p">,</span> <span class="nx">result</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="k">if</span> <span class="p">(</span><span class="nx">err</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">      <span class="nx">console</span><span class="p">.</span><span class="nx">error</span><span class="p">(</span><span class="s2">&#34;Error performing query: &#34;</span> <span class="o">+</span> <span class="nx">err</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">      <span class="kd">var</span> <span class="nx">votes</span> <span class="o">=</span> <span class="nx">collectVotesFromResult</span><span class="p">(</span><span class="nx">result</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">      <span class="nx">io</span><span class="p">.</span><span class="nx">sockets</span><span class="p">.</span><span class="nx">emit</span><span class="p">(</span><span class="s2">&#34;scores&#34;</span><span class="p">,</span> <span class="nx">JSON</span><span class="p">.</span><span class="nx">stringify</span><span class="p">(</span><span class="nx">votes</span><span class="p">));</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="nx">setTimeout</span><span class="p">(</span><span class="kd">function</span><span class="p">()</span> <span class="p">{</span><span class="nx">getVotes</span><span class="p">(</span><span class="nx">client</span><span class="p">)</span> <span class="p">},</span> <span class="mi">1000</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">  <span class="p">});</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h3 id="vote-입력">
+    <a href="#vote-%ec%9e%85%eb%a0%a5" class="anchor">
+        <svg class="icon" aria-hidden="true" focusable="false" height="16" version="1.1" viewBox="0 0 16 16" width="16">
+            <path fill-rule="evenodd"
+                d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z">
+            </path>
+        </svg>
+    </a>
+    Vote 입력
+</h3>
+<p>예제 애플리케이션의 차별점을 확인할 수 있는 부분이다. 차별점은 인메모리 DB가 중간에 껴서 DB 과부하 분산 및 입력 성능을 올려주는 것인데, 코드 레벨로 내려가 각 연동 부분을 확인하겠다. 구성은 vote(python) → 인메모리DB(redis)→ worker(.NET) → DB(Postgres) 로 되어 있으므로 순차적으로 확인하자.</p>
+<ul>
+<li>
+<p>vote(python)</p>
+<p>플라스크로 서버를 구성하였으며, redis 라이브러리를 통해 인메모리DB에 데이터를 전달한다. 코드 구성으로 확인해보자.</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="cl"><span class="c1"># 라이브러리 </span>
+</span></span><span class="line"><span class="cl"><span class="kn">from</span> <span class="nn">flask</span> <span class="kn">import</span> <span class="n">Flask</span><span class="p">,</span> <span class="n">render_template</span><span class="p">,</span> <span class="n">request</span><span class="p">,</span> <span class="n">make_response</span><span class="p">,</span> <span class="n">g</span>
+</span></span><span class="line"><span class="cl"><span class="kn">from</span> <span class="nn">redis</span> <span class="kn">import</span> <span class="n">Redis</span>
+</span></span><span class="line"><span class="cl"><span class="o">.</span>
+</span></span><span class="line"><span class="cl"><span class="o">.</span>
+</span></span><span class="line"><span class="cl"><span class="c1"># redis 연결 </span>
+</span></span><span class="line"><span class="cl"><span class="k">def</span> <span class="nf">get_redis</span><span class="p">():</span>
+</span></span><span class="line"><span class="cl">    <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">g</span><span class="p">,</span> <span class="s1">&#39;redis&#39;</span><span class="p">):</span>
+</span></span><span class="line"><span class="cl">        <span class="n">g</span><span class="o">.</span><span class="n">redis</span> <span class="o">=</span> <span class="n">Redis</span><span class="p">(</span><span class="n">host</span><span class="o">=</span><span class="s2">&#34;redis&#34;</span><span class="p">,</span> <span class="n">db</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">socket_timeout</span><span class="o">=</span><span class="mi">5</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="k">return</span> <span class="n">g</span><span class="o">.</span><span class="n">redis</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1"># redis 데이터 로 전송</span>
+</span></span><span class="line"><span class="cl"><span class="nd">@app.route</span><span class="p">(</span><span class="s2">&#34;/&#34;</span><span class="p">,</span> <span class="n">methods</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;POST&#39;</span><span class="p">,</span><span class="s1">&#39;GET&#39;</span><span class="p">])</span>
+</span></span><span class="line"><span class="cl"><span class="k">def</span> <span class="nf">hello</span><span class="p">():</span>
+</span></span><span class="line"><span class="cl">    <span class="n">voter_id</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">cookies</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;voter_id&#39;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="k">if</span> <span class="ow">not</span> <span class="n">voter_id</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">        <span class="n">voter_id</span> <span class="o">=</span> <span class="nb">hex</span><span class="p">(</span><span class="n">random</span><span class="o">.</span><span class="n">getrandbits</span><span class="p">(</span><span class="mi">64</span><span class="p">))[</span><span class="mi">2</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="n">vote</span> <span class="o">=</span> <span class="kc">None</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="k">if</span> <span class="n">request</span><span class="o">.</span><span class="n">method</span> <span class="o">==</span> <span class="s1">&#39;POST&#39;</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">        <span class="n">redis</span> <span class="o">=</span> <span class="n">get_redis</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl">        <span class="n">vote</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">form</span><span class="p">[</span><span class="s1">&#39;vote&#39;</span><span class="p">]</span>
+</span></span><span class="line"><span class="cl">        <span class="n">app</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Received vote for </span><span class="si">%s</span><span class="s1">&#39;</span><span class="p">,</span> <span class="n">vote</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">        <span class="n">data</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">({</span><span class="s1">&#39;voter_id&#39;</span><span class="p">:</span> <span class="n">voter_id</span><span class="p">,</span> <span class="s1">&#39;vote&#39;</span><span class="p">:</span> <span class="n">vote</span><span class="p">})</span>
+</span></span><span class="line"><span class="cl">        <span class="n">redis</span><span class="o">.</span><span class="n">rpush</span><span class="p">(</span><span class="s1">&#39;votes&#39;</span><span class="p">,</span> <span class="n">data</span><span class="p">)</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div></li>
+<li>
+<p>worker(.NET)</p>
+<p>0.1 초마다 인메모리 DB를 읽어 싱크 작업을 진행한다음 DB로 전달한다. 여기서 데이터 쓰기시 인메모리 DB를 사용하면 쓰기 성능가 올라가고, 분산 처리로 여러 서버에서의 데이터를 전달받아 동시에 작업을 수행할 수 있다. 이를 통해 다수의 사용자가 투표시 직관적으로 결과를 바로바로 확인할 수 있을 것이다. 핵심 로직 코드는 다음과 같다.</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-csharp" data-lang="csharp"><span class="line"><span class="cl"><span class="p">.</span>
+</span></span><span class="line"><span class="cl"><span class="p">.</span>
+</span></span><span class="line"><span class="cl"><span class="k">while</span> <span class="p">(</span><span class="k">true</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="c1">// Slow down to prevent CPU spike, only query each 100ms</span>
+</span></span><span class="line"><span class="cl">    <span class="n">Thread</span><span class="p">.</span><span class="n">Sleep</span><span class="p">(</span><span class="m">100</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="c1">// Reconnect redis if down</span>
+</span></span><span class="line"><span class="cl">    <span class="k">if</span> <span class="p">(</span><span class="n">redisConn</span> <span class="p">==</span> <span class="k">null</span> <span class="p">||</span> <span class="p">!</span><span class="n">redisConn</span><span class="p">.</span><span class="n">IsConnected</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="n">Console</span><span class="p">.</span><span class="n">WriteLine</span><span class="p">(</span><span class="s">&#34;Reconnecting Redis&#34;</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">        <span class="n">redisConn</span> <span class="p">=</span> <span class="n">OpenRedisConnection</span><span class="p">(</span><span class="s">&#34;redis&#34;</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">        <span class="n">redis</span> <span class="p">=</span> <span class="n">redisConn</span><span class="p">.</span><span class="n">GetDatabase</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl">    <span class="kt">string</span> <span class="n">json</span> <span class="p">=</span> <span class="n">redis</span><span class="p">.</span><span class="n">ListLeftPopAsync</span><span class="p">(</span><span class="s">&#34;votes&#34;</span><span class="p">).</span><span class="n">Result</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="k">if</span> <span class="p">(</span><span class="n">json</span> <span class="p">!=</span> <span class="k">null</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="kt">var</span> <span class="n">vote</span> <span class="p">=</span> <span class="n">JsonConvert</span><span class="p">.</span><span class="n">DeserializeAnonymousType</span><span class="p">(</span><span class="n">json</span><span class="p">,</span> <span class="n">definition</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">        <span class="n">Console</span><span class="p">.</span><span class="n">WriteLine</span><span class="p">(</span><span class="s">$&#34;Processing vote for &#39;{vote.vote}&#39; by &#39;{vote.voter_id}&#39;&#34;</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">        <span class="c1">// Reconnect DB if down</span>
+</span></span><span class="line"><span class="cl">        <span class="k">if</span> <span class="p">(!</span><span class="n">pgsql</span><span class="p">.</span><span class="n">State</span><span class="p">.</span><span class="n">Equals</span><span class="p">(</span><span class="n">System</span><span class="p">.</span><span class="n">Data</span><span class="p">.</span><span class="n">ConnectionState</span><span class="p">.</span><span class="n">Open</span><span class="p">))</span>
+</span></span><span class="line"><span class="cl">        <span class="p">{</span>
+</span></span><span class="line"><span class="cl">            <span class="n">Console</span><span class="p">.</span><span class="n">WriteLine</span><span class="p">(</span><span class="s">&#34;Reconnecting DB&#34;</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">            <span class="n">pgsql</span> <span class="p">=</span> <span class="n">OpenDbConnection</span><span class="p">(</span><span class="s">&#34;Server=db;Username=postgres;Password=postgres;&#34;</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">        <span class="p">}</span>
+</span></span><span class="line"><span class="cl">        <span class="k">else</span>
+</span></span><span class="line"><span class="cl">        <span class="p">{</span> <span class="c1">// Normal +1 vote requested</span>
+</span></span><span class="line"><span class="cl">            <span class="n">UpdateVote</span><span class="p">(</span><span class="n">pgsql</span><span class="p">,</span> <span class="n">vote</span><span class="p">.</span><span class="n">voter_id</span><span class="p">,</span> <span class="n">vote</span><span class="p">.</span><span class="n">vote</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">        <span class="p">}</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><ul>
+<li>핵심 부분은 <strong>ListLeftPopAsync</strong> 함수이다.   <strong>ListLeftPopAsync</strong> 함수는 Redis 라이브러리에서 제공하는 메서드로, Redis의 리스트에서 가장 왼쪽(즉, 가장 먼저 입력된) 요소를 제거하고 그 값을 반환하는 기능이다. 비동기적으로 작동하기 때문에 쓰레드 적용이 가능하다.</li>
+</ul>
+</li>
+</ul>
+<h2 id="끝으로">
+    <a href="#%eb%81%9d%ec%9c%bc%eb%a1%9c" class="anchor">
+        <svg class="icon" aria-hidden="true" focusable="false" height="16" version="1.1" viewBox="0 0 16 16" width="16">
+            <path fill-rule="evenodd"
+                d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z">
+            </path>
+        </svg>
+    </a>
+    끝으로
+</h2>
+<p>이번 글에서는 시스템 규모 확장에 초점을 맞추어 AWS 아키텍처를 확인하고, 예제 애플리케이션을 통해 100,000 규모의 사용자 애플리케이션의 아키텍처를 일부 구현하였다. 이번 시간에는 인메모리를 통해 DB 단의 성능을 챙겼지만 프론트앤드에서의 성능 이슈로 애플리케이션 운영시 CDN 연동까지 고려해야 한다.</p>
+<p>다음 시간에는 시스템 규모 확장을 테스트하기 위해 트래픽 테스트 툴을 살펴볼 예정이다.</p>
+<p><a href="https://www.notion.so/EKS-cdfee8e928ad4d049e799bb5cf8b4cb3?pvs=21">EKS 예제(폐기)</a></p>
+
+    </div>
+</div>
+
+<div class="container">
+    
+    <nav class="flex container suggested">
+        
+        <a rel="prev" href="/post/aws-devops-professnal/" title="Previous post (older)">
+            <span>Previous</span>
+            [자격증] AWS Devops Professnal(DOP-C02) 취득 후기
+            </a>
+        
+        
+        
+        <a rel="next" href="/post/t101-multicluster-migration/" title="Next post (newer)">
+            <span>Next</span>
+            [T101] Terraform을 활용한 EKS 멀티클러스터 마이그레이션
+            </a> 
+        
+    </nav>
+    
+</div>
+ 
+<div class="container">
+    
+    <script src="https://giscus.app/client.js" 
+        data-repo="WingLim/hugo-tania"
+        data-repo-id="MDEwOlJlcG9zaXRvcnkzMTYyNjQzMDc="
+        
+        data-category="Comments"
+        data-category-id="DIC_kwDOEtnPc84B_WKP"
+        
+        data-mapping="pathname"
+        data-reactions-enabled="1"
+        data-emit-metadata="0"
+        data-theme="light"
+        crossorigin="anonymous"
+        async
+        >
+</script>
+
+<script>
+    function setGiscusTeheme(theme) {
+        let giscus = document.querySelector('.giscus iframe');
+        if (giscus) {
+            giscus.contentWindow.postMessage(
+                {
+                    giscus: {
+                        setConfig: {
+                            theme: theme
+                        }
+                    }
+                },
+                'https://giscus.app'
+            )
+        }
+    }
+
+    addEventListener('message', event => {
+        if (event.origin !== 'https://giscus.app') return;
+        setGiscusTeheme(document.documentElement.dataset.userColorScheme)
+    });
+
+    window.addEventListener('onColorSchemeChange', (e) => {
+        setGiscusTeheme(e.detail)
+    })
+</script>
+
+</div>
+
+</main>
+
+
+        </main>
+        <footer class="footer flex">
+    <section class="container">
+        <nav class="footer-links">
+            
+            <a href="/index.xml">RSS</a>
+            
+        </nav>
+
+        
+    </section>
+    <script defer src="/ts/features.706a523ba43e6d0427c7fdf2b9d05dbd0920d3f12942b453690b495cb2522743.js" 
+    data-enable-footnotes="true"
+    ></script>
+</footer>
+
+    </body>
+</html>

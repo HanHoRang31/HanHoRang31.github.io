@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Architecture on HanHoRang Tech Blog</title>
+    <link>https://HanHoRang31.github.io/tags/architecture/</link>
+    <description>Recent content in Architecture on HanHoRang Tech Blog</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-us</language>
+    <lastBuildDate>Wed, 26 Jul 2023 00:00:00 +0000</lastBuildDate><atom:link href="https://HanHoRang31.github.io/tags/architecture/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>[아키텍처] AWS로 이해하는 시스템 규모의 확장</title>
+      <link>https://HanHoRang31.github.io/post/archi-scale-up/</link>
+      <pubDate>Wed, 26 Jul 2023 00:00:00 +0000</pubDate>
+      
+      <guid>https://HanHoRang31.github.io/post/archi-scale-up/</guid>
+      <description>이번 블로그 글의 주제로는 AWS 환경에서 시스템 규모의 확장에 따른 아키텍처에 대해 글을 쓰고자 한다. 시스템 규모의 확장은 백명의 사용자에서 수백만 사용자를 지원하는 시스템 설계를 뜻한다. 그렇다면, 처음부터 수백만의 사용자를 지원하는 시스템을 설계하면 되지 않을까라고 생각되지만, 확장에 필요한 서비스들의 비용, 작업 오버헤드 및 러닝 커브때문에 추천하지 않는다. 결국 소수의 사용자에서 몇 백만으로 이르기까지의 지속적인 계랑과 끝없는 개선이 요구되는 과정이라 볼 수 있다.
+그렇기 때문에 시스템 규모 확장를 이해하면 아키텍처 설계 및 이해에 큰 도움이 될 것이라 생각하며 정리한 글을 공유할 예정이다.</description>
+    </item>
+    
+  </channel>
+</rss>
