@@ -1,0 +1,838 @@
+<!DOCTYPE html>
+<html lang="en-us">
+    
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="theme-color" content="dark">
+    <title>[T1013] 코드로 보는 테라폼 문법과 테라폼 클라우드 프로비저닝 | HanHoRang Tech Blog</title>
+
+    
+    
+    
+    <meta property="og:site_name" content="HanHoRang Tech Blog by Tania in Hugo" />
+    <meta property="og:title" content="[T1013] 코드로 보는 테라폼 문법과 테라폼 클라우드 프로비저닝 | HanHoRang Tech Blog"/>
+    <meta itemprop="name" content="[T1013] 코드로 보는 테라폼 문법과 테라폼 클라우드 프로비저닝 | HanHoRang Tech Blog" />
+    <meta name="twitter:title" content="[T1013] 코드로 보는 테라폼 문법과 테라폼 클라우드 프로비저닝 | HanHoRang Tech Blog" />
+    <meta name="application-name" content="[T1013] 코드로 보는 테라폼 문법과 테라폼 클라우드 프로비저닝 | HanHoRang Tech Blog" /><meta name="twitter:card" content="summary"/>
+
+    <meta name="description" content="EKS 모듈 예제로 이해하는 테라폼 문법과 테라폼 클라우드로 EKS 프로비저닝하기" />
+    <meta name="twitter:description" content="EKS 모듈 예제로 이해하는 테라폼 문법과 테라폼 클라우드로 EKS 프로비저닝하기 "/>
+    <meta itemprop="description" content=" EKS 모듈 예제로 이해하는 테라폼 문법과 테라폼 클라우드로 EKS 프로비저닝하기 "/>
+    <meta property="og:description" content=" EKS 모듈 예제로 이해하는 테라폼 문법과 테라폼 클라우드로 EKS 프로비저닝하기 " />
+
+    
+
+<meta property="og:type" content="article" />
+<meta property="article:publisher" content="Hugo Tania" />
+<meta property="og:article:published_time" content=2023-09-06T00:00:00Z />
+<meta property="article:published_time" content=2023-09-06T00:00:00Z />
+
+
+  <meta property="og:article:author" content="Han ho rnag" />
+  <meta property="article:author" content="Han ho rnag" />
+  <meta name="author" content="Han ho rnag" />
+
+
+
+
+<script defer type="application/ld+json">
+  {
+    "@context": "http://schema.org",
+    "@type": "Article",
+    "headline": "[T1013] 코드로 보는 테라폼 문법과 테라폼 클라우드 프로비저닝",
+    "author": {
+      "@type": "Person",
+      "name": "Hugo Tania"
+    },
+    "datePublished": "2023-09-06",
+    "description": "EKS 모듈 예제로 이해하는 테라폼 문법과 테라폼 클라우드로 EKS 프로비저닝하기",
+    "wordCount":  1341 ,
+    "mainEntityOfPage": "True",
+    "dateModified": "2023-09-06",
+    "publisher": {
+      "@type": "Organization",
+      "name": "Hugo Tania",
+      "logo": {
+        "@type": "imageObject",
+        "url": "https:\/\/HanHoRang31.github.io\/favicon.ico"
+      }
+    }
+  }
+</script>
+
+
+
+    <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico" />
+    
+    <link rel="stylesheet" href="/sass/main.min.ab99ff095f832511e24ffb2fba2b51ad473b2f7e9301d674eba2c6c3a6e8bd81.css">
+    
+</head>
+    
+    <script>
+        (function() {
+            const colorSchemeKey = 'ThemeColorScheme';
+            if(!localStorage.getItem(colorSchemeKey)){
+                localStorage.setItem(colorSchemeKey, "auto");
+            }
+        })();
+    </script><script>
+    (function() {
+        const colorSchemeKey = 'ThemeColorScheme';
+        const colorSchemeItem = localStorage.getItem(colorSchemeKey);
+        const supportDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches === true;
+
+        if (colorSchemeItem == 'dark' || colorSchemeItem === 'auto' && supportDarkMode) {
+            
+
+            document.documentElement.dataset.userColorScheme = 'dark';
+        } else {
+            document.documentElement.dataset.userColorScheme = 'light';
+        }
+    })();
+</script>
+
+
+    <body class="dark">
+        <nav class="navbar">
+    <div class="container">
+        <div class="flex">
+            <div>
+                <a class="brand" href="/">
+                    
+                    
+                        <img src="/favicon.ico" />
+                    
+                    HanHoRang Tech Blog
+                    </a>
+            </div>
+            <div class="flex">
+                
+                <a href="/articles/">Articles</a>
+                
+                
+                    <button id="dark-mode-button">
+                    <svg class="light" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" aria-hidden="true" focusable="false" width="1em" height="1em" style="-ms-transform: rotate(360deg); -webkit-transform: rotate(360deg); transform: rotate(360deg);" preserveAspectRatio="xMidYMid meet" viewBox="0 0 36 36"><path fill="#FFD983" d="M30.312.776C32 19 20 32 .776 30.312c8.199 7.717 21.091 7.588 29.107-.429C37.9 21.867 38.03 8.975 30.312.776z"/><path d="M30.705 15.915a1.163 1.163 0 1 0 1.643 1.641a1.163 1.163 0 0 0-1.643-1.641zm-16.022 14.38a1.74 1.74 0 0 0 0 2.465a1.742 1.742 0 1 0 0-2.465zm13.968-2.147a2.904 2.904 0 0 1-4.108 0a2.902 2.902 0 0 1 0-4.107a2.902 2.902 0 0 1 4.108 0a2.902 2.902 0 0 1 0 4.107z" fill="#FFCC4D"/><rect x="0" y="0" width="36" height="36" fill="rgba(0, 0, 0, 0)" /></svg>
+                    <svg class="dark" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" aria-hidden="true" focusable="false" width="1em" height="1em" style="-ms-transform: rotate(360deg); -webkit-transform: rotate(360deg); transform: rotate(360deg);" preserveAspectRatio="xMidYMid meet" viewBox="0 0 36 36"><path fill="#FFD983" d="M16 2s0-2 2-2s2 2 2 2v2s0 2-2 2s-2-2-2-2V2zm18 14s2 0 2 2s-2 2-2 2h-2s-2 0-2-2s2-2 2-2h2zM4 16s2 0 2 2s-2 2-2 2H2s-2 0-2-2s2-2 2-2h2zm5.121-8.707s1.414 1.414 0 2.828s-2.828 0-2.828 0L4.878 8.708s-1.414-1.414 0-2.829c1.415-1.414 2.829 0 2.829 0l1.414 1.414zm21 21s1.414 1.414 0 2.828s-2.828 0-2.828 0l-1.414-1.414s-1.414-1.414 0-2.828s2.828 0 2.828 0l1.414 1.414zm-.413-18.172s-1.414 1.414-2.828 0s0-2.828 0-2.828l1.414-1.414s1.414-1.414 2.828 0s0 2.828 0 2.828l-1.414 1.414zm-21 21s-1.414 1.414-2.828 0s0-2.828 0-2.828l1.414-1.414s1.414-1.414 2.828 0s0 2.828 0 2.828l-1.414 1.414zM16 32s0-2 2-2s2 2 2 2v2s0 2-2 2s-2-2-2-2v-2z"/><circle fill="#FFD983" cx="18" cy="18" r="10"/><rect x="0" y="0" width="36" height="36" fill="rgba(0, 0, 0, 0)" /></svg>
+                    </button>
+                
+            </div>
+            </div>
+    </div>
+</nav>
+
+        <main>
+            
+<div class="container">
+    <article>
+        <header class="article-header">
+            <div class="thumb">
+                <div>
+                    <h1>[T1013] 코드로 보는 테라폼 문법과 테라폼 클라우드 프로비저닝</h1>
+                    <div class="post-meta">
+                        <div>
+                            
+                            
+                            By HanHoRnag | <time>September 06, 2023</time>
+                            | 7 minutes
+                        </div>
+                        <div class="tags">
+                            
+                            <a href="/tags/t101/">T101</a>
+                            
+                            <a href="/tags/eks/">eks</a>
+                            
+                            <a href="/tags/cloud/">cloud</a>
+                            
+                            <a href="/tags/aws/">AWS</a>
+                            
+                            <a href="/tags/terraform/">Terraform</a>
+                            
+                            <a href="/tags/terraform-cloud/">Terraform Cloud</a>
+                            
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </header>
+    </article>
+
+    <div class="article-post">
+    <p>테라폼은 HCL(HashiCorp Configuration Language) 을 통해 인프라를 관리하고 프로비저닝합니다. HCL은 흡사 Go언어와 같이 반복문, 조건문, 함수가 제공되며 HCL 특유의 블록들이 구성되어 인프라를 코드로 관리할 수 있게 도와줍니다.  테라폼 기초 문법 이해로 책을 한 번 훏는 것을 추천드립니다.</p>
+<p>이번 포스트에서는 그 다음 단계로, 실무 예제를 통해 HCL 문법이 어떻게 사용되는지 살펴보겠습니다. 또한, Terraform Cloud를 이용하여 인프라를 프로비저닝하는 방법에 대해서도 알아보겠습니다. 실무 예제는 스터디 참고 책 9장(인프라 운영 및 관리)에서 소개해주는 EKS 모듈 예제로 선택하였습니다. 예제는 <a href="https://github.com/terraform101/terraform-refactoring-and-modularity">책 저자님의 레파지토리</a>에서 확인이 가능합니다.</p>
+<h2 id="11-테라폼-모듈-이해">
+    <a href="#11-%ed%85%8c%eb%9d%bc%ed%8f%bc-%eb%aa%a8%eb%93%88-%ec%9d%b4%ed%95%b4" class="anchor">
+        <svg class="icon" aria-hidden="true" focusable="false" height="16" version="1.1" viewBox="0 0 16 16" width="16">
+            <path fill-rule="evenodd"
+                d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z">
+            </path>
+        </svg>
+    </a>
+    1.1 테라폼 모듈 이해
+</h2>
+<p>HCL 문법 사용에 들어가기 전 테라폼 모듈 구조를 알아보겠습니다. 테라폼 모듈은 재사용 가능한, 독립적인 코드 블록을 뜻합니다. 모듈을 사용하면 코드의 중복을 줄이고, 복잡한 인프라를 쉽게 관리할 수 있습니다. 참고 예제에서도 브랜치를 나뉘어 모듈 도입 전,후를 손 쉽게 비교할 수 있습니다. <a href="https://github.com/terraform101/terraform-refactoring-and-modularity/tree/modularity">레파지토리 브랜치 moularity</a> 에서는 자주 사용하는 서비스(VPC 서비스들과 EKS)을 모듈로 구성하였고 이외의 추가 서비스(ECR, DB)를 따로 코드를 통해 구성하는 것을 확인할 수 있습니다. 모듈의 구조는 다음과 같습니다.</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">➜ tree .            
+</span></span><span class="line"><span class="cl">.
+</span></span><span class="line"><span class="cl">// 차일드 모듈 
+</span></span><span class="line"><span class="cl">├── modules         
+</span></span><span class="line"><span class="cl">│   ├── common
+</span></span><span class="line"><span class="cl">│   │   ├── README.md
+</span></span><span class="line"><span class="cl">│   │   ├── main.tf
+</span></span><span class="line"><span class="cl">│   │   ├── output.tf
+</span></span><span class="line"><span class="cl">│   │   └── variable.tf
+</span></span><span class="line"><span class="cl">│   └── eks 
+</span></span><span class="line"><span class="cl">│       ├── README.md
+</span></span><span class="line"><span class="cl">│       ├── aws-iam-authenticator
+</span></span><span class="line"><span class="cl">│       ├── iam-policy.json
+</span></span><span class="line"><span class="cl">│       ├── kubectl
+</span></span><span class="line"><span class="cl">│       ├── main.tf
+</span></span><span class="line"><span class="cl">│       ├── output.tf
+</span></span><span class="line"><span class="cl">│       ├── template
+</span></span><span class="line"><span class="cl">│       │   ├── cert-manager.tpl
+</span></span><span class="line"><span class="cl">│       │   ├── crd.tpl
+</span></span><span class="line"><span class="cl">│       │   ├── eniconfig.tpl
+</span></span><span class="line"><span class="cl">│       │   ├── ingress.tpl
+</span></span><span class="line"><span class="cl">│       │   ├── kubeconfig.tpl
+</span></span><span class="line"><span class="cl">│       │   └── sa.tpl
+</span></span><span class="line"><span class="cl">│       └── variable.tf
+</span></span><span class="line"><span class="cl">// 루트 모듈 
+</span></span><span class="line"><span class="cl">├── main.tf       
+</span></span><span class="line"><span class="cl">├── output.tf
+</span></span><span class="line"><span class="cl">└── variable.tf
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>폴더 modules를 기반으로 모듈을 구분하여 child, root 모듈로 구분합니다. 루트 모듈에는 사용할 변수들과 사용할 서비스를 구성하고, 차일드 모듈을 통해 실제 서비스를 구성합니다. 모듈을 통해 구성되는 서비스의 아키텍처는 다음과 같습니다.</p>
+<p><img loading="lazy" 
+    src="/t101-code-cloud/Template_UCSI_1_prd.jpeg" 
+    alt="&lt;a href=&#34;https://github.com/terraform101/terraform-refactoring-and-modularity/tree/modularity&#34;&gt;https://github.com/terraform101/terraform-refactoring-and-modularity/tree/modularity&lt;/a&gt;" 
+     
+    width=3300 
+    height="2550"  /></p>
+<p><a href="https://github.com/terraform101/terraform-refactoring-and-modularity/tree/modularity">https://github.com/terraform101/terraform-refactoring-and-modularity/tree/modularity</a></p>
+<h2 id="12-모듈-내-문법-이해">
+    <a href="#12-%eb%aa%a8%eb%93%88-%eb%82%b4-%eb%ac%b8%eb%b2%95-%ec%9d%b4%ed%95%b4" class="anchor">
+        <svg class="icon" aria-hidden="true" focusable="false" height="16" version="1.1" viewBox="0 0 16 16" width="16">
+            <path fill-rule="evenodd"
+                d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z">
+            </path>
+        </svg>
+    </a>
+    1.2 모듈 내 문법 이해
+</h2>
+<p>EKS 모듈 예제를 통해 어떻게 사용되는 지 확인하겠습니다.</p>
+<h3 id="121-변수-사용">
+    <a href="#121-%eb%b3%80%ec%88%98-%ec%82%ac%ec%9a%a9" class="anchor">
+        <svg class="icon" aria-hidden="true" focusable="false" height="16" version="1.1" viewBox="0 0 16 16" width="16">
+            <path fill-rule="evenodd"
+                d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z">
+            </path>
+        </svg>
+    </a>
+    1.2.1 변수 사용
+</h3>
+<p>테라폼 구성 변수는 루트 모듈의 varible.tf을 통해 정의합니다. 변수를 살펴보자면, 변수의 민감 변수와 구성 변수로 나뉘어 집니다. 민감 변수는 환경 변수(TF로 시작) 나 테라폼 클라우드에서 저장한 변수를 통해 입력하는 것을 추천합니다. 민감 변수는 AWS 접근 키, 비밀키 등으로 구성됩니다.</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span><span class="lnt">8
+</span><span class="lnt">9
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">// varible.tf 의 민감변수 정의
+</span></span><span class="line"><span class="cl"><span class="c1">### FOR TEST</span>
+</span></span><span class="line"><span class="cl">variable <span class="s2">&#34;AWS_ACCESS_KEY_ID&#34;</span> <span class="o">{}</span>
+</span></span><span class="line"><span class="cl">variable <span class="s2">&#34;AWS_SECRET_ACCESS_KEY&#34;</span> <span class="o">{}</span>
+</span></span><span class="line"><span class="cl">.. 
+</span></span><span class="line"><span class="cl">variable <span class="s2">&#34;ucmp-access-secret&#34;</span> <span class="o">{</span>
+</span></span><span class="line"><span class="cl">  <span class="nv">default</span>   <span class="o">=</span> <span class="s2">&#34;&#34;</span>
+</span></span><span class="line"><span class="cl">  <span class="nv">sensitive</span> <span class="o">=</span> <span class="nb">true</span>
+</span></span><span class="line"><span class="cl"><span class="o">}</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>변수 사용의 또 다른 예로 예제 EC2 의 이미지를 data블록을 통해 AWS에 조회하여 사용합니다.</p>
+<p><img loading="lazy" 
+    src="/t101-code-cloud/data5.png" 
+    alt="data5.png" 
+     
+    width=1180 
+    height="659"  /></p>
+<p>data 블록 값들 정보는 <a href="https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/ami">테라폼 공식문서</a>에서 확인할 수 있습니다.</p>
+<p><img loading="lazy" 
+    src="/t101-code-cloud/data6.png" 
+    alt="data6.png" 
+     
+    width=1066 
+    height="811"  /></p>
+<h3 id="122-함수-사용">
+    <a href="#122-%ed%95%a8%ec%88%98-%ec%82%ac%ec%9a%a9" class="anchor">
+        <svg class="icon" aria-hidden="true" focusable="false" height="16" version="1.1" viewBox="0 0 16 16" width="16">
+            <path fill-rule="evenodd"
+                d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z">
+            </path>
+        </svg>
+    </a>
+    1.2.2 함수 사용
+</h3>
+<p>HCL은 자체적으로 내장 함수와 반복문, 조건문이 지원됩니다.</p>
+<p>예제 모듈에서도 해당 문법을 통해 인프라를 프로비저닝하는데 사용됩니다. 사용 예는 다음과 같습니다.</p>
+<ul>
+<li>
+<p>count 조건문을 통한 서비스 구성 여부</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">// 변수 구성
+</span></span><span class="line"><span class="cl">variable <span class="s2">&#34;enable_ecr&#34;</span> <span class="o">{</span>
+</span></span><span class="line"><span class="cl">  <span class="nb">type</span>        <span class="o">=</span> bool
+</span></span><span class="line"><span class="cl">  <span class="nv">default</span>     <span class="o">=</span> <span class="nb">false</span>
+</span></span><span class="line"><span class="cl">  <span class="nv">description</span> <span class="o">=</span> <span class="s2">&#34;ECR 활성/비활성&#34;</span>
+</span></span><span class="line"><span class="cl"><span class="o">}</span>
+</span></span><span class="line"><span class="cl">variable <span class="s2">&#34;enable_elasticache&#34;</span> <span class="o">{</span>
+</span></span><span class="line"><span class="cl">  <span class="nb">type</span>        <span class="o">=</span> bool
+</span></span><span class="line"><span class="cl">  <span class="nv">default</span>     <span class="o">=</span> <span class="nb">false</span>
+</span></span><span class="line"><span class="cl">  <span class="nv">description</span> <span class="o">=</span> <span class="s2">&#34;Elasticache 활성/비활성&#34;</span>
+</span></span><span class="line"><span class="cl"><span class="o">}</span> 
+</span></span><span class="line"><span class="cl">..
+</span></span><span class="line"><span class="cl">..
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">// ecr 구성 여부 
+</span></span><span class="line"><span class="cl">resource <span class="s2">&#34;aws_ecr_repository&#34;</span> <span class="s2">&#34;ecr&#34;</span> <span class="o">{</span>
+</span></span><span class="line"><span class="cl">  <span class="nv">count</span> <span class="o">=</span> var.enable_ecr ? <span class="m">1</span> : <span class="m">0</span> 
+</span></span><span class="line"><span class="cl">  <span class="nv">name</span>  <span class="o">=</span> <span class="s2">&#34;ecr-</span><span class="si">${</span><span class="nv">var</span><span class="p">.env</span><span class="si">}</span><span class="s2">-</span><span class="si">${</span><span class="nv">var</span><span class="p">.pjt</span><span class="si">}</span><span class="s2">-imagerepository&#34;</span>
+</span></span><span class="line"><span class="cl">..
+</span></span><span class="line"><span class="cl"><span class="o">}</span>
+</span></span><span class="line"><span class="cl">// elasticache_cluster 구성 여부  
+</span></span><span class="line"><span class="cl">resource <span class="s2">&#34;aws_elasticache_cluster&#34;</span> <span class="s2">&#34;replica&#34;</span> <span class="o">{</span>
+</span></span><span class="line"><span class="cl">  <span class="nv">count</span> <span class="o">=</span> var.enable_elasticache ? <span class="m">1</span> : <span class="m">0</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">  <span class="nv">cluster_id</span>           <span class="o">=</span> <span class="s2">&#34;elasticache-</span><span class="si">${</span><span class="nv">var</span><span class="p">.env</span><span class="si">}</span><span class="s2">-</span><span class="si">${</span><span class="nv">var</span><span class="p">.pjt</span><span class="si">}</span><span class="s2">-cluster-</span><span class="si">${</span><span class="nv">count</span><span class="p">.index</span><span class="si">}</span><span class="s2">&#34;</span>
+</span></span><span class="line"><span class="cl">  <span class="nv">replication_group_id</span> <span class="o">=</span> aws_elasticache_replication_group.cluster<span class="o">[</span>0<span class="o">]</span>.id
+</span></span><span class="line"><span class="cl"><span class="o">}</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div></li>
+<li>
+<p>내장 함수을 통한 인프라 구성</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">// 1. 반복분 
+</span></span><span class="line"><span class="cl">// 변수 developer_group_users에 정의된 목록만큼 iam user 생성 
+</span></span><span class="line"><span class="cl">resource <span class="s2">&#34;aws_iam_user&#34;</span> <span class="s2">&#34;developer&#34;</span> <span class="o">{</span>
+</span></span><span class="line"><span class="cl">  <span class="nv">for_each</span> <span class="o">=</span> toset<span class="o">(</span>var.developer_group_users<span class="o">)</span> // toset 은 결과값의 목록을 데이터 타입으로 변환합니다. 
+</span></span><span class="line"><span class="cl">  <span class="nv">name</span>     <span class="o">=</span> each.key
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">  <span class="nv">tags</span> <span class="o">=</span> <span class="o">{</span>
+</span></span><span class="line"><span class="cl">    <span class="nv">Name</span> <span class="o">=</span> <span class="s2">&#34;developer_group_user&#34;</span>
+</span></span><span class="line"><span class="cl">  <span class="o">}</span>
+</span></span><span class="line"><span class="cl"><span class="o">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">// 2. 내장 함수 
+</span></span><span class="line"><span class="cl">// 접두사 제거로 결과 도메인 https://의 뒷 문자열을 가져와 oidc 구성에 사용됩니다.
+</span></span><span class="line"><span class="cl"><span class="nv">oidc</span> <span class="o">=</span> trimprefix<span class="o">(</span><span class="s2">&#34;</span><span class="si">${</span><span class="nv">aws_eks_cluster</span><span class="p">.cluster.identity[0].oidc[0].issuer</span><span class="si">}</span><span class="s2">&#34;</span>, <span class="s2">&#34;https://&#34;</span><span class="o">)</span> 
+</span></span></code></pre></td></tr></table>
+</div>
+</div></li>
+</ul>
+<h3 id="123-프로비저너provisioner">
+    <a href="#123-%ed%94%84%eb%a1%9c%eb%b9%84%ec%a0%80%eb%84%88provisioner" class="anchor">
+        <svg class="icon" aria-hidden="true" focusable="false" height="16" version="1.1" viewBox="0 0 16 16" width="16">
+            <path fill-rule="evenodd"
+                d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z">
+            </path>
+        </svg>
+    </a>
+    1.2.3 프로비저너(provisioner)
+</h3>
+<p>변수나 함수인 경우 프로그래밍 코드에서의 변수와 함수처럼 직관적입니다. 반면, 인프라 프로비저닝 이후 로컬 머신에서 동작하는 과정은 익숙치가 않아서 인지 이해 하기가 쉽지 않아 따로 정리합니다. 프로비저너(provisioner)는 특정 리소스가 생성된 후에 추가적인 설정이나 작업을 자동화하기 위해 사용됩니다. 모듈 예제에서는 EC2 비밀 키 등록과 노드 그룹의 iam 정책 등록으로 사용되었습니다.</p>
+<ul>
+<li>
+<p>EC2 비밀 키 생성 및 등록</p>
+<p>${self.private_key_pem} 변수가 tls_private_key.key로 생성된 키로 입력됩니다. 하시코프에서 제공하는 tls 리소스로 생성한 변수가 프로비저너를 통해 바로 사용되는 것을 인지해야 합니다. tls 모듈 정보는 <a href="https://registry.terraform.io/providers/hashicorp/tls/latest/docs/resources/private_key">테라폼 문서</a>에서 확인이 가능합니다.</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">// ssh 접속 키를 생성
+</span></span><span class="line"><span class="cl">resource <span class="s2">&#34;tls_private_key&#34;</span> <span class="s2">&#34;key&#34;</span> <span class="o">{</span>
+</span></span><span class="line"><span class="cl">  <span class="nv">algorithm</span> <span class="o">=</span> <span class="s2">&#34;RSA&#34;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">  provisioner <span class="s2">&#34;local-exec&#34;</span> <span class="o">{</span>
+</span></span><span class="line"><span class="cl">    <span class="nb">command</span> <span class="o">=</span> <span class="s2">&#34;echo &#39;</span><span class="si">${</span><span class="nv">self</span><span class="p">.private_key_pem</span><span class="si">}</span><span class="s2">&#39; &gt; ./ec2-</span><span class="si">${</span><span class="nv">var</span><span class="p">.env</span><span class="si">}</span><span class="s2">-</span><span class="si">${</span><span class="nv">var</span><span class="p">.pjt</span><span class="si">}</span><span class="s2">-bastion1.pem&#34;</span>
+</span></span><span class="line"><span class="cl">  <span class="o">}</span>
+</span></span><span class="line"><span class="cl"><span class="o">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">resource <span class="s2">&#34;aws_key_pair&#34;</span> <span class="s2">&#34;keypair&#34;</span> <span class="o">{</span>
+</span></span><span class="line"><span class="cl">  <span class="nv">key_name</span>   <span class="o">=</span> <span class="s2">&#34;</span><span class="si">${</span><span class="nv">var</span><span class="p">.pjt</span><span class="si">}</span><span class="s2">-</span><span class="si">${</span><span class="nv">var</span><span class="p">.env</span><span class="si">}</span><span class="s2">-key&#34;</span>
+</span></span><span class="line"><span class="cl">  <span class="nv">public_key</span> <span class="o">=</span> tls_private_key.key.public_key_openssh
+</span></span><span class="line"><span class="cl"><span class="o">}</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div></li>
+<li>
+<p>EKS addon 쿠버네티스 리소스 생성</p>
+<p>프로비저너의 또 다른 사용 예로 EKS addon 사용에 필요한 쿠버네티스 오브젝트 생성에 사용됩니다. 이는 EKS 생성 이후의  role-arn 등록 및 EKS 인프라 정보가 필요하기 때문입니다. 오브젝트 생성 구성은 동일하게 진행되며 이해를 돕기위해 Secondary CIDR 의 등록 과정을 공유하겠습니다.</p>
+<p><img loading="lazy" 
+    src="/t101-code-cloud/cloud25.png" 
+    alt="cloud25.png" 
+     
+    width=1265 
+    height="700"  /></p>
+<p>테라폼으로 addon 을 구성 했으나, 구성 환경에 따라 addon 경우의 수가 많기에 addon 부분도 모듈화를 하면 좋을 것 같습니다.</p>
+</li>
+</ul>
+<h2 id="2-테라폼-클라우드로-eks-프로비저닝">
+    <a href="#2-%ed%85%8c%eb%9d%bc%ed%8f%bc-%ed%81%b4%eb%9d%bc%ec%9a%b0%eb%93%9c%eb%a1%9c-eks-%ed%94%84%eb%a1%9c%eb%b9%84%ec%a0%80%eb%8b%9d" class="anchor">
+        <svg class="icon" aria-hidden="true" focusable="false" height="16" version="1.1" viewBox="0 0 16 16" width="16">
+            <path fill-rule="evenodd"
+                d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z">
+            </path>
+        </svg>
+    </a>
+    2. 테라폼 클라우드로 EKS 프로비저닝
+</h2>
+<p>Terraform Cloud는 팀이 Terraform을 공동으로 사용할 수 있게 도와주는 관리형 서비스로, 일관된 환경에서 Terraform 작업을 실행하고 공유 상태 및 비밀 데이터에 쉽게 접근할 수 있습니다. 무료로 제공되는 기본 버전은 버전 관리, 변수 공유, 안정적인 원격 환경에서의 Terraform 실행, 원격 상태 저장을 지원하며, 유료 버전에서는 사용자 수와 권한 설정 등이 확장됩니다. (<a href="https://developer.hashicorp.com/terraform/cloud-docs">공식문서 참고</a>)</p>
+<p><img loading="lazy" 
+    src="/t101-code-cloud/terra-cloud-1.png" 
+    alt="&lt;a href=&#34;https://www.youtube.com/watch?v=SFHR3S-Znrw&amp;amp;t=270s&#34;&gt;https://www.youtube.com/watch?v=SFHR3S-Znrw&amp;amp;t=270s&lt;/a&gt;" 
+     
+    width=1229 
+    height="618"  /></p>
+<p><a href="https://www.youtube.com/watch?v=SFHR3S-Znrw&amp;t=270s">https://www.youtube.com/watch?v=SFHR3S-Znrw&amp;t=270s</a></p>
+<p>예제 EKS 모듈을 테라폼 클라우드로 프로비저닝하겠습니다. 테라폼 클라우드에서 EKS를 프로비저닝하기 위해서는 추가 작업이 필요합니다.</p>
+<h3 id="21-provider-설정">
+    <a href="#21-provider-%ec%84%a4%ec%a0%95" class="anchor">
+        <svg class="icon" aria-hidden="true" focusable="false" height="16" version="1.1" viewBox="0 0 16 16" width="16">
+            <path fill-rule="evenodd"
+                d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z">
+            </path>
+        </svg>
+    </a>
+    2.1 Provider 설정
+</h3>
+<p>먼저 Cloud에서 사용할 조직과 워크스페이스를 설정해야 합니다. 루트 모듈 main.tf에서 옵션을 확인하여 설정해주세요.</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-yaml" data-lang="yaml"><span class="line"><span class="cl"><span class="l">terraform {</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="l">cloud {</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="l">organization = &#34;t101-hanhorang&#34; // organization 설정</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="l">hostname     = &#34;app.terraform.io&#34; // terraform cloud 기본 주소 (변경하지 않는 값입니다.) </span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="l">workspaces { // 워크스페이스 설정</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">      </span><span class="l">name = &#34;t101&#34; </span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span>}<span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span>}<span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="l">required_providers {</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="l">aws = {</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">      </span><span class="l">source  = &#34;hashicorp/aws&#34;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">      </span><span class="l">version = &#34;&gt;= 3.0.0, &lt; 4.0.0&#34;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span>}<span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span>}<span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span>}<span class="w">
+</span></span></span></code></pre></td></tr></table>
+</div>
+</div><p>설정한 조직과 워크스페이스는 테라폼 클라우드 UI에서 확인할 수 있습니다.</p>
+<p><img loading="lazy" 
+    src="/t101-code-cloud/cloud1-2.png" 
+    alt="cloud1-2.png" 
+     
+    width=924 
+    height="491"  /></p>
+<h3 id="22-vsc-연동">
+    <a href="#22-vsc-%ec%97%b0%eb%8f%99" class="anchor">
+        <svg class="icon" aria-hidden="true" focusable="false" height="16" version="1.1" viewBox="0 0 16 16" width="16">
+            <path fill-rule="evenodd"
+                d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z">
+            </path>
+        </svg>
+    </a>
+    2.2 VSC 연동
+</h3>
+<p>테라폼 클라우드에서는 VCS 연동 기능을 지원합니다. VCS 연동 기능을 통해 깃허브에서 TF 코드를 관리할 수 있게 됩니다. 설정 방법은 간단합니다. 새로운 워크스페이스를 생성하여 단계별로 설정하면 됩니다.</p>
+<p><img loading="lazy" 
+    src="/t101-code-cloud/cloud2-1.png" 
+    alt="cloud2-1.png" 
+     
+    width=1178 
+    height="621"  /></p>
+<ul>
+<li>
+<p><a href="https://github.com/terraform101/terraform-refactoring-and-modularity/tree/modularity">EKS 모듈화 참고 레파지토리</a>를 확인하면 브랜치가 2개입니다. 레파지토리를 fork한 다음 브랜치를 moulraity 로 설정해주세요. 필자의 경우 rebase로 modularity 브랜치를 Main 브랜치로 병합했습니다.</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">git checkout modulaty
+</span></span><span class="line"><span class="cl">git rebase main
+</span></span><span class="line"><span class="cl">git checkout main
+</span></span><span class="line"><span class="cl">git merge modulaty 
+</span></span><span class="line"><span class="cl">git push origin main
+</span></span></code></pre></td></tr></table>
+</div>
+</div></li>
+</ul>
+<p>마지막 단계의 Advanced options 에서 VCS 연동 관련 기능을 설정할 수 있습니다.  Apply Method 에서는 terraform apply 여부를 설정할 수 있고, VCS Triggers 에서는 git 브랜치 변경에 따라 트리거할 수 있는  옵션을 설정할 수 있습니다. 필자의 경우 깃허브에서 브랜치 변동시 자동으로 terraform plan 까지만 확인할 수 있도록 설정하였습니다.</p>
+<p><img loading="lazy" 
+    src="/t101-code-cloud/cloud16.png" 
+    alt="cloud16.png" 
+     
+    width=656 
+    height="773"  /></p>
+<p>옵션 설정 이후, TF 변수 설정도 진행 해주세요.</p>
+<p><img loading="lazy" 
+    src="/t101-code-cloud/cloud178.png" 
+    alt="cloud178.png" 
+     
+    width=781 
+    height="636"  /></p>
+<h3 id="23-tf-연동">
+    <a href="#23-tf-%ec%97%b0%eb%8f%99" class="anchor">
+        <svg class="icon" aria-hidden="true" focusable="false" height="16" version="1.1" viewBox="0 0 16 16" width="16">
+            <path fill-rule="evenodd"
+                d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z">
+            </path>
+        </svg>
+    </a>
+    2.3 TF 연동
+</h3>
+<p>예제 레파지토리를 연동하면 다음의 에러가 발생합니다. 가져온 레파지토리에 수정 작업이 필요합니다.</p>
+<p><img loading="lazy" 
+    src="/t101-code-cloud/cloud4.png" 
+    alt="cloud4.png" 
+     
+    width=2122 
+    height="1388"  /></p>
+<ul>
+<li>
+<p>EC2 이미지 data 값 수정 : 예제에서는 ucmp 라는 관리자 계정에서 이미지를 관리하지만, 필자의 경우 aws 에서 관리하는 이미지를 가져올 수 있도록 수정하였습니다.</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">// main.tf
+</span></span><span class="line"><span class="cl">data <span class="s2">&#34;aws_ami&#34;</span> <span class="s2">&#34;node_ami_id&#34;</span> <span class="o">{</span>
+</span></span><span class="line"><span class="cl">  <span class="nv">count</span>       <span class="o">=</span> var.enable_eks ? <span class="m">1</span> : <span class="m">0</span>
+</span></span><span class="line"><span class="cl">  <span class="nv">provider</span>    <span class="o">=</span> aws.ucmp_owner
+</span></span><span class="line"><span class="cl">  <span class="nv">most_recent</span> <span class="o">=</span> <span class="nb">true</span>
+</span></span><span class="line"><span class="cl">  <span class="nv">owners</span>      <span class="o">=</span> <span class="o">[</span><span class="s2">&#34;amazon&#34;</span><span class="o">]</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">  filter <span class="o">{</span>
+</span></span><span class="line"><span class="cl">    <span class="nv">name</span>   <span class="o">=</span> <span class="s2">&#34;name&#34;</span>
+</span></span><span class="line"><span class="cl">    <span class="nv">values</span> <span class="o">=</span> <span class="o">[</span><span class="s2">&#34;amzn2-ami-hvm*&#34;</span><span class="o">]</span>
+</span></span><span class="line"><span class="cl">  <span class="o">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="o">}</span> 
+</span></span></code></pre></td></tr></table>
+</div>
+</div></li>
+<li>
+<p>사용하지 않는 output 값 제거 : 예제 프로젝트에서는 ecr를 사용하지 않으며, 오직 EKS만 배포할 예정입니다. 해당 옵션에 맞게 모듈을 수정해야합니다.</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">// variable.tf 
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1">#####################</span>
+</span></span><span class="line"><span class="cl"><span class="c1">## eks-node</span>
+</span></span><span class="line"><span class="cl"><span class="c1">#####################</span>
+</span></span><span class="line"><span class="cl">variable <span class="s2">&#34;enable_eks&#34;</span> <span class="o">{</span>
+</span></span><span class="line"><span class="cl">  <span class="nb">type</span>        <span class="o">=</span> bool
+</span></span><span class="line"><span class="cl">  <span class="nv">default</span>     <span class="o">=</span> <span class="nb">true</span>
+</span></span><span class="line"><span class="cl">  <span class="nv">description</span> <span class="o">=</span> <span class="s2">&#34;EKS 활성/비활성&#34;</span>
+</span></span><span class="line"><span class="cl"><span class="o">}</span>
+</span></span><span class="line"><span class="cl">..
+</span></span><span class="line"><span class="cl">..
+</span></span><span class="line"><span class="cl">// output.tf 
+</span></span><span class="line"><span class="cl">~~output <span class="s2">&#34;ECR_REPOSITORY&#34;</span> <span class="o">{</span>
+</span></span><span class="line"><span class="cl">  <span class="nv">value</span>       <span class="o">=</span> aws_ecr_repository.ecr<span class="o">[</span>0<span class="o">]</span>.name
+</span></span><span class="line"><span class="cl">  <span class="nv">description</span> <span class="o">=</span> <span class="s2">&#34;ECR repository&#34;</span>
+</span></span><span class="line"><span class="cl"><span class="o">}</span>~~
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">output <span class="s2">&#34;private_key&#34;</span> <span class="o">{</span>
+</span></span><span class="line"><span class="cl">  <span class="nv">value</span>       <span class="o">=</span> nonsensitive<span class="o">(</span>tls_private_key.key.private_key_pem<span class="o">)</span>
+</span></span><span class="line"><span class="cl">  <span class="nv">description</span> <span class="o">=</span> <span class="s2">&#34;테라폼으로 생섣된 SSH 접속용 키값&#34;</span>
+</span></span><span class="line"><span class="cl"><span class="o">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">output <span class="s2">&#34;kubeconfig&#34;</span> <span class="o">{</span>
+</span></span><span class="line"><span class="cl">  <span class="nv">value</span>       <span class="o">=</span> module.eks.kubeconfig
+</span></span><span class="line"><span class="cl">  <span class="nv">description</span> <span class="o">=</span> <span class="s2">&#34;kube-config 내용&#34;</span>
+</span></span><span class="line"><span class="cl"><span class="o">}</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div></li>
+</ul>
+<p>코드 수정 이후 깃허브로 브랜치를 푸쉬하면 트리거를 통해 테라폼 클라우드에서 자동으로 검사를 진행합니다.</p>
+<p><img loading="lazy" 
+    src="/t101-code-cloud/cloud188.png" 
+    alt="cloud188.png" 
+     
+    width=1164 
+    height="633"  /></p>
+<p>테라폼 클라우드에서 확인하면 plan 결과를 확인할 수 있습니다. Plan 이후 프로비저닝 작업은 화면 아래의 기능을 통해 진행하면 됩니다.</p>
+<p><img loading="lazy" 
+    src="/t101-code-cloud/cloud101.png" 
+    alt="cloud101.png" 
+     
+    width=915 
+    height="919"  /></p>
+<p><img loading="lazy" 
+    src="/t101-code-cloud/cloud102.png" 
+    alt="cloud102.png" 
+     
+    width=779 
+    height="436"  /></p>
+<h2 id="마치며">
+    <a href="#%eb%a7%88%ec%b9%98%eb%a9%b0" class="anchor">
+        <svg class="icon" aria-hidden="true" focusable="false" height="16" version="1.1" viewBox="0 0 16 16" width="16">
+            <path fill-rule="evenodd"
+                d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z">
+            </path>
+        </svg>
+    </a>
+    마치며
+</h2>
+<p>테라폼 클라우드 기능 엄청나네요. 코드로 인프라를 관리한다면 도입을 추천드립니다. 책 저자님의 예제 모듈 TF 코드도 예술 작품을 보는 느낌이였습니다. 코드 공유해주셔서 감사합니다. 역량 발전에 큰 도움이 되었습니다.</p>
+
+    </div>
+</div>
+
+<div class="container">
+    
+    <nav class="flex container suggested">
+        
+        <a rel="prev" href="/post/t101-multicluster-migration/" title="Previous post (older)">
+            <span>Previous</span>
+            [T1013] 테라폼을 활용한 EKS 클러스터 마이그레이션
+            </a>
+        
+        
+        
+    </nav>
+    
+</div>
+ 
+<div class="container">
+    
+    <script src="https://giscus.app/client.js" 
+        data-repo="WingLim/hugo-tania"
+        data-repo-id="MDEwOlJlcG9zaXRvcnkzMTYyNjQzMDc="
+        
+        data-category="Comments"
+        data-category-id="DIC_kwDOEtnPc84B_WKP"
+        
+        data-mapping="pathname"
+        data-reactions-enabled="1"
+        data-emit-metadata="0"
+        data-theme="light"
+        crossorigin="anonymous"
+        async
+        >
+</script>
+
+<script>
+    function setGiscusTeheme(theme) {
+        let giscus = document.querySelector('.giscus iframe');
+        if (giscus) {
+            giscus.contentWindow.postMessage(
+                {
+                    giscus: {
+                        setConfig: {
+                            theme: theme
+                        }
+                    }
+                },
+                'https://giscus.app'
+            )
+        }
+    }
+
+    addEventListener('message', event => {
+        if (event.origin !== 'https://giscus.app') return;
+        setGiscusTeheme(document.documentElement.dataset.userColorScheme)
+    });
+
+    window.addEventListener('onColorSchemeChange', (e) => {
+        setGiscusTeheme(e.detail)
+    })
+</script>
+
+</div>
+
+</main>
+
+
+        </main>
+        <footer class="footer flex">
+    <section class="container">
+        <nav class="footer-links">
+            
+            <a href="/index.xml">RSS</a>
+            
+        </nav>
+
+        
+    </section>
+    <script defer src="/ts/features.706a523ba43e6d0427c7fdf2b9d05dbd0920d3f12942b453690b495cb2522743.js" 
+    data-enable-footnotes="true"
+    ></script>
+</footer>
+
+    </body>
+</html>
