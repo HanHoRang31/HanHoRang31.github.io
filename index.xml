@@ -13,7 +13,7 @@
     <author>HanHoRnag</author>
     <guid>https://HanHoRang31.github.io/post/t101-code-cloud/</guid>
     <description>
-        &lt;p&gt;테라폼은 HCL(HashiCorp Configuration Language) 을 통해 인프라를 관리하고 프로비저닝합니다. HCL은 흡사 Go언어와 같이 반복문, 조건문, 함수가 제공되며 HCL 특유의 블록들이 구성되어 인프라를 코드로 관리할 수 있게 도와줍니다.  테라폼 기초 문법 이해로 책을 한 번 훏는 것을 추천드립니다.&lt;/p&gt;
+        &lt;p&gt;테라폼은 HCL(HashiCorp Configuration Language) 을 통해 인프라를 관리하고 프로비저닝합니다. HCL은 흡사 Go언어와 같이 반복문, 조건문, 함수가 제공되며 HCL 특유의 블록들이 구성되어 인프라를 코드로 관리할 수 있게 도와줍니다.  테라폼 기초 문법 이해로 책을 보는 것을 추천드립니다.&lt;/p&gt;
 &lt;p&gt;이번 포스트에서는 그 다음 단계로, 실무 예제를 통해 HCL 문법이 어떻게 사용되는지 살펴보겠습니다. 또한, Terraform Cloud를 이용하여 인프라를 프로비저닝하는 방법에 대해서도 알아보겠습니다. 실무 예제는 스터디 참고 책 9장(인프라 운영 및 관리)에서 소개해주는 EKS 모듈 예제로 선택하였습니다. 예제는 &lt;a href=&#34;https://github.com/terraform101/terraform-refactoring-and-modularity&#34;&gt;책 저자님의 레파지토리&lt;/a&gt;에서 확인이 가능합니다.&lt;/p&gt;
 &lt;h2 id=&#34;11-테라폼-모듈-이해&#34;&gt;
     &lt;a href=&#34;#11-%ed%85%8c%eb%9d%bc%ed%8f%bc-%eb%aa%a8%eb%93%88-%ec%9d%b4%ed%95%b4&#34; class=&#34;anchor&#34;&gt;
