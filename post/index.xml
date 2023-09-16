@@ -6,15 +6,24 @@
     <description>Recent content in Posts on HanHoRang Tech Blog</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <lastBuildDate>Wed, 06 Sep 2023 00:00:00 +0000</lastBuildDate><atom:link href="https://HanHoRang31.github.io/post/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Fri, 15 Sep 2023 00:00:00 +0000</lastBuildDate><atom:link href="https://HanHoRang31.github.io/post/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>[T1013] 테라폼 모듈로 EKS addon 관리하기</title>
+      <link>https://HanHoRang31.github.io/post/terraform-eks-addon/</link>
+      <pubDate>Fri, 15 Sep 2023 00:00:00 +0000</pubDate>
+      
+      <guid>https://HanHoRang31.github.io/post/terraform-eks-addon/</guid>
+      <description>1 2 3 T101 3기(=Terraform 101 Study)는 Terraform 실무 실습 스터디입니다. CloudNet@ 유형욱, 윤서율님이 진행하시며, 책 &amp;#34;테라폼으로 시작하는 IaC&amp;#34;을 기반으로 진행하고 있습니다. 지난 포스트 글에서는 테라폼 클라우드를 통해 EKS를 프로비저닝하였습니다. 프로비저닝은 EKS 모듈을 통해 진행하였는데요. 이번 글에서는 EKS 모듈에 대해 자세히 다뤄볼 예정입니다. 테라폼 레파지토리를 확인하면 EKS 모듈 사용 예제를 비롯하여 ALB 컨트롤러, External DNS와 같은 addon를 확인할 수 있습니다. 이번 글에서는 모듈 예제를 학습하고 EKS와 기본 addon을 프로비저닝하겠습니다. 구성 예제는 필자의 깃허브에서 확인이 가능합니다.</description>
+    </item>
+    
     <item>
       <title>[T1013] 코드로 보는 테라폼 문법과 테라폼 클라우드 프로비저닝</title>
       <link>https://HanHoRang31.github.io/post/t101-code-cloud/</link>
       <pubDate>Wed, 06 Sep 2023 00:00:00 +0000</pubDate>
       
       <guid>https://HanHoRang31.github.io/post/t101-code-cloud/</guid>
-      <description>테라폼은 HCL(HashiCorp Configuration Language) 을 통해 인프라를 관리하고 프로비저닝합니다. HCL은 흡사 Go언어와 같이 반복문, 조건문, 함수가 제공되며 HCL 특유의 블록들이 구성되어 인프라를 코드로 관리할 수 있게 도와줍니다. 테라폼 기초 문법 이해로 책을 보는 것을 추천드립니다.
-이번 포스트에서는 그 다음 단계로, 실무 예제를 통해 HCL 문법이 어떻게 사용되는지 살펴보겠습니다. 또한, Terraform Cloud를 이용하여 인프라를 프로비저닝하는 방법에 대해서도 알아보겠습니다. 실무 예제는 스터디 참고 책 9장(인프라 운영 및 관리)에서 소개해주는 EKS 모듈 예제로 선택하였습니다.</description>
+      <description>1 2 3 T101 3기(=Terraform 101 Study)는 Terraform 실무 실습 스터디입니다. CloudNet@ 유형욱, 윤서율님이 진행하시며, 책 &amp;#34;테라폼으로 시작하는 IaC&amp;#34;을 기반으로 진행하고 있습니다. 테라폼은 HCL(HashiCorp Configuration Language) 을 통해 인프라를 관리하고 프로비저닝합니다. HCL은 흡사 Go언어와 같이 반복문, 조건문, 함수가 제공되며 HCL 특유의 블록들이 구성되어 인프라를 코드로 관리할 수 있게 도와줍니다. 테라폼 기초 문법 이해로 책을 보는 것을 추천드립니다.
+이번 포스트에서는 그 다음 단계로, 실무 예제를 통해 HCL 문법이 어떻게 사용되는지 살펴보겠습니다.</description>
     </item>
     
     <item>
