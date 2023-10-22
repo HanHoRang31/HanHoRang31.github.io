@@ -1,0 +1,767 @@
+<!DOCTYPE html>
+<html lang="en-us">
+    
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="theme-color" content="dark">
+    <title>왜 서버가 지연될까? | HanHoRang Tech Blog</title>
+
+    
+    
+    
+    <meta property="og:site_name" content="HanHoRang Tech Blog by Tania in Hugo" />
+    <meta property="og:title" content="왜 서버가 지연될까? | HanHoRang Tech Blog"/>
+    <meta itemprop="name" content="왜 서버가 지연될까? | HanHoRang Tech Blog" />
+    <meta name="twitter:title" content="왜 서버가 지연될까? | HanHoRang Tech Blog" />
+    <meta name="application-name" content="왜 서버가 지연될까? | HanHoRang Tech Blog" /><meta name="twitter:card" content="summary"/>
+
+    <meta name="description" content="서버 리소스와 지표 확인하기" />
+    <meta name="twitter:description" content="서버 리소스와 지표 확인하기 "/>
+    <meta itemprop="description" content=" 서버 리소스와 지표 확인하기 "/>
+    <meta property="og:description" content=" 서버 리소스와 지표 확인하기 " />
+
+    
+
+<meta property="og:type" content="article" />
+<meta property="article:publisher" content="Hugo Tania" />
+<meta property="og:article:published_time" content=2023-10-15T00:00:00Z />
+<meta property="article:published_time" content=2023-10-15T00:00:00Z />
+
+
+  <meta property="og:article:author" content="Han ho rnag" />
+  <meta property="article:author" content="Han ho rnag" />
+  <meta name="author" content="Han ho rnag" />
+
+
+
+
+<script defer type="application/ld+json">
+  {
+    "@context": "http://schema.org",
+    "@type": "Article",
+    "headline": "왜 서버가 지연될까?",
+    "author": {
+      "@type": "Person",
+      "name": "Hugo Tania"
+    },
+    "datePublished": "2023-10-15",
+    "description": "서버 리소스와 지표 확인하기",
+    "wordCount":  1557 ,
+    "mainEntityOfPage": "True",
+    "dateModified": "2023-10-15",
+    "publisher": {
+      "@type": "Organization",
+      "name": "Hugo Tania",
+      "logo": {
+        "@type": "imageObject",
+        "url": "https:\/\/HanHoRang31.github.io\/favicon.ico"
+      }
+    }
+  }
+</script>
+
+
+
+    <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico" />
+    
+    <link rel="stylesheet" href="/sass/main.min.ab99ff095f832511e24ffb2fba2b51ad473b2f7e9301d674eba2c6c3a6e8bd81.css">
+    
+</head>
+    
+    <script>
+        (function() {
+            const colorSchemeKey = 'ThemeColorScheme';
+            if(!localStorage.getItem(colorSchemeKey)){
+                localStorage.setItem(colorSchemeKey, "auto");
+            }
+        })();
+    </script><script>
+    (function() {
+        const colorSchemeKey = 'ThemeColorScheme';
+        const colorSchemeItem = localStorage.getItem(colorSchemeKey);
+        const supportDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches === true;
+
+        if (colorSchemeItem == 'dark' || colorSchemeItem === 'auto' && supportDarkMode) {
+            
+
+            document.documentElement.dataset.userColorScheme = 'dark';
+        } else {
+            document.documentElement.dataset.userColorScheme = 'light';
+        }
+    })();
+</script>
+
+
+    <body class="dark">
+        <nav class="navbar">
+    <div class="container">
+        <div class="flex">
+            <div>
+                <a class="brand" href="/">
+                    
+                    
+                        <img src="/favicon.ico" />
+                    
+                    HanHoRang Tech Blog
+                    </a>
+            </div>
+            <div class="flex">
+                
+                <a href="/articles/">Articles</a>
+                
+                
+                    <button id="dark-mode-button">
+                    <svg class="light" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" aria-hidden="true" focusable="false" width="1em" height="1em" style="-ms-transform: rotate(360deg); -webkit-transform: rotate(360deg); transform: rotate(360deg);" preserveAspectRatio="xMidYMid meet" viewBox="0 0 36 36"><path fill="#FFD983" d="M30.312.776C32 19 20 32 .776 30.312c8.199 7.717 21.091 7.588 29.107-.429C37.9 21.867 38.03 8.975 30.312.776z"/><path d="M30.705 15.915a1.163 1.163 0 1 0 1.643 1.641a1.163 1.163 0 0 0-1.643-1.641zm-16.022 14.38a1.74 1.74 0 0 0 0 2.465a1.742 1.742 0 1 0 0-2.465zm13.968-2.147a2.904 2.904 0 0 1-4.108 0a2.902 2.902 0 0 1 0-4.107a2.902 2.902 0 0 1 4.108 0a2.902 2.902 0 0 1 0 4.107z" fill="#FFCC4D"/><rect x="0" y="0" width="36" height="36" fill="rgba(0, 0, 0, 0)" /></svg>
+                    <svg class="dark" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" aria-hidden="true" focusable="false" width="1em" height="1em" style="-ms-transform: rotate(360deg); -webkit-transform: rotate(360deg); transform: rotate(360deg);" preserveAspectRatio="xMidYMid meet" viewBox="0 0 36 36"><path fill="#FFD983" d="M16 2s0-2 2-2s2 2 2 2v2s0 2-2 2s-2-2-2-2V2zm18 14s2 0 2 2s-2 2-2 2h-2s-2 0-2-2s2-2 2-2h2zM4 16s2 0 2 2s-2 2-2 2H2s-2 0-2-2s2-2 2-2h2zm5.121-8.707s1.414 1.414 0 2.828s-2.828 0-2.828 0L4.878 8.708s-1.414-1.414 0-2.829c1.415-1.414 2.829 0 2.829 0l1.414 1.414zm21 21s1.414 1.414 0 2.828s-2.828 0-2.828 0l-1.414-1.414s-1.414-1.414 0-2.828s2.828 0 2.828 0l1.414 1.414zm-.413-18.172s-1.414 1.414-2.828 0s0-2.828 0-2.828l1.414-1.414s1.414-1.414 2.828 0s0 2.828 0 2.828l-1.414 1.414zm-21 21s-1.414 1.414-2.828 0s0-2.828 0-2.828l1.414-1.414s1.414-1.414 2.828 0s0 2.828 0 2.828l-1.414 1.414zM16 32s0-2 2-2s2 2 2 2v2s0 2-2 2s-2-2-2-2v-2z"/><circle fill="#FFD983" cx="18" cy="18" r="10"/><rect x="0" y="0" width="36" height="36" fill="rgba(0, 0, 0, 0)" /></svg>
+                    </button>
+                
+            </div>
+            </div>
+    </div>
+</nav>
+
+        <main>
+            
+<div class="container">
+    <article>
+        <header class="article-header">
+            <div class="thumb">
+                <div>
+                    <h1>왜 서버가 지연될까?</h1>
+                    <div class="post-meta">
+                        <div>
+                            
+                            
+                            By HanHoRnag | <time>October 15, 2023</time>
+                            | 8 minutes
+                        </div>
+                        <div class="tags">
+                            
+                            <a href="/tags/eks/">eks</a>
+                            
+                            <a href="/tags/cloud/">cloud</a>
+                            
+                            <a href="/tags/aws/">AWS</a>
+                            
+                            <a href="/tags/kubernetes/">kubernetes</a>
+                            
+                            <a href="/tags/prometheus/">prometheus</a>
+                            
+                            <a href="/tags/grafana/">grafana</a>
+                            
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </header>
+    </article>
+
+    <div class="article-post">
+    <p>금일 포스트 글에서는 이벤트 대응 프로세스 과정 중 성능 지연에 관해 다뤄보려 합니다. 서버 자원 중 CPU, 메모리, Disk 측면에서 서버 지연 원인, 지표, 처리 방안을 다뤄볼 예정입니다. 또한, 쿠버네티스(EKS) 환경에서 그라파나 대시보드를 통해 서버 지표를 확인할 예정입니다. 참고는 책 [Devops TroubleShooting] 2장을 참고하였습니다.</p>
+<h2 id="cpu-메모리-disk">
+    <a href="#cpu-%eb%a9%94%eb%aa%a8%eb%a6%ac-disk" class="anchor">
+        <svg class="icon" aria-hidden="true" focusable="false" height="16" version="1.1" viewBox="0 0 16 16" width="16">
+            <path fill-rule="evenodd"
+                d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z">
+            </path>
+        </svg>
+    </a>
+    CPU, 메모리, Disk
+</h2>
+<p>서버 지연을 위한 핵심 지표로 CPU, 메모리, 디스크 개념을 확인하겠습니다. (정리 ChatGPT)</p>
+<ol>
+<li>CPU (Central Processing Unit)
+<ul>
+<li>컴퓨터의 뇌와 같은 역할을 합니다.</li>
+<li>모든 계산과 처리를 담당하며, 프로그램의 명령어를 해석하고 실행합니다.</li>
+<li>CPU 단위로는 주파수와 코어가 있습니다. 주파수로는 MHz, GHz 단위로 표시되며 3.0 GHz의 CPU는 1초에 30억 번의 연산을 수행할 수 있습니다. 이와 반면 코어는 여러 작업을 동시에 처러할 수 있는 것을 뜻합니다. 대시보드에서 1.0 같이 정수로 표시되며 하나의 코어를 나타냅니다.</li>
+</ul>
+</li>
+<li>메모리 (RAM, Random Access Memory)
+<ul>
+<li>컴퓨터가 현재 실행 중인 프로그램과 데이터를 임시로 저장하는 공간입니다.</li>
+<li>전원을 끄면 저장된 정보는 사라집니다.</li>
+<li>접근 속도가 빠르기 때문에 컴퓨터의 작업 효율성을 높여줍니다.</li>
+<li>RAM 용량은 보통 GB 로 표시됩니다. 속도는 메모리 기술 사양(DDR3, DDR4) 등의 달라지며 주파수에 따라 달라집니다.</li>
+</ul>
+</li>
+<li>DISK (하드 드라이브 또는 SSD)
+<ul>
+<li>데이터를 영구적으로 저장하는 장치입니다.</li>
+<li>전원을 꺼도 저장된 데이터는 유지됩니다.</li>
+<li>하드 드라이브는 기계적인 구동 방식을 가지며, SSD는 반도체를 사용하여 더 빠른 접근 속도를 제공합니다.</li>
+<li>DISK 용량은 주로 GB, TB단위로 표시됩니다. HDD(하드디스크는) RPM(회전속도)로 속도를 나타내며 5400RPM, 7200RPM 로 표시되며, SSD 는 읽기/쓰기 속도를 MB/s 단위로 나타냅니다.</li>
+</ul>
+</li>
+</ol>
+<p>이 핵심 지표들은 서로 유기적으로 운영됩니다.</p>
+<p><img loading="lazy" 
+    src="/why-server-slow/re1.png" 
+    alt="&lt;a href=&#34;https://www.geeksforgeeks.org/cache-memory-in-computer-organization/&#34;&gt;https://www.geeksforgeeks.org/cache-memory-in-computer-organization/&lt;/a&gt;" 
+     
+    width=783 
+    height="239"  /></p>
+<p><a href="https://www.geeksforgeeks.org/cache-memory-in-computer-organization/">https://www.geeksforgeeks.org/cache-memory-in-computer-organization/</a></p>
+<ul>
+<li>Chche Memory 는 CPU 내부에 위치하며 매우 빠른 속도의 소량의 메모리입니다. 그 목적은 CPU가 데이터에 더 빠르게 접근하도록 돕는 메모리입니다.</li>
+<li>Primay Memory 는 RAM, Seconadry Memory 는 DISK 입니다.</li>
+<li></li>
+</ul>
+<p>컴퓨팅 운영 시나리오 보자면 다음과 같습니다.</p>
+<ol>
+<li>DISK에 모든 데이터와 프로그램이 저장됩니다.</li>
+<li>컴퓨터가 프로그램을 실행하거나 파일을 열 때, 해당 데이터는 빠르게 접근할 수 있는 메모리(RAM)로 이동합니다.</li>
+<li>CPU는 메모리에 저장된 데이터를 바로 처리합니다. 처리된 결과는 필요에 따라 다시 DISK에 저장될 수 있습니다.</li>
+</ol>
+<h3 id="지연이-일어나면-어떻게-될까">
+    <a href="#%ec%a7%80%ec%97%b0%ec%9d%b4-%ec%9d%bc%ec%96%b4%eb%82%98%eb%a9%b4-%ec%96%b4%eb%96%bb%ea%b2%8c-%eb%90%a0%ea%b9%8c" class="anchor">
+        <svg class="icon" aria-hidden="true" focusable="false" height="16" version="1.1" viewBox="0 0 16 16" width="16">
+            <path fill-rule="evenodd"
+                d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z">
+            </path>
+        </svg>
+    </a>
+    지연이 일어나면 어떻게 될까?
+</h3>
+<p>서버 운영 중 지연이 일어난다면 무엇을 확인해야 할까요? 세부 포지션마다 지연 원인을 찾는 방법이 다를 것 입니다. 참고 서적에서는 포지션별로 지연 원인을 찾는 행동에 대해 분석하여 정리하였습니다.</p>
+<ul>
+<li>개발자라면 최근에 체크인한 코드가 예전보다 훨씬 느리게 실행되는지 추적</li>
+<li>품질보증 엔지니어라면 운영환경으로 이관되기 전 부하 테스트 수행</li>
+<li>시스템 관리자는 지표 확인 후 더 많은 시스템 자원 구입</li>
+</ul>
+<p>많이 공감이 되는 내용입니다. 보통의 경우 지연이 발생한다면 git 히스토리와 알람이 설정된 지표를 확인하겠죠? 이 중에서 지표를 세부적으로 확인해보겠습니다.</p>
+<h2 id="서버-지표-확인">
+    <a href="#%ec%84%9c%eb%b2%84-%ec%a7%80%ed%91%9c-%ed%99%95%ec%9d%b8" class="anchor">
+        <svg class="icon" aria-hidden="true" focusable="false" height="16" version="1.1" viewBox="0 0 16 16" width="16">
+            <path fill-rule="evenodd"
+                d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z">
+            </path>
+        </svg>
+    </a>
+    서버 지표 확인
+</h2>
+<p>리눅스 서버에서 명령어를 통해 지표를 확인해보겠습니다. 해당 명령어와 내용은 참고 책을 확인하였습니다.</p>
+<h3 id="cpu-지표">
+    <a href="#cpu-%ec%a7%80%ed%91%9c" class="anchor">
+        <svg class="icon" aria-hidden="true" focusable="false" height="16" version="1.1" viewBox="0 0 16 16" width="16">
+            <path fill-rule="evenodd"
+                d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z">
+            </path>
+        </svg>
+    </a>
+    CPU 지표
+</h3>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">$ uptime 
+</span></span><span class="line"><span class="cl">12:34:56 up <span class="m">2</span> days, 14:03,  <span class="m">2</span> users,  load average: 0.12, 0.15, 0.09
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>일반적으로 1분, 5분, 15분 동안의 평균 부하를 나타냅니다.</p>
+<ul>
+<li><code>0.12</code>: 지난 1분 동안의 평균 부하</li>
+<li><code>0.15</code>: 지난 5분 동안의 평균 부하</li>
+<li><code>0.09</code>: 지난 15분 동안의 평균 부하</li>
+</ul>
+<p>평균 부하는 시스템의 전반적인 부하를 나타내며, CPU, 디스크 I/O, 네트워크 I/O 등 여러 요소가 포함됩니다. 즉, 평균 부하는 시스템에 대기 중인 작업의 평균 수를 나타내는 지표입니다.</p>
+<h3 id="메모리-지표">
+    <a href="#%eb%a9%94%eb%aa%a8%eb%a6%ac-%ec%a7%80%ed%91%9c" class="anchor">
+        <svg class="icon" aria-hidden="true" focusable="false" height="16" version="1.1" viewBox="0 0 16 16" width="16">
+            <path fill-rule="evenodd"
+                d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z">
+            </path>
+        </svg>
+    </a>
+    메모리 지표
+</h3>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">$ top -b- -n <span class="m">1</span> 
+</span></span><span class="line"><span class="cl">15:20:01 up <span class="m">10</span> days,  5:43,  <span class="m">1</span> user,  load average: 0.00, 0.01, 0.05
+</span></span><span class="line"><span class="cl">Tasks: <span class="m">193</span> total,   <span class="m">1</span> running, <span class="m">192</span> sleeping,   <span class="m">0</span> stopped,   <span class="m">0</span> zombie
+</span></span><span class="line"><span class="cl">%Cpu<span class="o">(</span>s<span class="o">)</span>:  2.0 us,  1.0 sy,  0.0 ni, 97.0 id,  0.0 wa,  0.0 hi,  0.0 si,  0.0 st
+</span></span><span class="line"><span class="cl">MiB Mem :  15936.8 total,   997408k used,   26768k free,  85520k buff
+</span></span><span class="line"><span class="cl">MiB Swap:   2048.0 total,   4360k used,     999692k free.  286040k cached
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">  PID USER      PR  NI    VIRT    RES    SHR S  %CPU  %MEM     TIME+ COMMAND
+</span></span><span class="line"><span class="cl"> <span class="m">1234</span> user1     <span class="m">20</span>   <span class="m">0</span>  <span class="m">162148</span>   <span class="m">2480</span>   <span class="m">1576</span> R  12.5   0.1   0:00.30 top
+</span></span><span class="line"><span class="cl">  <span class="m">101</span> root      <span class="m">20</span>   <span class="m">0</span>       <span class="m">0</span>      <span class="m">0</span>      <span class="m">0</span> S   6.2   0.0  42:18.20 kworker/u8:2
+</span></span><span class="line"><span class="cl"> <span class="m">7890</span> user2     <span class="m">20</span>   <span class="m">0</span>  <span class="m">453672</span>  <span class="m">26920</span>  <span class="m">16540</span> S   6.2   0.2   7:31.22 gnome-shell
+</span></span><span class="line"><span class="cl"> <span class="m">5678</span> root      <span class="m">20</span>   <span class="m">0</span>       <span class="m">0</span>      <span class="m">0</span>      <span class="m">0</span> I   0.1   0.0   0:15.17 rcu_sched
+</span></span><span class="line"><span class="cl"> <span class="m">9101</span> user1     <span class="m">20</span>   <span class="m">0</span>  <span class="m">722040</span>  <span class="m">43164</span>  <span class="m">30636</span> S   0.1   0.3   0:43.21 python3
+</span></span></code></pre></td></tr></table>
+</div>
+</div><ul>
+<li>높은 프로세스 제거를 원할시 <code>k</code> 를 누르고 PID 입력, 메모리 정렬은 M 키를 입력하면 됩니다.</li>
+<li>Mem은 RAM, Swap은 파일 캐시량을 뜻합니다. 사용 가능한 메모리가 26768k 가 없기때문에 고갈된 것으로 모이나 리눅스 파일 캐시를 생각해야합니다. 파일에서 RAM으로 불러오고 실행을 완료했다하더라고 제거하지 않습니다. 정확한 판단을 위해 997408k의 RAM 사용량과 286040 리눅스 파일 캐시로 사용된 것을 확인해야 합니다. 실제로는 711368(RAM 사용량-리눅스 파일캐시) 의 RAM이 사용된 것 입니다.</li>
+<li>RAM이 고갈되면 OOM Killer 발생하여 다른 프로세스 종료시킬 수 있습니다. 이 경우, /var/log/sys/log에서 out of memory: killed process 로 로그가 찍혀야 합니다.</li>
+</ul>
+<h3 id="disk-io-지표">
+    <a href="#disk-io-%ec%a7%80%ed%91%9c" class="anchor">
+        <svg class="icon" aria-hidden="true" focusable="false" height="16" version="1.1" viewBox="0 0 16 16" width="16">
+            <path fill-rule="evenodd"
+                d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z">
+            </path>
+        </svg>
+    </a>
+    DISK IO 지표
+</h3>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span><span class="lnt">8
+</span><span class="lnt">9
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">$ iostat
+</span></span><span class="line"><span class="cl">Linux 4.15.0-96-generic <span class="o">(</span>ubuntu<span class="o">)</span> 	Thursday <span class="m">14</span> May <span class="m">2020</span> 	_x86_64_	<span class="o">(</span><span class="m">2</span> CPU<span class="o">)</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">avg-cpu:  %user   %nice %system %iowait  %steal   %idle
+</span></span><span class="line"><span class="cl">          16.52    0.01    4.23    0.21    0.00   79.03
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">Device            tps    kB_read/s    kB_wrtn/s    kB_read    kB_wrtn
+</span></span><span class="line"><span class="cl">sda             44.07       678.92       256.73  <span class="m">123456789</span>   <span class="m">98765432</span>
+</span></span><span class="line"><span class="cl">sdb              5.91        56.72        43.97   <span class="m">12345678</span>    <span class="m">8765432</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>여기서 파티션 별로 구분하여 파악, 읽기 쓰기 작업 확인해야 합니다. 또한, 디스크별 정렬도 가능합니다.</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span><span class="lnt">8
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">$ iotop
+</span></span><span class="line"><span class="cl">Total DISK READ: 0.00 B/s <span class="p">|</span> Total DISK WRITE: 218.73 K/s
+</span></span><span class="line"><span class="cl">TID  PRIO  USER     DISK READ  DISK WRITE  SWAPIN     IO&gt;    COMMAND  
+</span></span><span class="line"><span class="cl">  <span class="m">1</span> be/4 root        0.00 B/s    0.00 B/s  0.00 %  0.00 % init      
+</span></span><span class="line"><span class="cl">  <span class="m">2</span> be/4 root        0.00 B/s    0.00 B/s  0.00 %  0.00 % <span class="o">[</span>kthreadd<span class="o">]</span>
+</span></span><span class="line"><span class="cl">  <span class="m">3</span> be/4 root        0.00 B/s    0.00 B/s  0.00 %  0.00 % <span class="o">[</span>ksoftirqd/0<span class="o">]</span>
+</span></span><span class="line"><span class="cl"><span class="m">100</span> be/4 mysql       0.00 B/s  112.36 K/s  0.00 %  2.17 % mysqld
+</span></span><span class="line"><span class="cl"><span class="m">200</span> be/4 apache      0.00 B/s   56.18 K/s  0.00 %  1.08 % httpd
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h3 id="리눅스-서버-지표-기록은-어떻게-해야하나">
+    <a href="#%eb%a6%ac%eb%88%85%ec%8a%a4-%ec%84%9c%eb%b2%84-%ec%a7%80%ed%91%9c-%ea%b8%b0%eb%a1%9d%ec%9d%80-%ec%96%b4%eb%96%bb%ea%b2%8c-%ed%95%b4%ec%95%bc%ed%95%98%eb%82%98" class="anchor">
+        <svg class="icon" aria-hidden="true" focusable="false" height="16" version="1.1" viewBox="0 0 16 16" width="16">
+            <path fill-rule="evenodd"
+                d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z">
+            </path>
+        </svg>
+    </a>
+    리눅스 서버 지표 기록은 어떻게 해야하나?
+</h3>
+<p>sysstat 패키지로 기록이 가능합니다.  패키지 설치시 /etc/default/sysstat 파일을 편집해서 ENABLE=’False’ 를 ‘true’ 로 변경하면 되며, 변경 기록은 /var/log/sysstat 이나 /var/log/sa 에 기록됩니다.</p>
+<p>기록된 정보는 $ sar 로 확인 가능합니다.</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="cl"><span class="n">sar</span> <span class="o">-</span><span class="n">r</span><span class="p">(</span><span class="n">ram</span><span class="p">)</span> <span class="o">-</span><span class="n">b</span> <span class="p">(</span><span class="n">디스크</span> <span class="n">IO</span><span class="p">)</span> <span class="o">-</span><span class="n">A</span><span class="p">(</span><span class="n">모든</span> <span class="n">정보</span><span class="p">)</span> <span class="o">-</span><span class="n">s</span> <span class="mi">20</span><span class="p">:</span><span class="mi">00</span><span class="p">:</span><span class="mi">00</span> <span class="o">-</span><span class="n">e</span> <span class="mi">20</span><span class="p">:</span><span class="mi">30</span><span class="p">:</span><span class="mi">00</span> <span class="p">(</span><span class="n">시간</span> <span class="n">설정</span><span class="p">)</span> 
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h3 id="각-리소스가-고갈된다면-">
+    <a href="#%ea%b0%81-%eb%a6%ac%ec%86%8c%ec%8a%a4%ea%b0%80-%ea%b3%a0%ea%b0%88%eb%90%9c%eb%8b%a4%eb%a9%b4-" class="anchor">
+        <svg class="icon" aria-hidden="true" focusable="false" height="16" version="1.1" viewBox="0 0 16 16" width="16">
+            <path fill-rule="evenodd"
+                d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z">
+            </path>
+        </svg>
+    </a>
+    각 리소스가 고갈된다면 ?
+</h3>
+<p>CPU, 메모리, DIsk 의 리소스가 고갈된다면 시스템에서 발생하는 현상은 다음과 같습니다.</p>
+<ol>
+<li>CPU 고갈 : 시스템 응답 시간이 느려지며, 프로세스가 대기 상태로 전환되어 작업처리가 지연됩니다.</li>
+<li>메모리 고갈 : 메모리 부족으로 프로세스가 강제 종료된다(OOM Killer), 스왑 영역이 사용되면서 시스템 성능이 저하 됩니다.</li>
+<li>디스크 고갈 : 새로운 파일 생성할 수 없으며 시스템에 따라 파드가 종료(eviction)될 수 있습니다.</li>
+</ol>
+<p>고갈되었을 때의 대응 방안으로는 기존의 불필요할 리소스를 삭제하거나, 새로운 리소스를 추가 증량하면 됩니다.</p>
+<h2 id="쿠버네티스에서-지표-확인">
+    <a href="#%ec%bf%a0%eb%b2%84%eb%84%a4%ed%8b%b0%ec%8a%a4%ec%97%90%ec%84%9c-%ec%a7%80%ed%91%9c-%ed%99%95%ec%9d%b8" class="anchor">
+        <svg class="icon" aria-hidden="true" focusable="false" height="16" version="1.1" viewBox="0 0 16 16" width="16">
+            <path fill-rule="evenodd"
+                d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z">
+            </path>
+        </svg>
+    </a>
+    쿠버네티스에서 지표 확인
+</h2>
+<p>쿠버네티스에서는 리눅스 서버의 지표와는 비슷하면서도 다릅니다. 쿠버네티스에서는 서버가 노드로 표시되며 각 애플리케이션은 각 파드에 할당되기 때문입니다. 애플리케이션이 서버가 아닌 파드로 운영되기에 쿠버네피스 관련 지표확인이 필요합니다. 쿠버네티스에서는 각 서버에 지표 확인을 위한 컴포넌트를 배포하는데요. 주요 컴포넌트를 통해 지표를 다양하게 확인할 수 있습니다. 노드 운영체제가 윈도우인 경우에는 <a href="https://github.com/prometheus-community/windows_exporter">windows exporter</a>,  NVIDIA GPU 지표인 경우 <a href="https://github.com/NVIDIA/dcgm-exporter">prometheus-dcgm</a> 확인을 추천드립니다. 이번 글에서는 대표 컴포넌트인 node-exporter 와 kube-state-metrics을 확인하겠습니다.</p>
+<h2 id="1--prometheus-node-exporter">
+    <a href="#1--prometheus-node-exporter" class="anchor">
+        <svg class="icon" aria-hidden="true" focusable="false" height="16" version="1.1" viewBox="0 0 16 16" width="16">
+            <path fill-rule="evenodd"
+                d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z">
+            </path>
+        </svg>
+    </a>
+    1.  Prometheus-node-exporter
+</h2>
+<p>시스템 메트릭을 수집하는 역할을 하는 소프트웨어입니다. Prometheus 모니터링 플랫폼의 일부로서 동작하며 노드에서 시스템 지표를 추출하고 Prometheus 서버가 쉽게 수집할 수 있는 형태로 제공합니다. node-exporter는 collector를 통해 지표를 수집합니다. 이를 통해 확인할 수 있는 지표는 다양합니다.</p>
+<p>시스템 외부 상태, 계층별 네트워크, CPU, 메모리, 디스크, 파일시스템, OS 지표등을 확인할 수 있습니다.또한, 시스템 커널 파라미터 지표(perf, sysctl) 도 제공됩니다. 이를 통해 시스템 및 애플리케이션 성능을 분석하는데 사용되지만 추가 작업이 필요합니다.  각 분야별로 세부 지표(가상 메모리 사용, ZFS, XFS 등..) 가 다양하게 제공됩니다. 자세한 내용은 공식 문서를 참고해주세요.</p>
+<p>수집된 지표들은 프로메테우스를 통해 확인할 수 있습니다.</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="cl"><span class="c1"># sysctl, TCP 소켓 수신 버퍼 </span>
+</span></span><span class="line"><span class="cl"><span class="c1"># 최소 버퍼 크기 (4KB)</span>
+</span></span><span class="line"><span class="cl"><span class="n">node_sysctl_net_ipv4_tcp_rmem</span><span class="p">{</span><span class="n">index</span><span class="o">=</span><span class="s2">&#34;0&#34;</span><span class="p">}</span> <span class="mi">4096</span>
+</span></span><span class="line"><span class="cl"><span class="c1"># 기본 버퍼 크기 (128 KB)</span>
+</span></span><span class="line"><span class="cl"><span class="n">node_sysctl_net_ipv4_tcp_rmem</span><span class="p">{</span><span class="n">index</span><span class="o">=</span><span class="s2">&#34;1&#34;</span><span class="p">}</span> <span class="mi">131072</span>
+</span></span><span class="line"><span class="cl"><span class="c1"># 최대 크기 버퍼 (6 MB) </span>
+</span></span><span class="line"><span class="cl"><span class="n">node_sysctl_net_ipv4_tcp_rmem</span><span class="p">{</span><span class="n">index</span><span class="o">=</span><span class="s2">&#34;2&#34;</span><span class="p">}</span> <span class="mi">6291456</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h2 id="2-kube-state-metrics">
+    <a href="#2-kube-state-metrics" class="anchor">
+        <svg class="icon" aria-hidden="true" focusable="false" height="16" version="1.1" viewBox="0 0 16 16" width="16">
+            <path fill-rule="evenodd"
+                d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z">
+            </path>
+        </svg>
+    </a>
+    2. kube-state-metrics
+</h2>
+<p>쿠버네티스 클러스터 내 오브젝트 상태에 대한 메트릭을 생성하는 컴포넌트입니다. 프로메테우스와 같은 모니터링 시스템에서 사용하기 위한 메트릭을 제공합니다.  쿠버네티스 오브젝트 단위(node, pod, service, deployment 등..) 정말 다양한데요. 이를 통해 쿠버네티스 클러스터의 상태, 성능 및 운영 효율성을 관리하고 최적화하는데 사용됩니다.</p>
+<aside>
+❓ 어떤 메트릭을 모니터링 해야할까
+<p>간단한 대답은 ‘모두’ 이지만, 메트릭이 너무 많으면 중요한 신호를 발견하기 어렵습니다! 따라서 계층적 방식으로 접근을 추천합니다.</p>
+<p>[계층적 방식]</p>
+<ol>
+<li>물리적 혹은 가상의 노드 ( CPU, 메모리, 네트워크, 디스크 사용률)</li>
+<li>클러스터 컴포넌트 (etcd 레이턴시)</li>
+<li>클러스터 추가 기능 (HPA, 인그래스 컨트롤러)</li>
+<li>최종 사용자 애플리케이션</li>
+</ol>
+</aside>
+<h3 id="대시보드를-통한-지표-확인">
+    <a href="#%eb%8c%80%ec%8b%9c%eb%b3%b4%eb%93%9c%eb%a5%bc-%ed%86%b5%ed%95%9c-%ec%a7%80%ed%91%9c-%ed%99%95%ec%9d%b8" class="anchor">
+        <svg class="icon" aria-hidden="true" focusable="false" height="16" version="1.1" viewBox="0 0 16 16" width="16">
+            <path fill-rule="evenodd"
+                d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z">
+            </path>
+        </svg>
+    </a>
+    대시보드를 통한 지표 확인
+</h3>
+<p>위에서 확인한 컴포넌트의 지표들은 kube-prometheus-stack를 통해 손쉽게 가능합니다. EKS에서 kube-prometheus-stack을 배포하고 대시보드인 grafana을 통해 지표를 확인하겠습니다.</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span><span class="lnt">31
+</span><span class="lnt">32
+</span><span class="lnt">33
+</span><span class="lnt">34
+</span><span class="lnt">35
+</span><span class="lnt">36
+</span><span class="lnt">37
+</span><span class="lnt">38
+</span><span class="lnt">39
+</span><span class="lnt">40
+</span><span class="lnt">41
+</span><span class="lnt">42
+</span><span class="lnt">43
+</span><span class="lnt">44
+</span><span class="lnt">45
+</span><span class="lnt">46
+</span><span class="lnt">47
+</span><span class="lnt">48
+</span><span class="lnt">49
+</span><span class="lnt">50
+</span><span class="lnt">51
+</span><span class="lnt">52
+</span><span class="lnt">53
+</span><span class="lnt">54
+</span><span class="lnt">55
+</span><span class="lnt">56
+</span><span class="lnt">57
+</span><span class="lnt">58
+</span><span class="lnt">59
+</span><span class="lnt">60
+</span><span class="lnt">61
+</span><span class="lnt">62
+</span><span class="lnt">63
+</span><span class="lnt">64
+</span><span class="lnt">65
+</span><span class="lnt">66
+</span><span class="lnt">67
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
+</span></span><span class="line"><span class="cl">helm repo update
+</span></span><span class="line"><span class="cl">helm fetch prometheus-community/kube-prometheus-stack --untar --version 45.7.1
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">cat <span class="s">&lt;&lt;EOT &gt; ./values-kube-prometheus-stack.yaml
+</span></span></span><span class="line"><span class="cl"><span class="s">alertmanager:
+</span></span></span><span class="line"><span class="cl"><span class="s">  enabled: false 
+</span></span></span><span class="line"><span class="cl"><span class="s">
+</span></span></span><span class="line"><span class="cl"><span class="s">grafana:
+</span></span></span><span class="line"><span class="cl"><span class="s">  defaultDashboardsTimezone: Asia/Seoul
+</span></span></span><span class="line"><span class="cl"><span class="s">  adminPassword: admin1234
+</span></span></span><span class="line"><span class="cl"><span class="s">
+</span></span></span><span class="line"><span class="cl"><span class="s">  ingress:
+</span></span></span><span class="line"><span class="cl"><span class="s">    enabled: true
+</span></span></span><span class="line"><span class="cl"><span class="s">    ingressClassName: alb
+</span></span></span><span class="line"><span class="cl"><span class="s">
+</span></span></span><span class="line"><span class="cl"><span class="s">    annotations:
+</span></span></span><span class="line"><span class="cl"><span class="s">      alb.ingress.kubernetes.io/scheme: internet-facing
+</span></span></span><span class="line"><span class="cl"><span class="s">      alb.ingress.kubernetes.io/target-type: ip
+</span></span></span><span class="line"><span class="cl"><span class="s">      alb.ingress.kubernetes.io/listen-ports: &#39;[{&#34;HTTPS&#34;:443}, {&#34;HTTP&#34;:80}]&#39;
+</span></span></span><span class="line"><span class="cl"><span class="s">      alb.ingress.kubernetes.io/certificate-arn: $CERT_ARN
+</span></span></span><span class="line"><span class="cl"><span class="s">      alb.ingress.kubernetes.io/success-codes: 200-399
+</span></span></span><span class="line"><span class="cl"><span class="s">      alb.ingress.kubernetes.io/group.name: &#34;monitoring&#34;
+</span></span></span><span class="line"><span class="cl"><span class="s">
+</span></span></span><span class="line"><span class="cl"><span class="s">    hosts:
+</span></span></span><span class="line"><span class="cl"><span class="s">      - grafana.$KOPS_CLUSTER_NAME
+</span></span></span><span class="line"><span class="cl"><span class="s">
+</span></span></span><span class="line"><span class="cl"><span class="s">    paths:
+</span></span></span><span class="line"><span class="cl"><span class="s">      - /*
+</span></span></span><span class="line"><span class="cl"><span class="s">
+</span></span></span><span class="line"><span class="cl"><span class="s">prometheus:
+</span></span></span><span class="line"><span class="cl"><span class="s">   # 사이드카 노출 서비스 설정
+</span></span></span><span class="line"><span class="cl"><span class="s">  thanosService:
+</span></span></span><span class="line"><span class="cl"><span class="s">    enabled: true
+</span></span></span><span class="line"><span class="cl"><span class="s">
+</span></span></span><span class="line"><span class="cl"><span class="s">  ingress:
+</span></span></span><span class="line"><span class="cl"><span class="s">    enabled: true
+</span></span></span><span class="line"><span class="cl"><span class="s">    ingressClassName: alb
+</span></span></span><span class="line"><span class="cl"><span class="s">
+</span></span></span><span class="line"><span class="cl"><span class="s">    annotations:
+</span></span></span><span class="line"><span class="cl"><span class="s">      alb.ingress.kubernetes.io/scheme: internet-facing
+</span></span></span><span class="line"><span class="cl"><span class="s">      alb.ingress.kubernetes.io/target-type: ip
+</span></span></span><span class="line"><span class="cl"><span class="s">      alb.ingress.kubernetes.io/listen-ports: &#39;[{&#34;HTTPS&#34;:443}, {&#34;HTTP&#34;:80}]&#39;
+</span></span></span><span class="line"><span class="cl"><span class="s">      alb.ingress.kubernetes.io/certificate-arn: $CERT_ARN
+</span></span></span><span class="line"><span class="cl"><span class="s">      alb.ingress.kubernetes.io/success-codes: 200-399
+</span></span></span><span class="line"><span class="cl"><span class="s">      alb.ingress.kubernetes.io/group.name: &#34;monitoring&#34;
+</span></span></span><span class="line"><span class="cl"><span class="s">
+</span></span></span><span class="line"><span class="cl"><span class="s">    hosts:
+</span></span></span><span class="line"><span class="cl"><span class="s">      - prometheus.$KOPS_CLUSTER_NAME
+</span></span></span><span class="line"><span class="cl"><span class="s">
+</span></span></span><span class="line"><span class="cl"><span class="s">    paths:
+</span></span></span><span class="line"><span class="cl"><span class="s">      - /*
+</span></span></span><span class="line"><span class="cl"><span class="s">
+</span></span></span><span class="line"><span class="cl"><span class="s">  prometheusSpec:
+</span></span></span><span class="line"><span class="cl"><span class="s">    podMonitorSelectorNilUsesHelmValues: false
+</span></span></span><span class="line"><span class="cl"><span class="s">    serviceMonitorSelectorNilUsesHelmValues: false
+</span></span></span><span class="line"><span class="cl"><span class="s">    retention: 5d
+</span></span></span><span class="line"><span class="cl"><span class="s">    retentionSize: &#34;10GiB&#34;
+</span></span></span><span class="line"><span class="cl"><span class="s">    scrapeInterval: &#34;15s&#34;
+</span></span></span><span class="line"><span class="cl"><span class="s">    # alert 관련 설정으로 주석 처리 
+</span></span></span><span class="line"><span class="cl"><span class="s">    # evaluationInterval: 15s
+</span></span></span><span class="line"><span class="cl"><span class="s">EOT</span> 
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">kubectl create ns monitoring
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">helm install kube-prometheus-stack prometheus-community/kube-prometheus-stack --version 45.7.1 <span class="se">\
+</span></span></span><span class="line"><span class="cl"><span class="se"></span>-f values-kube-prometheus-stack.yaml --namespace monitoring
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p><img loading="lazy" 
+    src="/why-server-slow/grafana3.png" 
+    alt="grafana3.png" 
+     
+    width=1150 
+    height="525"  /></p>
+<p>대시보드를 확인하면 해당 컴포넌트를 통해 시각화된 대시보드를 확인할 수 있습니다. 다만, 확인해야할 대시보드와 지표가 너무 많은데요. 어떤 것을 알람을 해야할지 어떤 지표를 확인해야할 지 감이 안오실 것입니다. 이 부분은 기본 알람을 통해 일부 해소를 할 수 있는데요. kube-prometheus-stack 의 default alram을 확인하면 219개의 룰이 설정되어 있습니다. 룰 안에는 쿠버네티스 컴포넌트 별로의 설정 알람과 리소스 알람, 쿠버네티스 오브젝트별 알람을 확인할 수 있습니다.</p>
+<ul>
+<li>
+<p>node-exporter 와 kube-state-metrics 알람</p>
+<p><img loading="lazy" 
+    src="/why-server-slow/alarm2.png" 
+    alt="alarm2.png" 
+     
+    width=1419 
+    height="954"  /></p>
+<p><img loading="lazy" 
+    src="/why-server-slow/alram1.png" 
+    alt="alram1.png" 
+     
+    width=1409 
+    height="951"  /></p>
+</li>
+<li>
+<p>리소스 알람</p>
+<p><img loading="lazy" 
+    src="/why-server-slow/resourc2.png" 
+    alt="resourc2.png" 
+     
+    width=1419 
+    height="793"  /></p>
+<p><img loading="lazy" 
+    src="/why-server-slow/resource1.png" 
+    alt="resource1.png" 
+     
+    width=1402 
+    height="948"  /></p>
+</li>
+</ul>
+<h2 id="마치며">
+    <a href="#%eb%a7%88%ec%b9%98%eb%a9%b0" class="anchor">
+        <svg class="icon" aria-hidden="true" focusable="false" height="16" version="1.1" viewBox="0 0 16 16" width="16">
+            <path fill-rule="evenodd"
+                d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z">
+            </path>
+        </svg>
+    </a>
+    마치며
+</h2>
+<p>서버 지연을 확인하기 위해 지표를 시스템별로 확인하였습니다. 트러블슈팅 과정에서 지표 확인은 시작 단계입니다. 한마디로 지표만 확인하고 끝이 아니라 지표를 시작으로 원인 분석을 들어가야 합니다. 예를 들어 지표 확인 후 이슈 있는 애플리케이션의 로그 확인하거나 트레이싱을 확인해야 합니다.</p>
+
+    </div>
+</div>
+
+<div class="container">
+    
+    <nav class="flex container suggested">
+        
+        <a rel="prev" href="/post/locust-test/" title="Previous post (older)">
+            <span>Previous</span>
+            Locust를 이용한 과부하 테스트
+            </a>
+        
+        
+        
+    </nav>
+    
+</div>
+ 
+<div class="container">
+    
+    <script src="https://giscus.app/client.js" 
+        data-repo="WingLim/hugo-tania"
+        data-repo-id="MDEwOlJlcG9zaXRvcnkzMTYyNjQzMDc="
+        
+        data-category="Comments"
+        data-category-id="DIC_kwDOEtnPc84B_WKP"
+        
+        data-mapping="pathname"
+        data-reactions-enabled="1"
+        data-emit-metadata="0"
+        data-theme="light"
+        crossorigin="anonymous"
+        async
+        >
+</script>
+
+<script>
+    function setGiscusTeheme(theme) {
+        let giscus = document.querySelector('.giscus iframe');
+        if (giscus) {
+            giscus.contentWindow.postMessage(
+                {
+                    giscus: {
+                        setConfig: {
+                            theme: theme
+                        }
+                    }
+                },
+                'https://giscus.app'
+            )
+        }
+    }
+
+    addEventListener('message', event => {
+        if (event.origin !== 'https://giscus.app') return;
+        setGiscusTeheme(document.documentElement.dataset.userColorScheme)
+    });
+
+    window.addEventListener('onColorSchemeChange', (e) => {
+        setGiscusTeheme(e.detail)
+    })
+</script>
+
+</div>
+
+</main>
+
+
+        </main>
+        <footer class="footer flex">
+    <section class="container">
+        <nav class="footer-links">
+            
+            <a href="/index.xml">RSS</a>
+            
+        </nav>
+
+        
+    </section>
+    <script defer src="/ts/features.706a523ba43e6d0427c7fdf2b9d05dbd0920d3f12942b453690b495cb2522743.js" 
+    data-enable-footnotes="true"
+    ></script>
+</footer>
+
+    </body>
+</html>

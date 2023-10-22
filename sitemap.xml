@@ -6,31 +6,40 @@
     <lastmod>2023-03-05T00:00:00+00:00</lastmod>
   </url><url>
     <loc>https://HanHoRang31.github.io/</loc>
-    <lastmod>2023-10-01T00:00:00+00:00</lastmod>
+    <lastmod>2023-10-15T00:00:00+00:00</lastmod>
     <priority>0</priority>
   </url><url>
     <loc>https://HanHoRang31.github.io/tags/aws/</loc>
-    <lastmod>2023-10-01T00:00:00+00:00</lastmod>
+    <lastmod>2023-10-15T00:00:00+00:00</lastmod>
   </url><url>
     <loc>https://HanHoRang31.github.io/tags/cloud/</loc>
-    <lastmod>2023-10-01T00:00:00+00:00</lastmod>
+    <lastmod>2023-10-15T00:00:00+00:00</lastmod>
   </url><url>
     <loc>https://HanHoRang31.github.io/tags/eks/</loc>
-    <lastmod>2023-10-01T00:00:00+00:00</lastmod>
+    <lastmod>2023-10-15T00:00:00+00:00</lastmod>
+  </url><url>
+    <loc>https://HanHoRang31.github.io/tags/grafana/</loc>
+    <lastmod>2023-10-15T00:00:00+00:00</lastmod>
   </url><url>
     <loc>https://HanHoRang31.github.io/tags/kubernetes/</loc>
-    <lastmod>2023-10-01T00:00:00+00:00</lastmod>
+    <lastmod>2023-10-15T00:00:00+00:00</lastmod>
+  </url><url>
+    <loc>https://HanHoRang31.github.io/post/</loc>
+    <lastmod>2023-10-15T00:00:00+00:00</lastmod>
+  </url><url>
+    <loc>https://HanHoRang31.github.io/tags/prometheus/</loc>
+    <lastmod>2023-10-15T00:00:00+00:00</lastmod>
+  </url><url>
+    <loc>https://HanHoRang31.github.io/tags/</loc>
+    <lastmod>2023-10-15T00:00:00+00:00</lastmod>
+  </url><url>
+    <loc>https://HanHoRang31.github.io/post/why-server-slow/</loc>
+    <lastmod>2023-10-15T00:00:00+00:00</lastmod>
   </url><url>
     <loc>https://HanHoRang31.github.io/tags/locust/</loc>
     <lastmod>2023-10-01T00:00:00+00:00</lastmod>
   </url><url>
     <loc>https://HanHoRang31.github.io/post/locust-test/</loc>
-    <lastmod>2023-10-01T00:00:00+00:00</lastmod>
-  </url><url>
-    <loc>https://HanHoRang31.github.io/post/</loc>
-    <lastmod>2023-10-01T00:00:00+00:00</lastmod>
-  </url><url>
-    <loc>https://HanHoRang31.github.io/tags/</loc>
     <lastmod>2023-10-01T00:00:00+00:00</lastmod>
   </url><url>
     <loc>https://HanHoRang31.github.io/post/terraform-eks-addon/</loc>
@@ -198,13 +207,7 @@
     <loc>https://HanHoRang31.github.io/post/pkos2-4-logging/</loc>
     <lastmod>2023-04-01T00:00:00+00:00</lastmod>
   </url><url>
-    <loc>https://HanHoRang31.github.io/tags/grafana/</loc>
-    <lastmod>2023-04-01T00:00:00+00:00</lastmod>
-  </url><url>
     <loc>https://HanHoRang31.github.io/tags/monitoring/</loc>
-    <lastmod>2023-04-01T00:00:00+00:00</lastmod>
-  </url><url>
-    <loc>https://HanHoRang31.github.io/tags/prometheus/</loc>
     <lastmod>2023-04-01T00:00:00+00:00</lastmod>
   </url><url>
     <loc>https://HanHoRang31.github.io/tags/thanos/</loc>
