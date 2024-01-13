@@ -6,17 +6,28 @@
     <lastmod>2023-03-05T00:00:00+00:00</lastmod>
   </url><url>
     <loc>https://HanHoRang31.github.io/</loc>
-    <lastmod>2023-10-15T00:00:00+00:00</lastmod>
-    <priority>0</priority>
+    <lastmod>2024-01-12T00:00:00+00:00</lastmod>
+  </url><url>
+    <loc>https://HanHoRang31.github.io/post/ansible1/</loc>
+    <lastmod>2024-01-12T00:00:00+00:00</lastmod>
+  </url><url>
+    <loc>https://HanHoRang31.github.io/tags/ansible/</loc>
+    <lastmod>2024-01-12T00:00:00+00:00</lastmod>
   </url><url>
     <loc>https://HanHoRang31.github.io/tags/aws/</loc>
-    <lastmod>2023-10-15T00:00:00+00:00</lastmod>
+    <lastmod>2024-01-12T00:00:00+00:00</lastmod>
   </url><url>
     <loc>https://HanHoRang31.github.io/tags/cloud/</loc>
-    <lastmod>2023-10-15T00:00:00+00:00</lastmod>
+    <lastmod>2024-01-12T00:00:00+00:00</lastmod>
   </url><url>
     <loc>https://HanHoRang31.github.io/tags/eks/</loc>
-    <lastmod>2023-10-15T00:00:00+00:00</lastmod>
+    <lastmod>2024-01-12T00:00:00+00:00</lastmod>
+  </url><url>
+    <loc>https://HanHoRang31.github.io/post/</loc>
+    <lastmod>2024-01-12T00:00:00+00:00</lastmod>
+  </url><url>
+    <loc>https://HanHoRang31.github.io/tags/</loc>
+    <lastmod>2024-01-12T00:00:00+00:00</lastmod>
   </url><url>
     <loc>https://HanHoRang31.github.io/tags/grafana/</loc>
     <lastmod>2023-10-15T00:00:00+00:00</lastmod>
@@ -24,13 +35,7 @@
     <loc>https://HanHoRang31.github.io/tags/kubernetes/</loc>
     <lastmod>2023-10-15T00:00:00+00:00</lastmod>
   </url><url>
-    <loc>https://HanHoRang31.github.io/post/</loc>
-    <lastmod>2023-10-15T00:00:00+00:00</lastmod>
-  </url><url>
     <loc>https://HanHoRang31.github.io/tags/prometheus/</loc>
-    <lastmod>2023-10-15T00:00:00+00:00</lastmod>
-  </url><url>
-    <loc>https://HanHoRang31.github.io/tags/</loc>
     <lastmod>2023-10-15T00:00:00+00:00</lastmod>
   </url><url>
     <loc>https://HanHoRang31.github.io/post/why-server-slow/</loc>
