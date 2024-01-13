@@ -6,429 +6,343 @@
     <description>Recent content in Tags on HanHoRang Tech Blog</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <lastBuildDate>Sun, 15 Oct 2023 00:00:00 +0000</lastBuildDate><atom:link href="https://HanHoRang31.github.io/tags/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Fri, 12 Jan 2024 00:00:00 +0000</lastBuildDate>
+    <atom:link href="https://HanHoRang31.github.io/tags/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Ansible</title>
+      <link>https://HanHoRang31.github.io/tags/ansible/</link>
+      <pubDate>Fri, 12 Jan 2024 00:00:00 +0000</pubDate>
+      <guid>https://HanHoRang31.github.io/tags/ansible/</guid>
+      <description></description>
+    </item>
     <item>
       <title>AWS</title>
       <link>https://HanHoRang31.github.io/tags/aws/</link>
-      <pubDate>Sun, 15 Oct 2023 00:00:00 +0000</pubDate>
-      
+      <pubDate>Fri, 12 Jan 2024 00:00:00 +0000</pubDate>
       <guid>https://HanHoRang31.github.io/tags/aws/</guid>
       <description></description>
     </item>
-    
     <item>
       <title>cloud</title>
       <link>https://HanHoRang31.github.io/tags/cloud/</link>
-      <pubDate>Sun, 15 Oct 2023 00:00:00 +0000</pubDate>
-      
+      <pubDate>Fri, 12 Jan 2024 00:00:00 +0000</pubDate>
       <guid>https://HanHoRang31.github.io/tags/cloud/</guid>
       <description></description>
     </item>
-    
     <item>
       <title>eks</title>
       <link>https://HanHoRang31.github.io/tags/eks/</link>
-      <pubDate>Sun, 15 Oct 2023 00:00:00 +0000</pubDate>
-      
+      <pubDate>Fri, 12 Jan 2024 00:00:00 +0000</pubDate>
       <guid>https://HanHoRang31.github.io/tags/eks/</guid>
       <description></description>
     </item>
-    
     <item>
       <title>grafana</title>
       <link>https://HanHoRang31.github.io/tags/grafana/</link>
       <pubDate>Sun, 15 Oct 2023 00:00:00 +0000</pubDate>
-      
       <guid>https://HanHoRang31.github.io/tags/grafana/</guid>
       <description></description>
     </item>
-    
     <item>
       <title>kubernetes</title>
       <link>https://HanHoRang31.github.io/tags/kubernetes/</link>
       <pubDate>Sun, 15 Oct 2023 00:00:00 +0000</pubDate>
-      
       <guid>https://HanHoRang31.github.io/tags/kubernetes/</guid>
       <description></description>
     </item>
-    
     <item>
       <title>prometheus</title>
       <link>https://HanHoRang31.github.io/tags/prometheus/</link>
       <pubDate>Sun, 15 Oct 2023 00:00:00 +0000</pubDate>
-      
       <guid>https://HanHoRang31.github.io/tags/prometheus/</guid>
       <description></description>
     </item>
-    
     <item>
       <title>Locust</title>
       <link>https://HanHoRang31.github.io/tags/locust/</link>
       <pubDate>Sun, 01 Oct 2023 00:00:00 +0000</pubDate>
-      
       <guid>https://HanHoRang31.github.io/tags/locust/</guid>
       <description></description>
     </item>
-    
     <item>
       <title>T101</title>
       <link>https://HanHoRang31.github.io/tags/t101/</link>
       <pubDate>Fri, 15 Sep 2023 00:00:00 +0000</pubDate>
-      
       <guid>https://HanHoRang31.github.io/tags/t101/</guid>
       <description></description>
     </item>
-    
     <item>
       <title>Terraform</title>
       <link>https://HanHoRang31.github.io/tags/terraform/</link>
       <pubDate>Fri, 15 Sep 2023 00:00:00 +0000</pubDate>
-      
       <guid>https://HanHoRang31.github.io/tags/terraform/</guid>
       <description></description>
     </item>
-    
     <item>
       <title>Terraform Cloud</title>
       <link>https://HanHoRang31.github.io/tags/terraform-cloud/</link>
       <pubDate>Fri, 15 Sep 2023 00:00:00 +0000</pubDate>
-      
       <guid>https://HanHoRang31.github.io/tags/terraform-cloud/</guid>
       <description></description>
     </item>
-    
     <item>
       <title>migration</title>
       <link>https://HanHoRang31.github.io/tags/migration/</link>
       <pubDate>Fri, 01 Sep 2023 00:00:00 +0000</pubDate>
-      
       <guid>https://HanHoRang31.github.io/tags/migration/</guid>
       <description></description>
     </item>
-    
     <item>
       <title>multi-cluster</title>
       <link>https://HanHoRang31.github.io/tags/multi-cluster/</link>
       <pubDate>Fri, 01 Sep 2023 00:00:00 +0000</pubDate>
-      
       <guid>https://HanHoRang31.github.io/tags/multi-cluster/</guid>
       <description></description>
     </item>
-    
     <item>
       <title>Route53</title>
       <link>https://HanHoRang31.github.io/tags/route53/</link>
       <pubDate>Fri, 01 Sep 2023 00:00:00 +0000</pubDate>
-      
       <guid>https://HanHoRang31.github.io/tags/route53/</guid>
       <description></description>
     </item>
-    
     <item>
       <title>Terraformer</title>
       <link>https://HanHoRang31.github.io/tags/terraformer/</link>
       <pubDate>Fri, 01 Sep 2023 00:00:00 +0000</pubDate>
-      
       <guid>https://HanHoRang31.github.io/tags/terraformer/</guid>
       <description></description>
     </item>
-    
     <item>
       <title>Architecture</title>
       <link>https://HanHoRang31.github.io/tags/architecture/</link>
       <pubDate>Wed, 26 Jul 2023 00:00:00 +0000</pubDate>
-      
       <guid>https://HanHoRang31.github.io/tags/architecture/</guid>
       <description></description>
     </item>
-    
     <item>
       <title>devops</title>
       <link>https://HanHoRang31.github.io/tags/devops/</link>
       <pubDate>Mon, 10 Jul 2023 00:00:00 +0000</pubDate>
-      
       <guid>https://HanHoRang31.github.io/tags/devops/</guid>
       <description></description>
     </item>
-    
     <item>
       <title>AEWS</title>
       <link>https://HanHoRang31.github.io/tags/aews/</link>
       <pubDate>Fri, 09 Jun 2023 00:00:00 +0000</pubDate>
-      
       <guid>https://HanHoRang31.github.io/tags/aews/</guid>
       <description></description>
     </item>
-    
     <item>
       <title>ArgoCD</title>
       <link>https://HanHoRang31.github.io/tags/argocd/</link>
       <pubDate>Fri, 09 Jun 2023 00:00:00 +0000</pubDate>
-      
       <guid>https://HanHoRang31.github.io/tags/argocd/</guid>
       <description></description>
     </item>
-    
     <item>
       <title>eksctl</title>
       <link>https://HanHoRang31.github.io/tags/eksctl/</link>
       <pubDate>Fri, 09 Jun 2023 00:00:00 +0000</pubDate>
-      
       <guid>https://HanHoRang31.github.io/tags/eksctl/</guid>
       <description></description>
     </item>
-    
     <item>
       <title>Gitlab</title>
       <link>https://HanHoRang31.github.io/tags/gitlab/</link>
       <pubDate>Fri, 09 Jun 2023 00:00:00 +0000</pubDate>
-      
       <guid>https://HanHoRang31.github.io/tags/gitlab/</guid>
       <description></description>
     </item>
-    
     <item>
       <title>GitOps</title>
       <link>https://HanHoRang31.github.io/tags/gitops/</link>
       <pubDate>Fri, 09 Jun 2023 00:00:00 +0000</pubDate>
-      
       <guid>https://HanHoRang31.github.io/tags/gitops/</guid>
       <description></description>
     </item>
-    
     <item>
       <title>jenkins</title>
       <link>https://HanHoRang31.github.io/tags/jenkins/</link>
       <pubDate>Fri, 09 Jun 2023 00:00:00 +0000</pubDate>
-      
       <guid>https://HanHoRang31.github.io/tags/jenkins/</guid>
       <description></description>
     </item>
-    
     <item>
       <title>kaniko</title>
       <link>https://HanHoRang31.github.io/tags/kaniko/</link>
       <pubDate>Fri, 09 Jun 2023 00:00:00 +0000</pubDate>
-      
       <guid>https://HanHoRang31.github.io/tags/kaniko/</guid>
       <description></description>
     </item>
-    
     <item>
       <title>kubeflow</title>
       <link>https://HanHoRang31.github.io/tags/kubeflow/</link>
       <pubDate>Fri, 09 Jun 2023 00:00:00 +0000</pubDate>
-      
       <guid>https://HanHoRang31.github.io/tags/kubeflow/</guid>
       <description></description>
     </item>
-    
     <item>
       <title>IRSA</title>
       <link>https://HanHoRang31.github.io/tags/irsa/</link>
       <pubDate>Fri, 02 Jun 2023 00:00:00 +0000</pubDate>
-      
       <guid>https://HanHoRang31.github.io/tags/irsa/</guid>
       <description></description>
     </item>
-    
     <item>
       <title>KANS</title>
       <link>https://HanHoRang31.github.io/tags/kans/</link>
       <pubDate>Fri, 02 Jun 2023 00:00:00 +0000</pubDate>
-      
       <guid>https://HanHoRang31.github.io/tags/kans/</guid>
       <description></description>
     </item>
-    
     <item>
       <title>SealedSecrets</title>
       <link>https://HanHoRang31.github.io/tags/sealedsecrets/</link>
       <pubDate>Fri, 02 Jun 2023 00:00:00 +0000</pubDate>
-      
       <guid>https://HanHoRang31.github.io/tags/sealedsecrets/</guid>
       <description></description>
     </item>
-    
     <item>
       <title>security</title>
       <link>https://HanHoRang31.github.io/tags/security/</link>
       <pubDate>Fri, 02 Jun 2023 00:00:00 +0000</pubDate>
-      
       <guid>https://HanHoRang31.github.io/tags/security/</guid>
       <description></description>
     </item>
-    
     <item>
       <title>karpenter</title>
       <link>https://HanHoRang31.github.io/tags/karpenter/</link>
       <pubDate>Fri, 26 May 2023 00:00:00 +0000</pubDate>
-      
       <guid>https://HanHoRang31.github.io/tags/karpenter/</guid>
       <description></description>
     </item>
-    
     <item>
       <title>keda</title>
       <link>https://HanHoRang31.github.io/tags/keda/</link>
       <pubDate>Fri, 26 May 2023 00:00:00 +0000</pubDate>
-      
       <guid>https://HanHoRang31.github.io/tags/keda/</guid>
       <description></description>
     </item>
-    
     <item>
       <title>Observability</title>
       <link>https://HanHoRang31.github.io/tags/observability/</link>
       <pubDate>Fri, 26 May 2023 00:00:00 +0000</pubDate>
-      
       <guid>https://HanHoRang31.github.io/tags/observability/</guid>
       <description></description>
     </item>
-    
     <item>
       <title>trace</title>
       <link>https://HanHoRang31.github.io/tags/trace/</link>
       <pubDate>Fri, 26 May 2023 00:00:00 +0000</pubDate>
-      
       <guid>https://HanHoRang31.github.io/tags/trace/</guid>
       <description></description>
     </item>
-    
     <item>
       <title>x-ray</title>
       <link>https://HanHoRang31.github.io/tags/x-ray/</link>
       <pubDate>Fri, 26 May 2023 00:00:00 +0000</pubDate>
-      
       <guid>https://HanHoRang31.github.io/tags/x-ray/</guid>
       <description></description>
     </item>
-    
     <item>
       <title>vpc</title>
       <link>https://HanHoRang31.github.io/tags/vpc/</link>
       <pubDate>Fri, 12 May 2023 00:00:00 +0000</pubDate>
-      
       <guid>https://HanHoRang31.github.io/tags/vpc/</guid>
       <description></description>
     </item>
-    
     <item>
       <title>harbor</title>
       <link>https://HanHoRang31.github.io/tags/harbor/</link>
       <pubDate>Fri, 21 Apr 2023 00:00:00 +0000</pubDate>
-      
       <guid>https://HanHoRang31.github.io/tags/harbor/</guid>
       <description></description>
     </item>
-    
     <item>
       <title>minio</title>
       <link>https://HanHoRang31.github.io/tags/minio/</link>
       <pubDate>Fri, 21 Apr 2023 00:00:00 +0000</pubDate>
-      
       <guid>https://HanHoRang31.github.io/tags/minio/</guid>
       <description></description>
     </item>
-    
     <item>
       <title>kops</title>
       <link>https://HanHoRang31.github.io/tags/kops/</link>
       <pubDate>Fri, 14 Apr 2023 00:00:00 +0000</pubDate>
-      
       <guid>https://HanHoRang31.github.io/tags/kops/</guid>
       <description></description>
     </item>
-    
     <item>
       <title>loki</title>
       <link>https://HanHoRang31.github.io/tags/loki/</link>
       <pubDate>Fri, 14 Apr 2023 00:00:00 +0000</pubDate>
-      
       <guid>https://HanHoRang31.github.io/tags/loki/</guid>
       <description></description>
     </item>
-    
     <item>
       <title>PLG</title>
       <link>https://HanHoRang31.github.io/tags/plg/</link>
       <pubDate>Fri, 14 Apr 2023 00:00:00 +0000</pubDate>
-      
       <guid>https://HanHoRang31.github.io/tags/plg/</guid>
       <description></description>
     </item>
-    
     <item>
       <title>promtail</title>
       <link>https://HanHoRang31.github.io/tags/promtail/</link>
       <pubDate>Fri, 14 Apr 2023 00:00:00 +0000</pubDate>
-      
       <guid>https://HanHoRang31.github.io/tags/promtail/</guid>
       <description></description>
     </item>
-    
     <item>
       <title>kubescape</title>
       <link>https://HanHoRang31.github.io/tags/kubescape/</link>
       <pubDate>Fri, 07 Apr 2023 00:00:00 +0000</pubDate>
-      
       <guid>https://HanHoRang31.github.io/tags/kubescape/</guid>
       <description></description>
     </item>
-    
     <item>
       <title>monitoring</title>
       <link>https://HanHoRang31.github.io/tags/monitoring/</link>
       <pubDate>Sat, 01 Apr 2023 00:00:00 +0000</pubDate>
-      
       <guid>https://HanHoRang31.github.io/tags/monitoring/</guid>
       <description></description>
     </item>
-    
     <item>
       <title>thanos</title>
       <link>https://HanHoRang31.github.io/tags/thanos/</link>
       <pubDate>Sat, 01 Apr 2023 00:00:00 +0000</pubDate>
-      
       <guid>https://HanHoRang31.github.io/tags/thanos/</guid>
       <description></description>
     </item>
-    
     <item>
       <title>local-path-provisioner</title>
       <link>https://HanHoRang31.github.io/tags/local-path-provisioner/</link>
       <pubDate>Sat, 18 Mar 2023 00:00:00 +0000</pubDate>
-      
       <guid>https://HanHoRang31.github.io/tags/local-path-provisioner/</guid>
       <description></description>
     </item>
-    
     <item>
       <title>velero</title>
       <link>https://HanHoRang31.github.io/tags/velero/</link>
       <pubDate>Sat, 18 Mar 2023 00:00:00 +0000</pubDate>
-      
       <guid>https://HanHoRang31.github.io/tags/velero/</guid>
       <description></description>
     </item>
-    
     <item>
       <title>Volume</title>
       <link>https://HanHoRang31.github.io/tags/volume/</link>
       <pubDate>Sat, 18 Mar 2023 00:00:00 +0000</pubDate>
-      
       <guid>https://HanHoRang31.github.io/tags/volume/</guid>
       <description></description>
     </item>
-    
     <item>
       <title>CI/CD</title>
       <link>https://HanHoRang31.github.io/tags/ci/cd/</link>
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
-      
       <guid>https://HanHoRang31.github.io/tags/ci/cd/</guid>
       <description></description>
     </item>
-    
   </channel>
 </rss>

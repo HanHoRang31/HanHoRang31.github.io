@@ -6,17 +6,14 @@
     <description>Recent content in minio on HanHoRang Tech Blog</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <lastBuildDate>Fri, 21 Apr 2023 00:00:00 +0000</lastBuildDate><atom:link href="https://HanHoRang31.github.io/tags/minio/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Fri, 21 Apr 2023 00:00:00 +0000</lastBuildDate>
+    <atom:link href="https://HanHoRang31.github.io/tags/minio/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>[테크 따라잡기] EKS에서 고가용성 Private Docker Registry(Harbor) 구축하기</title>
       <link>https://HanHoRang31.github.io/post/tech-private-docker/</link>
       <pubDate>Fri, 21 Apr 2023 00:00:00 +0000</pubDate>
-      
       <guid>https://HanHoRang31.github.io/post/tech-private-docker/</guid>
-      <description>1 2 [테크 따라잡기]는 IT 기업 기술 스택 사례를 참고하여 구현하고 정리하는 시리즈입니다. 오로지 기술 성장을 위해 작성할 예정이며 스터디 과정에서 얻는 인사이트를 공유하고자 합니다. 도커 레지스트리인 Harbor에 대해 사용 사례를 조사하던 중 배울 것이 많은 테크 블로그 글을 발견하였다. 그대로 글로만 보기에는 필자가 아쉬워서 직접 구현하고 구현 과정에서 얻는 인사이트를 공유하고자 블로그 글을 작성하였다. 참고한 테크 블로그는 다음의 링크에서 확인이 가능하다.
-https://engineering.linecorp.com/ko/blog/harbor-for-private-docker-registry
-블로그 글을 요약하자면, Private Docker Registry로 Harbor를 선택하여 구성하였고, 오픈소스 오브젝트 스토리지인 Minio를 통해 스토리지 고가용성을 보장하였다.</description>
+      <description>1 2 [테크 따라잡기]는 IT 기업 기술 스택 사례를 참고하여 구현하고 정리하는 시리즈입니다. 오로지 기술 성장을 위해 작성할 예정이며 스터디 과정에서 얻는 인사이트를 공유하고자 합니다. 도커 레지스트리인 Harbor에 대해 사용 사례를 조사하던 중 배울 것이 많은 테크 블로그 글을 발견하였다. 그대로 글로만 보기에는 필자가 아쉬워서 직접 구현하고 구현 과정에서 얻는 인사이트를 공유하고자 블로그 글을 작성하였다. 참고한 테크 블로그는 다음의 링크에서 확인이 가능하다.&#xA;https://engineering.linecorp.com/ko/blog/harbor-for-private-docker-registry&#xA;블로그 글을 요약하자면, Private Docker Registry로 Harbor를 선택하여 구성하였고, 오픈소스 오브젝트 스토리지인 Minio를 통해 스토리지 고가용성을 보장하였다.</description>
     </item>
-    
   </channel>
 </rss>

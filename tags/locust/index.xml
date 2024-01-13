@@ -6,18 +6,14 @@
     <description>Recent content in Locust on HanHoRang Tech Blog</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <lastBuildDate>Sun, 01 Oct 2023 00:00:00 +0000</lastBuildDate><atom:link href="https://HanHoRang31.github.io/tags/locust/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Sun, 01 Oct 2023 00:00:00 +0000</lastBuildDate>
+    <atom:link href="https://HanHoRang31.github.io/tags/locust/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>Locust를 이용한 과부하 테스트</title>
       <link>https://HanHoRang31.github.io/post/locust-test/</link>
       <pubDate>Sun, 01 Oct 2023 00:00:00 +0000</pubDate>
-      
       <guid>https://HanHoRang31.github.io/post/locust-test/</guid>
-      <description>안정적인 서비스를 오픈하기 위한 조건은 무엇일까요? 좋은 아키텍처도 물론 중요하지만, 트래픽을 견딜 수 있는 부하 테스트가 중요합니다. 이번 블로그 글에서는 부하 테스트 관련 글을 작성하고자 합니다.
-이벤트 대응 프로세스 부하 테스트를 알아보기 위해 이벤트 대응 프로세스를 알아보겠습니다. (좋은 영상을 공유해주신 장준엽님 감사합니다! 영상 링크)
-이벤트 랜딩 페이지 점검 : 부하가 제일 몰리는 구간으로 중요시 봐야하는 구간입니다. 페이지 랜딩 용량으로 7MB 정도(문제가 없는 수준)를 추천합니다.
-ELB Pre-Warmining 신청 : AWS ELB도 내부적 하드웨어 장비로 미리 늘려 놔야 합니다.</description>
+      <description>안정적인 서비스를 오픈하기 위한 조건은 무엇일까요? 좋은 아키텍처도 물론 중요하지만, 트래픽을 견딜 수 있는 부하 테스트가 중요합니다. 이번 블로그 글에서는 부하 테스트 관련 글을 작성하고자 합니다.&#xA;이벤트 대응 프로세스 부하 테스트를 알아보기 위해 이벤트 대응 프로세스를 알아보겠습니다. (좋은 영상을 공유해주신 장준엽님 감사합니다! 영상 링크)&#xA;이벤트 랜딩 페이지 점검 : 부하가 제일 몰리는 구간으로 중요시 봐야하는 구간입니다. 페이지 랜딩 용량으로 7MB 정도(문제가 없는 수준)를 추천합니다.&#xA;ELB Pre-Warmining 신청 : AWS ELB도 내부적 하드웨어 장비로 미리 늘려 놔야 합니다.</description>
     </item>
-    
   </channel>
 </rss>

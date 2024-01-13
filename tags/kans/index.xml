@@ -6,141 +6,98 @@
     <description>Recent content in KANS on HanHoRang Tech Blog</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <lastBuildDate>Fri, 02 Jun 2023 00:00:00 +0000</lastBuildDate><atom:link href="https://HanHoRang31.github.io/tags/kans/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Fri, 02 Jun 2023 00:00:00 +0000</lastBuildDate>
+    <atom:link href="https://HanHoRang31.github.io/tags/kans/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>[AEWS] AWS 서비스를 통한 EKS 보안 구성</title>
       <link>https://HanHoRang31.github.io/post/eks-security-allinone/</link>
       <pubDate>Fri, 02 Jun 2023 00:00:00 +0000</pubDate>
-      
       <guid>https://HanHoRang31.github.io/post/eks-security-allinone/</guid>
-      <description>1 2 AWS EKS Workshop Study (=AEWS)는 EKS Workshop 실습 스터디입니다. CloudNet@ Gasida(가시다)님이 진행하시며,공개된 AWS EKS Workshop을 기반으로 진행하고 있습니다. 지난 글에 이어서 AWS 서비스를 통해서 EKS 보안 구성을 한 내용들을 공유한다. 보안 구성 내용은 EKS 워크샵 내용을 참고하여 정리하였다. 보안 구성 내용은 다음과 같다.
-EKS Secret 시크릿 키 관리 : Sealed Secrets + AWS KMS EKS 이상 탐지 모니터링 : Amazon GuardDuty + 사고 대응 EKS 애플리케이션 트래픽 보호 : AWS WAF EKS Secret Key 관리 참고 : EKS 워크샵, AWS 블로그</description>
+      <description>1 2 AWS EKS Workshop Study (=AEWS)는 EKS Workshop 실습 스터디입니다. CloudNet@ Gasida(가시다)님이 진행하시며,공개된 AWS EKS Workshop을 기반으로 진행하고 있습니다. 지난 글에 이어서 AWS 서비스를 통해서 EKS 보안 구성을 한 내용들을 공유한다. 보안 구성 내용은 EKS 워크샵 내용을 참고하여 정리하였다. 보안 구성 내용은 다음과 같다.&#xA;EKS Secret 시크릿 키 관리 : Sealed Secrets + AWS KMS EKS 이상 탐지 모니터링 : Amazon GuardDuty + 사고 대응 EKS 애플리케이션 트래픽 보호 : AWS WAF EKS Secret Key 관리 참고 : EKS 워크샵, AWS 블로그</description>
     </item>
-    
     <item>
       <title>[AEWS] EKS Security 이해</title>
       <link>https://HanHoRang31.github.io/post/eks-security-concept/</link>
       <pubDate>Fri, 02 Jun 2023 00:00:00 +0000</pubDate>
-      
       <guid>https://HanHoRang31.github.io/post/eks-security-concept/</guid>
-      <description>1 2 AWS EKS Workshop Study (=AEWS)는 EKS Workshop 실습 스터디입니다. CloudNet@ Gasida(가시다)님이 진행하시며,공개된 AWS EKS Workshop을 기반으로 진행하고 있습니다. 스터디도 어느덧 6주차다. 6주차에는 EKS 보안을 주제로 모임장님이 스터디를 진행해주셨다. 스터디 내용으로 EKS 인증 / 인가와 IRSA의 원리를 소개해주셨는데.. 개인적으로 여러 번 돌려볼 정도로 내용이 많이 어려웠다.
-필자 스스로 보안이 다른 분야에 비해 미숙한 부분도 있고,, 아는 내용도 별로 없기 떄문이라 본다. 아마 필자에게 EKS 보안에 대해 소개해달라고 요청받으면 인증 → 인가 → RBAC 수준으로 밖에 답을 못할 것이라 예상한다.</description>
+      <description>1 2 AWS EKS Workshop Study (=AEWS)는 EKS Workshop 실습 스터디입니다. CloudNet@ Gasida(가시다)님이 진행하시며,공개된 AWS EKS Workshop을 기반으로 진행하고 있습니다. 스터디도 어느덧 6주차다. 6주차에는 EKS 보안을 주제로 모임장님이 스터디를 진행해주셨다. 스터디 내용으로 EKS 인증 / 인가와 IRSA의 원리를 소개해주셨는데.. 개인적으로 여러 번 돌려볼 정도로 내용이 많이 어려웠다.&#xA;필자 스스로 보안이 다른 분야에 비해 미숙한 부분도 있고,, 아는 내용도 별로 없기 떄문이라 본다. 아마 필자에게 EKS 보안에 대해 소개해달라고 요청받으면 인증 → 인가 → RBAC 수준으로 밖에 답을 못할 것이라 예상한다.</description>
     </item>
-    
     <item>
       <title>[AEWS] EKS VPC CNI Deep Dive</title>
       <link>https://HanHoRang31.github.io/post/aews-eks-vpc-1/</link>
       <pubDate>Fri, 12 May 2023 00:00:00 +0000</pubDate>
-      
       <guid>https://HanHoRang31.github.io/post/aews-eks-vpc-1/</guid>
-      <description>1 2 AWS EKS Workshop Study (=AEWS)는 EKS Workshop 실습 스터디입니다. CloudNet@ Gasida(가시다)님이 진행하시며,공개된 AWS EKS Workshop을 기반으로 진행하고 있습니다. EKS VPC CNI CNI(Container Network Interface) 란 네트워크 플러그인 인터페이스로 k8s 네트워크 환경을 구성해준다. EKS 에서는 기본 CNI로 VPC를 사용한다. 여기서 VPC는 AWS 네트워크 서비스인 AWS VPC로 VPC CIDR을 이용하여 파드 IP 할당 및 통신을 지원한다.
-EKS 에서 CNI를 VPC로 사용하면 대표적으로 얻을 수 있는 이점은 두 가지이다.
-노드 대역과 파드 대역이 동일하여 다른 노드간 통신시 오버레이가 없어 통신 오버헤드가 감소한다.</description>
+      <description>1 2 AWS EKS Workshop Study (=AEWS)는 EKS Workshop 실습 스터디입니다. CloudNet@ Gasida(가시다)님이 진행하시며,공개된 AWS EKS Workshop을 기반으로 진행하고 있습니다. EKS VPC CNI CNI(Container Network Interface) 란 네트워크 플러그인 인터페이스로 k8s 네트워크 환경을 구성해준다. EKS 에서는 기본 CNI로 VPC를 사용한다. 여기서 VPC는 AWS 네트워크 서비스인 AWS VPC로 VPC CIDR을 이용하여 파드 IP 할당 및 통신을 지원한다.&#xA;EKS 에서 CNI를 VPC로 사용하면 대표적으로 얻을 수 있는 이점은 두 가지이다.&#xA;노드 대역과 파드 대역이 동일하여 다른 노드간 통신시 오버레이가 없어 통신 오버헤드가 감소한다.</description>
     </item>
-    
     <item>
       <title>[AEWS] Kubeflow on AWS</title>
       <link>https://HanHoRang31.github.io/post/kubeflow-on-aws/</link>
       <pubDate>Thu, 11 May 2023 00:00:00 +0000</pubDate>
-      
       <guid>https://HanHoRang31.github.io/post/kubeflow-on-aws/</guid>
-      <description>1 2 AWS EKS Workshop Study (=AEWS)는 EKS Workshop 실습 스터디입니다. CloudNet@ Gasida(가시다)님이 진행하시며,공개된 AWS EKS Workshop을 기반으로 진행하고 있습니다. 지난 블로그 글에 이어서 kubeflow 를 스터디한 내용을 공유하고자 한다. 오늘 주제는 kubeflow 의 인프라 요소로 왜 쿠버네티스에서 머신러닝을 쓰는 것이 좋은 가와 kubeflow 가 AWS 클라우드(EKS)에 올라갔을 때 어떤 이점이 있는 지 확인하겠다.
-ML on kubernetes 먼저, 쿠버네티스는 머신러닝 워크플로우를 지원하는 데 매우 유용한 플랫폼으로 이유는 다음과 같이 확인할 수가 있다.</description>
+      <description>1 2 AWS EKS Workshop Study (=AEWS)는 EKS Workshop 실습 스터디입니다. CloudNet@ Gasida(가시다)님이 진행하시며,공개된 AWS EKS Workshop을 기반으로 진행하고 있습니다. 지난 블로그 글에 이어서 kubeflow 를 스터디한 내용을 공유하고자 한다. 오늘 주제는 kubeflow 의 인프라 요소로 왜 쿠버네티스에서 머신러닝을 쓰는 것이 좋은 가와 kubeflow 가 AWS 클라우드(EKS)에 올라갔을 때 어떤 이점이 있는 지 확인하겠다.&#xA;ML on kubernetes 먼저, 쿠버네티스는 머신러닝 워크플로우를 지원하는 데 매우 유용한 플랫폼으로 이유는 다음과 같이 확인할 수가 있다.</description>
     </item>
-    
     <item>
       <title>[AEWS] EKS Spot 인스턴스와 Kubeflow 배포하기</title>
       <link>https://HanHoRang31.github.io/post/spot-and-kubeflow/</link>
       <pubDate>Sat, 06 May 2023 00:00:00 +0000</pubDate>
-      
       <guid>https://HanHoRang31.github.io/post/spot-and-kubeflow/</guid>
-      <description>1 2 AWS EKS Workshop Study (=AEWS)는 EKS Workshop 실습 스터디입니다. CloudNet@ Gasida(가시다)님이 진행하시며,공개된 AWS EKS Workshop을 기반으로 진행하고 있습니다. EKS 구축 및 관리 툴인 eksctl은 다양한 구성 옵션을 제공한다. 공식 문서에 정리가 잘 되어 있으며 이번 블로그 글에서 필자 기준의 흥미로운 옵션을 몇 가지 선택하여 테스트한 내용을 공유하고자 한다.
-EKS addon 확장을 위한 AWS IAM 정책 생성 EKS 노드로 Spot 인스턴스 사용하기 Spot 인스턴스를 기반으로한 kubeflow 인프라 구성하기 EKS addon 확장을 위한 AWS IAM 정책 생성 EKS addon는 Amazon EKS에서 제공하는 쿠버네티스 클러스터 구성 요소로, 클러스터의 관리, 네트워킹, 로드 밸런싱 등을 담당하는 확장 기능이다.</description>
+      <description>1 2 AWS EKS Workshop Study (=AEWS)는 EKS Workshop 실습 스터디입니다. CloudNet@ Gasida(가시다)님이 진행하시며,공개된 AWS EKS Workshop을 기반으로 진행하고 있습니다. EKS 구축 및 관리 툴인 eksctl은 다양한 구성 옵션을 제공한다. 공식 문서에 정리가 잘 되어 있으며 이번 블로그 글에서 필자 기준의 흥미로운 옵션을 몇 가지 선택하여 테스트한 내용을 공유하고자 한다.&#xA;EKS addon 확장을 위한 AWS IAM 정책 생성 EKS 노드로 Spot 인스턴스 사용하기 Spot 인스턴스를 기반으로한 kubeflow 인프라 구성하기 EKS addon 확장을 위한 AWS IAM 정책 생성 EKS addon는 Amazon EKS에서 제공하는 쿠버네티스 클러스터 구성 요소로, 클러스터의 관리, 네트워킹, 로드 밸런싱 등을 담당하는 확장 기능이다.</description>
     </item>
-    
     <item>
       <title>[AEWS] EKS 아키텍처와 Private EKS 클러스터 배포하기</title>
       <link>https://HanHoRang31.github.io/post/aews-1-eks/</link>
       <pubDate>Sat, 29 Apr 2023 07:35:40 +0900</pubDate>
-      
       <guid>https://HanHoRang31.github.io/post/aews-1-eks/</guid>
-      <description>1 2 AWS EKS Workshop Study (=AEWS)는 EKS Workshop 실습 스터디입니다. CloudNet@ Gasida(가시다)님이 진행하시며,공개된 AWS EKS Workshop을 기반으로 진행하고 있습니다. EKS ? Amazon Elastic Kubernetes Service(EKS)는 AWS에서 제공하는 관리형 Kubernetes 서비스다. EKS를 사용하면 Kubernetes 클러스터를 생성, 운영 및 유지 관리할 수 있다.
-https://catalog.us-east-1.prod.workshops.aws/workshops/9c0aa9ab-90a9-44a6-abe1-8dff360ae428/ko-KR/10-intro/200-eks
-EKS의 주요 특징은 다음과 같다.
-관리형 서비스: EKS는 Kubernetes 컨트롤 플레인이나 데이터 플레인를 설치, 운영 및 유지 관리시켜주는 서비스이다. 사용자가 인프라 설치, 운영, 유지 관리를 할 필요가 없다.</description>
+      <description>1 2 AWS EKS Workshop Study (=AEWS)는 EKS Workshop 실습 스터디입니다. CloudNet@ Gasida(가시다)님이 진행하시며,공개된 AWS EKS Workshop을 기반으로 진행하고 있습니다. EKS ? Amazon Elastic Kubernetes Service(EKS)는 AWS에서 제공하는 관리형 Kubernetes 서비스다. EKS를 사용하면 Kubernetes 클러스터를 생성, 운영 및 유지 관리할 수 있다.&#xA;https://catalog.us-east-1.prod.workshops.aws/workshops/9c0aa9ab-90a9-44a6-abe1-8dff360ae428/ko-KR/10-intro/200-eks&#xA;EKS의 주요 특징은 다음과 같다.&#xA;관리형 서비스: EKS는 Kubernetes 컨트롤 플레인이나 데이터 플레인를 설치, 운영 및 유지 관리시켜주는 서비스이다. 사용자가 인프라 설치, 운영, 유지 관리를 할 필요가 없다.</description>
     </item>
-    
     <item>
       <title>Loki 최신버전(V2.8.0) DyanmoDB 연동하기</title>
       <link>https://HanHoRang31.github.io/post/loki-2-8-0/</link>
       <pubDate>Fri, 14 Apr 2023 00:00:00 +0000</pubDate>
-      
       <guid>https://HanHoRang31.github.io/post/loki-2-8-0/</guid>
-      <description>전글 Loki 최신 버전 설치하기에서 인덱스 DB를 Dynamodb로 연동하지 못했다. 미련이 남아 스터디가 끝난 이후에도 여러 테스트를 해보았고, 마침내 연동을 성공하여 관련 경험을 공유한다.
-먼저, Loki에서 DynamoDB로 연동해야 하는 목적부터 알고 가자. 배경 지식 설명을 위해 Loki 의 지원 스토리지를 다시 확인하겠다.
-https://grafana.com/docs/loki/latest/operations/storage/
-스토리지 연동 목록을 살펴보면 Loki 2.0 이상에서 싱글 스토어(boltdb-shipper)가 추가되었고 연동으로 추천하고 있다. (기본 스토리지도 싱글 스토어이다.) 이유를 살펴보니 비용 감소인데 로컬에서 인덱스를 저장하기 때문에 외부 스토리지에 대한 종속성이 줄기 때문이라 한다.</description>
+      <description>전글 Loki 최신 버전 설치하기에서 인덱스 DB를 Dynamodb로 연동하지 못했다. 미련이 남아 스터디가 끝난 이후에도 여러 테스트를 해보았고, 마침내 연동을 성공하여 관련 경험을 공유한다.&#xA;먼저, Loki에서 DynamoDB로 연동해야 하는 목적부터 알고 가자. 배경 지식 설명을 위해 Loki 의 지원 스토리지를 다시 확인하겠다.&#xA;https://grafana.com/docs/loki/latest/operations/storage/&#xA;스토리지 연동 목록을 살펴보면 Loki 2.0 이상에서 싱글 스토어(boltdb-shipper)가 추가되었고 연동으로 추천하고 있다. (기본 스토리지도 싱글 스토어이다.) 이유를 살펴보니 비용 감소인데 로컬에서 인덱스를 저장하기 때문에 외부 스토리지에 대한 종속성이 줄기 때문이라 한다.</description>
     </item>
-    
     <item>
       <title>[PKOS] 쿠버네티스 보안과 Kubescape DeepDive</title>
       <link>https://HanHoRang31.github.io/post/pkos-5-security/</link>
       <pubDate>Fri, 07 Apr 2023 00:00:00 +0000</pubDate>
-      
       <guid>https://HanHoRang31.github.io/post/pkos-5-security/</guid>
-      <description>1 2 Production Kubernetes Online Study (=PKOS)는 쿠버네티스 실무 실습 스터디입니다. CloudNet@ Gasida(가시다)님이 진행하시며, 책 &amp;#34;24단계 실습으로 정복하는 쿠버네티스&amp;#34;을 기반으로 진행하고 있습니다. 5주차 시간에는 모임장님께서 쿠버네티스 보안을 주제로 학습 내용을 공유해 주셨다. 이번 블로그 글에서는 쿠버네티스 보안에 대해 스터디한 내용을 공유하고자 한다.
-Kubernetes 4C Layer 쿠버네티스 공식문서에 따르면 쿠버네티스 보안은 4계층(클라우드/ 클러스터 / 컨테이너 / 코드)으로 구성되며, 각 계층에 대해 보안 관점이 필요하다고 한다.
-https://kubernetes.io/docs/concepts/security/overview/
-Cloud, Infra : 클라우드 계층에서는 쿠버네티스 클러스터가 실행되는 기반 인프라에 초점을 맞춘다.</description>
+      <description>1 2 Production Kubernetes Online Study (=PKOS)는 쿠버네티스 실무 실습 스터디입니다. CloudNet@ Gasida(가시다)님이 진행하시며, 책 &amp;#34;24단계 실습으로 정복하는 쿠버네티스&amp;#34;을 기반으로 진행하고 있습니다. 5주차 시간에는 모임장님께서 쿠버네티스 보안을 주제로 학습 내용을 공유해 주셨다. 이번 블로그 글에서는 쿠버네티스 보안에 대해 스터디한 내용을 공유하고자 한다.&#xA;Kubernetes 4C Layer 쿠버네티스 공식문서에 따르면 쿠버네티스 보안은 4계층(클라우드/ 클러스터 / 컨테이너 / 코드)으로 구성되며, 각 계층에 대해 보안 관점이 필요하다고 한다.&#xA;https://kubernetes.io/docs/concepts/security/overview/&#xA;Cloud, Infra : 클라우드 계층에서는 쿠버네티스 클러스터가 실행되는 기반 인프라에 초점을 맞춘다.</description>
     </item>
-    
     <item>
       <title>[PKOS] Thanos를 통한 고가용성 모니터링(프로메테우스) 시스템 구축하기</title>
       <link>https://HanHoRang31.github.io/post/pkos2-4-monitoring/</link>
       <pubDate>Sat, 01 Apr 2023 00:00:00 +0000</pubDate>
-      
       <guid>https://HanHoRang31.github.io/post/pkos2-4-monitoring/</guid>
-      <description>1 2 Production Kubernetes Online Study (=PKOS)는 쿠버네티스 실무 실습 스터디입니다. CloudNet@ Gasida(가시다)님이 진행하시며, 책 &amp;#34;24단계 실습으로 정복하는 쿠버네티스&amp;#34;을 기반으로 진행하고 있습니다. 스터디 4주차 시간에는 쿠버네티스 모니터링과 로깅 시스템을 구축하여 기능들을 살펴보았다. 이번 블로그 글에서는 모니터링 시스템에 대해 심화 학습한 내용들을 공유하고자 한다.
-모니터링은 어떤 대상을 감시, 감찰한다는 뜻으로 모니터링의 목적은 지속적인 감시, 감찰을 통해 대상의 상태나 가용성, 변화 등을 확인하고 대비하는 것이다. 모니터링의 개념처럼 쿠버네티스 모니터링도 똑같다. 쿠버네티스에서 특정 기간에 측정한 일련의 숫자(메트릭)에 대해 감시와 감찰을 통해 대상의 상태나 가용성 변화를 확인하고 대비한다고 보면 되겠다.</description>
+      <description>1 2 Production Kubernetes Online Study (=PKOS)는 쿠버네티스 실무 실습 스터디입니다. CloudNet@ Gasida(가시다)님이 진행하시며, 책 &amp;#34;24단계 실습으로 정복하는 쿠버네티스&amp;#34;을 기반으로 진행하고 있습니다. 스터디 4주차 시간에는 쿠버네티스 모니터링과 로깅 시스템을 구축하여 기능들을 살펴보았다. 이번 블로그 글에서는 모니터링 시스템에 대해 심화 학습한 내용들을 공유하고자 한다.&#xA;모니터링은 어떤 대상을 감시, 감찰한다는 뜻으로 모니터링의 목적은 지속적인 감시, 감찰을 통해 대상의 상태나 가용성, 변화 등을 확인하고 대비하는 것이다. 모니터링의 개념처럼 쿠버네티스 모니터링도 똑같다. 쿠버네티스에서 특정 기간에 측정한 일련의 숫자(메트릭)에 대해 감시와 감찰을 통해 대상의 상태나 가용성 변화를 확인하고 대비한다고 보면 되겠다.</description>
     </item>
-    
     <item>
       <title>[PKOS] 로깅 PLG 스택, 최신 버전(Loki v2.8.0) 배포하기</title>
       <link>https://HanHoRang31.github.io/post/pkos2-4-logging/</link>
       <pubDate>Sat, 01 Apr 2023 00:00:00 +0000</pubDate>
-      
       <guid>https://HanHoRang31.github.io/post/pkos2-4-logging/</guid>
-      <description>로깅 (Loki &amp;amp; Promtail ) 1 2 Production Kubernetes Online Study (=PKOS)는 쿠버네티스 실무 실습 스터디입니다. CloudNet@ Gasida(가시다)님이 진행하시며, 책 &amp;#34;24단계 실습으로 정복하는 쿠버네티스&amp;#34;을 기반으로 진행하고 있습니다. Logging? 애플리케이션 실행 중 발생하는 이벤트, 작업, 오류 등의 정보를 기록하는 프로세스이다. 로깅의 주요 목적은 프로그램의 실행 상태를 추적하고, 문제 발생 시 원인을 찾기고, 내부 감사를 기록하기 위함이다. 로그 파일은 시간 순서대로 저장되며, 대부분의 경우 텍스트 파일 또는 데이터베이스에 저장된다.
-컨테이너화된 애플리케이션에 가장 쉽고 가장 널리 사용되는 로깅 방법은 표준 출력(stdout)과 표준 에러(stderr) 스트림에 작성하는 것이다.</description>
+      <description>로깅 (Loki &amp;amp; Promtail ) 1 2 Production Kubernetes Online Study (=PKOS)는 쿠버네티스 실무 실습 스터디입니다. CloudNet@ Gasida(가시다)님이 진행하시며, 책 &amp;#34;24단계 실습으로 정복하는 쿠버네티스&amp;#34;을 기반으로 진행하고 있습니다. Logging? 애플리케이션 실행 중 발생하는 이벤트, 작업, 오류 등의 정보를 기록하는 프로세스이다. 로깅의 주요 목적은 프로그램의 실행 상태를 추적하고, 문제 발생 시 원인을 찾기고, 내부 감사를 기록하기 위함이다. 로그 파일은 시간 순서대로 저장되며, 대부분의 경우 텍스트 파일 또는 데이터베이스에 저장된다.&#xA;컨테이너화된 애플리케이션에 가장 쉽고 가장 널리 사용되는 로깅 방법은 표준 출력(stdout)과 표준 에러(stderr) 스트림에 작성하는 것이다.</description>
     </item>
-    
     <item>
       <title>[PKOS] GitOps와 ArgoCD DeepDive</title>
       <link>https://HanHoRang31.github.io/post/pkos2-3-gitops/</link>
       <pubDate>Sat, 25 Mar 2023 07:35:40 +0900</pubDate>
-      
       <guid>https://HanHoRang31.github.io/post/pkos2-3-gitops/</guid>
-      <description>1 2 Production Kubernetes Online Study (=PKOS)는 쿠버네티스 실무 실습 스터디입니다. CloudNet@ Gasida(가시다)님이 진행하시며, 책 &amp;#34;24단계 실습으로 정복하는 쿠버네티스&amp;#34;을 기반으로 진행하고 있습니다. 3주차 시간에는 Gitlab 과 ArgoCD를 배포하여 Gitops 시스템을 구축하였다. 이번 블로그 글에서는 GitOPS 시스템에 대한 실습 내용들을 정리하고 공유하고자 한다.
-GitOps는 GIt을 진실의 원천(SSOT, Single Source of Truth) 으로 사용하는 인프라와 애플리케이션 배포 관리 방식이다. 진실의 원천이라는 말은 Git에서만 소스를 관리할 수 있게 하여 단일 진실 원천을 구현한다는 말이다.</description>
+      <description>1 2 Production Kubernetes Online Study (=PKOS)는 쿠버네티스 실무 실습 스터디입니다. CloudNet@ Gasida(가시다)님이 진행하시며, 책 &amp;#34;24단계 실습으로 정복하는 쿠버네티스&amp;#34;을 기반으로 진행하고 있습니다. 3주차 시간에는 Gitlab 과 ArgoCD를 배포하여 Gitops 시스템을 구축하였다. 이번 블로그 글에서는 GitOPS 시스템에 대한 실습 내용들을 정리하고 공유하고자 한다.&#xA;GitOps는 GIt을 진실의 원천(SSOT, Single Source of Truth) 으로 사용하는 인프라와 애플리케이션 배포 관리 방식이다. 진실의 원천이라는 말은 Git에서만 소스를 관리할 수 있게 하여 단일 진실 원천을 구현한다는 말이다.</description>
     </item>
-    
     <item>
       <title>[PKOS] 쿠버네티스 로컬스토리지와 Velero를 통한 백업 테스트</title>
       <link>https://HanHoRang31.github.io/post/pkos2-2-localstorage/</link>
       <pubDate>Sat, 18 Mar 2023 00:00:00 +0000</pubDate>
-      
       <guid>https://HanHoRang31.github.io/post/pkos2-2-localstorage/</guid>
       <description>1 2 Production Kubernetes Online Study (=PKOS)는 쿠버네티스 실무 실습 스터디입니다. CloudNet@ Gasida(가시다)님이 진행하시며, 책 &amp;#34;24단계 실습으로 정복하는 쿠버네티스&amp;#34;을 기반으로 진행하고 있습니다. 2주차 스터디에서는 쿠버네티스의 네트워크와 스토리지를 중점적으로 공부하였다. 분량이 많아 네트워크와 스토리지를 나눠서 블로그를 작성할 예정이다. 이번 블로그 글에서는 로컬 스토리지에 대해 공유하겠다. 일반적으로 로컬 스토리지는 IOPS 성능이 특화되어 있지만 노드에 종속되어 있어 고가용성이나 스토리지 기능에 제한이 있다. 이러한 제한을 없애기 위한 과정으로 로컬 스토리지의 Hostpath, local 볼륨을 마운트하여 테스트를 진행할 것이고, 마지막으로는 로컬 볼륨에서 고가용성과 스토리지 기능(백업)을 가진 Mysql 데이터베이스를 구성하겠다.</description>
     </item>
-    
     <item>
       <title>[PKOS] Kops로 클러스터 구축하기</title>
       <link>https://HanHoRang31.github.io/post/pkos2-1-kops/</link>
       <pubDate>Fri, 10 Mar 2023 00:00:00 +0000</pubDate>
-      
       <guid>https://HanHoRang31.github.io/post/pkos2-1-kops/</guid>
       <description>1 2 Production Kubernetes Online Study (=PKOS)는 쿠버네티스 실무 실습 스터디입니다. CloudNet@ Gasida(가시다)님이 진행하시며, 책 &amp;#34;24단계 실습으로 정복하는 쿠버네티스&amp;#34;을 기반으로 진행하고 있습니다. PKOS 1주차 스터디 내용과 느낌점을 정리하고자 한다. 스터디하면서 매번 느끼는 거지만 정말 괴수분들 너무 많고, 배울 점이 정말 많다… 특히 모임장님이신 가시다님의 스터디 내용은 볼 때마다 감탄만 나온다. 쿠버네티스에 대한 원리와 세부 컴포넌트에 대한 명령어까지 배운 점이 많다. 본 글에서는 필자가 배운 내용을 정리함과 동시에 개념에 대해 몰랐던 부분이나, 트러블슈팅에 대한 내용을 중점적으로 정리하였다.</description>
     </item>
-    
   </channel>
 </rss>

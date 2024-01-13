@@ -6,16 +6,14 @@
     <description>Recent content in kaniko on HanHoRang Tech Blog</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <lastBuildDate>Fri, 09 Jun 2023 00:00:00 +0000</lastBuildDate><atom:link href="https://HanHoRang31.github.io/tags/kaniko/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Fri, 09 Jun 2023 00:00:00 +0000</lastBuildDate>
+    <atom:link href="https://HanHoRang31.github.io/tags/kaniko/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>[AEWS] Gitops CI &amp; CD 구성</title>
       <link>https://HanHoRang31.github.io/post/aews-gitops/</link>
       <pubDate>Fri, 09 Jun 2023 00:00:00 +0000</pubDate>
-      
       <guid>https://HanHoRang31.github.io/post/aews-gitops/</guid>
-      <description>1 2 AWS EKS Workshop Study (=AEWS)는 EKS Workshop 실습 스터디입니다. CloudNet@ Gasida(가시다)님이 진행하시며,공개된 AWS EKS Workshop을 기반으로 진행하고 있습니다. 스터디 마지막 시간에는 EKS Automation 을 주제로 진행하였다. 여기서 Automation 단어는 인프라 프로비저닝 및 코드 배포를 포함하여 소프트웨어 제공 수명 주기의 일부를 자동화를 의미한다. 스터디에서는 모임장님께서 AWS 서비스 기반의 Automation(ACK)를 소개해주셨는데 실무에 도입하기에는 아직 보완할 서비스라 느껴, 다른 주제(gitops ci / cd 파이프라인 구성)를 선정하여 블로그를 작성한다.
-사실 지난 스터디에서 다룬 주제였지만, 내부 트러블슈팅으로 절반(CD 파이프라인 구성) 정도 밖에 구성하지 못하였다.</description>
+      <description>1 2 AWS EKS Workshop Study (=AEWS)는 EKS Workshop 실습 스터디입니다. CloudNet@ Gasida(가시다)님이 진행하시며,공개된 AWS EKS Workshop을 기반으로 진행하고 있습니다. 스터디 마지막 시간에는 EKS Automation 을 주제로 진행하였다. 여기서 Automation 단어는 인프라 프로비저닝 및 코드 배포를 포함하여 소프트웨어 제공 수명 주기의 일부를 자동화를 의미한다. 스터디에서는 모임장님께서 AWS 서비스 기반의 Automation(ACK)를 소개해주셨는데 실무에 도입하기에는 아직 보완할 서비스라 느껴, 다른 주제(gitops ci / cd 파이프라인 구성)를 선정하여 블로그를 작성한다.&#xA;사실 지난 스터디에서 다룬 주제였지만, 내부 트러블슈팅으로 절반(CD 파이프라인 구성) 정도 밖에 구성하지 못하였다.</description>
     </item>
-    
   </channel>
 </rss>
